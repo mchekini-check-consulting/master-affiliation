@@ -1,0 +1,28 @@
+# ============================================================
+# TEMPLATE — pour ajouter une nouvelle application :
+#   1. Copier ce fichier en <app>.conf (le suffixe .example
+#      empêche celui-ci d'être chargé par nginx)
+#   2. Remplacer APP_HOST, APP_SERVICE et APP_PORT
+#   3. Ajouter le service dans docker-compose.yml (réseau "proxy")
+#   4. docker compose up -d && docker compose exec nginx nginx -s reload
+# ============================================================
+server {
+    listen 80;
+    server_name APP_HOST;                # ex: monapp.check-consulting.net
+
+    location / {
+        # La variable force la résolution DNS à chaque requête :
+        # nginx démarre même si cette app est arrêtée.
+        set $upstream http://APP_SERVICE:APP_PORT;   # ex: http://monapp:3000
+        proxy_pass $upstream;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}

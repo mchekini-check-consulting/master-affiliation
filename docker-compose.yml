@@ -1,24 +1,126 @@
-# Docker Compose global — déploie l'ensemble des sites.
+# Docker Compose global — déploie le reverse proxy et l'ensemble des applications.
 #
-# Un Dockerfile par projet, un seul compose global. Les ports et tags sont
-# configurés dans le fichier .env à la racine.
+# Le reverse proxy est le point d'entrée unique (port 80) : il route selon le
+# header Host vers la bonne application. Un fichier de conf par application
+# dans reverse-proxy/conf.d/.
 #
 # Tout déployer           : docker compose up -d
 # Déployer un seul projet : docker compose pull <service> && docker compose up -d --no-deps <service>
 
 services:
+
+  # ==========================================================
+  # Reverse proxy — point d'entrée unique du serveur
+  # ==========================================================
+  reverse-proxy:
+    image: nginx:1.27-alpine
+    container_name: reverse-proxy
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      # - "443:443"   # à activer quand on mettra le TLS en place
+    volumes:
+      - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./reverse-proxy/conf.d:/etc/nginx/conf.d:ro
+    networks:
+      - default   # sites de ce projet (site-a, site-b)
+      - proxy     # frontends des applications (ex: fidexil-front)
+    # Permet au conteneur de joindre des services qui tournent
+    # directement sur l'hôte (ex: la landing page pm2 sur le port 3000)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - site-a
+      - site-b
+      - fidexil-front
+
+  # ==========================================================
+  # Sites d'affiliation
+  # ==========================================================
   site-a:
     image: ghcr.io/mchekini-check-consulting/master-affiliation/site-a:${SITE_A_TAG:-latest}
     build: ./site-a
     container_name: site-a
     restart: unless-stopped
-    ports:
-      - "${SITE_A_PORT:-3001}:80"
 
   site-b:
     image: ghcr.io/mchekini-check-consulting/master-affiliation/site-b:${SITE_B_TAG:-latest}
     build: ./site-b
     container_name: site-b
     restart: unless-stopped
-    ports:
-      - "${SITE_B_PORT:-3002}:80"
+
+  # ==========================================================
+  # Application Fidexil
+  #   reverse-proxy -> fidexil-front:80 -> (/api) fidexil-back:8080
+  #                                     -> fidexil-db:5432
+  # ==========================================================
+
+  # --- Base de données -------------------------------------
+  fidexil-db:
+    image: postgres:16-alpine
+    container_name: fidexil-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fidexil
+      POSTGRES_USER: fidexil
+      POSTGRES_PASSWORD: ${FIDEXIL_DB_PASSWORD:-changeme}
+    networks:
+      - fidexil-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fidexil -d fidexil"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # volumes:                                # persistance : à activer plus tard
+    #   - fidexil-db-data:/var/lib/postgresql/data
+
+  # --- Backend Spring Boot ----------------------------------
+  fidexil-back:
+    image: mchekini/fidexil-back:1.0
+    container_name: fidexil-back
+    restart: unless-stopped
+    environment:
+      DB_HOST: fidexil-db
+      DB_PORT: "5432"
+      DB_NAME: fidexil
+      DB_USERNAME: fidexil
+      DB_PASSWORD: ${FIDEXIL_DB_PASSWORD:-changeme}
+    networks:
+      - fidexil-net
+    depends_on:
+      fidexil-db:
+        condition: service_healthy
+
+  # --- Frontend React (nginx interne, proxifie /api) --------
+  fidexil-front:
+    image: mchekini/fidexil-front:1.0
+    container_name: fidexil-front
+    restart: unless-stopped
+    environment:
+      BACKEND_HOST: fidexil-back
+      BACKEND_PORT: "8080"
+    networks:
+      - proxy         # joignable par le reverse proxy
+      - fidexil-net   # pour proxifier /api vers le backend
+    depends_on:
+      - fidexil-back
+
+# ==========================================================
+# Réseaux
+#   default      : reverse proxy <-> sites de ce projet
+#   proxy        : reverse proxy <-> frontends des applications
+#   <app>-net    : réseau interne d'une application
+# ==========================================================
+networks:
+  proxy:
+    name: proxy
+    # Sous-réseau fixe : la règle de pare-feu sur le serveur
+    # (ufw allow from 10.0.100.0/24 to any port 3000) en dépend
+    ipam:
+      config:
+        - subnet: 10.0.100.0/24
+  fidexil-net:
+    name: fidexil-net
+
+# volumes:                                    # persistance : à activer plus tard
+#   fidexil-db-data:
