@@ -1,0 +1,16 @@
+# Pipeline du projet site-b : ne se déclenche que si site-b/ change sur main.
+name: site-b
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site-b/**"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-project.yml
+    with:
+      project: site-b
+    secrets: inherit

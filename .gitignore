@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Logs
+npm-debug.log*
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+
+# NOTE : le .env racine est volontairement versionné : il contient la
+# configuration des projets (ports, tags), pas de secrets.

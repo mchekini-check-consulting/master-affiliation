@@ -1,0 +1,69 @@
+# Workflow réutilisable : build de l'image Docker d'un projet, push sur GHCR,
+# puis déploiement sur la VM (redémarre uniquement le service du projet).
+#
+# Secrets requis (Settings > Secrets and variables > Actions) :
+#   VM_HOST     : IP ou hostname de la VM
+#   VM_USER     : utilisateur SSH
+#   VM_SSH_KEY  : clé privée SSH
+#
+# Prérequis sur la VM : Docker + Docker Compose >= 2.21, et le repo cloné
+# dans /opt/master-affiliation.
+
+name: deploy-project
+
+on:
+  workflow_call:
+    inputs:
+      project:
+        description: "Nom du répertoire du projet (ex: site-a)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    name: Build & push ${{ inputs.project }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ inputs.project }}
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ inputs.project }}:latest
+            ghcr.io/${{ github.repository }}/${{ inputs.project }}:${{ github.sha }}
+
+  deploy:
+    name: Deploy ${{ inputs.project }} sur la VM
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Redémarrer uniquement le service du projet
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/master-affiliation
+            git fetch origin main
+            git reset --hard origin/main
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose pull ${{ inputs.project }}
+            docker compose up -d --no-deps ${{ inputs.project }}
+            docker image prune -f

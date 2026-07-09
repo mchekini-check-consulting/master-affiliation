@@ -1,0 +1,24 @@
+# Docker Compose global — déploie l'ensemble des sites.
+#
+# Un Dockerfile par projet, un seul compose global. Les ports et tags sont
+# configurés dans le fichier .env à la racine.
+#
+# Tout déployer           : docker compose up -d
+# Déployer un seul projet : docker compose pull <service> && docker compose up -d --no-deps <service>
+
+services:
+  site-a:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/site-a:${SITE_A_TAG:-latest}
+    build: ./site-a
+    container_name: site-a
+    restart: unless-stopped
+    ports:
+      - "${SITE_A_PORT:-3001}:80"
+
+  site-b:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/site-b:${SITE_B_TAG:-latest}
+    build: ./site-b
+    container_name: site-b
+    restart: unless-stopped
+    ports:
+      - "${SITE_B_PORT:-3002}:80"
