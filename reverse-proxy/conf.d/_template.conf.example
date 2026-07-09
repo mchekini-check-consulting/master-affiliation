@@ -4,11 +4,34 @@
 #      empêche celui-ci d'être chargé par nginx)
 #   2. Remplacer APP_HOST, APP_SERVICE et APP_PORT
 #   3. Ajouter le service dans docker-compose.yml (réseau "proxy")
-#   4. docker compose up -d && docker compose exec nginx nginx -s reload
+#   4. Ajouter APP_HOST dans "domains" de reverse-proxy/init-letsencrypt.sh
+#      et relancer le script sur le serveur (émet le certificat manquant)
+#   5. docker compose up -d && docker compose exec reverse-proxy nginx -s reload
 # ============================================================
+
+# HTTP : sert le challenge ACME (Let's Encrypt) et redirige le reste en HTTPS.
 server {
     listen 80;
     server_name APP_HOST;                # ex: monapp.check-consulting.net
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# HTTPS : terminaison TLS ici, le trafic interne vers le conteneur reste en HTTP.
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name APP_HOST;
+
+    ssl_certificate     /etc/letsencrypt/live/APP_HOST/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/APP_HOST/privkey.pem;
+    include /etc/nginx/snippets/ssl-params.conf;
 
     location / {
         # La variable force la résolution DNS à chaque requête :
