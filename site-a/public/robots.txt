@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://site-a.example.com/sitemap-index.xml
+Sitemap: https://aquascaping-facile.fr/sitemap-index.xml

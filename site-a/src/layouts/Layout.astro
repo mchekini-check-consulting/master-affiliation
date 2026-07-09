@@ -15,12 +15,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0c2b26" />
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Figtree:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <slot />
@@ -28,12 +35,36 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 </html>
 
 <style is:global>
+  :root {
+    --surface: #f4f8f5;
+    --surface-2: #e7f0ea;
+    --mousse: #256d52;
+    --abysse: #0c2b26;
+    --encre: #16302a;
+    --estompe: #52685f;
+    --lampe: #c99b3f;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--abysse);
+  }
+
   body {
-    font-family: system-ui, sans-serif;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-    line-height: 1.6;
-    color: #1a1a1a;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Figtree', system-ui, sans-serif;
+    line-height: 1.65;
+    color: var(--encre);
+    background: linear-gradient(var(--surface) 0%, var(--surface-2) 60%, #d3e5da 100%);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--lampe);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 </style>

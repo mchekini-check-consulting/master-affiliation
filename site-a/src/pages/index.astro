@@ -1,15 +1,422 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const styles = [
+  {
+    nom: 'Iwagumi',
+    latin: 'Le minimalisme japonais',
+    texte:
+      "Quelques pierres, un tapis de verdure, rien d'autre. Le style le plus épuré — et le plus exigeant : chaque roche compte.",
+    plante: 'Eleocharis acicularis',
+  },
+  {
+    nom: 'Nature',
+    latin: "L'école Amano",
+    texte:
+      "Reproduire un paysage terrestre sous l'eau : forêt, colline, rive. Bois, roches et plantes composent une scène qui semble avoir toujours existé.",
+    plante: 'Rotala rotundifolia',
+  },
+  {
+    nom: 'Hollandais',
+    latin: 'Le jardin à la française… des Pays-Bas',
+    texte:
+      'Pas de décor : uniquement des plantes, taillées et alignées en massifs de couleurs contrastées. Le style des jardiniers dans l\'âme.',
+    plante: 'Alternanthera reineckii',
+  },
+];
+
+const etapes = [
+  {
+    titre: 'Le bac et la lumière',
+    texte:
+      "Un aquarium simple de 60 litres et un éclairage correct suffisent largement pour débuter. Inutile de viser grand : plus c'est petit, moins c'est cher — mais plus c'est sensible.",
+  },
+  {
+    titre: 'Le sol et le hardscape',
+    texte:
+      "Un sol technique nourrit les plantes pendant des mois. Posez ensuite roches et racines avant la mise en eau : c'est le squelette de votre paysage.",
+  },
+  {
+    titre: 'La plantation',
+    texte:
+      "Plantez dense dès le premier jour, avec des espèces faciles : mousses, Anubias, Cryptocorynes. Les plantes installées laissent peu de place aux algues.",
+  },
+  {
+    titre: 'Le cyclage, puis la patience',
+    texte:
+      "Quatre à six semaines sans poissons, le temps que les bactéries s'installent. L'aquascaping s'apprend en semaines et se maîtrise en années — c'est ce qui le rend passionnant.",
+  },
+];
 ---
 
 <Layout
-  title="Site A — Projet temporaire"
-  description="Site d'affiliation temporaire (site-a). Contenu de test destiné à être remplacé par une vraie niche."
+  title="Aquascaping Facile — L'art de jardiner sous l'eau"
+  description="Guides simples pour débuter l'aquascaping : choisir son bac, ses plantes et son matériel, comprendre les styles iwagumi, nature et hollandais."
 >
-  <h1>Site A — projet temporaire</h1>
-  <p>
-    Ce site est un projet de test du monorepo <strong>master-affiliation</strong>.
-    Il sera remplacé par un vrai site d'affiliation sur une niche dédiée.
-  </p>
-  <p>Généré statiquement avec Astro, servi par nginx.</p>
+  <header class="entete">
+    <p class="marque">Aquascaping <em>Facile</em></p>
+    <nav aria-label="Navigation principale">
+      <a href="#styles">Les styles</a>
+      <a href="#commencer">Commencer</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Le jardinage, sous la surface</p>
+      <h1>Des forêts entières<br />dans quelques litres d'eau.</h1>
+      <p class="hero-texte">
+        L'aquascaping, c'est composer un paysage vivant dans un aquarium :
+        roches, bois, plantes — et beaucoup de patience. Ce site rassemble des
+        guides simples, en français, pour se lancer sans se tromper de matériel.
+      </p>
+      <a class="cta" href="#commencer">Par où commencer&nbsp;?</a>
+    </section>
+
+    <div class="ligne-eau" aria-hidden="true">
+      <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
+        <path
+          d="M0,20 C150,38 300,2 450,20 C600,38 750,2 900,20 C1050,38 1150,10 1200,20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        ></path>
+      </svg>
+    </div>
+
+    <section id="styles" class="styles">
+      <h2>Trois écoles, trois paysages</h2>
+      <div class="cartes">
+        {
+          styles.map((s) => (
+            <article class="carte">
+              <h3>{s.nom}</h3>
+              <p class="sous-titre">{s.latin}</p>
+              <p>{s.texte}</p>
+              <p class="plante">
+                Plante emblème&nbsp;: <em>{s.plante}</em>
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="commencer" class="commencer">
+      <h2>Par où commencer</h2>
+      <p class="intro">
+        Quatre étapes, dans cet ordre — parce qu'un aquarium planté se construit
+        de bas en haut, et que la précipitation est la première cause d'abandon.
+      </p>
+      <ol class="etapes">
+        {
+          etapes.map((e) => (
+            <li>
+              <h3>{e.titre}</h3>
+              <p>{e.texte}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </main>
+
+  <footer class="fond">
+    <svg class="herbier" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+      <g fill="#12463a">
+        <path d="M40,120 C35,70 55,55 48,20 C60,60 50,80 58,120 Z" />
+        <path d="M70,120 C68,85 85,70 80,45 C90,78 78,95 86,120 Z" />
+        <path d="M180,120 C170,60 200,45 190,10 C205,55 188,85 200,120 Z" />
+        <path d="M215,120 C213,90 228,80 224,60 C232,88 222,100 230,120 Z" />
+        <path d="M960,120 C950,65 975,50 966,18 C980,58 966,88 978,120 Z" />
+        <path d="M1000,120 C997,85 1015,72 1009,48 C1019,80 1006,98 1015,120 Z" />
+        <path d="M1120,120 C1112,75 1132,60 1125,32 C1138,68 1124,92 1136,120 Z" />
+      </g>
+    </svg>
+    <div class="fond-contenu">
+      <p class="marque marque-claire">Aquascaping <em>Facile</em></p>
+      <p>
+        Les guides matériel arrivent bientôt. Certains liens qui y figureront
+        seront des liens d'affiliation&nbsp;: ils ne changent rien au prix pour
+        vous et financent le site.
+      </p>
+      <p class="copyright">© 2026 aquascaping-facile.fr</p>
+    </div>
+  </footer>
 </Layout>
+
+<style>
+  .entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 0;
+  }
+
+  .marque {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .marque em {
+    color: var(--mousse);
+  }
+
+  .entete nav a {
+    margin-left: 1.5rem;
+    color: var(--encre);
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-bottom: 1px solid transparent;
+  }
+
+  .entete nav a:hover {
+    border-bottom-color: var(--lampe);
+  }
+
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  .hero {
+    padding: 5.5rem 0 3.5rem;
+    max-width: 680px;
+  }
+
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--lampe);
+  }
+
+  h1 {
+    margin: 0 0 1.25rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2.4rem, 6vw, 3.9rem);
+    line-height: 1.08;
+    color: var(--abysse);
+  }
+
+  .hero-texte {
+    margin: 0 0 2rem;
+    font-size: 1.1rem;
+    color: var(--estompe);
+    max-width: 54ch;
+  }
+
+  .cta {
+    display: inline-block;
+    padding: 0.75rem 1.6rem;
+    background: var(--mousse);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 999px;
+    transition: background 0.2s ease;
+  }
+
+  .cta:hover {
+    background: var(--abysse);
+  }
+
+  .ligne-eau {
+    color: var(--mousse);
+    opacity: 0.45;
+    margin: 0 -1.25rem;
+  }
+
+  .ligne-eau svg {
+    display: block;
+    width: 100%;
+    height: 40px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    color: var(--abysse);
+    margin: 0 0 0.75rem;
+  }
+
+  .styles {
+    padding: 3.5rem 0 1rem;
+  }
+
+  .cartes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .carte {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(37, 109, 82, 0.18);
+    border-radius: 10px;
+    padding: 1.5rem 1.4rem;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .carte:hover {
+    transform: translateY(-3px);
+    border-color: var(--lampe);
+  }
+
+  .carte h3 {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--mousse);
+  }
+
+  .sous-titre {
+    margin: 0.15rem 0 0.9rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--estompe);
+  }
+
+  .carte p {
+    margin: 0 0 0.9rem;
+    font-size: 0.98rem;
+  }
+
+  .plante {
+    font-size: 0.85rem;
+    color: var(--estompe);
+  }
+
+  .plante em {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+  }
+
+  .commencer {
+    padding: 3rem 0 4.5rem;
+  }
+
+  .commencer .intro {
+    max-width: 58ch;
+    color: var(--estompe);
+    margin: 0 0 2rem;
+  }
+
+  .etapes {
+    list-style: none;
+    counter-reset: etape;
+    margin: 0;
+    padding: 0;
+    max-width: 640px;
+  }
+
+  .etapes li {
+    counter-increment: etape;
+    position: relative;
+    padding: 0 0 2rem 3.5rem;
+    border-left: 1px solid rgba(37, 109, 82, 0.3);
+    margin-left: 1.1rem;
+  }
+
+  .etapes li:last-child {
+    border-left-color: transparent;
+    padding-bottom: 0;
+  }
+
+  .etapes li::before {
+    content: counter(etape);
+    position: absolute;
+    left: -1.15rem;
+    top: -0.2rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    border: 1px solid var(--lampe);
+    border-radius: 50%;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--abysse);
+  }
+
+  .etapes h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--abysse);
+  }
+
+  .etapes p {
+    margin: 0;
+    color: var(--estompe);
+    font-size: 0.98rem;
+  }
+
+  .fond {
+    background: var(--abysse);
+    color: #cfe0d8;
+  }
+
+  .herbier {
+    display: block;
+    width: 100%;
+    height: 90px;
+    background: linear-gradient(#d3e5da, transparent 30%);
+  }
+
+  .fond-contenu {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem 1.25rem 3rem;
+  }
+
+  .fond-contenu p {
+    max-width: 64ch;
+    font-size: 0.92rem;
+  }
+
+  .marque-claire {
+    color: #fff;
+    font-size: 1.2rem;
+  }
+
+  .marque-claire em {
+    color: var(--lampe);
+  }
+
+  .copyright {
+    margin-top: 2rem;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 560px) {
+    .hero {
+      padding-top: 3.5rem;
+    }
+
+    .entete {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .entete nav a:first-child {
+      margin-left: 0;
+    }
+  }
+</style>
