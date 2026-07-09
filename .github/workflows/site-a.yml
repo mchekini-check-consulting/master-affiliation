@@ -8,6 +8,10 @@ on:
       - "site-a/**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   deploy:
     uses: ./.github/workflows/_deploy-project.yml

@@ -6,8 +6,8 @@
 #   VM_USER     : utilisateur SSH
 #   VM_SSH_KEY  : clé privée SSH
 #
-# Prérequis sur la VM : Docker + Docker Compose >= 2.21, et le repo cloné
-# dans /opt/master-affiliation.
+# Prérequis sur la VM : Docker + Docker Compose >= 2.21, git, et un utilisateur
+# SSH avec sudo sans mot de passe (uniquement pour le clonage initial dans /opt).
 
 name: deploy-project
 
@@ -60,7 +60,14 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             set -e
+            REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+            if [ ! -d /opt/master-affiliation/.git ]; then
+              sudo mkdir -p /opt/master-affiliation
+              sudo chown "$(id -u):$(id -g)" /opt/master-affiliation
+              git clone "$REPO_URL" /opt/master-affiliation
+            fi
             cd /opt/master-affiliation
+            git remote set-url origin "$REPO_URL"
             git fetch origin main
             git reset --hard origin/main
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
