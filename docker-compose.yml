@@ -30,7 +30,7 @@ services:
     # le volume partagé, nginx doit relire).
     command: /bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'
     networks:
-      - default   # sites de ce projet (site-a, site-b)
+      - default   # sites de ce projet (site-a, site-b, hi-tech-academy)
       - proxy     # frontends des applications (ex: fidexil-front)
     # Permet au conteneur de joindre des services qui tournent
     # directement sur l'hôte (ex: la landing page pm2 sur le port 3000)
@@ -39,6 +39,7 @@ services:
     depends_on:
       - site-a
       - site-b
+      - hi-tech-academy
       - fidexil-front
 
   # ==========================================================
@@ -70,6 +71,12 @@ services:
     image: ghcr.io/mchekini-check-consulting/master-affiliation/site-b:${SITE_B_TAG:-latest}
     build: ./site-b
     container_name: site-b
+    restart: unless-stopped
+
+  hi-tech-academy:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/hi-tech-academy:${HI_TECH_ACADEMY_TAG:-latest}
+    build: ./hi-tech-academy
+    container_name: hi-tech-academy
     restart: unless-stopped
 
   # ==========================================================

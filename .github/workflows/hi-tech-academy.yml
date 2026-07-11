@@ -1,0 +1,20 @@
+# Pipeline du projet hi-tech-academy : ne se déclenche que si hi-tech-academy/ change sur main.
+name: hi-tech-academy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "hi-tech-academy/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-project.yml
+    with:
+      project: hi-tech-academy
+    secrets: inherit
