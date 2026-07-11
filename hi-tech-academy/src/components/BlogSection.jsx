@@ -1,32 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
-
-const blogPosts = [
-{
-  title: 'Les 10 compétences tech les plus demandées en 2024',
-  excerpt: 'Découvrez les compétences essentielles pour réussir dans le secteur technologique cette année.',
-  date: '15 Juin 2024',
-  readTime: '5 min',
-  image: '/images/c3290df03_feature-2.webp',
-  category: 'Carrière'
-},
-{
-  title: 'Comment devenir développeur full-stack en 6 mois',
-  excerpt: 'Un guide complet pour maîtriser le développement web moderne et lancer votre carrière.',
-  date: '10 Juin 2024',
-  readTime: '8 min',
-  image: '/images/df0155452_istock-2177184303.jpg',
-  category: 'Formation'
-},
-{
-  title: 'L\'intelligence artificielle dans l\'éducation',
-  excerpt: 'Comment l\'IA transforme l\'apprentissage et la formation professionnelle.',
-  date: '5 Juin 2024',
-  readTime: '6 min',
-  image: '/images/cbdcfde73_generated_f57bba76.png',
-  category: 'Innovation'
-}];
+import { blogPosts } from '@/data/blogPosts';
 
 
 const fadeUp = {
@@ -70,14 +46,15 @@ export default function BlogSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {blogPosts.map((post, i) =>
           <motion.article
-            key={i}
-            className="group cursor-pointer"
+            key={post.slug}
+            className="group"
             custom={i}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}>
-            
+
+            <Link to={`/blog/${post.slug}`} className="block cursor-pointer">
               {/* Image Container */}
               <div className="relative overflow-hidden rounded-2xl mb-5 aspect-[4/3]">
                 <img
@@ -125,15 +102,15 @@ export default function BlogSection() {
                 </p>
 
                 {/* Read More Link */}
-                <a
-                href="#"
+                <span
                 className="inline-flex items-center gap-2 text-sm font-semibold transition-all group-hover:gap-3"
                 style={{ color: '#005064', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                
+
                   Lire l'article
                   <ArrowRight className="w-4 h-4" />
-                </a>
+                </span>
               </div>
+            </Link>
             </motion.article>
           )}
         </div>
@@ -146,18 +123,18 @@ export default function BlogSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}>
           
-          <a
-            href="#"
+          <Link
+            to="/blog"
             className="inline-flex items-center gap-2 h-11 px-6 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:shadow-lg"
             style={{
               backgroundColor: '#005064',
               color: 'white',
               fontFamily: "'Plus Jakarta Sans', sans-serif"
             }}>
-            
+
             Voir tous les articles
             <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </motion.div>
 
       </div>

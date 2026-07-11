@@ -24,7 +24,7 @@ export default function TopBar() {
         {/* Right — quick links */}
         <div className="flex items-center gap-5 ml-auto">
           <a href="#about" className="text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">À propos</a>
-          <a href="#programmes" className="text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">Blog</a>
+          <a href="/blog" className="text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">Blog</a>
           <a href="#contact" className="text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">Contact</a>
           
           

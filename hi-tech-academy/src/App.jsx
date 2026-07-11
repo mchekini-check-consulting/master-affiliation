@@ -10,6 +10,8 @@ import Home from './pages/Home';
 import LegalNotices from './pages/LegalNotices';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -39,6 +41,8 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/mentions-legales" element={<LegalNotices />} />
       <Route path="/politique-confidentialite" element={<PrivacyPolicy />} />
       <Route path="/conditions-vente" element={<TermsAndConditions />} />
