@@ -9,7 +9,7 @@ const highlights = [
 
 
 const highlights_sub = [
-'Formations certifiantes reconnues & emploi garanti dans un domaine porteur.',
+'Une formation concrète et intensive dans un domaine porteur.',
 'Compétences numériques concrètes pour booster votre carrière dès aujourd\'hui.',
 'De la passion à la profession, nos formateurs experts vous guident pas à pas.'];
 

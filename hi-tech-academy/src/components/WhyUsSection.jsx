@@ -17,8 +17,8 @@ const features = [
 },
 {
   icon: Award,
-  title: 'Certification Reconnue',
-  description: 'Recevez une certification reconnue par les employeurs du secteur.'
+  title: 'Attestation de Formation',
+  description: 'Recevez une attestation de fin de formation détaillant les acquis évalués.'
 },
 {
   icon: HeadphonesIcon,

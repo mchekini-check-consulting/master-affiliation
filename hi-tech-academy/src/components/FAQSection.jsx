@@ -4,28 +4,28 @@ import { Plus, Minus } from 'lucide-react';
 
 const faqs = [
   {
-    question: "Quels sont les prérequis pour rejoindre une formation ?",
-    answer: "La plupart de nos formations ne nécessitent aucun prérequis technique. Une simple motivation et un ordinateur suffisent pour commencer. Certaines formations avancées peuvent nécessiter des bases en programmation — cela est précisé sur chaque fiche de formation.",
+    question: "Quels sont les prérequis pour rejoindre la formation Kubernetes ?",
+    answer: "La formation Kubernetes – Fondamentaux nécessite la maîtrise des bases de la ligne de commande Linux et des fondamentaux des conteneurs et de Docker. Ces prérequis sont vérifiés à l'entrée via un test de positionnement, et le programme détaillé les précise.",
   },
   {
-    question: "Les formations sont-elles reconnues par les entreprises ?",
-    answer: "Oui. Nos certifications sont reconnues par un large réseau de partenaires entreprises. Elles attestent de compétences concrètes et sont valorisées lors des recrutements dans le secteur tech.",
+    question: "Quel document est délivré à l'issue de la formation ?",
+    answer: "La formation donne lieu à une attestation de fin de formation (art. L.6353-1 du Code du travail) mentionnant les objectifs, la nature, la durée et les résultats de l'évaluation des acquis.",
   },
   {
-    question: "Est-ce que les formations se font en ligne ou en présentiel ?",
-    answer: "Nous proposons les deux formats. Vous pouvez suivre nos formations entièrement en ligne à votre rythme, ou opter pour des sessions en présentiel disponibles dans nos centres. Des formats hybrides sont également disponibles.",
+    question: "Est-ce que la formation se fait en ligne ou en présentiel ?",
+    answer: "La formation se déroule 100 % à distance, en classe virtuelle synchrone (Google Meet), animée en direct par le formateur, avec des travaux pratiques sur un cluster Kubernetes réel (Azure AKS).",
   },
   {
-    question: "Quelle est la durée moyenne d'une formation ?",
-    answer: "La durée varie selon le programme : de 3 mois pour des formations courtes ciblées, jusqu'à 6 mois pour des parcours complets comme le Développement Full Stack. Chaque formation précise sa durée et le volume horaire.",
+    question: "Quelle est la durée de la formation ?",
+    answer: "La formation Kubernetes – Fondamentaux dure 21 heures, réparties sur 3 journées de 7 heures (3 h 30 le matin et 3 h 30 l'après-midi).",
   },
   {
-    question: "Y a-t-il un accompagnement après la formation ?",
-    answer: "Absolument. Nous proposons un accompagnement carrière post-formation incluant la préparation CV, la simulation d'entretiens, et une mise en relation avec notre réseau d'entreprises partenaires.",
+    question: "Sous quel délai puis-je commencer la formation ?",
+    answer: "Le délai d'accès est de 8 jours minimum entre votre demande et le début de la formation (hors délais de prise en charge par un financeur). La session ouvre à partir de 3 participants, et une session individuelle est possible.",
   },
   {
-    question: "Comment se déroule le paiement et y a-t-il des facilités ?",
-    answer: "Nous proposons plusieurs options de paiement : paiement comptant, paiement en plusieurs fois sans frais, et des solutions de financement selon votre situation. Contactez notre équipe pour trouver la formule adaptée.",
+    question: "La formation est-elle accessible aux personnes en situation de handicap ?",
+    answer: "Oui. Nos formations à distance peuvent être adaptées aux personnes en situation de handicap. Lors de l'inscription, notre référent handicap (Mahdi CHEKINI — contact@hi-techacademy.fr — 07 51 47 41 35) étudie avec vous les aménagements nécessaires.",
   },
 ];
 

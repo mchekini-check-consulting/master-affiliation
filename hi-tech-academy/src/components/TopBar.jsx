@@ -7,14 +7,18 @@ export default function TopBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between">
         {/* Left — contact info */}
         <div className="hidden md:flex items-center gap-6">
-          <a href="tel:+213000000000" className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">
+          <a href="tel:+33751474135" className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">
             <Phone className="w-3 h-3" />
-            +213 00 000 00 00
+            07 51 47 41 35
           </a>
-          <a href="mailto:contact@hitechacademy.dz" className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">
+          <a href="mailto:contact@hi-techacademy.fr" className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">
             <Mail className="w-3 h-3" />
-            contact@hitechacademy.dz
+            contact@hi-techacademy.fr
           </a>
+          <span className="hidden lg:flex items-center gap-1.5 text-xs text-gray-500 [font-family:'Inter',sans-serif]">
+            <MapPin className="w-3 h-3" />
+            73 Rue de Reuilly, 75012 Paris
+          </span>
         </div>
 
         {/* Right — quick links */}

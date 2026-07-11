@@ -97,7 +97,7 @@ export default function TermsAndConditions() {
                 8. Droit applicable
               </h2>
               <p>
-                Les présentes CGV sont soumises au droit algérien. Tout litige sera de la compétence des tribunaux d'Alger.
+                Les présentes CGV sont soumises au droit français. Tout litige sera de la compétence des tribunaux de Paris.
               </p>
             </section>
 

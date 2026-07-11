@@ -25,10 +25,13 @@ export default function LegalNotices() {
                 1. Éditeur du site
               </h2>
               <p className="mb-2">
-                <strong>Hi Tech Academy</strong><br />
-                Siège social : 123 Rue de l'Innovation, Alger, Algérie<br />
-                Téléphone : +213 00 000 00 00<br />
-                Email : contact@hitechacademy.dz
+                <strong>Hi-Tech Academy</strong> — Organisme de formation<br />
+                Siège social : 73 Rue de Reuilly, 75012 Paris<br />
+                SIRET : 922 695 648 00027<br />
+                Déclaration d'activité enregistrée sous le n° 11756755575 auprès du préfet de la région
+                Île-de-France (cet enregistrement ne vaut pas agrément de l'État)<br />
+                Téléphone : 07 51 47 41 35<br />
+                Email : contact@hi-techacademy.fr
               </p>
             </section>
 
@@ -37,7 +40,7 @@ export default function LegalNotices() {
                 2. Directeur de la publication
               </h2>
               <p>
-                Le directeur de la publication est le représentant légal de Hi Tech Academy.
+                Le directeur de la publication est Mahdi CHEKINI, représentant légal de Hi-Tech Academy.
               </p>
             </section>
 
@@ -46,7 +49,7 @@ export default function LegalNotices() {
                 3. Hébergement
               </h2>
               <p>
-                Le site est hébergé par Base44, conformément aux réglementations en vigueur.
+                Le site est hébergé par Hostinger International Ltd., 61 Lordou Vironos Street, 6023 Larnaca, Chypre.
               </p>
             </section>
 

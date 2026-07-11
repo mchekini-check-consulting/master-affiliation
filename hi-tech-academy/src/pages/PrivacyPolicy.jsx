@@ -83,7 +83,7 @@ export default function PrivacyPolicy() {
                 <li>Droit à la portabilité des données</li>
               </ul>
               <p className="mt-3">
-                Pour exercer ces droits, contactez-nous à : contact@hitechacademy.dz
+                Pour exercer ces droits, contactez-nous à : contact@hi-techacademy.fr
               </p>
             </section>
 

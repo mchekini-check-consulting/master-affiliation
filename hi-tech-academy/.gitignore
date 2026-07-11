@@ -29,3 +29,6 @@ dist-ssr
 
 .env
 .vite
+
+# Documents sources Qualiopi (non publiés, à usage interne)
+documents_source/

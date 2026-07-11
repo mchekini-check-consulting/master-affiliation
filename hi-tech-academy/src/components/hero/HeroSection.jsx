@@ -29,7 +29,7 @@ const HeroSection = ({ title, subtitle, actions }) => {
               className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
               style={{ background: 'rgba(248,177,2,0.15)', color: '#F8B102', border: '1px solid rgba(248,177,2,0.35)' }}
             >
-              ✦ Formations certifiantes
+              ✦ Organisme de formation déclaré
             </span>
           </div>
 

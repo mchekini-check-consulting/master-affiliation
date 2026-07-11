@@ -78,7 +78,7 @@ export default function CTASection() {
                 className="text-xs sm:text-sm md:text-base leading-relaxed mb-8 text-white/75 max-w-xl"
                 style={{ fontFamily: "'Inter', sans-serif" }}>
                 
-                Devenez un expert avec nos formations certifiantes et obtenez un emploi dans un domaine porteur.
+                Montez en compétences avec notre formation Kubernetes animée en direct par un formateur expert, 100 % à distance.
               </p>
 
               {/* Trust indicators */}

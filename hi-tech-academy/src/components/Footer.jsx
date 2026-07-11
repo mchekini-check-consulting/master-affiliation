@@ -7,12 +7,7 @@ const BRAND_COLOR = '#005064';
 const CTA_COLOR = '#F8B102';
 
 const formations = [
-  'Développement Web Full Stack',
-  'Data Science & IA',
-  'Cybersécurité',
-  'Cloud & DevOps',
-  'Mobile Development',
-  'UI/UX Design',
+  'Kubernetes – Fondamentaux',
 ];
 
 const liens = [
@@ -194,7 +189,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-white/80 text-xs sm:text-sm font-medium">Adresse</p>
-                  <p className="text-white/45 text-xs mt-0.5 leading-relaxed">123 Rue de l'Innovation, Alger, Algérie</p>
+                  <p className="text-white/45 text-xs mt-0.5 leading-relaxed">73 Rue de Reuilly, 75012 Paris</p>
                 </div>
               </li>
               <li className="flex items-start gap-2.5 sm:gap-3">
@@ -203,7 +198,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-white/80 text-xs sm:text-sm font-medium">Téléphone</p>
-                  <a href="tel:+213000000000" className="text-white/45 text-xs mt-0.5 hover:text-white transition-colors">+213 00 000 00 00</a>
+                  <a href="tel:+33751474135" className="text-white/45 text-xs mt-0.5 hover:text-white transition-colors">07 51 47 41 35</a>
                 </div>
               </li>
               <li className="flex items-start gap-2.5 sm:gap-3">
@@ -212,7 +207,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-white/80 text-xs sm:text-sm font-medium">Email</p>
-                  <a href="mailto:contact@hitechacademy.dz" className="text-white/45 text-xs mt-0.5 hover:text-white transition-colors">contact@hitechacademy.dz</a>
+                  <a href="mailto:contact@hi-techacademy.fr" className="text-white/45 text-xs mt-0.5 hover:text-white transition-colors">contact@hi-techacademy.fr</a>
                 </div>
               </li>
             </ul>
@@ -224,9 +219,15 @@ export default function Footer() {
       {/* ── Bottom Bar ── */}
       <div style={{ background: 'white', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-gray-600 text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
-            © {new Date().getFullYear()} Hi Tech Academy. Tous droits réservés.
-          </p>
+          <div>
+            <p className="text-gray-600 text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
+              © {new Date().getFullYear()} Hi-Tech Academy. Tous droits réservés. — SIRET 922 695 648 00027
+            </p>
+            <p className="text-gray-500 text-[11px] mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Déclaration d'activité enregistrée sous le n° 11756755575 auprès du préfet de la région Île-de-France.
+              Cet enregistrement ne vaut pas agrément de l'État.
+            </p>
+          </div>
           <div className="flex gap-2 sm:gap-3">
             {socials.map(({ icon: Icon, href, label }) => (
               <a

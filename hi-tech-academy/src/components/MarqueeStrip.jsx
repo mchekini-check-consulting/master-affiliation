@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 
 const items = [
   '🚀 Lancez votre carrière tech',
-  '✦ 95% de taux d\'insertion',
-  '🎓 Formations intensives & certifiantes',
-  '✦ +2 000 étudiants formés',
-  '💡 Mentorat d\'élite',
+  '✦ 100 % à distance, en direct',
+  '🎓 Formation intensive Kubernetes',
+  '✦ TP sur cluster réel (Azure AKS)',
+  '💡 Formateur expert',
   '✦ Apprenez. Créez. Réussissez.',
   '🌍 Rejoignez la révolution digitale',
   '✦ Inscription ouverte maintenant',

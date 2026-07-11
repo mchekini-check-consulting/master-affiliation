@@ -53,8 +53,8 @@ const steps = [
   {
     number: '06',
     tag: 'Étape 6',
-    title: 'Évaluation & Certification',
-    description: "Évaluation finale et certification reconnue qui atteste de votre expertise et améliore votre employabilité.",
+    title: 'Évaluation & Attestation',
+    description: "Évaluation finale des acquis (QCM + mise en pratique) et attestation de fin de formation détaillant les résultats.",
     icon: Award,
     span: 'col-span-2 md:col-span-1',
   },
