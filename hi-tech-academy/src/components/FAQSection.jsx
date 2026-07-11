@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     question: "Sous quel délai puis-je commencer la formation ?",
-    answer: "Le délai d'accès est de 8 jours minimum entre votre demande et le début de la formation (hors délais de prise en charge par un financeur). La session ouvre à partir de 3 participants, et une session individuelle est possible.",
+    answer: "Le délai d'accès est de 2 jours minimum entre votre demande et le début de la formation (hors délais de prise en charge par un financeur). La session ouvre à partir de 3 participants, et une session individuelle est possible.",
   },
   {
     question: "La formation est-elle accessible aux personnes en situation de handicap ?",

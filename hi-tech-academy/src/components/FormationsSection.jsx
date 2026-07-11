@@ -19,13 +19,13 @@ const formations = [
     description:
       "Déployez et administrez des applications conteneurisées avec Kubernetes : architecture d'un cluster, Deployments, Services, Ingress, ConfigMaps, Secrets et règles de placement — avec travaux pratiques sur un cluster Azure (AKS) réel.",
     image: '/images/0002848c7_istock-2177184303.jpg',
-    version: 'Programme V1.1 du 11/07/2026',
-    pdf: '/documents/Programme_Kubernetes_Fondamentaux_V1.1.pdf',
+    version: 'Programme V1.2 du 11/07/2026',
+    pdf: '/documents/Programme_Kubernetes_Fondamentaux_V1.2.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '21 h — 3 jours de 7 h' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
       { icon: Euro, label: 'Tarif', value: '1 000 € net de taxe / stagiaire' },
-      { icon: CalendarClock, label: "Délai d'accès", value: '8 jours minimum entre la demande et le début' },
+      { icon: CalendarClock, label: "Délai d'accès", value: '2 jours minimum entre la demande et le début' },
       { icon: Users, label: 'Effectif', value: 'Dès 3 participants — session individuelle possible' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
     ],
@@ -95,7 +95,7 @@ const formations = [
         content: (
           <ul className="list-disc pl-5 space-y-1">
             <li>Inscription par e-mail (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>) ou téléphone (<a href="tel:+33751474135" className="underline">07 51 47 41 35</a>).</li>
-            <li>Délai d'accès : 8 jours minimum entre la demande et le début de la formation (hors prise en charge financeur).</li>
+            <li>Délai d'accès : 2 jours minimum entre la demande et le début de la formation (hors prise en charge financeur).</li>
             <li>Ouverture de la session à partir de 3 participants ; session individuelle possible.</li>
           </ul>
         ),
