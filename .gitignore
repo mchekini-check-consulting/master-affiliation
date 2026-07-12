@@ -17,3 +17,6 @@ npm-debug.log*
 
 # NOTE : le .env racine est volontairement versionné : il contient la
 # configuration des projets (ports, tags), pas de secrets.
+
+# Notes de travail locales (jamais versionnées)
+prompt
