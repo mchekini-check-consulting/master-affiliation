@@ -1,9 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  LucideAngularModule, Archive, BookOpen, ChevronDown, Download, Eye, FileText,
-  FileType, FileUp, FolderPlus, Image, Inbox, Loader2, Pencil, Plus, RefreshCw,
-  RotateCcw, Search, Sheet, Trash2, Upload, X,
+  LucideAngularModule, Archive, BookOpen, ChevronDown, Download, ExternalLink, Eye,
+  FileText, FileType, FileUp, FolderPlus, Image, Inbox, Loader2, Pencil, Plus,
+  RefreshCw, RotateCcw, Search, Sheet, Trash2, Upload, X,
 } from 'lucide-angular';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DashboardLayoutComponent } from '../dashboard/dashboard-layout.component';
@@ -14,12 +14,17 @@ import { DocItem, DocTheme, DocumentService, FileFamily } from '../../core/docum
 interface PendingUpload {
   file: File;
   title: string;
+  /** id d'une thématique existante, ou AUTRE_THEME pour en créer une à la volée. */
   themeId: number | null;
+  nouvelleThematique: string;
   description: string;
   tags: string;
   status: 'attente' | 'envoi' | 'ok' | 'erreur';
   erreur?: string;
 }
+
+/** Valeur sentinelle de l'option « Autre » de la liste déroulante. */
+const AUTRE_THEME = -1;
 
 interface ThemeGroup {
   theme: string;
@@ -107,7 +112,11 @@ const TYPES: { id: FileFamily; label: string }[] = [
                       <select class="ui-input ui-select" [(ngModel)]="p.themeId">
                         <option [ngValue]="null">Thématique * (obligatoire)</option>
                         @for (t of themes; track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
+                        <option [ngValue]="AUTRE_THEME">Autre — nouvelle thématique…</option>
                       </select>
+                      @if (p.themeId === AUTRE_THEME) {
+                        <input class="ui-input" placeholder="Nom de la nouvelle thématique *" [(ngModel)]="p.nouvelleThematique" />
+                      }
                       <input class="ui-input" placeholder="Description (optionnelle)" [(ngModel)]="p.description" />
                       <input class="ui-input" placeholder="Tags séparés par des virgules" [(ngModel)]="p.tags" />
                     </div>
@@ -310,6 +319,10 @@ const TYPES: { id: FileFamily; label: string }[] = [
                               <button (click)="voir(d)" class="ui-btn ui-btn-sm ui-btn-outline">
                                 <lucide-icon [img]="ic.Eye" class="w-4 h-4 mr-1" /> Voir
                               </button>
+                              <a [href]="urlFichier(d)" target="_blank" rel="noopener"
+                                class="ui-btn ui-btn-sm ui-btn-outline" title="Ouvrir dans un onglet du navigateur">
+                                <lucide-icon [img]="ic.ExternalLink" class="w-4 h-4" />
+                              </a>
                             }
                             <a [href]="urlTelechargement(d)" class="ui-btn ui-btn-sm bg-blue-600 hover:bg-blue-700 text-white">
                               <lucide-icon [img]="ic.Download" class="w-4 h-4 mr-1" /> Télécharger
@@ -345,6 +358,9 @@ const TYPES: { id: FileFamily; label: string }[] = [
               <div class="flex items-center justify-between px-5 py-3 border-b border-slate-200">
                 <p class="font-semibold text-slate-900 truncate">{{ visionneuse.title }}</p>
                 <div class="flex items-center gap-2">
+                  <a [href]="urlFichier(visionneuse)" target="_blank" rel="noopener" class="ui-btn ui-btn-sm ui-btn-outline">
+                    <lucide-icon [img]="ic.ExternalLink" class="w-4 h-4 mr-1" /> Ouvrir dans le navigateur
+                  </a>
                   <a [href]="urlTelechargement(visionneuse)" class="ui-btn ui-btn-sm ui-btn-outline">
                     <lucide-icon [img]="ic.Download" class="w-4 h-4 mr-1" /> Télécharger
                   </a>
@@ -415,10 +431,11 @@ export class DocumentsComponent implements OnInit {
   private toast = inject(ToastService);
   private sanitizer = inject(DomSanitizer);
   protected readonly ic = {
-    Archive, BookOpen, ChevronDown, Download, Eye, FileText, FileType, FileUp, FolderPlus,
-    Image, Inbox, Loader2, Pencil, Plus, RefreshCw, RotateCcw, Search, Sheet, Trash2, Upload, X,
+    Archive, BookOpen, ChevronDown, Download, ExternalLink, Eye, FileText, FileType, FileUp,
+    FolderPlus, Image, Inbox, Loader2, Pencil, Plus, RefreshCw, RotateCcw, Search, Sheet, Trash2, Upload, X,
   };
   protected readonly typesListe = TYPES;
+  protected readonly AUTRE_THEME = AUTRE_THEME;
 
   isAdmin = false;
   chargement = true;
@@ -553,6 +570,10 @@ export class DocumentsComponent implements OnInit {
     return this.docs.downloadUrl(d.id);
   }
 
+  urlFichier(d: DocItem): string {
+    return this.docs.fileUrl(d.id);
+  }
+
   // ------------------------------------------------------------------
   // Admin : upload
   // ------------------------------------------------------------------
@@ -580,6 +601,7 @@ export class DocumentsComponent implements OnInit {
         file,
         title: file.name.replace(/\.[^.]+$/, ''),
         themeId: this.themes.length === 1 ? this.themes[0].id : null,
+        nouvelleThematique: '',
         description: '', tags: '', status: 'attente',
       });
     }
@@ -590,18 +612,30 @@ export class DocumentsComponent implements OnInit {
   }
 
   async toutUploader(): Promise<void> {
-    const manquants = this.enAttente.filter(p => p.status !== 'ok' && p.themeId === null);
-    if (manquants.length) {
-      manquants.forEach(p => p.erreur = 'La thématique est obligatoire');
+    const aEnvoyer = this.enAttente.filter(p => p.status !== 'ok');
+    let invalide = false;
+    for (const p of aEnvoyer) {
+      if (p.themeId === null) {
+        p.erreur = 'La thématique est obligatoire';
+        invalide = true;
+      } else if (p.themeId === AUTRE_THEME && !p.nouvelleThematique.trim()) {
+        p.erreur = 'Renseignez le nom de la nouvelle thématique';
+        invalide = true;
+      }
+    }
+    if (invalide) {
       this.toast.error('Renseignez la thématique de chaque document');
       return;
     }
     this.uploadEnCours = true;
-    for (const p of this.enAttente.filter(x => x.status !== 'ok')) {
+    for (const p of aEnvoyer) {
       p.status = 'envoi';
       p.erreur = undefined;
       try {
-        await this.docs.upload(p.file, p.title, p.themeId!, p.description, p.tags);
+        const themeId = p.themeId === AUTRE_THEME
+          ? await this.themeIdPourNom(p.nouvelleThematique)
+          : p.themeId!;
+        await this.docs.upload(p.file, p.title, themeId, p.description, p.tags);
         p.status = 'ok';
       } catch (e: unknown) {
         p.status = 'erreur';
@@ -614,6 +648,16 @@ export class DocumentsComponent implements OnInit {
     this.enAttente = this.enAttente.filter(p => p.status !== 'ok');
     if (!this.enAttente.length) this.panneauUpload = false;
     await this.rafraichir();
+  }
+
+  /** Réutilise la thématique si elle existe déjà (insensible à la casse), sinon la crée. */
+  private async themeIdPourNom(nom: string): Promise<number> {
+    const propre = nom.trim();
+    const existante = this.themes.find(t => t.name.toLowerCase() === propre.toLowerCase());
+    if (existante) return existante.id;
+    const creee = await this.docs.createTheme(propre);
+    this.themes = [...this.themes, creee];
+    return creee.id;
   }
 
   private messageErreur(e: unknown): string {
