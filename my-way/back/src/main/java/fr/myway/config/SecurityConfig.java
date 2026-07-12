@@ -31,6 +31,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, SecurityContextRepository securityContextRepository) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                // SAMEORIGIN (au lieu de DENY par défaut) : la visionneuse de
+                // l'espace documentaire affiche les fichiers dans une iframe
+                // du même domaine.
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .securityContext(context -> context.securityContextRepository(securityContextRepository))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login", "/auth/logout").permitAll()
