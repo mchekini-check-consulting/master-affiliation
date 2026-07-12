@@ -41,6 +41,7 @@ services:
       - site-b
       - hi-tech-academy
       - fidexil-front
+      - my-way-front
 
   # ==========================================================
   # Certbot — émission et renouvellement des certificats TLS
@@ -135,6 +136,61 @@ services:
     depends_on:
       - fidexil-back
 
+  # ==========================================================
+  # Application My Way
+  #   reverse-proxy -> my-way-front:80 -> (/api) my-way-back:8080
+  #                                    -> my-way-db:5432
+  # ==========================================================
+
+  # --- Base de données -------------------------------------
+  my-way-db:
+    image: postgres:16-alpine
+    container_name: my-way-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: my_way
+      POSTGRES_USER: my_way
+      POSTGRES_PASSWORD: ${MY_WAY_DB_PASSWORD:-changeme}
+    networks:
+      - my-way-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U my_way -d my_way"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - my-way-db-data:/var/lib/postgresql/data
+
+  # --- Backend Spring Boot ----------------------------------
+  my-way-back:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/my-way-back:${MY_WAY_BACK_TAG:-latest}
+    build: ./my-way/back
+    container_name: my-way-back
+    restart: unless-stopped
+    environment:
+      DB_HOST: my-way-db
+      DB_PORT: "5432"
+      DB_NAME: my_way
+      DB_USERNAME: my_way
+      DB_PASSWORD: ${MY_WAY_DB_PASSWORD:-changeme}
+    networks:
+      - my-way-net
+    depends_on:
+      my-way-db:
+        condition: service_healthy
+
+  # --- Frontend Angular (nginx interne, proxifie /api) -------
+  my-way-front:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/my-way-front:${MY_WAY_FRONT_TAG:-latest}
+    build: ./my-way/front
+    container_name: my-way-front
+    restart: unless-stopped
+    networks:
+      - proxy        # joignable par le reverse proxy
+      - my-way-net   # pour proxifier /api vers le backend
+    depends_on:
+      - my-way-back
+
 # ==========================================================
 # Réseaux
 #   default      : reverse proxy <-> sites de ce projet
@@ -151,10 +207,14 @@ networks:
         - subnet: 10.0.100.0/24
   fidexil-net:
     name: fidexil-net
+  my-way-net:
+    name: my-way-net
 
 volumes:
   # Certificats Let's Encrypt (écrits par certbot, lus par le reverse proxy)
   certbot-etc:
   # Webroot du challenge ACME (écrit par certbot, servi par le reverse proxy)
   certbot-www:
+  # Données PostgreSQL de My Way
+  my-way-db-data:
 #   fidexil-db-data:                          # persistance : à activer plus tard

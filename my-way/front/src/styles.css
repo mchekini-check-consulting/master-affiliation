@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ---- Équivalents des composants shadcn/ui (mêmes classes) ---- */
+@layer components {
+  .ui-btn {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2;
+  }
+  .ui-btn-sm { @apply h-9 rounded-md px-3; }
+  .ui-btn-lg { @apply h-11 rounded-md px-8; }
+  .ui-btn-outline { @apply border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground; }
+  .ui-btn-ghost { @apply bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground; }
+  .ui-input {
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
+  }
+  .ui-textarea { @apply min-h-[80px] h-auto; }
+  .ui-select {
+    @apply appearance-none pr-9 bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+  }
+  .ui-card { @apply rounded-lg border bg-card text-card-foreground shadow-sm; }
+  .ui-card-header { @apply flex flex-col space-y-1.5 p-6; }
+  .ui-card-title { @apply text-2xl font-semibold leading-none tracking-tight; }
+  .ui-card-content { @apply p-6 pt-0; }
+  .ui-badge {
+    @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-primary text-primary-foreground;
+  }
+  .ui-badge-secondary { @apply bg-secondary text-secondary-foreground; }
+  .ui-badge-outline { @apply border-border bg-transparent text-foreground; }
+  .ui-checkbox { @apply h-4 w-4 shrink-0 rounded-sm border border-primary accent-blue-600 cursor-pointer; }
+  .ui-label { @apply text-sm font-medium leading-none; }
+}
+
+/* ---- Slider (équivalent visuel radix) ---- */
+input[type='range'].ui-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, hsl(var(--primary)) var(--fill, 50%), hsl(var(--secondary)) var(--fill, 50%));
+  outline: none;
+}
+input[type='range'].ui-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: hsl(var(--background));
+  border: 2px solid hsl(var(--primary));
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+input[type='range'].ui-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.15);
+}
+input[type='range'].ui-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: hsl(var(--background));
+  border: 2px solid hsl(var(--primary));
+  cursor: pointer;
+}
+
+/* ---- Animations (équivalents framer-motion) ---- */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slide-x {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.anim-fade-up { animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-fade-in { animation: fade-in 0.7s ease both; }
+.anim-scale-in { animation: scale-in 0.5s ease both; }
+.anim-slide-x { animation: slide-x 0.3s ease both; }
+
+/* whileInView : la directive appInView ajoute .in-view */
+.fade-up-on-view { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+.fade-up-on-view.in-view { opacity: 1; transform: translateY(0); }
+
+/* Icônes lucide : la taille vient des classes tailwind sur l'élément */
+lucide-icon { display: inline-flex; flex-shrink: 0; }
+lucide-icon svg { width: 100%; height: 100%; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
