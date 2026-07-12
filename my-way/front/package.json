@@ -20,6 +20,8 @@
     "@angular/router": "^19.2.0",
     "@angular/ssr": "^19.2.27",
     "lucide-angular": "^1.0.0",
+    "modele-social": "^11.0.0",
+    "publicodes": "^1.10.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
