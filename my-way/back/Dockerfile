@@ -10,7 +10,11 @@ RUN mvn -q package -DskipTests
 # Étape 2 : JRE léger, utilisateur non-root
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-RUN addgroup -S spring && adduser -S spring -G spring
+# /data/documents : stockage de l'espace documentaire. Créé et approprié à
+# l'utilisateur applicatif dans l'image pour que le volume nommé hérite des
+# bons droits à sa première initialisation.
+RUN addgroup -S spring && adduser -S spring -G spring \
+ && mkdir -p /data/documents && chown -R spring:spring /data
 USER spring
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
