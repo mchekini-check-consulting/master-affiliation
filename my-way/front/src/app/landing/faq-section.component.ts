@@ -13,7 +13,7 @@ import { InViewDirective } from '../core/in-view.directive';
             Questions fréquentes
           </h2>
           <p class="text-lg text-slate-600">
-            Tout ce que vous devez savoir sur IndepBoost
+            Tout ce que vous devez savoir sur freelance-now
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export class FaqSectionComponent {
 
   protected readonly faqs = [
     {
-      q: 'IndepBoost est-il vraiment gratuit ?',
+      q: 'freelance-now est-il vraiment gratuit ?',
       a: "Oui, 100% gratuit. Nous nous rémunérons via des partenariats (experts-comptables, assurances, etc.) et de l'apport d'affaires. Aucun coût caché, jamais.",
     },
     {
@@ -65,7 +65,7 @@ export class FaqSectionComponent {
       a: 'Créez votre compte gratuit en 2 minutes. Vous aurez immédiatement accès aux codes promo négociés et pourrez activer les alertes missions selon vos critères.',
     },
     {
-      q: 'Qui peut rejoindre IndepBoost ?',
+      q: 'Qui peut rejoindre freelance-now ?',
       a: 'Tous les freelances IT en France : développeurs, data scientists, DevOps, product managers, designers UX/UI, etc. Que vous débutiez ou que vous soyez confirmé.',
     },
   ];

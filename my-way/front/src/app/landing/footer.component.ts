@@ -13,7 +13,7 @@ import { LucideAngularModule, Zap } from 'lucide-angular';
               <div class="w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/30">
                 <lucide-icon [img]="ic.Zap" class="w-5 h-5 text-white" />
               </div>
-              <span class="text-lg font-bold text-white">IndepBoost</span>
+              <span class="text-lg font-bold text-white">freelance-now</span>
             </div>
             <p class="text-sm leading-relaxed">
               La plateforme tout-en-un créée par des indépendants, pour des indépendants IT en France.
@@ -52,7 +52,7 @@ import { LucideAngularModule, Zap } from 'lucide-angular';
         </div>
 
         <div class="border-t border-slate-800 pt-8 text-center text-sm">
-          <p>© {{ year }} IndepBoost. Tous droits réservés.</p>
+          <p>© {{ year }} freelance-now. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

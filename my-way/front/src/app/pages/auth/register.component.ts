@@ -18,7 +18,7 @@ import { SeoService } from '../../core/seo.service';
             <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
               <lucide-icon [img]="ic.Zap" class="w-6 h-6 text-white" />
             </div>
-            <span class="text-2xl font-bold text-slate-900">IndepBoost</span>
+            <span class="text-2xl font-bold text-slate-900">freelance-now</span>
           </a>
         </div>
 
@@ -107,8 +107,8 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.seo.set({
-      title: 'Créer mon espace gratuit — IndepBoost',
-      description: 'Créez votre espace IndepBoost gratuit en 2 minutes.',
+      title: 'Créer mon espace gratuit — freelance-now',
+      description: 'Créez votre espace freelance-now gratuit en 2 minutes.',
       path: '/Register',
       noindex: true,
     });

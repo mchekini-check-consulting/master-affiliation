@@ -125,7 +125,7 @@ export class DealsComponent {
     {
       id: 1, company: 'GitHub', logo: '🐙',
       title: 'GitHub Team - 50% de réduction',
-      description: 'Offre exclusive pour les freelances IndepBoost sur GitHub Team',
+      description: 'Offre exclusive pour les freelances freelance-now sur GitHub Team',
       discount: '-50%', code: 'INDEP50', category: 'Développement',
       validUntil: '30 juin 2026', featured: true,
     },

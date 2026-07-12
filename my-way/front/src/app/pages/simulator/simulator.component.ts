@@ -416,7 +416,7 @@ export class SimulatorComponent implements OnInit {
 
   ngOnInit(): void {
     this.seo.set({
-      title: 'Simulateur de revenus freelance : micro, EURL, SASU, portage, salariat — IndepBoost',
+      title: 'Simulateur de revenus freelance : micro, EURL, SASU, portage, salariat — freelance-now',
       description: 'Comparez gratuitement votre net après impôt sous tous les statuts (micro-entreprise, EURL, SASU IS/IR, portage salarial, salariat) avec le moteur officiel URSSAF, impôt du foyer et droits sociaux inclus.',
       path: '/',
     });

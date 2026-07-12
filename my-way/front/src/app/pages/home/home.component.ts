@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.seo.set({
-      title: 'IndepBoost — La plateforme tout-en-un des freelances IT',
+      title: 'freelance-now — La plateforme tout-en-un des freelances IT',
       description: "Simulateurs de statuts, communauté, missions, bons plans et accompagnement : tout ce qu'il faut pour réussir en freelance IT, gratuitement.",
       path: '/Home',
     });

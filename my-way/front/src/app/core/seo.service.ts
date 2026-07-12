@@ -24,7 +24,7 @@ export class SeoService {
     this.meta.updateTag({ property: 'og:description', content: config.description });
     this.meta.updateTag({ property: 'og:type', content: 'website' });
     this.meta.updateTag({ property: 'og:url', content: SITE_URL + config.path });
-    this.meta.updateTag({ property: 'og:site_name', content: 'IndepBoost' });
+    this.meta.updateTag({ property: 'og:site_name', content: 'freelance-now' });
 
     if (config.noindex) {
       this.meta.updateTag({ name: 'robots', content: 'noindex, nofollow' });

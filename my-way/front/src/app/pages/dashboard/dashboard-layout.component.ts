@@ -33,7 +33,7 @@ interface MenuItem { icon: LucideIconData; label: string; path: string | null; s
               <div class="w-7 h-7 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-lg flex items-center justify-center">
                 <lucide-icon [img]="ic.Zap" class="w-4 h-4 text-white" />
               </div>
-              <span class="font-bold text-slate-900">IndepBoost</span>
+              <span class="font-bold text-slate-900">freelance-now</span>
             </div>
             <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center">
               {{ initials }}
@@ -46,6 +46,21 @@ interface MenuItem { icon: LucideIconData; label: string; path: string | null; s
           <div class="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm" (click)="mobileOpen = false"></div>
         }
 
+        <!-- Barre supérieure desktop : profil connecté en haut à droite -->
+        <header class="hidden lg:flex fixed top-0 left-72 right-0 z-30 h-16 bg-white border-b border-slate-200 items-center justify-end px-6">
+          <div class="flex items-center gap-3">
+            <div class="text-right min-w-0">
+              <p class="text-sm font-semibold text-slate-900 truncate">{{ user.full_name }}</p>
+              <p class="text-xs text-slate-500 truncate">
+                {{ user.specialties?.length ? user.specialties![0] : 'Freelance IT' }}
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-emerald-400 text-white font-bold flex items-center justify-center">
+              {{ initials }}
+            </div>
+          </div>
+        </header>
+
         <!-- Sidebar -->
         <aside
           class="fixed top-0 left-0 h-full w-72 bg-white border-r border-slate-200 z-50 transition-transform duration-300"
@@ -57,23 +72,8 @@ interface MenuItem { icon: LucideIconData; label: string; path: string | null; s
                 <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-lg flex items-center justify-center">
                   <lucide-icon [img]="ic.Zap" class="w-5 h-5 text-white" />
                 </div>
-                <span class="text-lg font-bold text-slate-900">IndepBoost</span>
+                <span class="text-lg font-bold text-slate-900">freelance-now</span>
               </a>
-            </div>
-
-            <!-- User Profile -->
-            <div class="p-4 border-b border-slate-200">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-emerald-400 text-white font-bold flex items-center justify-center">
-                  {{ initials }}
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-slate-900 truncate">{{ user.full_name }}</p>
-                  <p class="text-xs text-slate-500 truncate">
-                    {{ user.specialties?.length ? user.specialties![0] : 'Freelance IT' }}
-                  </p>
-                </div>
-              </div>
             </div>
 
             <!-- Navigation -->
@@ -124,7 +124,7 @@ interface MenuItem { icon: LucideIconData; label: string; path: string | null; s
         </aside>
 
         <!-- Main Content -->
-        <main class="lg:pl-72 pt-16 lg:pt-0">
+        <main class="lg:pl-72 pt-16">
           <div class="min-h-screen">
             <ng-content />
           </div>

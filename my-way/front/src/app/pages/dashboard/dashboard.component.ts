@@ -19,7 +19,7 @@ import { simulateAE, simulateSASU, getBestStatus } from '../../core/simulator-co
             <h1 class="text-3xl font-bold text-slate-900 mb-2">
               Bonjour {{ firstName }} 👋
             </h1>
-            <p class="text-slate-500">Voici un aperçu de votre espace IndepBoost</p>
+            <p class="text-slate-500">Voici un aperçu de votre espace freelance-now</p>
           </div>
 
           <!-- Quick Stats -->

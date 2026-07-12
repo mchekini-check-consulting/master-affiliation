@@ -15,7 +15,7 @@ import { AuthService } from '../core/auth.service';
             <div class="w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/30">
               <lucide-icon [img]="ic.Zap" class="w-5 h-5 text-white" />
             </div>
-            <span class="text-xl font-bold text-slate-900">IndepBoost</span>
+            <span class="text-xl font-bold text-slate-900">freelance-now</span>
           </a>
 
           <!-- Desktop nav -->

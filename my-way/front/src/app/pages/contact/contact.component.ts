@@ -91,7 +91,7 @@ import { SeoService } from '../../core/seo.service';
                   <div class="flex items-start gap-2">
                     <input type="checkbox" id="rgpd" class="ui-checkbox mt-0.5" [(ngModel)]="rgpd" name="rgpd" />
                     <label for="rgpd" class="text-xs text-slate-500 leading-relaxed cursor-pointer">
-                      J'accepte que mes données soient traitées conformément à la politique de confidentialité d'IndepBoost.
+                      J'accepte que mes données soient traitées conformément à la politique de confidentialité d'freelance-now.
                     </label>
                   </div>
                   <button
@@ -126,8 +126,8 @@ export class ContactComponent implements OnInit {
 
   ngOnInit(): void {
     this.seo.set({
-      title: 'Contact — IndepBoost',
-      description: "Une question, une suggestion, un partenariat ? Contactez l'équipe IndepBoost, nous sommes à votre écoute.",
+      title: 'Contact — freelance-now',
+      description: "Une question, une suggestion, un partenariat ? Contactez l'équipe freelance-now, nous sommes à votre écoute.",
       path: '/Contact',
     });
   }
@@ -148,7 +148,7 @@ export class ContactComponent implements OnInit {
   ];
 
   protected readonly infoCards = [
-    { icon: Mail, title: 'Email', text: 'contact@indepboost.fr' },
+    { icon: Mail, title: 'Email', text: 'contact@freelance-now.fr' },
     { icon: Phone, title: 'Téléphone', text: '+33 1 23 45 67 89' },
     { icon: MapPin, title: 'Localisation', text: 'Paris, France' },
   ];

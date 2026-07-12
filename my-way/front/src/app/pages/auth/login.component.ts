@@ -18,7 +18,7 @@ import { SeoService } from '../../core/seo.service';
             <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
               <lucide-icon [img]="ic.Zap" class="w-6 h-6 text-white" />
             </div>
-            <span class="text-2xl font-bold text-slate-900">IndepBoost</span>
+            <span class="text-2xl font-bold text-slate-900">freelance-now</span>
           </a>
         </div>
 
@@ -103,8 +103,8 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.seo.set({
-      title: 'Connexion — IndepBoost',
-      description: 'Connectez-vous à votre espace IndepBoost.',
+      title: 'Connexion — freelance-now',
+      description: 'Connectez-vous à votre espace freelance-now.',
       path: '/Login',
       noindex: true,
     });

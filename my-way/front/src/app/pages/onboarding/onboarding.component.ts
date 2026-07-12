@@ -139,7 +139,7 @@ import { SliderComponent } from '../../shared/slider.component';
                   </div>
                   <div>
                     <h2 class="text-xl font-bold text-slate-900">Vos objectifs</h2>
-                    <p class="text-sm text-slate-500">Que cherchez-vous sur IndepBoost ?</p>
+                    <p class="text-sm text-slate-500">Que cherchez-vous sur freelance-now ?</p>
                   </div>
                 </div>
 
