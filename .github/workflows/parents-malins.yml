@@ -1,0 +1,20 @@
+# Pipeline du projet parents-malins : ne se déclenche que si parents-malins/ change sur main.
+name: parents-malins
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "parents-malins/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-project.yml
+    with:
+      project: parents-malins
+    secrets: inherit

@@ -16,12 +16,14 @@ master-affiliation/
 │   ├── site-a.yml            # Pipeline site-a (déclenchée si site-a/** change)
 │   ├── site-b.yml            # Pipeline site-b (déclenchée si site-b/** change)
 │   ├── hi-tech-academy.yml   # Pipeline hi-tech-academy (déclenchée si hi-tech-academy/** change)
+│   ├── parents-malins.yml    # Pipeline parents-malins (déclenchée si parents-malins/** change)
 │   └── my-way.yml            # Pipeline my-way (fullstack : images back + front)
 ├── site-a/                   # Projet temporaire A (port 3001)
 │   ├── Dockerfile            # Build Astro → nginx
 │   └── src/                  # Code du site
 ├── site-b/                   # Projet temporaire B (port 3002)
 ├── hi-tech-academy/          # Hi-Tech Academy (hi-tech-academy.fr) — React/Vite + Base44, servi en SPA
+├── parents-malins/           # Parents Malins (parents-malins.fr) — Astro statique → nginx
 └── my-way/                   # My Way (my-way.fr) — Angular + Spring Boot + PostgreSQL
     ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
     └── front/                # Front Angular (Dockerfile multi-stage Node → nginx, proxifie /api)

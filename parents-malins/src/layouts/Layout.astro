@@ -1,0 +1,63 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#2b2440" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --surface: #fdf9f3;
+    --nuit: #2b2440;
+    --encre: #332c4a;
+    --estompe: #6f6885;
+    --soleil: #f2a541;
+    --corail: #e46e5a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--nuit);
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    line-height: 1.65;
+    color: var(--encre);
+    background: var(--surface);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--soleil);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+</style>
