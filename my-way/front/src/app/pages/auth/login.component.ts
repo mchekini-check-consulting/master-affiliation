@@ -2,8 +2,10 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule, Zap, LogIn } from 'lucide-angular';
+import { OnInit } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
+import { SeoService } from '../../core/seo.service';
 
 @Component({
   selector: 'app-login',
@@ -91,12 +93,22 @@ import { ToastService } from '../../core/toast.service';
     </div>
   `,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toast = inject(ToastService);
+  private seo = inject(SeoService);
   protected readonly ic = { Zap, LogIn };
+
+  ngOnInit(): void {
+    this.seo.set({
+      title: 'Connexion — IndepBoost',
+      description: 'Connectez-vous à votre espace IndepBoost.',
+      path: '/Login',
+      noindex: true,
+    });
+  }
 
   email = '';
   password = '';

@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { InViewDirective } from '../core/in-view.directive';
 
 @Component({
@@ -77,7 +78,10 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
     },
   ];
 
+  private platformId = inject(PLATFORM_ID);
+
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.interval = setInterval(() => {
       this.current = (this.current + 1) % this.testimonials.length;
     }, 6000);

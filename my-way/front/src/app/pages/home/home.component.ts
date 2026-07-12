@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { SeoService } from '../../core/seo.service';
 import { NavbarComponent } from '../../landing/navbar.component';
 import { HeroSectionComponent } from '../../landing/hero-section.component';
 import { ServicesSectionComponent } from '../../landing/services-section.component';
@@ -39,4 +40,14 @@ import { FooterComponent } from '../../landing/footer.component';
     </div>
   `,
 })
-export class HomeComponent {}
+export class HomeComponent implements OnInit {
+  private seo = inject(SeoService);
+
+  ngOnInit(): void {
+    this.seo.set({
+      title: 'IndepBoost — La plateforme tout-en-un des freelances IT',
+      description: "Simulateurs de statuts, communauté, missions, bons plans et accompagnement : tout ce qu'il faut pour réussir en freelance IT, gratuitement.",
+      path: '/Home',
+    });
+  }
+}

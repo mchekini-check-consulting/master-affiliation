@@ -6,6 +6,7 @@ import { FooterComponent } from '../../landing/footer.component';
 import { SliderComponent } from '../../shared/slider.component';
 import { SwitchComponent } from '../../shared/switch.component';
 import { AuthService } from '../../core/auth.service';
+import { SeoService } from '../../core/seo.service';
 import { SimResult } from '../../core/models';
 import { simulateAE, simulateSASU } from '../../core/simulator-config';
 
@@ -190,6 +191,7 @@ import { simulateAE, simulateSASU } from '../../core/simulator-config';
 })
 export class SimulatorComponent implements OnInit {
   private auth = inject(AuthService);
+  private seo = inject(SeoService);
   protected readonly ic = { Calculator, TrendingUp, AlertTriangle, Award, ArrowRight, Lock };
 
   tjm = 500;
@@ -200,6 +202,11 @@ export class SimulatorComponent implements OnInit {
   isAuth = false;
 
   ngOnInit(): void {
+    this.seo.set({
+      title: 'Simulateur de revenus freelance : Auto-entrepreneur vs SASU — IndepBoost',
+      description: 'Simulez gratuitement vos revenus de freelance IT en 2 minutes : comparez Auto-entrepreneur et SASU (charges, IR, ACRE) et découvrez votre net mensuel réel.',
+      path: '/',
+    });
     this.auth.isAuthenticated().then(v => this.isAuth = v);
     this.compute();
   }

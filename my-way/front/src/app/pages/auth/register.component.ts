@@ -2,8 +2,10 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule, Zap, UserPlus } from 'lucide-angular';
+import { OnInit } from '@angular/core';
 import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
+import { SeoService } from '../../core/seo.service';
 
 @Component({
   selector: 'app-register',
@@ -95,12 +97,22 @@ import { ToastService } from '../../core/toast.service';
     </div>
   `,
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toast = inject(ToastService);
+  private seo = inject(SeoService);
   protected readonly ic = { Zap, UserPlus };
+
+  ngOnInit(): void {
+    this.seo.set({
+      title: 'Créer mon espace gratuit — IndepBoost',
+      description: 'Créez votre espace IndepBoost gratuit en 2 minutes.',
+      path: '/Register',
+      noindex: true,
+    });
+  }
 
   fullName = '';
   email = '';

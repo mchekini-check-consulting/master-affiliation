@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Send, CheckCircle2, Mail, Phone, MapPin } from 'lucide-angular';
 import { NavbarComponent } from '../../landing/navbar.component';
 import { FooterComponent } from '../../landing/footer.component';
 import { ContactService } from '../../core/contact.service';
+import { SeoService } from '../../core/seo.service';
 
 @Component({
   selector: 'app-contact',
@@ -119,8 +120,17 @@ import { ContactService } from '../../core/contact.service';
     </div>
   `,
 })
-export class ContactComponent {
+export class ContactComponent implements OnInit {
   private contactService = inject(ContactService);
+  private seo = inject(SeoService);
+
+  ngOnInit(): void {
+    this.seo.set({
+      title: 'Contact — IndepBoost',
+      description: "Une question, une suggestion, un partenariat ? Contactez l'équipe IndepBoost, nous sommes à votre écoute.",
+      path: '/Contact',
+    });
+  }
   protected readonly ic = { Send, CheckCircle2, Mail, Phone, MapPin };
 
   form = { first_name: '', last_name: '', email: '', phone: '', subject: '', message: '' };

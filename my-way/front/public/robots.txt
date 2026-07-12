@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /Dashboard
+Disallow: /Onboarding
+Disallow: /MySimulations
+Disallow: /AdvancedSimulator
+Disallow: /Community
+Disallow: /Missions
+Disallow: /Deals
+Disallow: /Login
+Disallow: /Register
+
+Sitemap: https://my-way.fr/sitemap.xml

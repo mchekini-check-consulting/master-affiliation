@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -8,8 +9,13 @@ import { User } from './models';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
   me(): Promise<User> {
+    // Au prérendu (serveur), pas de session : on rend la version anonyme
+    if (!isPlatformBrowser(this.platformId)) {
+      return Promise.reject(new Error('server'));
+    }
     return firstValueFrom(this.http.get<User>('/api/auth/me'));
   }
 

@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 interface Metric { value: number; suffix: string; label: string; prefix: string; count: number; }
 
@@ -33,7 +34,14 @@ export class MetricsSectionComponent implements OnInit, OnDestroy {
     { value: 500, suffix: '+', label: 'Missions partagées/mois', prefix: '', count: 0 },
   ];
 
+  private platformId = inject(PLATFORM_ID);
+
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      // Prérendu : afficher directement les valeurs finales dans le HTML
+      this.metrics.forEach(m => m.count = m.value);
+      return;
+    }
     this.observer = new IntersectionObserver((entries) => {
       if (entries.some(e => e.isIntersecting)) {
         this.startCounters();
