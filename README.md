@@ -24,7 +24,7 @@ master-affiliation/
 ├── site-b/                   # Projet temporaire B (port 3002)
 ├── hi-tech-academy/          # Hi-Tech Academy (hi-tech-academy.fr) — React/Vite + Base44, servi en SPA
 ├── parents-malins/           # Parents Malins (parents-malins.fr) — Astro statique → nginx
-└── my-way/                   # My Way (my-way.fr) — Angular + Spring Boot + PostgreSQL
+└── my-way/                   # My Way (freelance-now.fr) — Angular + Spring Boot + PostgreSQL
     ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
     └── front/                # Front Angular (Dockerfile multi-stage Node → nginx, proxifie /api)
 ```

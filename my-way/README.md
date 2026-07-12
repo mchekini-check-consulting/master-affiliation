@@ -4,7 +4,7 @@ Plateforme pour freelances IT (« IndepBoost ») : front **Angular 19** (Tailwin
 rendu repris de la maquette boost-your-freelance), back **Java Spring Boot**
 (Java 21), base **PostgreSQL**.
 
-- **Domaine** : https://my-way.fr
+- **Domaine** : https://freelance-now.fr
 - **Services Docker** (compose racine) : `my-way-front` (port interne 80),
   `my-way-back` (port interne 8080), `my-way-db` (PostgreSQL 16, jamais exposée)
 - **Images** : `ghcr.io/mchekini-check-consulting/master-affiliation/my-way-front` et `…/my-way-back`

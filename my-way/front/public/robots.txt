@@ -10,4 +10,4 @@ Disallow: /Deals
 Disallow: /Login
 Disallow: /Register
 
-Sitemap: https://my-way.fr/sitemap.xml
+Sitemap: https://freelance-now.fr/sitemap.xml
