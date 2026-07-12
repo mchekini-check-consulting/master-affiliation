@@ -129,7 +129,10 @@ export class FiscalEngineService {
   private portage(p: PersonneInput): StatutResult {
     const ca = caAnnuel(p.revenu);
     const commission = ca * p.options.commissionPortage / 100;
-    const coutEmployeur = Math.max(0, ca - commission);
+    // Les frais professionnels sont remboursés par la société de portage : ils
+    // sortent de l'assiette cotisée et reviennent au salarié porté sans impôt.
+    const fraisRembourses = Math.min(Math.max(0, p.revenu.depenses), Math.max(0, ca - commission));
+    const coutEmployeur = Math.max(0, ca - commission - fraisRembourses);
 
     // CDI de portage statut cadre : le brut est déduit du compte d'activité par
     // inversion (coût employeur → brut), comme sur le simulateur URSSAF.
@@ -145,14 +148,17 @@ export class FiscalEngineService {
     const details: LigneDetail[] = [
       { label: "Chiffre d'affaires", montant: ca },
       { label: `Commission de portage (${p.options.commissionPortage} %)`, montant: -commission },
+      ...(fraisRembourses > 0
+        ? [{ label: 'Frais professionnels remboursés (non soumis)', montant: fraisRembourses }]
+        : []),
       { label: 'Salaire brut (CDI portage cadre)', montant: brut },
       { label: 'Cotisations (salariales + patronales)', montant: net - coutEmployeur },
-      { label: 'Net avant impôt', montant: net, emphase: true },
+      { label: 'Net avant impôt', montant: net + fraisRembourses, emphase: true },
     ];
     return {
       id: 'portage', label: STATUT_LABELS['portage'], eligible: true,
-      caAnnuel: ca, depenses: 0, cotisations: coutEmployeur - net, impotSociete: 0, salaireBrut: brut,
-      netAvantImpot: net, dividendesBruts: 0, dividendesNets: 0,
+      caAnnuel: ca, depenses: p.revenu.depenses, cotisations: coutEmployeur - net, impotSociete: 0, salaireBrut: brut,
+      netAvantImpot: net + fraisRembourses, dividendesBruts: 0, dividendesNets: 0,
       imposableActivite: imposable, imposableDejaAbattu: 0, impotForfaitaire: 0,
       droits: this.droits(trimestres, 'AGIRC-ARRCO', true, 'Complètes'),
       details,
