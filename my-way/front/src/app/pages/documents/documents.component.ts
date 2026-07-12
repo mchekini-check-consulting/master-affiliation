@@ -293,54 +293,80 @@ const TYPES: { id: FileFamily; label: string }[] = [
                   <lucide-icon [img]="ic.ChevronDown" class="w-4 h-4 text-slate-400 transition-transform" [class.rotate-180]="!groupe.replie" />
                 </button>
                 @if (!groupe.replie) {
-                  <div class="border-t border-slate-100">
+                  <div class="border-t border-slate-100 p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     @for (d of groupe.docs; track d.id) {
-                      <div class="px-6 py-4 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors">
-                        <div class="flex items-start gap-4">
-                          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" [class]="fondIcone(d.file_type)">
-                            <lucide-icon [img]="icone(d.file_type)" class="w-5 h-5" />
-                          </div>
-                          <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-slate-900">{{ d.title }}</p>
-                            <p class="text-xs text-slate-400 mt-0.5">
-                              {{ libelleType(d.file_type) }} · {{ taille(d.size_bytes) }} · publié le {{ dateFr(d.published_date) }}
+                      <div class="rounded-xl border border-slate-200 bg-white overflow-hidden flex flex-col hover:shadow-lg hover:border-slate-300 transition-all">
+                        <!-- Aperçu (cliquable pour PDF et images) -->
+                        <button type="button"
+                          class="relative h-44 w-full bg-slate-100 overflow-hidden block"
+                          [class.cursor-zoom-in]="visualisable(d)"
+                          [class.cursor-default]="!visualisable(d)"
+                          (click)="visualisable(d) ? voir(d) : null">
+                          @if (d.file_type === 'IMAGE') {
+                            <img [src]="urlFichier(d)" [alt]="d.title" loading="lazy"
+                              class="w-full h-full object-cover" />
+                          } @else if (d.file_type === 'PDF') {
+                            <iframe [src]="apercu(d)" loading="lazy" tabindex="-1"
+                              class="w-full h-full pointer-events-none border-0 bg-white"
+                              title="Aperçu de {{ d.title }}"></iframe>
+                          } @else {
+                            <div class="w-full h-full flex flex-col items-center justify-center gap-2" [class]="fondIcone(d.file_type)">
+                              <lucide-icon [img]="icone(d.file_type)" class="w-12 h-12" />
+                              <span class="text-xs font-bold uppercase tracking-wide">{{ libelleType(d.file_type) }}</span>
+                            </div>
+                          }
+                          <span class="absolute top-2 right-2 ui-badge px-2 py-0.5 text-[10px] font-bold uppercase shadow-sm"
+                            [class]="fondIcone(d.file_type)">{{ libelleType(d.file_type) }}</span>
+                        </button>
+
+                        <!-- Métadonnées -->
+                        <div class="p-3.5 flex-1 flex flex-col">
+                          <p class="font-semibold text-slate-900 text-sm leading-snug line-clamp-2" [title]="d.title">{{ d.title }}</p>
+                          <p class="text-xs text-slate-400 mt-1">{{ taille(d.size_bytes) }} · {{ dateFr(d.published_date) }}</p>
+                          @if (d.description) {
+                            <p class="text-xs text-slate-500 mt-1.5 line-clamp-2" [title]="d.description">{{ d.description }}</p>
+                          }
+                          @if (d.tags.length) {
+                            <p class="mt-1.5">
+                              @for (tag of d.tags; track tag) {
+                                <span class="ui-badge bg-slate-100 text-slate-500 px-1.5 py-0.5 text-[10px] mr-1">{{ tag }}</span>
+                              }
                             </p>
-                            @if (d.description) { <p class="text-sm text-slate-500 mt-1">{{ d.description }}</p> }
-                            @if (d.tags.length) {
-                              <p class="mt-1.5">
-                                @for (tag of d.tags; track tag) {
-                                  <span class="ui-badge bg-slate-100 text-slate-500 px-2 py-0.5 text-xs mr-1">{{ tag }}</span>
-                                }
-                              </p>
-                            }
-                          </div>
-                          <div class="flex items-center gap-2 shrink-0">
-                            @if (d.file_type === 'PDF' || d.file_type === 'IMAGE') {
-                              <button (click)="voir(d)" class="ui-btn ui-btn-sm ui-btn-outline">
+                          }
+
+                          <!-- Actions -->
+                          <div class="flex items-center gap-1.5 mt-auto pt-3">
+                            @if (visualisable(d)) {
+                              <button (click)="voir(d)" class="ui-btn ui-btn-sm ui-btn-outline flex-1" title="Visionneuse intégrée">
                                 <lucide-icon [img]="ic.Eye" class="w-4 h-4 mr-1" /> Voir
                               </button>
                               <a [href]="urlFichier(d)" target="_blank" rel="noopener"
-                                class="ui-btn ui-btn-sm ui-btn-outline" title="Ouvrir dans un onglet du navigateur">
+                                class="ui-btn ui-btn-sm ui-btn-outline px-2.5" title="Ouvrir dans un onglet du navigateur">
                                 <lucide-icon [img]="ic.ExternalLink" class="w-4 h-4" />
                               </a>
                             }
-                            <a [href]="urlTelechargement(d)" class="ui-btn ui-btn-sm bg-blue-600 hover:bg-blue-700 text-white">
-                              <lucide-icon [img]="ic.Download" class="w-4 h-4 mr-1" /> Télécharger
+                            <a [href]="urlTelechargement(d)" class="ui-btn ui-btn-sm bg-blue-600 hover:bg-blue-700 text-white px-2.5"
+                              [class.flex-1]="!visualisable(d)" title="Télécharger ({{ d.original_filename }})">
+                              <lucide-icon [img]="ic.Download" class="w-4 h-4" />
+                              @if (!visualisable(d)) { <span class="ml-1">Télécharger</span> }
                             </a>
-                            @if (isAdmin) {
-                              <button (click)="ouvrirEdition(d)" class="p-1.5 text-slate-400 hover:text-blue-600" title="Modifier">
-                                <lucide-icon [img]="ic.Pencil" class="w-4 h-4" />
-                              </button>
+                          </div>
+
+                          @if (isAdmin) {
+                            <div class="flex items-center justify-end gap-1 mt-2 pt-2 border-t border-slate-100">
                               @if (suppressionDocId === d.id) {
-                                <button (click)="supprimer(d)" class="ui-btn ui-btn-sm bg-red-600 text-white">Confirmer</button>
+                                <button (click)="supprimer(d)" class="ui-btn ui-btn-sm bg-red-600 text-white flex-1">Confirmer la suppression</button>
                                 <button (click)="suppressionDocId = null" class="ui-btn ui-btn-sm ui-btn-outline">Annuler</button>
                               } @else {
+                                <button (click)="ouvrirEdition(d)" class="p-1.5 text-slate-400 hover:text-blue-600" title="Modifier">
+                                  <lucide-icon [img]="ic.Pencil" class="w-4 h-4" />
+                                </button>
                                 <button (click)="suppressionDocId = d.id" class="p-1.5 text-slate-400 hover:text-red-500" title="Supprimer">
                                   <lucide-icon [img]="ic.Trash2" class="w-4 h-4" />
                                 </button>
                               }
-                            }
-                          </div>
+                            </div>
+                          }
                         </div>
                       </div>
                     }
@@ -456,6 +482,8 @@ export class DocumentsComponent implements OnInit {
   visionneuse: DocItem | null = null;
   urlVisionneuse: SafeResourceUrl | null = null;
   zoomImage = false;
+  /** URLs d'aperçu PDF, mises en cache pour garder des références stables (sinon les iframes rechargent en boucle). */
+  private apercus = new Map<number, SafeResourceUrl>();
 
   // Admin
   panneauUpload = false;
@@ -502,6 +530,13 @@ export class DocumentsComponent implements OnInit {
       ]);
       this.themes = themes;
       this.resultats = resultats;
+      for (const d of resultats) {
+        if (d.file_type === 'PDF' && !this.apercus.has(d.id)) {
+          // Aperçu première page, sans barre d'outils ni panneau latéral
+          this.apercus.set(d.id, this.sanitizer.bypassSecurityTrustResourceUrl(
+            this.docs.fileUrl(d.id) + '#toolbar=0&navpanes=0&scrollbar=0&view=FitH'));
+        }
+      }
       this.grouper();
     } catch {
       this.toast.error('Impossible de charger les documents');
@@ -572,6 +607,14 @@ export class DocumentsComponent implements OnInit {
 
   urlFichier(d: DocItem): string {
     return this.docs.fileUrl(d.id);
+  }
+
+  apercu(d: DocItem): SafeResourceUrl | null {
+    return this.apercus.get(d.id) ?? null;
+  }
+
+  visualisable(d: DocItem): boolean {
+    return d.file_type === 'PDF' || d.file_type === 'IMAGE';
   }
 
   // ------------------------------------------------------------------
