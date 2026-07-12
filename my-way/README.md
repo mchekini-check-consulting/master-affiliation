@@ -28,7 +28,14 @@ via les variables d'environnement `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`
   Le bouton « Se connecter avec Google » est présent mais pas encore actif.
 - **Espace connecté** (après onboarding en 3 étapes) : dashboard, simulateur
   avancé (AE/SASU/EURL/portage), simulations sauvegardées, communauté,
-  missions, bons plans.
+  missions, bons plans, espace documentaire.
+- **Espace documentaire** : documents (PDF, Word, Excel, images) organisés par
+  thématique, visionneuse intégrée (PDF/images), téléchargement, recherche
+  multicritère. L'administration (upload, thématiques, corbeille 30 j) est
+  réservée au rôle `ADMIN` — contrôle appliqué côté API. Fichiers stockés sur
+  le volume `my-way-documents` sous identifiant technique, MIME réel vérifié
+  (Apache Tika), 20 Mo max (`MAX_UPLOAD_SIZE`). Promotion d'un admin :
+  `UPDATE users SET role = 'ADMIN' WHERE email = '...';`
 
 ## API (context-path /api, JSON en snake_case)
 

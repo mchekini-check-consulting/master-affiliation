@@ -11,6 +11,8 @@ export interface User {
   household_income?: number;
   goals?: string[];
   onboarding_completed?: boolean;
+  /** USER (défaut) ou ADMIN — pilote l'affichage des fonctions d'administration. */
+  role?: string;
 }
 
 export interface Simulation {

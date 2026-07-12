@@ -15,14 +15,15 @@ public record UserDto(
         Double familyShares,
         Integer householdIncome,
         List<String> goals,
-        boolean onboardingCompleted
+        boolean onboardingCompleted,
+        String role
 ) {
     public static UserDto from(UserAccount u) {
         return new UserDto(
                 u.getId(), u.getEmail(), u.getFullName(), u.getCity(),
                 u.getSpecialties(), u.getCurrentStatus(), u.getDesiredTjm(),
                 u.getDaysPerMonth(), u.getFamilyShares(), u.getHouseholdIncome(),
-                u.getGoals(), u.isOnboardingCompleted()
+                u.getGoals(), u.isOnboardingCompleted(), u.getRole()
         );
     }
 }

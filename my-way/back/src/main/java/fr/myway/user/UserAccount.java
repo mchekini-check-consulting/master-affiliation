@@ -45,6 +45,10 @@ public class UserAccount {
     @Column(nullable = false)
     private boolean onboardingCompleted = false;
 
+    // Rôle applicatif : USER (défaut) ou ADMIN. Promotion manuelle en base :
+    //   UPDATE users SET role = 'ADMIN' WHERE email = '...';
+    private String role;
+
     @CreationTimestamp
     @Column(updatable = false)
     private Instant createdDate;
@@ -72,6 +76,9 @@ public class UserAccount {
     public void setHouseholdIncome(Integer householdIncome) { this.householdIncome = householdIncome; }
     public List<String> getGoals() { return goals; }
     public void setGoals(List<String> goals) { this.goals = goals; }
+    public String getRole() { return role == null || role.isBlank() ? "USER" : role; }
+    public void setRole(String role) { this.role = role; }
+    public boolean isAdmin() { return "ADMIN".equalsIgnoreCase(getRole()); }
     public boolean isOnboardingCompleted() { return onboardingCompleted; }
     public void setOnboardingCompleted(boolean onboardingCompleted) { this.onboardingCompleted = onboardingCompleted; }
     public Instant getCreatedDate() { return createdDate; }

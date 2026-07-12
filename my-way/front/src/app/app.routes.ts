@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'AdvancedSimulator', loadComponent: () => import('./pages/advanced-simulator/advanced-simulator.component').then(m => m.AdvancedSimulatorComponent) },
   { path: 'Community', loadComponent: () => import('./pages/community/community.component').then(m => m.CommunityComponent) },
   { path: 'Deals', loadComponent: () => import('./pages/deals/deals.component').then(m => m.DealsComponent) },
+  { path: 'Documents', loadComponent: () => import('./pages/documents/documents.component').then(m => m.DocumentsComponent) },
   { path: 'Missions', loadComponent: () => import('./pages/missions/missions.component').then(m => m.MissionsComponent) },
   { path: '**', loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent) },
 ];

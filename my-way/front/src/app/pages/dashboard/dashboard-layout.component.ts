@@ -148,7 +148,7 @@ export class DashboardLayoutComponent implements OnInit {
     { icon: Users, label: 'Communauté', path: '/Community' },
     { icon: Briefcase, label: 'Missions', path: '/Missions' },
     { icon: Tag, label: 'Bons Plans', path: '/Deals' },
-    { icon: BookOpen, label: 'Documentation', path: null, soon: true },
+    { icon: BookOpen, label: 'Documents', path: '/Documents' },
     { icon: Rocket, label: 'Accompagnement', path: null, soon: true },
   ];
 

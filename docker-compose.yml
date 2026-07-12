@@ -180,6 +180,11 @@ services:
       DB_NAME: my_way
       DB_USERNAME: my_way
       DB_PASSWORD: ${MY_WAY_DB_PASSWORD:-changeme}
+      DOCUMENTS_DIR: /data/documents
+    volumes:
+      # Fichiers de l'espace documentaire (identifiants techniques, servis
+      # uniquement via l'API authentifiée)
+      - my-way-documents:/data/documents
     networks:
       - my-way-net
     depends_on:
@@ -224,4 +229,6 @@ volumes:
   certbot-www:
   # Données PostgreSQL de My Way
   my-way-db-data:
+  # Fichiers de l'espace documentaire My Way
+  my-way-documents:
 #   fidexil-db-data:                          # persistance : à activer plus tard
