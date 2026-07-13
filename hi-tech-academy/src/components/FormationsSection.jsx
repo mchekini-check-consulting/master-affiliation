@@ -21,6 +21,7 @@ const formations = [
     image: '/images/0002848c7_istock-2177184303.jpg',
     version: 'Programme V1.2 du 11/07/2026',
     pdf: '/documents/Programme_Kubernetes_Fondamentaux_V1.2.pdf',
+    registrationUrl: 'https://10eeb566.qualiobee.fr/qualiobee/formation/d3d3588b-30f6-45b5-ba86-5ff1156492c3/registration/form',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '21 h — 3 jours de 7 h' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
@@ -222,7 +223,9 @@ function FormationRow({ formation }) {
             Télécharger le programme (PDF)
           </a>
           <a
-            href="#contact"
+            href={formation.registrationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2 py-3.5 mt-3 rounded-xl font-bold text-sm transition-all"
             style={{
               background: '#f0f3fa',
