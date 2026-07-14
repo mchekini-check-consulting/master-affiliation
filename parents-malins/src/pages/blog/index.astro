@@ -1,0 +1,166 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const articles = [
+  {
+    url: '/blog/meilleur-lit-enfant-comparatif/',
+    categorie: 'Chambre & sommeil',
+    titre: "Quel lit pour votre enfant ? Comparatif des 5 meilleurs types de lits",
+    resume:
+      "Cabane, évolutif, gigogne, mi-hauteur ou premier lit à barrières : le bon choix selon l'âge, la chambre et le budget.",
+    date: '14 juillet 2026',
+  },
+];
+---
+
+<Layout
+  title="Le blog — Parents Malins"
+  description="Comparatifs, astuces et bons plans pour simplifier le quotidien des parents : sommeil, équipement, organisation."
+>
+  <header class="entete">
+    <a class="marque" href="/">Parents <em>Malins</em></a>
+    <nav aria-label="Navigation principale">
+      <a href="/blog/" aria-current="page">Le blog</a>
+    </nav>
+  </header>
+
+  <main>
+    <p class="eyebrow">Le blog</p>
+    <h1>Comparatifs et astuces de parents</h1>
+    <p class="intro">
+      Des guides concrets, testés et comparés, pour équiper et organiser la
+      vie de famille sans y laisser son budget.
+    </p>
+
+    <div class="liste">
+      {articles.map((a) => (
+        <a class="carte" href={a.url}>
+          <p class="categorie">{a.categorie}</p>
+          <h2>{a.titre}</h2>
+          <p class="resume">{a.resume}</p>
+          <p class="meta">{a.date} · Lire l'article →</p>
+        </a>
+      ))}
+    </div>
+  </main>
+
+  <footer class="pied">
+    <p>© 2026 parents-malins.fr — <a href="/">Accueil</a></p>
+  </footer>
+</Layout>
+
+<style>
+  .entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 0;
+  }
+
+  .marque {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--nuit);
+    text-decoration: none;
+  }
+
+  .marque em {
+    color: var(--corail);
+    font-style: normal;
+  }
+
+  .entete nav a {
+    color: var(--encre);
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--soleil);
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3.5rem 1.25rem 4rem;
+  }
+
+  .eyebrow {
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--corail);
+  }
+
+  h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    line-height: 1.15;
+    color: var(--nuit);
+  }
+
+  .intro {
+    color: var(--estompe);
+    font-size: 1.08rem;
+    margin: 0 0 2.5rem;
+  }
+
+  .liste {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .carte {
+    display: block;
+    padding: 1.5rem 1.6rem;
+    background: #fff;
+    border: 1px solid #eadfce;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .carte:hover {
+    transform: translateY(-2px);
+    border-color: var(--soleil);
+  }
+
+  .categorie {
+    margin: 0 0 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--corail);
+  }
+
+  .carte h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    color: var(--nuit);
+    line-height: 1.3;
+  }
+
+  .resume {
+    margin: 0 0 0.75rem;
+    color: var(--estompe);
+    font-size: 0.98rem;
+  }
+
+  .meta {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--nuit);
+  }
+
+  .pied {
+    text-align: center;
+    padding: 2rem 1.25rem;
+    font-size: 0.9rem;
+    color: var(--estompe);
+  }
+
+  .pied a { color: var(--corail); }
+</style>

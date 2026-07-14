@@ -1,0 +1,523 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const lits = [
+  {
+    id: 'lit-cabane',
+    cta: 'Voir les lits cabane sur Amazon',
+    nom: 'Le lit cabane Montessori',
+    badge: 'Le coup de cœur',
+    dimensions: '90 × 190 cm',
+    age: 'Dès 2 ans',
+    budget: '150 à 300 €',
+    resume:
+      "Posé au sol ou très bas, entouré d'une structure en bois massif en forme de maison, le lit cabane est la star des chambres d'enfants — et pas seulement pour son look. Fidèle à la pédagogie Montessori, il permet à l'enfant de monter et descendre seul de son lit, en toute sécurité.",
+    pour: [
+      'Autonomie totale : aucun risque de chute grave, l\'enfant gère seul ses couchers',
+      'Cadre en pin massif sur la plupart des modèles, à peindre ou laisser brut',
+      'Taille 90 × 190 : le même matelas jusqu\'à l\'adolescence',
+      'Devient un espace de jeu et de lecture la journée',
+    ],
+    contre: [
+      'Encombrant : la structure demande une chambre d\'au moins 9 m²',
+      'Draps et lit au ras du sol : passez l\'aspirateur dessous régulièrement',
+    ],
+    lien: 'https://www.amazon.fr/s?k=lit+cabane+enfant+90x190',
+  },
+  {
+    id: 'lit-evolutif',
+    cta: 'Voir les lits évolutifs sur Amazon',
+    nom: 'Le lit évolutif',
+    badge: 'Le plus économique à long terme',
+    dimensions: '90 × 140 → 90 × 190/200 cm',
+    age: 'De 2 à 12 ans et plus',
+    budget: '180 à 400 € (sommier compris)',
+    resume:
+      "Un seul achat pour dix ans de sommeil : le lit évolutif s'allonge par crans (140, 170 puis 190/200 cm) au rythme des poussées de croissance. C'est le choix de la raison — à condition de prendre un matelas évolutif ou de prévoir son remplacement à chaque palier.",
+    pour: [
+      'Un seul lit du sortir du lit bébé jusqu\'au collège',
+      'Souvent vendu avec kit de conversion et barrière amovible pour les premiers mois',
+      'Excellent rapport prix/durée d\'utilisation',
+    ],
+    contre: [
+      'Le matelas évolutif (en plusieurs sections) est moins confortable qu\'un matelas une pièce',
+      'Mécanisme d\'extension à vérifier : privilégiez le bois massif aux panneaux de particules',
+    ],
+    lien: 'https://www.amazon.fr/s?k=lit+evolutif+enfant',
+  },
+  {
+    id: 'lit-gigogne',
+    cta: 'Voir les lits gigognes sur Amazon',
+    nom: 'Le lit gigogne',
+    badge: 'Le meilleur pour recevoir',
+    dimensions: '90 × 190 cm + tiroir-lit 90 × 190 cm',
+    age: 'Dès 5 ans',
+    budget: '250 à 450 € (deux sommiers)',
+    resume:
+      "Un lit classique qui cache un second couchage dans un tiroir : le lit gigogne est l'arme secrète des soirées pyjama et des chambres partagées ponctuellement. Le tiroir se déplie en dix secondes, et la chambre reste dégagée le reste du temps.",
+    pour: [
+      'Deux vrais couchages 90 × 190 sur l\'emprise au sol d\'un seul',
+      'Idéal cousins, copains et garde alternée',
+      'Le tiroir sert aussi de rangement géant si on n\'y met pas de matelas',
+    ],
+    contre: [
+      'Le couchage du bas est à quelques centimètres du sol (matelas fin, 12-15 cm max)',
+      'Vérifiez les roulettes du tiroir : c\'est le point faible des modèles premier prix',
+    ],
+    lien: 'https://www.amazon.fr/s?k=lit+gigogne+enfant',
+  },
+  {
+    id: 'lit-mi-hauteur',
+    cta: 'Voir les lits mi-hauteur sur Amazon',
+    nom: 'Le lit mi-hauteur',
+    badge: 'Le champion des petites chambres',
+    dimensions: '90 × 190 cm, couchage à ~115 cm',
+    age: 'Dès 6 ans (norme constructeur)',
+    budget: '200 à 500 €',
+    resume:
+      "Surélever le couchage à hauteur d'épaule d'adulte libère 1,7 m² au sol : bureau, coffre à jouets, tente de jeu ou dressing viennent se glisser dessous. Moins impressionnant qu'un lit mezzanine, le mi-hauteur reste accessible aux enfants d'âge primaire.",
+    pour: [
+      'Gain de place spectaculaire dans les chambres de moins de 10 m²',
+      'L\'espace du dessous évolue : cabane de jeu à 6 ans, bureau à 10 ans',
+      'Échelle inclinée et barrières hautes sur les bons modèles',
+    ],
+    contre: [
+      'Déconseillé avant 6 ans (risque de chute pendant le sommeil)',
+      'Faire le lit demande de la gymnastique ; hauteur sous plafond minimum 2,20 m',
+    ],
+    lien: 'https://www.amazon.fr/s?k=lit+mi-hauteur+enfant',
+  },
+  {
+    id: 'premier-lit',
+    cta: 'Voir les lits 70 × 140 sur Amazon',
+    nom: 'Le premier lit 70 × 140 avec barrières',
+    badge: 'La transition douce',
+    dimensions: '70 × 140 cm',
+    age: 'De 18 mois à 5 ans',
+    budget: '100 à 220 €',
+    resume:
+      "Pour quitter le lit à barreaux sans brusquer personne : le 70 × 140 reprend le matelas du lit bébé, monte sur des pieds bas et s'équipe de demi-barrières anti-chute. C'est le choix le plus rassurant pour les tout-petits — en acceptant qu'il faudra racheter un lit vers 5 ans.",
+    pour: [
+      'Réutilise le matelas 70 × 140 du lit bébé : économie immédiate',
+      'Hauteur de couchage très basse et barrières amovibles',
+      'Léger, compact, parfait dans une petite chambre',
+    ],
+    contre: [
+      'Durée de vie limitée : trop court dès 5-6 ans',
+      'Peu de modèles vraiment robustes en entrée de gamme',
+    ],
+    lien: 'https://www.amazon.fr/s?k=lit+enfant+70x140+avec+barrieres',
+  },
+];
+---
+
+<Layout
+  title="Lit enfant : comparatif des 5 meilleurs types de lits (2026) — Parents Malins"
+  description="Lit cabane, évolutif, gigogne, mi-hauteur ou premier lit 70×140 : notre comparatif 2026 pour choisir le lit d'enfant adapté à son âge, sa chambre et votre budget."
+>
+  <header class="entete">
+    <a class="marque" href="/">Parents <em>Malins</em></a>
+    <nav aria-label="Navigation principale">
+      <a href="/blog/">Le blog</a>
+    </nav>
+  </header>
+
+  <main>
+    <article>
+      <p class="eyebrow">Chambre &amp; sommeil</p>
+      <h1>Quel lit pour votre enfant&nbsp;? Comparatif des 5 meilleurs types de lits</h1>
+      <p class="chapo">
+        Cabane, évolutif, gigogne, mi-hauteur ou premier lit à barrières&nbsp;:
+        chaque famille de lits répond à un âge, une taille de chambre et un
+        budget différents. Voici notre comparatif pour choisir sans se tromper
+        — et sans racheter un lit tous les deux ans.
+      </p>
+
+      <p class="disclosure">
+        Cet article contient des liens vers Amazon&nbsp;: si vous achetez via
+        ces liens, Parents Malins peut percevoir une commission, sans surcoût
+        pour vous. Cela ne change ni notre sélection ni notre avis.
+      </p>
+
+      <!-- Tableau récapitulatif -->
+      <h2>Le comparatif en un coup d'œil</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Lit</th>
+              <th>Âge conseillé</th>
+              <th>Dimensions</th>
+              <th>Budget</th>
+              <th>Idéal pour</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="#lit-cabane">Lit cabane Montessori</a></td>
+              <td>Dès 2 ans</td>
+              <td>90 × 190</td>
+              <td>150 – 300 €</td>
+              <td>L'autonomie des petits</td>
+            </tr>
+            <tr>
+              <td><a href="#lit-evolutif">Lit évolutif</a></td>
+              <td>2 à 12 ans</td>
+              <td>140 → 200</td>
+              <td>180 – 400 €</td>
+              <td>Un seul achat pour 10 ans</td>
+            </tr>
+            <tr>
+              <td><a href="#lit-gigogne">Lit gigogne</a></td>
+              <td>Dès 5 ans</td>
+              <td>2 × (90 × 190)</td>
+              <td>250 – 450 €</td>
+              <td>Les soirées pyjama</td>
+            </tr>
+            <tr>
+              <td><a href="#lit-mi-hauteur">Lit mi-hauteur</a></td>
+              <td>Dès 6 ans</td>
+              <td>90 × 190</td>
+              <td>200 – 500 €</td>
+              <td>Les petites chambres</td>
+            </tr>
+            <tr>
+              <td><a href="#premier-lit">Premier lit 70 × 140</a></td>
+              <td>18 mois à 5 ans</td>
+              <td>70 × 140</td>
+              <td>100 – 220 €</td>
+              <td>La sortie du lit bébé</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Fiches détaillées -->
+      {lits.map((lit, i) => (
+        <section id={lit.id} class="fiche">
+          <p class="badge">{lit.badge}</p>
+          <h2>{i + 1}. {lit.nom}</h2>
+          <ul class="specs">
+            <li><strong>Âge</strong> {lit.age}</li>
+            <li><strong>Dimensions</strong> {lit.dimensions}</li>
+            <li><strong>Budget constaté</strong> {lit.budget}</li>
+          </ul>
+          <p>{lit.resume}</p>
+          <div class="pour-contre">
+            <div>
+              <h3>On aime</h3>
+              <ul>
+                {lit.pour.map((p) => <li>{p}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h3>On aime moins</h3>
+              <ul class="contre">
+                {lit.contre.map((c) => <li>{c}</li>)}
+              </ul>
+            </div>
+          </div>
+          <a class="cta" href={lit.lien} target="_blank" rel="nofollow sponsored noopener">
+            {lit.cta}&nbsp;→
+          </a>
+        </section>
+      ))}
+
+      <!-- Guide d'achat -->
+      <h2>Comment choisir&nbsp;? Les 4 critères qui comptent vraiment</h2>
+      <ol class="criteres">
+        <li>
+          <strong>L'âge et l'autonomie de l'enfant.</strong> Avant 5 ans,
+          restez au ras du sol (lit cabane, 70 × 140 à barrières). Le couchage
+          en hauteur attend l'âge de l'école primaire — c'est aussi la
+          recommandation des fabricants sérieux.
+        </li>
+        <li>
+          <strong>La norme de sécurité.</strong> Cherchez la mention
+          <strong>NF EN 716</strong> (lits enfants) et des angles arrondis.
+          Sur les lits en hauteur, les barrières doivent dépasser le matelas
+          d'au moins 16 cm.
+        </li>
+        <li>
+          <strong>La taille du matelas.</strong> Passer directement au
+          90 × 190 (cabane, gigogne, mi-hauteur) évite de racheter matelas et
+          parure à chaque étape. Le 70 × 140 ne se justifie que pour recycler
+          le matelas du lit bébé.
+        </li>
+        <li>
+          <strong>Le matériau.</strong> Le pin ou le hêtre massif vieillit
+          mieux que le panneau de particules, surtout sur les structures
+          (cabane, mi-hauteur) qui encaissent les escalades quotidiennes.
+        </li>
+      </ol>
+
+      <!-- FAQ -->
+      <h2>Les questions que tout le monde se pose</h2>
+      <details>
+        <summary>À quel âge passer du lit bébé au lit d'enfant&nbsp;?</summary>
+        <p>
+          Généralement entre 18 mois et 3 ans — dès que l'enfant tente
+          d'enjamber les barreaux, il est temps. Le lit cabane et le 70 × 140 à
+          barrières sont les deux transitions les plus douces.
+        </p>
+      </details>
+      <details>
+        <summary>Un lit mi-hauteur est-il dangereux&nbsp;?</summary>
+        <p>
+          Pas après 6 ans, avec des barrières conformes et une échelle stable.
+          Avant cet âge, le risque de chute pendant le sommeil est réel&nbsp;:
+          tous les fabricants le déconseillent.
+        </p>
+      </details>
+      <details>
+        <summary>Quel budget prévoir pour un bon lit d'enfant&nbsp;?</summary>
+        <p>
+          Entre 150 et 400 € structure seule, selon le type. Ajoutez 80 à
+          150 € pour un matelas neuf de qualité — c'est lui qui fait la
+          différence sur le sommeil, ne rognez pas dessus.
+        </p>
+      </details>
+
+      <h2>Notre verdict</h2>
+      <p>
+        Pour la majorité des familles, le <a href="#lit-cabane">lit cabane en
+        90 × 190</a> offre le meilleur équilibre autonomie/durée de vie dès
+        2 ans. Petite chambre&nbsp;? Visez le <a href="#lit-mi-hauteur">
+        mi-hauteur</a> à partir de 6 ans. Et si le budget est serré sur la
+        décennie, le <a href="#lit-evolutif">lit évolutif</a> reste imbattable.
+      </p>
+
+      <p class="maj">Publié le 14 juillet 2026 · Parents Malins</p>
+    </article>
+  </main>
+
+  <footer class="pied">
+    <p>© 2026 parents-malins.fr — <a href="/">Accueil</a> · <a href="/blog/">Blog</a></p>
+  </footer>
+</Layout>
+
+<style>
+  .entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 0;
+  }
+
+  .marque {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--nuit);
+    text-decoration: none;
+  }
+
+  .marque em {
+    color: var(--corail);
+    font-style: normal;
+  }
+
+  .entete nav a {
+    color: var(--encre);
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-bottom: 1px solid transparent;
+  }
+
+  .entete nav a:hover {
+    border-bottom-color: var(--soleil);
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 4rem;
+  }
+
+  .eyebrow {
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--corail);
+  }
+
+  h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    line-height: 1.15;
+    color: var(--nuit);
+  }
+
+  .chapo {
+    font-size: 1.12rem;
+    color: var(--estompe);
+    margin: 0 0 1.5rem;
+  }
+
+  .disclosure {
+    font-size: 0.85rem;
+    color: var(--estompe);
+    background: #f4efe6;
+    border-left: 3px solid var(--soleil);
+    padding: 0.7rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 2rem;
+  }
+
+  h2 {
+    margin: 2.5rem 0 1rem;
+    font-size: 1.45rem;
+    color: var(--nuit);
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #eadfce;
+  }
+
+  th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--estompe);
+  }
+
+  td a {
+    color: var(--corail);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  td a:hover { text-decoration: underline; }
+
+  .fiche {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eadfce;
+  }
+
+  .badge {
+    display: inline-block;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--nuit);
+    background: var(--soleil);
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+  }
+
+  .fiche h2 {
+    margin-top: 0.9rem;
+  }
+
+  .specs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    color: var(--estompe);
+  }
+
+  .specs strong {
+    color: var(--nuit);
+    margin-right: 0.35rem;
+  }
+
+  .pour-contre {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin: 1.25rem 0;
+  }
+
+  @media (max-width: 560px) {
+    .pour-contre { grid-template-columns: 1fr; }
+  }
+
+  .pour-contre h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.5rem;
+    color: var(--nuit);
+  }
+
+  .pour-contre ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.95rem;
+  }
+
+  .pour-contre li { margin-bottom: 0.4rem; }
+  .pour-contre li::marker { color: #3d9970; content: "✓ "; }
+  .pour-contre .contre li::marker { color: var(--corail); content: "✗ "; }
+
+  .cta {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: var(--nuit);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 999px;
+    transition: background 0.2s ease;
+  }
+
+  .cta:hover { background: var(--corail); }
+
+  .criteres li { margin-bottom: 0.9rem; }
+
+  details {
+    border: 1px solid #eadfce;
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 0.75rem;
+    background: #fff;
+  }
+
+  summary {
+    font-weight: 600;
+    color: var(--nuit);
+    cursor: pointer;
+  }
+
+  details p {
+    margin: 0.75rem 0 0;
+    color: var(--estompe);
+  }
+
+  .maj {
+    margin-top: 3rem;
+    font-size: 0.85rem;
+    color: var(--estompe);
+  }
+
+  .pied {
+    text-align: center;
+    padding: 2rem 1.25rem;
+    font-size: 0.9rem;
+    color: var(--estompe);
+  }
+
+  .pied a { color: var(--corail); }
+</style>
