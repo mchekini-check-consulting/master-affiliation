@@ -96,7 +96,7 @@ export const blogPosts = [
           Inutile de tout apprendre de front. Choisissez un socle (développement ou infrastructure), puis
           ajoutez les briques transverses : conteneurs, cloud, sécurité. Si votre objectif est
           l'infrastructure moderne, la maîtrise de Kubernetes est aujourd'hui le meilleur point d'entrée —
-          c'est précisément l'objet de notre formation <strong>Kubernetes – Fondamentaux et introduction au GitOps</strong> : 21 heures,
+          c'est précisément l'objet de notre formation <strong>Kubernetes – Fondamentaux</strong> : 7 heures,
           100 % à distance, avec travaux pratiques sur un cluster réel.
         </p>
       </>
@@ -175,7 +175,7 @@ export const blogPosts = [
           Une fois en poste, la progression continue : tests avancés, architecture, cloud, conteneurs.
           C'est souvent à ce moment-là que Kubernetes entre en scène — pour comprendre comment vos
           applications sont réellement déployées et opérées. Notre formation
-          <strong> Kubernetes – Fondamentaux et introduction au GitOps</strong> est pensée exactement pour cette étape.
+          <strong> Kubernetes – Fondamentaux</strong> est pensée exactement pour cette étape.
         </p>
       </>
     ),
@@ -237,7 +237,7 @@ export const blogPosts = [
           Utilisez l'IA pour accélérer — explorer une notion, déboguer, varier les exercices — mais ancrez
           votre apprentissage dans la pratique réelle : de vrais projets, de vrais environnements, de vrais
           retours humains. C'est ce que nous appliquons dans notre formation
-          <strong> Kubernetes – Fondamentaux et introduction au GitOps</strong> : 21 heures en direct avec un formateur, sur un
+          <strong> Kubernetes – Fondamentaux</strong> : 7 heures en direct avec un formateur, sur un
           cluster réel, où chaque manipulation est faite — et comprise — par le stagiaire.
         </p>
       </>

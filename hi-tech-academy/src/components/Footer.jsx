@@ -7,7 +7,7 @@ const BRAND_COLOR = '#005064';
 const CTA_COLOR = '#F8B102';
 
 const formations = [
-  'Kubernetes – Fondamentaux et introduction au GitOps',
+  'Kubernetes – Fondamentaux',
 ];
 
 const liens = [

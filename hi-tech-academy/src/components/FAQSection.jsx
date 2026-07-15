@@ -5,7 +5,7 @@ import { Plus, Minus } from 'lucide-react';
 const faqs = [
   {
     question: "Quels sont les prérequis pour rejoindre la formation Kubernetes ?",
-    answer: "La formation Kubernetes – Fondamentaux et introduction au GitOps nécessite la maîtrise des bases de la ligne de commande Linux et des fondamentaux des conteneurs et de Docker. Ces prérequis sont vérifiés à l'entrée via un test de positionnement, et le programme détaillé les précise.",
+    answer: "La formation Kubernetes – Fondamentaux nécessite la maîtrise des bases de la ligne de commande Linux et des fondamentaux des conteneurs et de Docker. Ces prérequis sont vérifiés à l'entrée via un test de positionnement, et le programme détaillé les précise.",
   },
   {
     question: "Quel document est délivré à l'issue de la formation ?",
@@ -17,11 +17,11 @@ const faqs = [
   },
   {
     question: "Quelle est la durée de la formation ?",
-    answer: "La formation Kubernetes – Fondamentaux et introduction au GitOps dure 21 heures, réparties sur 7 séances de 3 heures (1 à 2 séances par semaine, pour favoriser l'assimilation).",
+    answer: "La formation Kubernetes – Fondamentaux dure 7 heures, sur 1 journée : 3 h 30 le matin (9 h 00–12 h 30) et 3 h 30 l'après-midi (13 h 30–17 h 00).",
   },
   {
     question: "Sous quel délai puis-je commencer la formation ?",
-    answer: "Le délai d'accès est de 14 jours minimum entre votre demande et le début de la formation (hors délais de prise en charge par un financeur). La session ouvre à partir d'un participant inscrit, et une session individuelle est possible.",
+    answer: "Le délai d'accès est de 1 jour minimum entre votre demande et le début de la formation (hors délais de prise en charge par un financeur). La session ouvre à partir de 1 participant.",
   },
   {
     question: "La formation est-elle accessible aux personnes en situation de handicap ?",

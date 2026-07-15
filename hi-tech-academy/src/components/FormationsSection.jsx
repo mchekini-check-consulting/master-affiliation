@@ -15,19 +15,19 @@ const formations = [
   {
     id: 'kubernetes-fondamentaux',
     tag: 'Infrastructure & Cloud',
-    title: 'Kubernetes – Fondamentaux et introduction au GitOps',
+    title: 'Kubernetes – Fondamentaux',
     description:
-      "Déployez et administrez des applications conteneurisées avec Kubernetes : architecture d'un cluster, Deployments, Services, Ingress, ConfigMaps, Secrets, règles de placement, opérateurs et introduction au GitOps avec Argo CD — avec travaux pratiques sur un cluster Azure (AKS) réel.",
+      "Maîtrisez le déploiement d'applications conteneurisées avec Kubernetes en une journée : architecture d'un cluster, Pods et Deployments, Services (survol d'Ingress), ConfigMaps et Secrets — avec travaux pratiques sur un cluster Azure (AKS) réel.",
     image: '/images/0002848c7_istock-2177184303.jpg',
     version: 'Programme V1.0 du 21/06/2026',
     pdf: '/documents/Programme_Kubernetes_Fondamentaux_V1.0.pdf',
     registrationUrl: 'https://10eeb566.qualiobee.fr/qualiobee/formation/d3d3588b-30f6-45b5-ba86-5ff1156492c3/registration/form',
     keyFacts: [
-      { icon: Clock, label: 'Durée', value: '21 h — 7 séances de 3 h (1 à 2 par semaine)' },
+      { icon: Clock, label: 'Durée', value: '7 h — 1 journée (9 h–12 h 30 / 13 h 30–17 h)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
-      { icon: Euro, label: 'Tarif', value: '1 000 € HT (1 200 € TTC) / stagiaire' },
-      { icon: CalendarClock, label: "Délai d'accès", value: '14 jours minimum entre la demande et le début' },
-      { icon: Users, label: 'Effectif', value: '4 à 8 participants — session individuelle possible' },
+      { icon: Euro, label: 'Tarif', value: '1 000 € HT (1 200 € TTC) / stagiaire — forfait 7 h' },
+      { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
+      { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
     ],
     qualiopiSections: [
@@ -38,7 +38,7 @@ const formations = [
           <>
             <p className="mb-2">
               <strong>Public concerné :</strong> développeurs, administrateurs systèmes et réseaux, ingénieurs
-              DevOps / Cloud, techniciens et architectes IT souhaitant déployer et administrer des applications
+              DevOps / Cloud, techniciens et architectes IT souhaitant déployer des applications
               conteneurisées avec Kubernetes.
             </p>
             <p className="mb-1"><strong>Prérequis :</strong></p>
@@ -57,15 +57,10 @@ const formations = [
           <>
             <p className="mb-2">À l'issue de la formation, le participant sera capable de :</p>
             <ol className="list-decimal pl-5 space-y-1">
-              <li>Expliquer le rôle de Kubernetes dans le cycle de vie d'une application conteneurisée et identifier ses cas d'usage.</li>
-              <li>Décrire l'architecture d'un cluster et le rôle de chaque composant du control plane et des nœuds.</li>
-              <li>Expliquer les mécanismes assurant la haute disponibilité d'un cluster Kubernetes.</li>
-              <li>Créer, déployer et administrer les principales ressources (Pod, Service, Deployment, DaemonSet, StatefulSet, Ingress) via manifestes YAML et kubectl.</li>
+              <li>Expliquer le rôle de Kubernetes dans le cycle de vie d'une application conteneurisée et décrire l'architecture d'un cluster (control plane, nœuds).</li>
+              <li>Déployer une application conteneurisée avec des Pods et des Deployments, via manifestes YAML et kubectl.</li>
+              <li>Exposer une application avec un Service et identifier les cas d'usage du routage HTTP avec Ingress.</li>
               <li>Externaliser la configuration et les données sensibles d'une application via ConfigMap et Secrets.</li>
-              <li>Mettre en œuvre des règles de placement des pods (affinity / anti-affinity).</li>
-              <li>Identifier le rôle et le principe de fonctionnement des opérateurs Kubernetes.</li>
-              <li>Expliquer les principes du GitOps, justifier le choix d'Argo CD et déployer une application via Argo CD.</li>
-              <li>Décrire la structure d'un projet Argo CD (Application, App of Apps, dépôt Git).</li>
             </ol>
           </>
         ),
@@ -77,7 +72,7 @@ const formations = [
           <ul className="list-disc pl-5 space-y-1">
             <li>Alternance d'apports théoriques et de mises en pratique ; démonstrations en direct et travaux pratiques guidés sur cluster réel.</li>
             <li>Classe virtuelle synchrone Google Meet (caméra, partage d'écran, suivi de connexion).</li>
-            <li>Cluster Kubernetes managé Microsoft Azure (AKS), avec un espace de noms dédié par stagiaire ; kubectl et dépôts Git de travaux pratiques.</li>
+            <li>Cluster Kubernetes managé Microsoft Azure (AKS), avec un espace de noms dédié par stagiaire ; kubectl et manifestes YAML de travaux pratiques.</li>
             <li>Support de cours, fiches de commandes, énoncés et corrigés des TP téléchargeables sur l'espace de la formation.</li>
           </ul>
         ),
@@ -88,8 +83,8 @@ const formations = [
         content: (
           <ul className="list-disc pl-5 space-y-1">
             <li><strong>Avant :</strong> questionnaire d'analyse du besoin et des attentes ; test de positionnement (prérequis).</li>
-            <li><strong>Pendant :</strong> un quiz à la fin de chaque module, travaux pratiques corrigés, émargement par séance et rapport de connexion.</li>
-            <li><strong>En fin de formation :</strong> évaluation finale des acquis (QCM + mise en pratique), questionnaires de satisfaction à chaud puis à froid, attestation de fin de formation.</li>
+            <li><strong>Pendant :</strong> travaux pratiques corrigés, émargement par demi-journée et rapport de connexion Google Meet.</li>
+            <li><strong>En fin de formation :</strong> évaluation finale des acquis (QCM + mise en pratique) en fin de journée, questionnaires de satisfaction à chaud puis à froid, attestation de fin de formation.</li>
           </ul>
         ),
       },
@@ -98,9 +93,9 @@ const formations = [
         title: "Modalités et délais d'accès",
         content: (
           <ul className="list-disc pl-5 space-y-1">
-            <li>Inscription par e-mail (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>) ou téléphone (<a href="tel:+33751474135" className="underline">07 51 47 41 35</a>).</li>
-            <li>Délai d'accès : 14 jours minimum entre la demande et le début de la formation (hors prise en charge financeur).</li>
-            <li>Ouverture de la session à partir d'un participant inscrit ; session individuelle possible.</li>
+            <li>Inscription par e-mail (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>), téléphone (<a href="tel:+33751474135" className="underline">07 51 47 41 35</a>) ou via le formulaire de contact du site.</li>
+            <li>Délai d'accès : 1 jour minimum entre la demande et le début de la formation (hors prise en charge financeur).</li>
+            <li>Ouverture de la session à partir de 1 participant.</li>
           </ul>
         ),
       },
