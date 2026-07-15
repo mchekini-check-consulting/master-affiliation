@@ -84,7 +84,7 @@ export default function BlogPost() {
               Envie de passer à la pratique ?
             </h2>
             <p className="text-sm mb-5" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
-              Découvrez notre formation Kubernetes – Fondamentaux : 21 h en direct, 100 % à distance,
+              Découvrez notre formation Kubernetes – Fondamentaux et introduction au GitOps : 21 h en direct, 100 % à distance,
               avec travaux pratiques sur un cluster réel.
             </p>
             <Link
