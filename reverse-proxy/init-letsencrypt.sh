@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-domains=(aquascaping-facile.fr fidexil.check-consulting.net hi-tech-academy.fr freelance-now.fr parents-malins.fr)
+domains=(fidexil.check-consulting.net hi-tech-academy.fr freelance-now.fr parents-malins.fr preparation.check-consulting.net)
 email="me.chekini@gmail.com"
 staging="${STAGING:-0}"
 
