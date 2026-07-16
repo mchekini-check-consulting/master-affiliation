@@ -32,3 +32,6 @@ dist-ssr
 
 # Documents sources Qualiopi (non publiés, à usage interne)
 documents_source/
+
+# Documents finaux Qualiopi (non publiés, à usage interne)
+documents_finaux/
