@@ -1,0 +1,279 @@
+/* ==========================================================
+   Prépa Technique — design system « cahier de prépa »
+   Papier quadrillé, bleu Bic, surligneur fluo, corrections
+   au stylo rouge/vert.
+   ========================================================== */
+
+:root {
+  /* Palette */
+  --papier: #f8f8f5;
+  --papier-carreau: rgba(32, 68, 196, 0.055);
+  --blanc: #ffffff;
+  --encre: #191d2b;
+  --estompe: #5d6474;
+  --bic: #2044c4;
+  --bic-doux: #e8edfb;
+  --surligneur: #ffe24a;
+  --rouge: #d23b2e;
+  --rouge-doux: #fdf1f0;
+  --vert: #1e8a4c;
+  --vert-doux: #eff8f2;
+  --trait: #dcdcd4;
+
+  /* Typo */
+  --f-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --f-corps: 'Source Serif 4 Variable', georgia, serif;
+  --f-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Layout */
+  --sidebar-l: 288px;
+  --contenu-max: 46rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--papier);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--f-corps);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--encre);
+  background:
+    linear-gradient(var(--papier-carreau) 1px, transparent 1px),
+    linear-gradient(90deg, var(--papier-carreau) 1px, transparent 1px),
+    var(--papier);
+  background-size: 24px 24px, 24px 24px, auto;
+}
+
+::selection {
+  background: var(--surligneur);
+  color: var(--encre);
+}
+
+:focus-visible {
+  outline: 2px solid var(--bic);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--f-display);
+  line-height: 1.2;
+  color: var(--encre);
+  text-wrap: balance;
+}
+
+a {
+  color: var(--bic);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+code {
+  font-family: var(--f-mono);
+  font-size: 0.85em;
+  background: var(--bic-doux);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.8125rem;
+}
+
+pre {
+  font-family: var(--f-mono);
+  background: var(--blanc);
+  border: 1px solid var(--trait);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  line-height: 1.55;
+}
+
+/* Trait de surligneur — l'accent signature, utilisé avec parcimonie */
+.marque {
+  background: linear-gradient(
+    100deg,
+    transparent 2%,
+    var(--surligneur) 8%,
+    var(--surligneur) 94%,
+    transparent 98%
+  );
+  padding: 0 0.15em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ==========================================================
+   Prose des fiches
+   ========================================================== */
+
+.prose {
+  max-width: var(--contenu-max);
+}
+
+.prose > p:first-child {
+  font-size: 1.1875rem;
+  color: var(--estompe);
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 650;
+  margin: 2.75rem 0 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--trait);
+}
+
+.prose h3 {
+  font-size: 1.125rem;
+  font-weight: 650;
+  margin: 2rem 0 0.5rem;
+}
+
+.prose li {
+  margin: 0.3rem 0;
+}
+
+.prose li::marker {
+  color: var(--bic);
+}
+
+.prose blockquote {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
+  border-left: 3px solid var(--surligneur);
+  background: var(--blanc);
+  border-radius: 0 8px 8px 0;
+  font-style: normal;
+}
+
+.prose blockquote p {
+  margin: 0;
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+  font-family: var(--f-display);
+  font-size: 0.9rem;
+  background: var(--blanc);
+  border: 1px solid var(--trait);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.prose th {
+  text-align: left;
+  background: var(--bic-doux);
+  color: var(--encre);
+  font-weight: 650;
+  padding: 0.6rem 0.9rem;
+}
+
+.prose td {
+  padding: 0.55rem 0.9rem;
+  border-top: 1px solid var(--trait);
+  vertical-align: top;
+}
+
+.prose img {
+  max-width: 100%;
+}
+
+/* ==========================================================
+   Corrections au stylo — bons / mauvais exemples
+   ========================================================== */
+
+.exemple {
+  position: relative;
+  margin: 1.75rem 0 1.75rem 1.1rem;
+  padding-left: 1.15rem;
+}
+
+.exemple::before {
+  font-family: var(--f-display);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-block;
+  margin-bottom: 0.4rem;
+  transform: rotate(-1.2deg);
+}
+
+.exemple::after {
+  /* trait de stylo dans la marge */
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  left: 0;
+  width: 3px;
+  border-radius: 2px;
+}
+
+.exemple > p {
+  margin: 0 0 0.6rem;
+  font-size: 0.9375rem;
+  color: var(--estompe);
+}
+
+.exemple pre {
+  margin: 0.35rem 0 0;
+}
+
+.exemple--mauvais::before {
+  content: '✗ À corriger';
+  color: var(--rouge);
+}
+
+.exemple--mauvais::after {
+  background: var(--rouge);
+}
+
+.exemple--mauvais pre {
+  background: var(--rouge-doux);
+  border-color: color-mix(in srgb, var(--rouge) 25%, var(--trait));
+}
+
+.exemple--bon::before {
+  content: '✓ Correction';
+  color: var(--vert);
+}
+
+.exemple--bon::after {
+  background: var(--vert);
+}
+
+.exemple--bon pre {
+  background: var(--vert-doux);
+  border-color: color-mix(in srgb, var(--vert) 25%, var(--trait));
+}

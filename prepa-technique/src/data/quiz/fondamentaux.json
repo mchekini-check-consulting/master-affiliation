@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Que signifie la valeur « Les individus et leurs interactions plus que les processus et les outils » du Manifeste Agile ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les processus et les outils sont inutiles en agilité",
+        "Les interactions humaines ont plus de valeur, sans rejeter les processus et outils",
+        "Chaque développeur choisit ses propres outils",
+        "Les réunions doivent remplacer toute documentation"
+      ],
+      "reponse": 1,
+      "explication": "Le manifeste ne rejette pas les éléments de droite (processus, outils, documentation, plans) : il indique simplement que ceux de gauche ont davantage de valeur."
+    },
+    {
+      "question": "Combien de valeurs fondamentales compte le Manifeste Agile ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "3",
+        "4",
+        "7",
+        "12"
+      ],
+      "reponse": 1,
+      "explication": "Le Manifeste Agile repose sur 4 valeurs (individus, logiciels opérationnels, collaboration client, adaptation au changement). Les 12, ce sont ses principes — un piège classique."
+    },
+    {
+      "question": "Quel est le principal problème du cycle en V pointé par l'approche agile ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il ne produit aucune documentation",
+        "Il interdit de faire des tests",
+        "Le feedback client et la découverte des problèmes arrivent tardivement",
+        "Il impose des sprints trop courts"
+      ],
+      "reponse": 2,
+      "explication": "Avec des phases séquentielles, des spécifications figées et des tests en fin de cycle, les problèmes et le retour client arrivent tard — d'où un risque de non-adéquation au besoin."
+    },
+    {
+      "question": "Quelle caractéristique distingue Kanban de Scrum ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Kanban impose des sprints de 2 à 4 semaines",
+        "Kanban fonctionne en flux continu avec limitation du WIP, sans sprints fixes",
+        "Kanban définit les rôles PO et Scrum Master",
+        "Kanban interdit la visualisation du travail"
+      ],
+      "reponse": 1,
+      "explication": "Kanban organise le travail en flux continu : on visualise le flux et on limite le travail en cours (WIP), sans itérations fixes, contrairement aux sprints de Scrum."
+    },
+    {
+      "question": "Quelles pratiques sont au cœur d'eXtreme Programming (XP) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Pair programming, TDD, intégration continue et refactoring",
+        "Sprint Planning, Daily Scrum et Sprint Review",
+        "Diagrammes de Gantt et jalons contractuels",
+        "Limitation du WIP et flux tiré"
+      ],
+      "reponse": 0,
+      "explication": "XP se concentre sur les pratiques techniques : pair programming, TDD, intégration continue et refactoring. Les cérémonies relèvent de Scrum, le WIP de Kanban."
+    },
+    {
+      "question": "En agilité, comment les exigences sont-elles traitées par rapport au cycle en V ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Elles sont figées dès le début du projet",
+        "Elles évoluent en continu, les changements étant acceptés au fil des itérations",
+        "Elles sont supprimées au profit du code",
+        "Elles ne sont validées qu'à la livraison finale"
+      ],
+      "reponse": 1,
+      "explication": "Là où le cycle en V fige les spécifications au départ, l'agilité accepte l'évolution continue des exigences et s'adapte rapidement aux changements grâce aux itérations courtes."
+    },
+    {
+      "question": "Quel avantage l'approche agile tire-t-elle de ses livraisons fréquentes ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Elle supprime le besoin de tests",
+        "Elle garantit un budget fixe",
+        "Un feedback rapide et continu qui réduit les risques de non-adéquation au besoin",
+        "Elle permet de se passer d'un Product Owner"
+      ],
+      "reponse": 2,
+      "explication": "Livrer fréquemment permet d'obtenir un retour rapide du client, de corriger le tir tôt et donc de réduire le risque de construire un produit inadapté."
+    }
+  ]
+}

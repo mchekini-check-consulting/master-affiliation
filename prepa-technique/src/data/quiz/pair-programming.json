@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est le rôle du Navigator en pair programming ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Écrire le code ligne par ligne au clavier",
+        "Observer, garder la vue d'ensemble, détecter les erreurs et proposer des améliorations",
+        "Rédiger la documentation pendant que le Driver code",
+        "Valider les pull requests à la fin de la session"
+      ],
+      "reponse": 1,
+      "explication": "Le Driver tient le clavier et gère les détails tactiques ; le Navigator prend du recul : direction, stratégie, détection des problèmes et suggestions."
+    },
+    {
+      "question": "À quelle fréquence les rôles Driver et Navigator doivent-ils tourner ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Jamais : chacun garde son rôle de prédilection",
+        "Une fois par jour, au standup",
+        "Régulièrement, toutes les 15 à 30 minutes",
+        "Uniquement quand le Driver est bloqué"
+      ],
+      "reponse": 2,
+      "explication": "La rotation régulière (15-30 min) maintient l'engagement des deux partenaires et évite qu'une personne domine la session."
+    },
+    {
+      "question": "Qu'est-ce que le Ping-Pong Pairing ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Deux binômes travaillent en parallèle et comparent leurs solutions",
+        "Un développeur écrit le test, l'autre écrit l'implémentation, puis on alterne",
+        "Le Navigator dicte chaque ligne que le Driver tape sans initiative",
+        "Les binômes changent de partenaire à chaque sprint"
+      ],
+      "reponse": 1,
+      "explication": "Le Ping-Pong Pairing combine pair programming et TDD : l'un écrit un test qui échoue, l'autre le fait passer, et les rôles alternent naturellement."
+    },
+    {
+      "question": "En quoi consiste le Strong-Style Pairing ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le Navigator guide et le Driver exécute sans prendre d'initiative",
+        "Le Driver décide de tout et le Navigator observe en silence",
+        "Les deux développeurs codent chacun sur leur machine",
+        "Le binôme est composé de deux experts seniors"
+      ],
+      "reponse": 0,
+      "explication": "Dans le Strong-Style, toute idée doit passer par les mains de l'autre : le Navigator dirige la réflexion, le Driver traduit au clavier sans initiative propre — très utile pour le transfert de connaissances."
+    },
+    {
+      "question": "Que répondre à un manager qui objecte que le pair programming « coûte deux développeurs pour une tâche » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "C'est vrai, il faut le réserver aux urgences de production",
+        "Le ROI est positif : moins de bugs, meilleure qualité, revue continue et résolution plus rapide des problèmes complexes",
+        "Le coût est compensé en faisant travailler les binômes deux fois plus longtemps",
+        "C'est faux, un binôme écrit deux fois plus de lignes de code"
+      ],
+      "reponse": 1,
+      "explication": "Le coût n'est qu'apparent : la qualité du code, la détection immédiate des erreurs, le partage de connaissances et la vitesse sur les tâches complexes produisent un retour sur investissement positif."
+    },
+    {
+      "question": "Comment prévenir la fatigue mentale liée au pair programming ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Pairer uniquement en fin de journée",
+        "Limiter les sessions à 2-3 heures et faire des pauses régulières",
+        "Laisser le Navigator se reposer pendant que le Driver code",
+        "Réserver le pairing aux développeurs juniors"
+      ],
+      "reponse": 1,
+      "explication": "Le pairing demande une concentration intense : sessions courtes (2-4 h max), rotation des rôles toutes les 15-30 min et pauses de 10-15 minutes toutes les heures."
+    },
+    {
+      "question": "Pour quel type de tâche le pair programming apporte-t-il le PLUS de valeur ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le renommage en masse de variables dans tout le projet",
+        "La mise à jour mécanique de dépendances",
+        "Le code critique (sécurité, paiements) et le debugging difficile",
+        "La rédaction de comptes rendus de réunion"
+      ],
+      "reponse": 2,
+      "explication": "Le pairing brille sur les tâches complexes ou à fort enjeu : algorithmes, architecture critique, bugs difficiles, sécurité et paiements — ainsi que pour l'onboarding et le transfert de connaissances."
+    }
+  ]
+}

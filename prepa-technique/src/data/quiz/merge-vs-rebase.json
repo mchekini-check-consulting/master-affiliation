@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence fondamentale entre merge et rebase ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Merge est plus rapide que rebase",
+        "Merge préserve l'historique avec un commit de fusion, rebase réécrit l'historique en le linéarisant",
+        "Rebase fusionne les fichiers, merge fusionne les branches",
+        "Merge ne fonctionne que sur la branche main"
+      ],
+      "reponse": 1,
+      "explication": "Merge crée un commit de fusion qui relie les deux branches et préserve l'historique réel ; rebase rejoue les commits au-dessus de la cible et produit un historique linéaire, mais réécrit."
+    },
+    {
+      "question": "Que se passe-t-il exactement lors d'un `git rebase main` depuis une branche feature ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les commits de main sont copiés dans la feature",
+        "Un commit de merge est créé sur la feature",
+        "Les commits de la feature sont rejoués un par un au-dessus du dernier commit de main",
+        "La feature est supprimée puis recréée depuis main"
+      ],
+      "reponse": 2,
+      "explication": "Le rebase « rejoue » chaque commit de la branche au-dessus de la cible : les commits D et E deviennent D' et E', de nouveaux commits avec le même contenu mais un autre parent (et un autre SHA)."
+    },
+    {
+      "question": "Pourquoi dit-on que le rebase est « dangereux » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il peut supprimer des fichiers du projet",
+        "Il réécrit l'historique : sur une branche partagée, les autres développeurs se retrouvent avec un historique divergent",
+        "Il est plus lent que le merge sur les gros dépôts",
+        "Il désactive temporairement les hooks Git"
+      ],
+      "reponse": 1,
+      "explication": "Les commits rejoués ont de nouveaux SHA. Si la branche était déjà poussée, l'historique distant et les copies locales des collègues divergent — d'où la règle d'or : ne jamais rebaser une branche partagée."
+    },
+    {
+      "question": "Dans quel cas le merge est-il préférable au rebase ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Sur une branche de feature personnelle avant push",
+        "Quand on veut un historique parfaitement linéaire",
+        "Sur des branches partagées où la traçabilité complète compte",
+        "Quand on veut éviter tout commit supplémentaire"
+      ],
+      "reponse": 2,
+      "explication": "Le merge est non destructif et conserve la trace réelle du travail : c'est le bon choix pour les branches partagées, les releases, et les équipes hétérogènes."
+    },
+    {
+      "question": "Quelle séquence de commandes intègre proprement main dans votre feature avec un rebase ?",
+      "code": "git checkout ???\ngit rebase ???",
+      "lang": "bash",
+      "options": [
+        "git checkout main puis git rebase feature-branch",
+        "git checkout feature-branch puis git rebase main",
+        "git checkout main puis git rebase main",
+        "git checkout feature-branch puis git rebase feature-branch"
+      ],
+      "reponse": 1,
+      "explication": "On se place sur la branche à rebaser (la feature), puis on la rejoue au-dessus de la cible : `git rebase main` depuis la feature."
+    },
+    {
+      "question": "Après un rebase, les commits D et E deviennent D' et E'. Qu'ont-ils de différent ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Rien, ce sont exactement les mêmes commits",
+        "Leur contenu change mais leur SHA reste identique",
+        "Leur parent change, donc leur SHA change — ce sont de nouveaux commits",
+        "Ils sont fusionnés en un seul commit"
+      ],
+      "reponse": 2,
+      "explication": "Un commit est identifié par un SHA calculé notamment à partir de son parent : rejoué sur un nouveau parent, le « même » commit devient un nouveau commit avec un nouveau SHA."
+    },
+    {
+      "question": "Votre équipe veut un historique linéaire sur main tout en travaillant sur des branches de feature. Quelle pratique est cohérente ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Merger main dans la feature tous les jours",
+        "Rebaser la feature sur main avant de la merger (fast-forward ou squash)",
+        "Ne jamais créer de branches et commiter directement sur main",
+        "Faire un revert de chaque commit de merge"
+      ],
+      "reponse": 1,
+      "explication": "Le pattern courant « rebase then merge » : on rebase sa feature personnelle sur main juste avant l'intégration, ce qui permet un merge fast-forward et un historique linéaire."
+    }
+  ]
+}

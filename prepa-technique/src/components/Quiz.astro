@@ -1,0 +1,359 @@
+---
+// Quiz « interro » de fin de fiche. Rendu statique des questions,
+// interactivité en vanilla JS (une question à la fois, feedback
+// immédiat, score final tamponné comme une copie corrigée).
+export interface Question {
+  question: string;
+  code: string | null;
+  lang: string | null;
+  options: string[];
+  reponse: number;
+  explication: string;
+}
+
+interface Props {
+  questions: Question[];
+}
+
+const { questions } = Astro.props;
+const lettres = ['A', 'B', 'C', 'D'];
+---
+
+<section class="quiz" data-quiz aria-label="Quiz du chapitre">
+  <header class="quiz-tete">
+    <h2>Interro écrite</h2>
+    <p class="quiz-consigne">
+      {questions.length} questions pour valider la fiche. Une seule réponse par
+      question.
+    </p>
+  </header>
+
+  <div class="quiz-corps">
+    {
+      questions.map((q, qi) => (
+        <fieldset class="question" data-question data-reponse={q.reponse} hidden={qi !== 0}>
+          <legend>
+            <span class="question-num">
+              Question {qi + 1}/{questions.length}
+            </span>
+            {q.question}
+          </legend>
+          {q.code && (
+            <pre class="question-code"><code>{q.code}</code></pre>
+          )}
+          <div class="question-options" role="group">
+            {q.options.map((opt, oi) => (
+              <button class="option" type="button" data-option data-index={oi}>
+                <span class="option-lettre">{lettres[oi]}</span>
+                {opt}
+              </button>
+            ))}
+          </div>
+          <p class="question-explication" data-explication hidden>
+            {q.explication}
+          </p>
+          <button class="question-suivante" type="button" data-suivante hidden>
+            {qi === questions.length - 1 ? 'Voir ma note' : 'Question suivante'}
+          </button>
+        </fieldset>
+      ))
+    }
+
+    <div class="quiz-resultat" data-resultat hidden>
+      <p class="resultat-tampon" data-tampon></p>
+      <p class="resultat-note">
+        <span data-score></span>/{questions.length}
+      </p>
+      <p class="resultat-appreciation" data-appreciation></p>
+      <button class="question-suivante" type="button" data-rejouer>
+        Recommencer l’interro
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-quiz]').forEach((quiz) => {
+    const questions = [...quiz.querySelectorAll('[data-question]')] as HTMLFieldSetElement[];
+    const resultat = quiz.querySelector('[data-resultat]') as HTMLElement;
+    let score = 0;
+    let courante = 0;
+
+    const afficherResultat = () => {
+      const total = questions.length;
+      const ratio = score / total;
+      const tampon = quiz.querySelector('[data-tampon]') as HTMLElement;
+      const appreciation = quiz.querySelector('[data-appreciation]') as HTMLElement;
+      (quiz.querySelector('[data-score]') as HTMLElement).textContent = String(score);
+      if (ratio === 1) {
+        tampon.textContent = 'Excellent';
+        appreciation.textContent = 'Sans faute. Cette fiche est acquise, passez à la suivante.';
+      } else if (ratio >= 0.7) {
+        tampon.textContent = 'Bien';
+        appreciation.textContent = 'Solide. Relisez les explications des questions ratées avant l’entretien.';
+      } else if (ratio >= 0.4) {
+        tampon.textContent = 'À revoir';
+        appreciation.textContent = 'Les bases sont là, mais relisez la fiche avant de retenter l’interro.';
+      } else {
+        tampon.textContent = 'À réviser';
+        appreciation.textContent = 'Reprenez la fiche depuis le début, puis retentez l’interro.';
+      }
+      tampon.dataset.niveau = ratio >= 0.7 ? 'bon' : ratio >= 0.4 ? 'moyen' : 'faible';
+      resultat.hidden = false;
+    };
+
+    questions.forEach((q) => {
+      const bonne = Number(q.dataset.reponse);
+      const options = [...q.querySelectorAll('[data-option]')] as HTMLButtonElement[];
+      const explication = q.querySelector('[data-explication]') as HTMLElement;
+      const suivante = q.querySelector('[data-suivante]') as HTMLButtonElement;
+
+      options.forEach((opt) => {
+        opt.addEventListener('click', () => {
+          if (q.dataset.repondu) return;
+          q.dataset.repondu = 'oui';
+          const choisi = Number(opt.dataset.index);
+          if (choisi === bonne) score += 1;
+          opt.classList.add(choisi === bonne ? 'option--bonne' : 'option--mauvaise');
+          options[bonne].classList.add('option--bonne');
+          options.forEach((o) => (o.disabled = true));
+          explication.hidden = false;
+          suivante.hidden = false;
+          suivante.focus();
+        });
+      });
+
+      suivante.addEventListener('click', () => {
+        q.hidden = true;
+        courante += 1;
+        if (courante < questions.length) {
+          questions[courante].hidden = false;
+        } else {
+          afficherResultat();
+        }
+      });
+    });
+
+    quiz.querySelector('[data-rejouer]')?.addEventListener('click', () => {
+      score = 0;
+      courante = 0;
+      resultat.hidden = true;
+      questions.forEach((q, qi) => {
+        delete q.dataset.repondu;
+        q.hidden = qi !== 0;
+        (q.querySelector('[data-explication]') as HTMLElement).hidden = true;
+        (q.querySelector('[data-suivante]') as HTMLElement).hidden = true;
+        q.querySelectorAll('[data-option]').forEach((o) => {
+          const btn = o as HTMLButtonElement;
+          btn.disabled = false;
+          btn.classList.remove('option--bonne', 'option--mauvaise');
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  .quiz {
+    max-width: var(--contenu-max);
+    margin-top: 3.5rem;
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    background: var(--blanc);
+    overflow: hidden;
+  }
+
+  .quiz-tete {
+    padding: 1.25rem 1.5rem 1rem;
+    background: var(--encre);
+    color: var(--blanc);
+  }
+
+  .quiz-tete h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--blanc);
+  }
+
+  .quiz-tete h2::after {
+    content: '';
+    display: inline-block;
+    width: 2.2rem;
+    height: 4px;
+    margin-left: 0.6rem;
+    vertical-align: 0.18em;
+    background: var(--surligneur);
+    border-radius: 2px;
+    transform: rotate(-2deg);
+  }
+
+  .quiz-consigne {
+    margin: 0.35rem 0 0;
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .quiz-corps {
+    padding: 1.5rem;
+  }
+
+  .question {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  legend {
+    font-family: var(--f-display);
+    font-size: 1.0625rem;
+    font-weight: 650;
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+
+  .question-num {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--bic);
+    margin-bottom: 0.3rem;
+  }
+
+  .question-code {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .question-options {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .option {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    width: 100%;
+    text-align: left;
+    font-family: var(--f-display);
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    padding: 0.65rem 0.9rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .option:hover:not(:disabled) {
+    border-color: var(--bic);
+    background: var(--bic-doux);
+  }
+
+  .option-lettre {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    align-self: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .option:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .option--bonne {
+    opacity: 1 !important;
+    border-color: var(--vert);
+    background: var(--vert-doux) !important;
+    color: var(--vert);
+    font-weight: 650;
+  }
+
+  .option--mauvaise {
+    opacity: 1 !important;
+    border-color: var(--rouge);
+    background: var(--rouge-doux) !important;
+    color: var(--rouge);
+    text-decoration: line-through;
+  }
+
+  .question-explication {
+    margin: 1rem 0 0;
+    padding: 0.75rem 1rem;
+    background: var(--papier);
+    border-left: 3px solid var(--surligneur);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9375rem;
+  }
+
+  .question-suivante {
+    margin-top: 1rem;
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    padding: 0.55rem 1.2rem;
+    background: var(--bic);
+    color: var(--blanc);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .question-suivante:hover {
+    background: color-mix(in srgb, var(--bic) 85%, black);
+  }
+
+  .quiz-resultat {
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .resultat-tampon {
+    display: inline-block;
+    margin: 0;
+    font-family: var(--f-display);
+    font-size: 1.5rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 1.1rem;
+    border: 3px solid var(--vert);
+    border-radius: 8px;
+    color: var(--vert);
+    transform: rotate(-4deg);
+  }
+
+  .resultat-tampon[data-niveau='moyen'] {
+    border-color: var(--bic);
+    color: var(--bic);
+  }
+
+  .resultat-tampon[data-niveau='faible'] {
+    border-color: var(--rouge);
+    color: var(--rouge);
+  }
+
+  .resultat-note {
+    font-family: var(--f-display);
+    font-size: 2.75rem;
+    font-weight: 750;
+    margin: 1rem 0 0.25rem;
+  }
+
+  .resultat-appreciation {
+    color: var(--estompe);
+    margin: 0 auto 1rem;
+    max-width: 28rem;
+  }
+</style>

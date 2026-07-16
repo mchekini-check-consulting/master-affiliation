@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence entre `@Mock` et `@MockBean` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Aucune, ce sont deux alias de la même annotation",
+        "@Mock crée un mock Mockito hors contexte Spring ; @MockBean remplace un bean dans le contexte Spring",
+        "@Mock ne fonctionne qu'avec les repositories, @MockBean avec les services",
+        "@MockBean est plus rapide car il n'utilise pas Mockito"
+      ],
+      "reponse": 1,
+      "explication": "@Mock est du Mockito pur, utilisé dans les tests unitaires sans contexte. @MockBean s'utilise dans les tests Spring (@SpringBootTest, @WebMvcTest) : il enregistre le mock comme bean du contexte à la place du vrai."
+    },
+    {
+      "question": "Que fait `@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il ne charge que la couche web sur un port aléatoire",
+        "Il démarre le contexte Spring complet avec un vrai serveur web sur un port aléatoire",
+        "Il exécute les tests en parallèle sur plusieurs ports",
+        "Il mocke le serveur web pour éviter tout appel réseau"
+      ],
+      "reponse": 1,
+      "explication": "C'est le test d'intégration le plus complet : toute l'application démarre avec un serveur réel sur un port libre choisi au hasard, et on la teste via de vraies requêtes HTTP (TestRestTemplate)."
+    },
+    {
+      "question": "Dans un test `@WebMvcTest(UserController.class)`, pourquoi doit-on déclarer `@MockBean private UserService userService` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Pour accélérer la sérialisation JSON des réponses",
+        "Parce que @WebMvcTest ne charge que la couche MVC : le service n'existe pas dans le contexte et doit être fourni en mock",
+        "Parce que les services ne sont jamais injectables dans les tests",
+        "Pour empêcher le contrôleur d'appeler la base de données réelle"
+      ],
+      "reponse": 1,
+      "explication": "Un slice test ne charge qu'une tranche du contexte. @WebMvcTest instancie le contrôleur et l'infrastructure MVC, mais pas les services : sans @MockBean, l'injection échoue au démarrage du test."
+    },
+    {
+      "question": "Que teste ce code et avec quel outil ?",
+      "code": "mockMvc.perform(get(\"/api/users/1\"))\n    .andExpect(status().isOk())\n    .andExpect(jsonPath(\"$.email\").value(\"john@example.com\"));",
+      "lang": "java",
+      "options": [
+        "Un vrai appel HTTP vers un serveur démarré, via TestRestTemplate",
+        "Une requête simulée vers la couche MVC (sans serveur réel), avec vérification du statut et du JSON via MockMvc",
+        "Un test de repository qui vérifie une requête SQL",
+        "Un test de performance qui mesure le temps de réponse"
+      ],
+      "reponse": 1,
+      "explication": "MockMvc simule la requête à travers la couche MVC sans démarrer de serveur HTTP. jsonPath permet d'asserter le contenu du corps JSON de la réponse ($.email = champ email à la racine)."
+    },
+    {
+      "question": "Quel est le rôle de `@InjectMocks` dans un test unitaire Mockito ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Créer un mock du composant testé",
+        "Instancier le composant testé en lui injectant les champs annotés @Mock",
+        "Charger le contexte Spring et injecter tous les beans",
+        "Vérifier que toutes les méthodes mockées ont été appelées"
+      ],
+      "reponse": 1,
+      "explication": "@InjectMocks crée une vraie instance de la classe testée (ex. UserService) et y injecte les mocks déclarés (@Mock UserRepository, @Mock EmailService) : on teste le vrai code du service avec des dépendances factices."
+    },
+    {
+      "question": "Que fournit `@DataJpaTest` par défaut ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le contexte Spring complet avec la base de production",
+        "Uniquement la couche JPA (entités, repositories) avec une base embarquée et un TestEntityManager",
+        "Uniquement la couche web avec MockMvc",
+        "Un mock automatique de tous les repositories"
+      ],
+      "reponse": 1,
+      "explication": "@DataJpaTest est un slice test de la couche de persistance : il configure une base embarquée, ne charge que les composants JPA et fournit TestEntityManager pour préparer les données (persistAndFlush)."
+    },
+    {
+      "question": "Quand préférer un slice test (@WebMvcTest, @DataJpaTest) à un @SpringBootTest complet ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Jamais : @SpringBootTest est toujours plus fiable",
+        "Quand on veut tester une couche isolément avec un démarrage plus rapide, sans charger tout le contexte",
+        "Uniquement quand l'application n'a pas de base de données",
+        "Quand on veut tester plusieurs microservices en même temps"
+      ],
+      "reponse": 1,
+      "explication": "Les slice tests ne chargent qu'une tranche du contexte : ils démarrent bien plus vite et isolent la couche testée. @SpringBootTest reste utile pour les scénarios de bout en bout, mais en abuser rend la suite de tests lente."
+    },
+    {
+      "question": "Dans le test unitaire de UserService, à quoi sert `verify(emailService).sendWelcomeEmail(user.getEmail())` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À envoyer réellement un email de test",
+        "À stubber la méthode pour qu'elle retourne une valeur",
+        "À vérifier que le service a bien appelé sendWelcomeEmail avec cet argument pendant le test",
+        "À réinitialiser le mock entre deux tests"
+      ],
+      "reponse": 2,
+      "explication": "verify() contrôle les interactions : le test échoue si la méthode n'a pas été appelée (ou pas avec les bons arguments). C'est complémentaire de when()/thenReturn() qui, lui, définit le comportement du mock."
+    }
+  ]
+}

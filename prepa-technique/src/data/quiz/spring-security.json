@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence entre authentification et autorisation ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Ce sont deux synonymes en sécurité applicative",
+        "L'authentification vérifie l'identité de l'utilisateur, l'autorisation contrôle ses droits d'accès aux ressources",
+        "L'authentification concerne les API REST, l'autorisation les pages HTML",
+        "L'autorisation précède toujours l'authentification"
+      ],
+      "reponse": 1,
+      "explication": "L'authentification répond à « qui êtes-vous ? » (login, JWT, OAuth2…) ; l'autorisation répond à « qu'avez-vous le droit de faire ? » (rôles, permissions). La première précède toujours la seconde."
+    },
+    {
+      "question": "Comment configure-t-on la sécurité web dans Spring Security moderne (Spring Security 6) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "En héritant de WebSecurityConfigurerAdapter et en surchargeant configure()",
+        "En déclarant un bean SecurityFilterChain construit avec le DSL lambda de HttpSecurity",
+        "Uniquement via le fichier web.xml",
+        "En annotant chaque contrôleur avec @Secured"
+      ],
+      "reponse": 1,
+      "explication": "WebSecurityConfigurerAdapter a été supprimé : la configuration moderne expose un bean SecurityFilterChain construit via http.authorizeHttpRequests(...), http.formLogin(...), etc."
+    },
+    {
+      "question": "Avec cette configuration, qui peut accéder à un endpoint sous /api/admin/ ?",
+      "code": ".authorizeHttpRequests(authz -> authz\n    .requestMatchers(\"/api/auth/**\").permitAll()\n    .requestMatchers(\"/api/admin/**\").hasRole(\"ADMIN\")\n    .requestMatchers(\"/api/user/**\").hasAnyRole(\"USER\", \"ADMIN\")\n    .anyRequest().authenticated()\n)",
+      "lang": "java",
+      "options": [
+        "Tout utilisateur authentifié",
+        "Tout le monde, y compris les anonymes",
+        "Uniquement les utilisateurs possédant le rôle ADMIN",
+        "Les utilisateurs ayant le rôle USER ou ADMIN"
+      ],
+      "reponse": 2,
+      "explication": "hasRole(\"ADMIN\") exige l'autorité ROLE_ADMIN. Les règles sont évaluées dans l'ordre de déclaration : /api/admin/** est réservé aux ADMIN, tandis que /api/user/** accepte USER et ADMIN."
+    },
+    {
+      "question": "Pourquoi désactive-t-on souvent CSRF et passe-t-on la session en STATELESS pour une API REST à JWT ?",
+      "code": ".csrf(csrf -> csrf.disable())\n.sessionManagement(session ->\n    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))",
+      "lang": "java",
+      "options": [
+        "Pour améliorer les performances du serveur uniquement",
+        "Parce que sans cookie de session, la protection CSRF n'a plus de raison d'être : chaque requête porte son propre jeton d'authentification",
+        "Parce que CSRF est incompatible avec HTTPS",
+        "Pour permettre les requêtes anonymes sur toute l'API"
+      ],
+      "reponse": 1,
+      "explication": "L'attaque CSRF exploite les cookies de session envoyés automatiquement par le navigateur. Une API stateless authentifiée par JWT dans un header n'utilise pas ce mécanisme : la protection CSRF devient inutile."
+    },
+    {
+      "question": "Quel est le rôle du PasswordEncoder (ex. BCryptPasswordEncoder) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Chiffrer les mots de passe de manière réversible pour pouvoir les renvoyer à l'utilisateur",
+        "Hacher les mots de passe avant stockage et vérifier les correspondances sans jamais stocker le mot de passe en clair",
+        "Encoder les mots de passe en Base64 pour le transport HTTP",
+        "Générer des mots de passe aléatoires à l'inscription"
+      ],
+      "reponse": 1,
+      "explication": "BCrypt applique un hachage à sens unique avec sel intégré : on stocke le hash, jamais le mot de passe, et matches() compare le mot de passe saisi au hash. Base64 n'est pas de la sécurité."
+    },
+    {
+      "question": "À quoi sert l'interface UserDetailsService ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À créer automatiquement les tables utilisateurs en base",
+        "À charger les informations d'un utilisateur (identifiant, mot de passe haché, autorités) depuis une source de données pour l'authentification",
+        "À gérer les sessions HTTP des utilisateurs connectés",
+        "À envoyer les emails de réinitialisation de mot de passe"
+      ],
+      "reponse": 1,
+      "explication": "loadUserByUsername est le point d'extension par lequel Spring Security récupère l'utilisateur (souvent en base via un repository) et le convertit en UserDetails pour vérifier les identifiants et les rôles."
+    },
+    {
+      "question": "Dans le code suivant, pourquoi préfixer le nom du rôle par « ROLE_ » ?",
+      "code": "return roles.stream()\n    .map(role -> new SimpleGrantedAuthority(\"ROLE_\" + role.getName()))\n    .collect(Collectors.toList());",
+      "lang": "java",
+      "options": [
+        "C'est purement décoratif, le préfixe est ignoré",
+        "Parce que hasRole(\"ADMIN\") recherche en réalité l'autorité nommée ROLE_ADMIN",
+        "Pour éviter les collisions avec les noms de tables SQL",
+        "Parce que les autorités doivent obligatoirement être en majuscules"
+      ],
+      "reponse": 1,
+      "explication": "Convention Spring Security : hasRole(\"ADMIN\") ajoute automatiquement le préfixe et compare à l'autorité ROLE_ADMIN. Sans ce préfixe côté autorités, il faudrait utiliser hasAuthority(\"ADMIN\")."
+    },
+    {
+      "question": "Que permet @EnableMethodSecurity(prePostEnabled = true) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "D'activer la sécurité au niveau des méthodes avec des annotations comme @PreAuthorize",
+        "De sécuriser automatiquement toutes les méthodes publiques de l'application",
+        "D'exécuter les filtres de sécurité avant et après chaque requête HTTP",
+        "D'activer la double authentification"
+      ],
+      "reponse": 0,
+      "explication": "Cette annotation active la sécurité au niveau méthode : on peut alors poser @PreAuthorize(\"hasRole('ADMIN')\") sur une méthode de service pour contrôler l'accès au-delà du seul filtrage des URLs."
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence fondamentale entre `git reset` et `git revert` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Reset annule un commit en créant un commit inverse, revert déplace HEAD",
+        "Reset déplace HEAD et réécrit l'historique, revert crée un nouveau commit qui annule les changements",
+        "Reset ne fonctionne que sur le dernier commit, revert sur n'importe lequel",
+        "Ce sont deux syntaxes équivalentes"
+      ],
+      "reponse": 1,
+      "explication": "Reset fait « disparaître » des commits en déplaçant HEAD (historique réécrit) ; revert ajoute un commit C' qui inverse les changements de C, sans toucher à l'historique existant."
+    },
+    {
+      "question": "Que se passe-t-il après cette commande si le dernier commit contenait des modifications ?",
+      "code": "git reset --soft HEAD~1",
+      "lang": "bash",
+      "options": [
+        "Le commit est annulé et toutes les modifications sont perdues",
+        "Le commit est annulé et les modifications reviennent non stagées dans le working directory",
+        "Le commit est annulé et les modifications restent stagées dans l'index, prêtes à être recommitées",
+        "Rien, --soft ne fait qu'afficher un aperçu"
+      ],
+      "reponse": 2,
+      "explication": "--soft déplace HEAD en arrière mais conserve l'index : les fichiers du commit annulé restent « staged », ce qui est pratique pour recommitter différemment (squash manuel, correction de message)."
+    },
+    {
+      "question": "Quel mode de reset est utilisé par défaut si aucune option n'est précisée ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "--soft : les changements restent stagés",
+        "--mixed : les changements sont conservés mais « unstaged »",
+        "--hard : les changements sont supprimés",
+        "--keep : Git refuse sans option explicite"
+      ],
+      "reponse": 1,
+      "explication": "Sans option, `git reset` est en mode --mixed : le commit est annulé et les fichiers reviennent dans le working directory, mais retirés de la staging area."
+    },
+    {
+      "question": "Pourquoi `git reset --hard HEAD~1` est-il considéré comme dangereux ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il pousse automatiquement la suppression sur le remote",
+        "Il annule le commit ET supprime tous les changements du working directory, sans commit inverse pour les retrouver",
+        "Il supprime la branche courante",
+        "Il bloque le dépôt jusqu'à un nouveau commit"
+      ],
+      "reponse": 1,
+      "explication": "--hard écrase l'index et le working directory : les modifications non sauvegardées ailleurs sont perdues. Sur une branche partagée, la réécriture d'historique pose en plus un problème de synchronisation."
+    },
+    {
+      "question": "Un bug a été introduit par le commit C, déjà poussé sur la branche partagée main. Quelle est la bonne façon de l'annuler ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "git reset --hard sur le commit précédent, puis push --force",
+        "git revert <hash-de-C> : un commit C' qui annule C est ajouté, l'historique est préservé",
+        "git cherry-pick <hash-de-C> pour le déplacer sur une autre branche",
+        "git stash pour mettre le commit de côté"
+      ],
+      "reponse": 1,
+      "explication": "Sur une branche partagée, on ne réécrit pas l'historique : revert crée un nouveau commit qui inverse les changements, solution sécurisée et traçable."
+    },
+    {
+      "question": "Que fait `git cherry-pick <commit-hash>` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il fusionne toute la branche contenant ce commit dans la branche courante",
+        "Il applique les changements de ce seul commit sur la branche actuelle, en créant une copie du commit",
+        "Il supprime ce commit de sa branche d'origine",
+        "Il compare ce commit avec HEAD"
+      ],
+      "reponse": 1,
+      "explication": "Cherry-pick copie un commit précis (par exemple E d'une feature) sur la branche courante sous forme d'un nouveau commit E'. Utile pour les hotfixes, mais attention aux doublons si la branche est mergée ensuite."
+    },
+    {
+      "question": "Vous devez changer de branche en urgence mais vous avez des modifications non commitées, y compris un fichier nouvellement créé non tracké. Que faire ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "git stash suffit, il inclut toujours les fichiers non trackés",
+        "git stash -u, car par défaut le stash n'inclut pas les fichiers non trackés",
+        "git reset --hard puis changer de branche",
+        "git commit --amend pour tout ranger dans le dernier commit"
+      ],
+      "reponse": 1,
+      "explication": "Le stash met de côté les modifications trackées ; l'option -u (--include-untracked) est nécessaire pour embarquer aussi les nouveaux fichiers non suivis."
+    },
+    {
+      "question": "Quelle est la différence entre `git stash pop` et `git stash apply` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "pop applique le stash et le supprime de la liste, apply l'applique en le conservant",
+        "pop applique le plus ancien stash, apply le plus récent",
+        "pop crée un commit, apply modifie seulement le working directory",
+        "Aucune, ce sont des alias"
+      ],
+      "reponse": 0,
+      "explication": "pop = apply + drop : les changements sont restaurés puis l'entrée est retirée du stash. apply (par exemple `git stash apply stash@{0}`) restaure sans supprimer, ce qui permet de réappliquer le même stash ailleurs."
+    }
+  ]
+}

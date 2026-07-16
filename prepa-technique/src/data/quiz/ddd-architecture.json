@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Qu'est-ce que l'Ubiquitous Language en DDD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Un langage de programmation adapté au domaine métier",
+        "Un vocabulaire commun partagé entre développeurs et experts métier, utilisé jusque dans le code",
+        "Une convention de nommage des tables de la base de données",
+        "Un format d'échange standardisé entre microservices"
+      ],
+      "reponse": 1,
+      "explication": "L'Ubiquitous Language est le langage commun de l'équipe et du métier : les mêmes termes se retrouvent dans les conversations, la documentation et le code (classes, méthodes)."
+    },
+    {
+      "question": "Quelle est la différence fondamentale entre une Entity et un Value Object ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "L'Entity est stockée en base, le Value Object reste en mémoire",
+        "L'Entity a une identité (id) et un cycle de vie ; le Value Object est immuable et défini uniquement par ses valeurs",
+        "Le Value Object contient la logique métier, l'Entity seulement des données",
+        "L'Entity est une interface, le Value Object une classe concrète"
+      ],
+      "reponse": 1,
+      "explication": "Une Entity reste « la même » quand ses attributs changent, grâce à son identité. Un Value Object comme Money est immuable et deux instances de mêmes valeurs sont égales."
+    },
+    {
+      "question": "Que garantit ce constructeur du Value Object Money ?",
+      "code": "public Money(BigDecimal amount, Currency currency) {\n    if (amount.compareTo(BigDecimal.ZERO) < 0) {\n        throw new IllegalArgumentException(\"Amount cannot be negative\");\n    }\n    this.amount = amount;\n    this.currency = currency;\n}",
+      "lang": "java",
+      "options": [
+        "La conversion automatique entre devises",
+        "Qu'un Money invalide (montant négatif) ne peut tout simplement pas exister",
+        "La persistance du montant en base de données",
+        "L'égalité par référence entre deux Money"
+      ],
+      "reponse": 1,
+      "explication": "Le Value Object protège ses invariants dès la construction : il est impossible de créer un Money négatif, la règle métier est encapsulée dans le modèle."
+    },
+    {
+      "question": "En architecture hexagonale, qu'est-ce qu'un port et qu'est-ce qu'un adapter ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le port est le point d'entrée HTTP, l'adapter le convertisseur JSON",
+        "Le port est une interface définie par le domaine, l'adapter en est une implémentation technique",
+        "Le port est côté base de données, l'adapter côté interface utilisateur",
+        "Le port et l'adapter sont deux noms pour le même composant"
+      ],
+      "reponse": 1,
+      "explication": "Le domaine définit ses besoins sous forme d'interfaces (ports, ex. OrderRepository) ; les adapters (JPA, REST, email…) les implémentent côté infrastructure, ce qui isole le métier des détails techniques."
+    },
+    {
+      "question": "Quelle est la « règle de dépendance » de la Clean Architecture ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Chaque couche ne dépend que de la couche immédiatement supérieure",
+        "Les dépendances pointent toujours vers l'intérieur, vers le domaine",
+        "Les entités dépendent des use cases qui les orchestrent",
+        "Toutes les couches dépendent du framework choisi"
+      ],
+      "reponse": 1,
+      "explication": "Les dépendances vont des couches externes (frameworks, adapters) vers les couches internes (use cases, entités). Le domaine ne connaît ni la base de données ni le web."
+    },
+    {
+      "question": "L'interface `OrderRepository` est définie dans le domaine mais implémentée par `JpaOrderRepository` dans l'infrastructure. Quel principe est appliqué ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le principe de responsabilité unique (SRP)",
+        "L'inversion de dépendance : la couche externe implémente une interface définie par la couche interne",
+        "Le principe ouvert/fermé (OCP)",
+        "La ségrégation des interfaces (ISP)"
+      ],
+      "reponse": 1,
+      "explication": "C'est l'inversion de contrôle/dépendance : le domaine définit le contrat dont il a besoin, l'infrastructure s'y conforme. Le sens de la dépendance du code pointe ainsi vers le domaine."
+    },
+    {
+      "question": "Quel est le rôle d'un Aggregate Root en DDD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Servir de classe de base dont héritent toutes les entités",
+        "Garantir la cohérence et les invariants d'un groupe d'objets, seul point d'accès à l'agrégat",
+        "Agréger les résultats de plusieurs requêtes SQL",
+        "Centraliser la configuration de l'injection de dépendances"
+      ],
+      "reponse": 1,
+      "explication": "L'Aggregate Root (ex. Order avec ses OrderLine) est le gardien des invariants de l'agrégat : toutes les modifications passent par lui, comme addOrderLine qui refuse de modifier une commande confirmée."
+    },
+    {
+      "question": "Dans quel cas est-il raisonnable de NE PAS appliquer ces architectures (hexagonale, clean) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Quand l'application a plusieurs interfaces (API, UI, CLI)",
+        "Quand le domaine métier est simple et que la complexité ne le justifie pas",
+        "Quand l'équipe veut des tests automatisés",
+        "Quand le cycle de vie de l'application est long"
+      ],
+      "reponse": 1,
+      "explication": "Conseil clé : commencer simple. Ces patterns ajoutent de la structure et du code ; ils ne se justifient que si la complexité du domaine ou du projet le demande, et on peut y refactorer progressivement."
+    }
+  ]
+}

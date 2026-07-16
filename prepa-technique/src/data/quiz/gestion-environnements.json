@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quel est le rôle de l'environnement de staging par rapport à la production ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Héberger les utilisateurs finaux avec les données réelles",
+        "Servir de zone de tests d'intégration et de validation métier avec des données similaires à la prod",
+        "Remplacer l'environnement de développement local",
+        "Stocker les sauvegardes de la production"
+      ],
+      "reponse": 1,
+      "explication": "Le staging est l'antichambre de la production : tests d'intégration, validation métier et tests de performance, sur des données proches de la prod mais sans utilisateurs réels."
+    },
+    {
+      "question": "Dans la stratégie « branches par environnement », quel est le flux de promotion du code ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "main → staging → develop",
+        "feature → develop → staging → main, chaque branche déclenchant le déploiement de son environnement",
+        "feature → main directement, puis cherry-pick vers develop",
+        "Un tag par environnement sur une branche unique"
+      ],
+      "reponse": 1,
+      "explication": "Le code monte par merges successifs : la feature est intégrée dans develop (DEV), promue vers staging (STAGING), puis vers main (PRODUCTION), chaque branche étant liée à un déploiement."
+    },
+    {
+      "question": "Quel est un inconvénient connu de la stratégie « branches par environnement » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Impossible de faire des rollbacks",
+        "Aucun contrôle sur les déploiements",
+        "La maintenance et la synchronisation de multiples branches, avec des hotfixes compliqués",
+        "L'obligation d'utiliser des feature flags"
+      ],
+      "reponse": 2,
+      "explication": "Multiplier les branches longue durée impose de les maintenir synchronisées : conflits lors des promotions, hotfixes à propager dans plusieurs branches, risque de divergence entre environnements."
+    },
+    {
+      "question": "Dans la stratégie par tags, que déclenche cette séquence ?",
+      "code": "git tag v1.3.0-rc.1\ngit push origin v1.3.0-rc.1",
+      "lang": "bash",
+      "options": [
+        "Un déploiement en production",
+        "Un déploiement automatique du release candidate en staging",
+        "La création d'une branche release/v1.3.0",
+        "Rien, un tag est purement décoratif"
+      ],
+      "reponse": 1,
+      "explication": "Le format `-rc.N` (release candidate) est réservé au staging : la CI détecte le tag poussé et déploie cette version en staging pour les tests d'intégration. Le tag final `v1.3.0` ira, lui, en production."
+    },
+    {
+      "question": "Dans la stratégie par tags, comment gérer un hotfix sur la version v1.3.0 en production ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Commiter directement sur main et redéployer tout main",
+        "Partir du tag v1.3.0 (checkout), créer une branche hotfix, corriger, puis tagger v1.3.1",
+        "Supprimer le tag v1.3.0 et le recréer sur le nouveau commit",
+        "Modifier le tag existant avec git tag --amend"
+      ],
+      "reponse": 1,
+      "explication": "On se positionne sur l'état exact de la prod (`git checkout v1.3.0`), on corrige sur une branche hotfix, puis on publie un nouveau tag `v1.3.1` : les tags restent immuables et traçables."
+    },
+    {
+      "question": "Avec des feature flags configurés par environnement, quel est le grand avantage en cas de problème en production ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le rollback est instantané : il suffit de désactiver le flag, sans redéploiement",
+        "Le bug se corrige automatiquement",
+        "Git annule le dernier merge tout seul",
+        "La production bascule automatiquement sur staging"
+      ],
+      "reponse": 0,
+      "explication": "Le code problématique reste déployé mais inactif : basculer le flag à false le désactive immédiatement, sans pipeline de redéploiement ni revert. C'est aussi ce qui permet l'A/B testing et les tests sur un public limité."
+    },
+    {
+      "question": "D'après cette configuration, que renvoie `featureService.isEnabled('BETA_UI', 'staging')` ?",
+      "code": "const config = {\n  development: { NEW_FEATURE: true, BETA_UI: true },\n  staging: { NEW_FEATURE: true, BETA_UI: false },\n  production: { NEW_FEATURE: false, BETA_UI: false }\n};\nreturn config[environment][feature] || false;",
+      "lang": "js",
+      "options": [
+        "true, car BETA_UI est activé en development",
+        "false, car BETA_UI est désactivé en staging",
+        "undefined, car la clé n'existe pas",
+        "Une erreur, car staging n'a pas de flag BETA_UI"
+      ],
+      "reponse": 1,
+      "explication": "La configuration est lue par environnement : en staging, BETA_UI vaut false. Chaque environnement active progressivement moins de flags à mesure qu'on s'approche de la production."
+    },
+    {
+      "question": "Quelle stratégie de gestion des environnements recommander à une équipe junior ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Feature flags avec déploiement continu automatisé",
+        "Branches par environnement avec un processus de promotion strict et une validation manuelle",
+        "Aucune stratégie : commits directs en production",
+        "Tags de release candidates gérés par chaque développeur"
+      ],
+      "reponse": 1,
+      "explication": "Les branches par environnement offrent un cadre visuel et strict (une branche = un environnement) plus facile à suivre pour une équipe junior ; tags + flags et l'automatisation poussée conviennent aux équipes expérimentées."
+    }
+  ]
+}

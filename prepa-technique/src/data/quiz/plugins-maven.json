@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Qu'est-ce qu'un plugin Maven ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Un module optionnel de l'IDE pour colorer le POM",
+        "Une extension qui exécute des tâches (goals) liées aux phases du cycle de vie, configurable via le POM",
+        "Une dépendance embarquée dans le JAR final",
+        "Un script shell lancé après le build"
+      ],
+      "reponse": 1,
+      "explication": "Les plugins ajoutent des fonctionnalités à Maven : chacun expose des goals rattachés aux phases du cycle de vie et se configure dans le POM. Tout le travail réel de Maven est fait par des plugins."
+    },
+    {
+      "question": "Quel plugin core exécute les tests unitaires ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "maven-compiler-plugin",
+        "maven-test-plugin",
+        "maven-surefire-plugin",
+        "maven-junit-plugin"
+      ],
+      "reponse": 2,
+      "explication": "maven-surefire-plugin est lié à la phase test et exécute les tests unitaires (par défaut les classes *Test / *Tests). maven-test-plugin et maven-junit-plugin n'existent pas — distracteurs classiques."
+    },
+    {
+      "question": "Que configure ce bloc XML ?",
+      "code": "<plugin>\n    <groupId>org.apache.maven.plugins</groupId>\n    <artifactId>maven-compiler-plugin</artifactId>\n    <version>3.11.0</version>\n    <configuration>\n        <source>17</source>\n        <target>17</target>\n        <encoding>UTF-8</encoding>\n    </configuration>\n</plugin>",
+      "lang": "xml",
+      "options": [
+        "La version de Maven à utiliser (3.11.0) et celle du JDK installé",
+        "La compilation du code en Java 17 (source et bytecode cible) avec un encodage UTF-8",
+        "Le déploiement de l'application sur un serveur Java 17",
+        "La génération de 17 rapports de compilation"
+      ],
+      "reponse": 1,
+      "explication": "Le maven-compiler-plugin compile le code : source = version du langage acceptée, target = version du bytecode produit, encoding = encodage des fichiers. 3.11.0 est la version du plugin, pas de Maven."
+    },
+    {
+      "question": "Quelle est la différence entre un build plugin et un reporting plugin ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les build plugins sont payants, les reporting plugins gratuits",
+        "Les build plugins s'exécutent pendant le build, les reporting plugins génèrent des rapports",
+        "Les reporting plugins ne fonctionnent qu'avec Jenkins",
+        "Les build plugins sont écrits en Java, les reporting plugins en XML"
+      ],
+      "reponse": 1,
+      "explication": "On distingue les build plugins (exécutés pendant le build, déclarés dans <build>) des reporting plugins (génération de rapports, typiquement pour le site du projet)."
+    },
+    {
+      "question": "Quel plugin permet de définir la classe principale (Main-Class) du manifeste d'un JAR exécutable ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "maven-install-plugin",
+        "maven-deploy-plugin",
+        "maven-jar-plugin, via <archive><manifest><mainClass>",
+        "maven-clean-plugin"
+      ],
+      "reponse": 2,
+      "explication": "maven-jar-plugin crée l'archive JAR et permet de configurer le manifeste, notamment la mainClass. install et deploy ne font que copier l'artefact vers les repositories."
+    },
+    {
+      "question": "Avec la configuration Surefire ci-dessous, quelles classes de test seront exécutées ?",
+      "code": "<configuration>\n    <includes>\n        <include>**/*Test.java</include>\n        <include>**/*Tests.java</include>\n    </includes>\n</configuration>",
+      "lang": "xml",
+      "options": [
+        "Toutes les classes du projet",
+        "Uniquement les classes dont le nom se termine par Test ou Tests",
+        "Uniquement les classes annotées @Test",
+        "Aucune : cette configuration désactive les tests"
+      ],
+      "reponse": 1,
+      "explication": "Les patterns includes filtrent par nom de fichier : ici les classes se terminant par Test.java ou Tests.java, quel que soit leur package (**/)."
+    },
+    {
+      "question": "À quelle phase du cycle de vie le goal du maven-clean-plugin est-il naturellement lié ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À la phase clean du cycle de vie clean",
+        "À la phase validate du cycle default",
+        "À la phase deploy du cycle default",
+        "À aucune : il ne peut être lancé que manuellement"
+      ],
+      "reponse": 0,
+      "explication": "Chaque plugin core est rattaché à une phase : clean pour maven-clean-plugin, compile pour le compiler, test pour Surefire, jar pour package, install et deploy pour les plugins du même nom."
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est l'objectif premier du BDD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Remplacer les tests unitaires par des tests end-to-end",
+        "Créer un langage commun entre Dev, QA et Business autour du comportement attendu",
+        "Générer automatiquement le code à partir des spécifications",
+        "Accélérer l'exécution de la suite de tests"
+      ],
+      "reponse": 1,
+      "explication": "Le BDD est avant tout une pratique de collaboration : les scénarios en langage naturel réduisent les malentendus entre équipes ; leur exécution automatisée n'en est que la conséquence."
+    },
+    {
+      "question": "Dans un scénario Gherkin, que représente le mot-clé `Given` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "L'action effectuée par l'utilisateur",
+        "Le résultat attendu à la fin du scénario",
+        "Le contexte initial, l'état du système avant l'action",
+        "La donnée de test injectée dans les Examples"
+      ],
+      "reponse": 2,
+      "explication": "Given pose le contexte initial (état du système), When décrit l'action de l'utilisateur, Then vérifie le résultat attendu."
+    },
+    {
+      "question": "À quoi sert la section `Background` dans un fichier Gherkin ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À documenter le contexte métier sans être exécutée",
+        "À définir des étapes communes exécutées avant chaque scénario de la feature",
+        "À déclarer les variables utilisées dans les Examples",
+        "À exécuter des étapes de nettoyage après chaque scénario"
+      ],
+      "reponse": 1,
+      "explication": "Le Background factorise les étapes Given communes : il est exécuté avant chaque scénario de la feature, évitant de répéter la même mise en place."
+    },
+    {
+      "question": "Que permet un `Scenario Outline` accompagné d'une table `Examples` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "D'exécuter le même scénario avec plusieurs jeux de données",
+        "De décrire un scénario optionnel qui ne bloque pas le build",
+        "De regrouper plusieurs features dans un même fichier",
+        "De générer la documentation HTML du scénario"
+      ],
+      "reponse": 0,
+      "explication": "Le Scenario Outline paramètre le scénario avec des placeholders (<email>, <password>…) ; chaque ligne de la table Examples produit une exécution avec ces valeurs."
+    },
+    {
+      "question": "Quel mot-clé Gherkin manque à la place des ??? pour décrire l'action de l'utilisateur ?",
+      "code": "Given je suis sur la page de connexion\n??? je clique sur le bouton \"Se connecter\"\nThen je suis redirigé vers le tableau de bord",
+      "lang": "text",
+      "options": [
+        "Given",
+        "When",
+        "Then",
+        "Examples"
+      ],
+      "reponse": 1,
+      "explication": "L'action déclenchée par l'utilisateur s'exprime avec When ; Given décrit l'état de départ et Then le résultat attendu."
+    },
+    {
+      "question": "Dans une step definition Cucumber.js, que fait le placeholder `{string}` ?",
+      "code": "When('je saisis {string} dans le champ email', async function (email) {\n  await this.page.fill('[data-testid=\"email-input\"]', email);\n});",
+      "lang": "js",
+      "options": [
+        "Il convertit la valeur saisie en chaîne JSON",
+        "Il capture la valeur entre guillemets du scénario et la passe en paramètre à la fonction",
+        "Il vérifie que le champ contient bien une chaîne de caractères",
+        "Il échappe les caractères spéciaux du sélecteur CSS"
+      ],
+      "reponse": 1,
+      "explication": "Les placeholders ({string}, {int}…) capturent les valeurs écrites dans la phrase Gherkin et les transmettent en arguments à la step definition, rendant la step réutilisable."
+    },
+    {
+      "question": "Pourquoi parle-t-on de « spécifications vivantes » à propos du BDD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que les scénarios sont réécrits à chaque sprint",
+        "Parce que les scénarios sont exécutés automatiquement : une spécification obsolète fait échouer les tests",
+        "Parce que le métier peut modifier les scénarios directement en production",
+        "Parce que les scénarios sont stockés dans un wiki collaboratif"
+      ],
+      "reponse": 1,
+      "explication": "Les scénarios Gherkin sont à la fois documentation et tests exécutés : si le comportement de l'application diverge de la spécification, les tests échouent, ce qui force à garder la documentation à jour."
+    }
+  ]
+}

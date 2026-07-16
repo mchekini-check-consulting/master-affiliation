@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est le rôle de chaque composant dans la stack Prometheus/Grafana/Alert Manager ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Prometheus visualise, Grafana stocke, Alert Manager collecte",
+        "Prometheus collecte et stocke les métriques, Grafana les visualise, Alert Manager route les notifications d'alerte",
+        "Grafana collecte les métriques et les envoie à Prometheus pour affichage",
+        "Alert Manager stocke les métriques et Prometheus envoie les emails"
+      ],
+      "reponse": 1,
+      "explication": "Prometheus scrape les métriques et les stocke dans sa TSDB ; Grafana interroge Prometheus via son API pour tracer les dashboards ; Alert Manager reçoit les alertes déclenchées par les règles Prometheus et les route vers email/SMS/Teams."
+    },
+    {
+      "question": "Comment Prometheus récupère-t-il les métriques des applications ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les applications poussent leurs métriques vers Prometheus à chaque requête",
+        "En mode pull : Prometheus scrape à intervalle régulier un endpoint HTTP exposé par chaque application (ex : /metrics)",
+        "Via des agents installés qui lisent les logs applicatifs",
+        "En interceptant le trafic réseau entre les services"
+      ],
+      "reponse": 1,
+      "explication": "Prometheus fonctionne en pull : selon le `scrape_interval` (10 s dans la fiche), il appelle l'endpoint de métriques de chaque cible déclarée dans `scrape_configs` — `/actuator/prometheus` pour une app Spring Boot."
+    },
+    {
+      "question": "Que calcule cette requête PromQL ?",
+      "code": "rate(http_requests_total{status=~\"5..\"}[5m]) / rate(http_requests_total[5m]) * 100",
+      "lang": "text",
+      "options": [
+        "Le nombre total de requêtes HTTP depuis le démarrage",
+        "Le pourcentage de requêtes en erreur 5xx sur les 5 dernières minutes",
+        "La latence moyenne des requêtes en erreur",
+        "Le nombre de serveurs en panne dans le cluster"
+      ],
+      "reponse": 1,
+      "explication": "On divise le débit des requêtes dont le status matche 5.. (500, 502, 503…) par le débit total sur une fenêtre de 5 minutes, multiplié par 100 : c'est le taux d'erreur serveur en pourcentage."
+    },
+    {
+      "question": "Pourquoi utiliser `histogram_quantile(0.95, ...)` plutôt qu'une moyenne pour suivre le temps de réponse ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que la moyenne est impossible à calculer en PromQL",
+        "Parce que le percentile 95 révèle l'expérience des utilisateurs les plus lents, que la moyenne masque",
+        "Parce que le percentile 95 est toujours inférieur à la moyenne",
+        "Parce que Grafana n'affiche que des percentiles"
+      ],
+      "reponse": 1,
+      "explication": "Une moyenne peut rester bonne alors que 5 % des utilisateurs subissent des temps de réponse catastrophiques. Le p95 dit : « 95 % des requêtes sont plus rapides que cette valeur » — bien plus représentatif de l'expérience réelle."
+    },
+    {
+      "question": "À quoi sert le Node Exporter dans cette architecture ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À exporter les dashboards Grafana au format JSON",
+        "À exposer les métriques système des machines (CPU, mémoire, disque, réseau) pour que Prometheus les scrape",
+        "À envoyer les alertes vers Node.js",
+        "À collecter les métriques business des applications"
+      ],
+      "reponse": 1,
+      "explication": "Le Node Exporter tourne sur chaque nœud et expose les métriques système (node_cpu_seconds_total, node_memory_MemAvailable_bytes…) sur le port 9100, que Prometheus scrape comme n'importe quelle cible."
+    },
+    {
+      "question": "Dans la configuration de la fiche, à quoi sert le bloc `kubernetes_sd_configs` avec `role: node` ?",
+      "code": "- job_name: 'kubernetes-nodes'\n  kubernetes_sd_configs:\n    - role: node\n  relabel_configs:\n    - source_labels: [__address__]\n      regex: '(.*):10250'\n      target_label: __address__\n      replacement: '${1}:9100'",
+      "lang": "yaml",
+      "options": [
+        "À lister manuellement les adresses IP de chaque nœud",
+        "À découvrir automatiquement les nœuds du cluster Kubernetes et rediriger le scrape vers le port 9100 du Node Exporter",
+        "À déployer Prometheus sur chaque nœud du cluster",
+        "À limiter le scrape aux nœuds master"
+      ],
+      "reponse": 1,
+      "explication": "La service discovery Kubernetes énumère dynamiquement les nœuds (inutile de maintenir une liste statique), et le relabeling réécrit l'adresse découverte (port kubelet 10250) vers le port 9100 où écoute le Node Exporter."
+    },
+    {
+      "question": "Quelles sont les quatre familles de métriques citées dans la fiche ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Logs, traces, événements, alertes",
+        "Application (latence, erreurs), système (CPU, mémoire), base de données (connexions, requêtes) et business (transactions, utilisateurs actifs)",
+        "Frontend, backend, réseau, sécurité",
+        "Compteurs, jauges, histogrammes, résumés"
+      ],
+      "reponse": 1,
+      "explication": "Un monitoring complet couvre plusieurs niveaux : les métriques applicatives et système pour la santé technique, les métriques base de données pour les dépendances, et les métriques business pour vérifier que le service rend réellement service."
+    }
+  ]
+}

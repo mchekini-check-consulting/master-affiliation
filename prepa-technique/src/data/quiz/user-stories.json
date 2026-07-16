@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est le format standard d'une User Story ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "En tant que [utilisateur], je veux [fonctionnalité], afin de [bénéfice]",
+        "Étant donné [contexte], quand [action], alors [résultat]",
+        "Le système doit [exigence technique] avant [échéance]",
+        "Titre, description, assigné, priorité"
+      ],
+      "reponse": 0,
+      "explication": "Le template « En tant que… je veux… afin de… » centre l'exigence sur l'utilisateur et sa valeur. « Étant donné / quand / alors » est le format Gherkin des critères d'acceptation en BDD."
+    },
+    {
+      "question": "Pourquoi cette User Story est-elle mal rédigée ?",
+      "code": "En tant que développeur,\nJe veux créer une API REST,\nAfin d'avoir une architecture propre.",
+      "lang": "text",
+      "options": [
+        "Elle est trop courte",
+        "Elle ne mentionne pas de technologie précise",
+        "Elle adopte une perspective technique sans valeur métier claire ni critères mesurables",
+        "Elle devrait être écrite en anglais"
+      ],
+      "reponse": 2,
+      "explication": "Une bonne story part de l'utilisateur final et de la valeur métier. Ici la perspective est technique (développeur), vague, sans bénéfice utilisateur ni critères mesurables."
+    },
+    {
+      "question": "Dans l'acronyme INVEST, que signifie le « I » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Itérative : réalisée sur plusieurs sprints",
+        "Independent : développable dans n'importe quel ordre, sans dépendances fortes",
+        "Importante : toujours en haut du backlog",
+        "Intégrée : liée à toutes les autres stories"
+      ],
+      "reponse": 1,
+      "explication": "Independent : une story doit pouvoir être développée dans n'importe quel ordre. Les cinq autres critères sont Negotiable, Valuable, Estimable, Small, Testable."
+    },
+    {
+      "question": "Selon le critère « Small » d'INVEST, quelle taille doit avoir une User Story ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Réalisable en une heure maximum",
+        "Terminable dans un sprint, généralement 1 à 8 story points",
+        "Au moins 21 story points pour justifier un sprint",
+        "La taille n'a pas d'importance si elle est bien décrite"
+      ],
+      "reponse": 1,
+      "explication": "Une story doit pouvoir être terminée dans un sprint (généralement 1-8 points). Au-delà (13, 21+), on la découpe en stories plus petites."
+    },
+    {
+      "question": "Quelle est la hiérarchie correcte des exigences, du plus large au plus précis ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "User Story → Epic → Thème",
+        "Epic → Thème → User Story",
+        "Thème → Epic → User Story",
+        "Thème → User Story → Epic"
+      ],
+      "reponse": 2,
+      "explication": "Le Thème porte la vision globale (ex : améliorer l'expérience d'achat), l'Epic une grande fonctionnalité (ex : gestion du panier), la User Story une fonctionnalité spécifique (ex : ajouter un produit au panier)."
+    },
+    {
+      "question": "À quoi servent les critères d'acceptation d'une User Story ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À estimer le salaire des développeurs",
+        "À définir des conditions claires et vérifiables qui rendent la story testable",
+        "À remplacer les tests unitaires",
+        "À fixer la date de livraison"
+      ],
+      "reponse": 1,
+      "explication": "Les critères d'acceptation (ex : « le filtre peut être réinitialisé ») rendent la story vérifiable — c'est le « T » de Testable dans INVEST."
+    },
+    {
+      "question": "« Système de recommandations » regroupant plusieurs stories comme « Recommander des produits similaires » : de quoi s'agit-il ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "D'un Thème",
+        "D'une tâche technique",
+        "D'un critère d'acceptation",
+        "D'un Epic"
+      ],
+      "reponse": 3,
+      "explication": "Un Epic est une grande fonctionnalité trop volumineuse pour un sprint, qu'on décompose en User Stories spécifiques. Le Thème est encore au-dessus (vision globale)."
+    }
+  ]
+}

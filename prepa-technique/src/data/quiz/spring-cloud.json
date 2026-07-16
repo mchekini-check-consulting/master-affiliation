@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "À quoi sert le Service Discovery (Eureka, Consul) dans une architecture microservices ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À répartir la charge entre les instances d'un même service",
+        "À maintenir un annuaire des services disponibles pour qu'ils puissent se trouver dynamiquement",
+        "À centraliser les fichiers de configuration des services",
+        "À couper les appels vers un service défaillant"
+      ],
+      "reponse": 1,
+      "explication": "Le Service Discovery est un annuaire : chaque service s'y enregistre au démarrage, et les autres le consultent pour résoudre un nom logique en adresse réelle, sans coder les adresses en dur."
+    },
+    {
+      "question": "Quel composant Spring Cloud protège l'application contre les pannes en cascade quand un service distant ne répond plus ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le Config Server",
+        "Le Load Balancer (Ribbon)",
+        "Le Circuit Breaker (Hystrix, Resilience4j)",
+        "Le tracing (Sleuth, Zipkin)"
+      ],
+      "reponse": 2,
+      "explication": "Le circuit breaker « ouvre le circuit » après un certain nombre d'échecs : les appels suivants échouent immédiatement (ou basculent sur un fallback) au lieu de saturer le service défaillant et de propager la panne."
+    },
+    {
+      "question": "Pourquoi la configuration d'un serveur Eureka contient-elle `register-with-eureka: false` et `fetch-registry: false` ?",
+      "code": "eureka:\n  client:\n    register-with-eureka: false\n    fetch-registry: false",
+      "lang": "yaml",
+      "options": [
+        "Pour désactiver complètement Eureka en environnement de test",
+        "Parce que le serveur est lui-même le registre : il n'a pas à s'enregistrer ni à récupérer l'annuaire comme un client",
+        "Pour empêcher les clients de s'enregistrer sans authentification",
+        "Pour forcer l'utilisation de Consul à la place d'Eureka"
+      ],
+      "reponse": 1,
+      "explication": "Ces deux propriétés indiquent que l'application est le registre lui-même : elle ne doit pas se comporter comme un client qui s'enregistre auprès d'un autre serveur ou télécharge l'annuaire."
+    },
+    {
+      "question": "Que fait cette interface annotée `@FeignClient` ?",
+      "code": "@FeignClient(name = \"order-service\")\npublic interface OrderServiceClient {\n\n    @GetMapping(\"/api/orders/user/{userId}\")\n    List<Order> getOrdersByUserId(@PathVariable Long userId);\n}",
+      "lang": "java",
+      "options": [
+        "Elle expose un endpoint REST /api/orders/user/{userId} dans le service courant",
+        "Elle génère un client HTTP déclaratif : Spring implémente l'interface et appelle order-service via le registre",
+        "Elle crée une file de messages entre user-service et order-service",
+        "Elle duplique la base de données d'order-service en local"
+      ],
+      "reponse": 1,
+      "explication": "Feign génère l'implémentation HTTP à partir de l'interface : appeler getOrdersByUserId déclenche un GET vers l'instance d'order-service résolue via le service discovery. Ce n'est pas un contrôleur, c'est un client."
+    },
+    {
+      "question": "Quel est le rôle d'une API Gateway (Spring Cloud Gateway, Zuul) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Servir de point d'entrée unique qui route les requêtes externes vers les bons microservices",
+        "Stocker les secrets et mots de passe des services",
+        "Enregistrer les services au démarrage",
+        "Exécuter les traitements par lots de l'application"
+      ],
+      "reponse": 0,
+      "explication": "La gateway est la porte d'entrée du système : elle route chaque requête vers le bon service et centralise les préoccupations transversales (authentification, rate limiting, logs) au lieu de les dupliquer dans chaque service."
+    },
+    {
+      "question": "Quel problème le Spring Cloud Config Server résout-il ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "La lenteur des appels HTTP entre services",
+        "La dispersion de la configuration : il centralise les propriétés de tous les services (souvent dans un dépôt Git)",
+        "La découverte des instances de services",
+        "La mise en cache des réponses des microservices"
+      ],
+      "reponse": 1,
+      "explication": "Avec des dizaines de services, gérer un application.yml par service devient ingérable. Le Config Server centralise la configuration et la sert à chaque service au démarrage ; Vault joue le même rôle pour les secrets."
+    },
+    {
+      "question": "Une requête traverse 5 microservices et vous voulez suivre son parcours de bout en bout. Quels outils Spring Cloud utilisez-vous ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Eureka et Consul",
+        "Ribbon et Spring Cloud LoadBalancer",
+        "Sleuth et Zipkin",
+        "Config Server et Vault"
+      ],
+      "reponse": 2,
+      "explication": "Sleuth ajoute des identifiants de corrélation (trace ID, span ID) propagés d'un service à l'autre, et Zipkin collecte et visualise ces traces : c'est le tracing distribué."
+    }
+  ]
+}

@@ -1,4 +1,9 @@
 ---
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/source-serif-4';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+
 interface Props {
   title: string;
   description: string;
@@ -15,7 +20,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#1d2d44" />
+    <meta name="theme-color" content="#2044c4" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
@@ -28,36 +33,3 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <slot />
   </body>
 </html>
-
-<style is:global>
-  :root {
-    --surface: #f7f9fc;
-    --marine: #1d2d44;
-    --encre: #253550;
-    --estompe: #64748b;
-    --accent: #2f6fed;
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  html {
-    background: var(--marine);
-  }
-
-  body {
-    min-height: 100vh;
-    margin: 0;
-    font-family: system-ui, sans-serif;
-    line-height: 1.65;
-    color: var(--encre);
-    background: var(--surface);
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-    border-radius: 2px;
-  }
-</style>

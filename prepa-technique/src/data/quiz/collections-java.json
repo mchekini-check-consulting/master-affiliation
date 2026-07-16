@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence fondamentale entre List et Set ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "List est triée, Set ne l'est jamais",
+        "List autorise les doublons et l'accès par index ; Set interdit les doublons",
+        "Set est plus rapide que List dans tous les cas",
+        "List stocke des paires clé-valeur, Set des valeurs simples"
+      ],
+      "reponse": 1,
+      "explication": "Une List est une collection ordonnée avec doublons et accès par index ; un Set garantit l'unicité des éléments, avec des stratégies d'ordre variables selon l'implémentation."
+    },
+    {
+      "question": "Dans quel cas préférer LinkedList à ArrayList ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Quand on fait beaucoup d'accès aléatoires par index",
+        "Quand on veut économiser de la mémoire",
+        "Quand on fait beaucoup d'insertions/suppressions en début ou fin de liste",
+        "Quand on veut trier automatiquement les éléments"
+      ],
+      "reponse": 2,
+      "explication": "LinkedList insère et supprime en O(1) aux extrémités, mais accède en O(n) et consomme plus de mémoire. ArrayList reste meilleure pour l'accès par index (O(1))."
+    },
+    {
+      "question": "Que se passe-t-il à la troisième ligne d'ajout ?",
+      "code": "Set<String> set = new HashSet<>();\nset.add(\"Java\");\nset.add(\"Python\");\nset.add(\"Java\");",
+      "lang": "java",
+      "options": [
+        "Une exception DuplicateElementException est levée",
+        "Le doublon est ignoré : le set contient toujours 2 éléments",
+        "Le set contient \"Java\" deux fois",
+        "Le premier \"Java\" est remplacé et passe en fin de parcours"
+      ],
+      "reponse": 1,
+      "explication": "Un Set n'accepte pas les doublons : add() renvoie simplement false et le set reste inchangé, sans exception."
+    },
+    {
+      "question": "Quelle implémentation de Set conserve l'ordre d'insertion des éléments ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "HashSet",
+        "TreeSet",
+        "LinkedHashSet",
+        "Aucune : les Set n'ont jamais d'ordre"
+      ],
+      "reponse": 2,
+      "explication": "LinkedHashSet double la table de hachage d'une liste chaînée qui mémorise l'ordre d'insertion. HashSet n'a aucun ordre garanti et TreeSet trie selon l'ordre naturel (ou un Comparator)."
+    },
+    {
+      "question": "Qu'affiche cette boucle ?",
+      "code": "Set<String> set = new TreeSet<>();\nset.add(\"Python\");\nset.add(\"Java\");\nset.add(\"C++\");\nfor (String lang : set) {\n    System.out.println(lang);\n}",
+      "lang": "java",
+      "options": [
+        "Python, Java, C++ (ordre d'insertion)",
+        "C++, Java, Python (ordre alphabétique)",
+        "Un ordre aléatoire différent à chaque exécution",
+        "Python, C++, Java (ordre inverse d'insertion)"
+      ],
+      "reponse": 1,
+      "explication": "TreeSet maintient les éléments triés selon leur ordre naturel (ici alphabétique pour des String), quel que soit l'ordre d'insertion. Les opérations coûtent O(log n)."
+    },
+    {
+      "question": "Que vaut la valeur associée à \"Alice\" après ce code ?",
+      "code": "Map<String, Integer> ages = new HashMap<>();\nages.put(\"Alice\", 25);\nages.merge(\"Alice\", 1, Integer::sum);",
+      "lang": "java",
+      "options": [
+        "1, la nouvelle valeur remplace l'ancienne",
+        "25, merge ignore les clés déjà présentes",
+        "26, merge combine l'ancienne valeur et la nouvelle avec la fonction fournie",
+        "251, les valeurs sont concaténées"
+      ],
+      "reponse": 2,
+      "explication": "merge() applique la fonction de fusion quand la clé existe déjà : Integer::sum additionne l'ancienne valeur (25) et celle fournie (1), donc 26. Si la clé était absente, la valeur 1 serait simplement insérée."
+    },
+    {
+      "question": "Quelle est la complexité moyenne d'une recherche dans un HashMap et dans un TreeMap ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "O(1) pour les deux",
+        "O(1) pour HashMap, O(log n) pour TreeMap",
+        "O(log n) pour HashMap, O(1) pour TreeMap",
+        "O(n) pour les deux"
+      ],
+      "reponse": 1,
+      "explication": "HashMap s'appuie sur le hachage : O(1) en moyenne mais aucun ordre. TreeMap s'appuie sur un arbre trié : O(log n), en échange de clés maintenues triées (firstKey, subMap…)."
+    },
+    {
+      "question": "Vous devez itérer sur des paires clé-valeur en obtenant les clés par ordre alphabétique. Quelle structure choisir ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "HashMap",
+        "Hashtable",
+        "LinkedHashMap",
+        "TreeMap"
+      ],
+      "reponse": 3,
+      "explication": "TreeMap maintient les clés triées selon leur ordre naturel : l'itération sur keySet() les renvoie en ordre alphabétique. LinkedHashMap conserve l'ordre d'insertion, pas l'ordre trié."
+    }
+  ]
+}

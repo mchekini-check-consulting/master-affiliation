@@ -1,0 +1,82 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence fondamentale entre monitoring et alerting ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le monitoring concerne l'infrastructure, l'alerting les applications",
+        "Le monitoring observe passivement le système via des dashboards ; l'alerting notifie activement un humain quand une intervention est requise",
+        "L'alerting stocke les métriques, le monitoring les affiche",
+        "Le monitoring est temps réel, l'alerting fonctionne en différé"
+      ],
+      "reponse": 1,
+      "explication": "Un dashboard se consulte quand on en a besoin ; une alerte interrompt quelqu'un, parfois en pleine nuit. C'est pourquoi les alertes doivent être rares, pertinentes et actionnables."
+    },
+    {
+      "question": "Pourquoi recommande-t-on d'alerter sur les symptômes plutôt que sur les causes ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que les causes sont impossibles à mesurer avec Prometheus",
+        "Parce qu'un symptôme reflète ce que l'utilisateur subit réellement, alors qu'une cause possible (CPU à 90 %) n'implique pas forcément une dégradation du service",
+        "Parce que les symptômes se corrigent automatiquement",
+        "Parce que les alertes sur les causes sont plus lentes à évaluer"
+      ],
+      "reponse": 1,
+      "explication": "Un CPU élevé sans impact sur la latence ni les erreurs n'est pas un incident ; à l'inverse, des erreurs 5xx méritent une intervention quelle qu'en soit la cause. Les métriques de causes restent utiles, mais dans les dashboards de diagnostic."
+    },
+    {
+      "question": "Quels sont les quatre golden signals ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "CPU, mémoire, disque, réseau",
+        "Latence, trafic, erreurs, saturation",
+        "Disponibilité, sécurité, coût, performance",
+        "Logs, métriques, traces, événements"
+      ],
+      "reponse": 1,
+      "explication": "Les golden signals du SRE book de Google sont des symptômes côté service : latence des requêtes, volume de trafic, taux d'erreurs et saturation de la ressource la plus contrainte. CPU/mémoire/disque sont des métriques de ressources, pas les golden signals."
+    },
+    {
+      "question": "Dans cette règle Prometheus, à quoi sert la clause `for: 5m` ?",
+      "code": "- alert: HighErrorRate\n  expr: rate(http_requests_total{status=~\"5..\"}[5m])\n        / rate(http_requests_total[5m]) > 0.05\n  for: 5m\n  labels:\n    severity: critical",
+      "lang": "yaml",
+      "options": [
+        "Elle répète la notification toutes les 5 minutes tant que l'alerte est active",
+        "Elle exige que la condition reste vraie pendant 5 minutes avant de déclencher, pour filtrer les pics transitoires",
+        "Elle limite l'évaluation de la règle à une fois toutes les 5 minutes",
+        "Elle supprime l'alerte automatiquement au bout de 5 minutes"
+      ],
+      "reponse": 1,
+      "explication": "La durée de persistance évite les faux positifs : un dépassement de seuil de 30 secondes pendant un déploiement ne réveille personne. Le compromis : plus la durée est longue, plus la détection des vrais incidents est tardive."
+    },
+    {
+      "question": "Quand une alerte doit-elle « pager » l'astreinte plutôt que créer un ticket ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Dès qu'elle concerne l'environnement de production",
+        "Quand le problème dégrade le service maintenant (ou de façon imminente) et exige une intervention humaine immédiate, même la nuit",
+        "Quand elle provient de Prometheus plutôt que de Grafana",
+        "Quand le seuil est dépassé de plus de 50 %"
+      ],
+      "reponse": 1,
+      "explication": "La règle : si personne ne doit se lever à 3 h du matin pour cette alerte, elle ne doit pas pager. Un disque qui sera plein dans quatre jours mérite un ticket traité en heures ouvrées, pas une page."
+    },
+    {
+      "question": "Votre équipe reçoit des dizaines d'alertes par jour et a pris l'habitude de les acquitter sans les lire. Quel est le problème et que faire ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "C'est normal, plus il y a d'alertes, mieux le système est surveillé ; il faut juste recruter plus d'astreintes",
+        "C'est de la fatigue d'alerte : il faut supprimer ou rétrograder les alertes non actionnables, regrouper les notifications liées et attacher un runbook à chaque alerte restante",
+        "Il faut désactiver l'alerting et se fier uniquement aux dashboards",
+        "Il faut baisser tous les seuils pour détecter les incidents plus tôt"
+      ],
+      "reponse": 1,
+      "explication": "La fatigue d'alerte est le principal mode d'échec de l'alerting : à force de bruit, la vraie alerte passe inaperçue. Le remède : ne garder que des alertes actionnables, utiliser le regroupement et les inhibitions d'Alertmanager, documenter chaque alerte par un runbook et réviser régulièrement les règles."
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est l'apport principal de Spring Boot par rapport à Spring « classique » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il remplace complètement le conteneur IoC de Spring",
+        "Il élimine l'essentiel de la configuration manuelle grâce à l'auto-configuration et aux starters",
+        "Il rend les applications Spring compatibles avec Node.js",
+        "Il impose l'utilisation de fichiers XML pour la configuration"
+      ],
+      "reponse": 1,
+      "explication": "Spring Boot s'appuie sur Spring et le rend immédiatement productif : auto-configuration basée sur le classpath, starters de dépendances et configuration par défaut sensée, sans XML."
+    },
+    {
+      "question": "Sur quoi se base l'auto-configuration de Spring Boot pour décider quels beans créer ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Sur les commentaires Javadoc du projet",
+        "Sur le contenu du classpath et les beans déjà définis par le développeur",
+        "Sur un fichier XML obligatoire nommé beans.xml",
+        "Sur les variables d'environnement uniquement"
+      ],
+      "reponse": 1,
+      "explication": "L'auto-configuration est conditionnelle (@ConditionalOnClass, @ConditionalOnMissingBean…) : un bean n'est configuré que si la classe correspondante est sur le classpath et qu'aucun bean équivalent n'existe déjà."
+    },
+    {
+      "question": "Qu'est-ce qu'un « starter » Spring Boot ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Un script shell qui démarre l'application",
+        "Une classe main annotée @SpringBootApplication",
+        "Un artefact de dépendances qui regroupe toutes les bibliothèques cohérentes pour un besoin donné",
+        "Un plugin d'IDE pour générer du code"
+      ],
+      "reponse": 2,
+      "explication": "Un starter (ex. spring-boot-starter-web) est une dépendance « parapluie » : en l'ajoutant, on récupère un ensemble cohérent et compatible de bibliothèques, sans gérer chaque version soi-même."
+    },
+    {
+      "question": "Quel starter faut-il ajouter pour développer une API web avec Spring MVC ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "spring-boot-starter-data-jpa",
+        "spring-boot-starter-web",
+        "spring-boot-starter-actuator",
+        "spring-boot-starter-validation"
+      ],
+      "reponse": 1,
+      "explication": "spring-boot-starter-web apporte Spring MVC, Jackson pour le JSON et un Tomcat embarqué : tout le nécessaire pour une application ou API web."
+    },
+    {
+      "question": "Quel avantage apporte le serveur embarqué de Spring Boot ?",
+      "code": "java -jar mon-application.jar",
+      "lang": "bash",
+      "options": [
+        "Il permet de déployer l'application comme un simple JAR exécutable, sans serveur externe",
+        "Il rend l'application deux fois plus rapide qu'avec un Tomcat externe",
+        "Il supprime le besoin de JVM sur le serveur",
+        "Il ne fonctionne qu'en environnement de développement"
+      ],
+      "reponse": 0,
+      "explication": "Tomcat (ou Jetty/Undertow) est intégré dans l'application : le déploiement se réduit à lancer le JAR, sans installer ni configurer de serveur d'applications externe."
+    },
+    {
+      "question": "Quel starter fournit des endpoints de monitoring (santé, métriques) prêts à l'emploi ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "spring-boot-starter-test",
+        "spring-boot-starter-security",
+        "spring-boot-starter-actuator",
+        "spring-boot-starter-web"
+      ],
+      "reponse": 2,
+      "explication": "Actuator expose des endpoints comme /actuator/health ou /actuator/metrics, très utilisés en production pour la supervision et les sondes Kubernetes."
+    },
+    {
+      "question": "Vous définissez votre propre bean DataSource dans votre configuration. Que fait l'auto-configuration de Spring Boot ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Elle lève une erreur de bean dupliqué au démarrage",
+        "Elle remplace votre bean par le sien",
+        "Elle se retire : votre bean est prioritaire grâce aux conditions @ConditionalOnMissingBean",
+        "Elle crée les deux beans et en choisit un au hasard"
+      ],
+      "reponse": 2,
+      "explication": "L'auto-configuration est conçue pour s'effacer devant la configuration explicite : grâce à @ConditionalOnMissingBean, Spring Boot ne crée son bean par défaut que si le développeur n'en a pas déjà fourni un."
+    }
+  ]
+}

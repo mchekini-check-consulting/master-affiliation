@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelles sont les 3 grandes familles de design patterns ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Création, structurel, comportemental",
+        "Frontend, backend, base de données",
+        "Synchrone, asynchrone, réactif",
+        "Héritage, composition, agrégation"
+      ],
+      "reponse": 0,
+      "explication": "Les patterns de création gèrent l'instanciation (Builder, Singleton, Factory), les structurels organisent classes et objets (Adapter, Decorator), les comportementaux gèrent les interactions (Chain of Responsibility)."
+    },
+    {
+      "question": "Dans quel cas le pattern Builder est-il particulièrement adapté ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Quand il faut garantir une instance unique d'une classe",
+        "Quand il faut construire un objet complexe étape par étape, avec des combinaisons d'options variables",
+        "Quand deux interfaces incompatibles doivent collaborer",
+        "Quand une requête doit être traitée par plusieurs objets successifs"
+      ],
+      "reponse": 1,
+      "explication": "Le Builder assemble l'objet par appels chaînés (addCheese().addTomato().build()) : idéal quand un constructeur à multiples paramètres optionnels deviendrait illisible."
+    },
+    {
+      "question": "Qu'affiche ce programme ?",
+      "code": "Database db1 = Database.getInstance();\nDatabase db2 = Database.getInstance();\n\nSystem.out.println(db1 == db2);",
+      "lang": "java",
+      "options": [
+        "false, car chaque appel crée une nouvelle instance",
+        "true, car getInstance() renvoie toujours la même instance (Singleton)",
+        "Une exception, car le constructeur est privé",
+        "Cela dépend du garbage collector"
+      ],
+      "reponse": 1,
+      "explication": "Le Singleton stocke l'unique instance dans un champ statique : le premier appel la crée, les suivants renvoient la même référence, donc db1 == db2 vaut true."
+    },
+    {
+      "question": "Quelle est la faiblesse classique du Singleton « lazy » à base de `if (instance == null)` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il consomme trop de mémoire au démarrage",
+        "Il n'est pas thread-safe : deux threads peuvent créer deux instances simultanément",
+        "Il empêche l'héritage de toutes les autres classes du projet",
+        "Il ne fonctionne qu'avec des classes final"
+      ],
+      "reponse": 1,
+      "explication": "Sans synchronisation, deux threads peuvent passer le test null en même temps. Les parades : méthode synchronisée, double-checked locking avec volatile, ou l'enum singleton."
+    },
+    {
+      "question": "Quel est le rôle du pattern Factory ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Créer des objets sans exposer la logique de création au client",
+        "Fusionner plusieurs objets en un seul",
+        "Empêcher la création de plus d'une instance",
+        "Cloner des objets existants"
+      ],
+      "reponse": 0,
+      "explication": "Le client demande `factory.getShape(\"CIRCLE\")` et reçoit un Shape : il ne connaît ni les classes concrètes ni la logique d'instanciation, centralisées dans la factory."
+    },
+    {
+      "question": "Vous devez faire fonctionner une classe legacy `OldPrinter.printText()` derrière une nouvelle interface `NewPrinter.print()`. Quel pattern utiliser ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Singleton",
+        "Decorator",
+        "Adapter",
+        "Builder"
+      ],
+      "reponse": 2,
+      "explication": "L'Adapter enveloppe l'objet existant et traduit les appels de la nouvelle interface vers l'ancienne API, sans modifier la classe legacy."
+    },
+    {
+      "question": "Dans l'exemple Decorator, que renvoie `logged.send()` pour `new LoggedMessage(new EncryptedMessage(new SimpleMessage()))` ?",
+      "code": "Message message = new SimpleMessage();\nMessage encrypted = new EncryptedMessage(message);\nMessage logged = new LoggedMessage(encrypted);\n\nSystem.out.println(logged.send());",
+      "lang": "java",
+      "options": [
+        "\"Message sent\"",
+        "\"Encrypted(Message sent)\" (après avoir affiché la ligne de log)",
+        "\"Logging(Encrypted(Message sent))\"",
+        "Une exception, car on ne peut pas empiler deux décorateurs"
+      ],
+      "reponse": 1,
+      "explication": "Chaque décorateur enveloppe le précédent : LoggedMessage affiche le log puis délègue à EncryptedMessage, qui entoure le résultat de SimpleMessage. Les décorateurs s'empilent librement, c'est leur force."
+    },
+    {
+      "question": "Dans une Chain of Responsibility, que se passe-t-il quand un handler ne sait pas traiter la requête ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il lève systématiquement une exception",
+        "Il la transmet au handler suivant de la chaîne, s'il existe",
+        "Il la renvoie à l'émetteur pour reformulation",
+        "Il la traite quand même avec un comportement par défaut"
+      ],
+      "reponse": 1,
+      "explication": "Chaque handler traite la requête ou la passe à `next`. Si toute la chaîne échoue, le dernier maillon peut signaler « Request not handled » — l'émetteur ignore qui a finalement traité sa requête."
+    }
+  ]
+}

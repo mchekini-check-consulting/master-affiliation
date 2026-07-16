@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel problème la programmation orientée aspect (AOP) résout-elle ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "La lenteur des applications monolithiques",
+        "La duplication des préoccupations transversales (logging, sécurité, transactions) dans le code métier",
+        "L'absence d'injection de dépendances dans Spring",
+        "La gestion des migrations de base de données"
+      ],
+      "reponse": 1,
+      "explication": "L'AOP isole les préoccupations transversales dans des aspects : au lieu de répéter le code de logging ou de gestion de transaction dans chaque méthode, on le déclare une fois et il s'applique aux points sélectionnés."
+    },
+    {
+      "question": "Quelle est la différence entre un Join Point, un Pointcut et un Advice ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Ce sont trois synonymes du même concept",
+        "Le Join Point est un point d'exécution, le Pointcut est l'expression qui sélectionne les join points, l'Advice est le code exécuté à ces points",
+        "Le Pointcut est le code exécuté, l'Advice est l'expression de sélection, le Join Point est l'aspect",
+        "L'Advice sélectionne les méthodes, le Pointcut les exécute"
+      ],
+      "reponse": 1,
+      "explication": "Le join point est un endroit possible d'interception (exécution d'une méthode), le pointcut est l'expression qui dit LESQUELS intercepter, et l'advice est le code QUI s'exécute (avant, après, autour)."
+    },
+    {
+      "question": "Que sélectionne cette expression de pointcut ?",
+      "code": "@Pointcut(\"execution(* com.example.service.*.*(..))\")\npublic void serviceLayer() {}",
+      "lang": "java",
+      "options": [
+        "Uniquement les méthodes sans argument du package service",
+        "Toutes les méthodes, quel que soit leur retour et leurs arguments, de toutes les classes du package com.example.service",
+        "Toutes les classes de tous les sous-packages de com.example, récursivement",
+        "Uniquement les méthodes annotées @Service"
+      ],
+      "reponse": 1,
+      "explication": "Dans execution(* com.example.service.*.*(..)), le premier * est le type de retour (n'importe lequel), le deuxième la classe, le troisième la méthode, et (..) accepte tout nombre d'arguments. Le pointcut couvre donc toute la couche service."
+    },
+    {
+      "question": "Quel type d'advice choisir pour mesurer le temps d'exécution d'une méthode ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "@Before, en enregistrant l'heure de début",
+        "@AfterReturning, en lisant le résultat",
+        "@Around, car il englobe l'appel : on prend l'heure avant joinPoint.proceed() et après",
+        "@AfterThrowing, car il capture toutes les exécutions"
+      ],
+      "reponse": 2,
+      "explication": "@Around est le seul advice qui entoure l'appel : on capture le temps avant et après joinPoint.proceed(), et on peut même modifier le résultat ou intercepter l'exception. @Before et @After seuls ne partagent pas d'état entre eux."
+    },
+    {
+      "question": "Dans un advice @Around, que se passe-t-il si vous oubliez d'appeler `joinPoint.proceed()` ?",
+      "code": "@Around(\"serviceLayer()\")\npublic Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {\n    logger.info(\"Method started\");\n    return null; // proceed() jamais appelé\n}",
+      "lang": "java",
+      "options": [
+        "Spring lève une exception au démarrage de l'application",
+        "La méthode cible s'exécute quand même, mais son résultat est perdu",
+        "La méthode cible n'est jamais exécutée : l'aspect court-circuite silencieusement l'appel",
+        "L'advice est ignoré et l'appel se déroule normalement"
+      ],
+      "reponse": 2,
+      "explication": "C'est proceed() qui déclenche l'exécution de la méthode interceptée. Sans cet appel, l'appelant reçoit la valeur retournée par l'advice (ici null) et le code métier ne tourne jamais — un bug silencieux classique."
+    },
+    {
+      "question": "Quelle est la différence entre @After et @AfterReturning ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "@After s'exécute dans tous les cas (retour normal ou exception), @AfterReturning uniquement après un retour normal",
+        "@After s'exécute avant la méthode, @AfterReturning après",
+        "@AfterReturning s'exécute même si la méthode lève une exception",
+        "Aucune, @AfterReturning est l'ancien nom de @After"
+      ],
+      "reponse": 0,
+      "explication": "@After est comme un finally : il s'exécute que la méthode réussisse ou lève une exception. @AfterReturning ne s'exécute qu'en cas de retour normal (et peut accéder à la valeur retournée) ; @AfterThrowing couvre le cas de l'exception."
+    },
+    {
+      "question": "À quoi sert l'annotation @EnableAspectJAutoProxy sur une classe de configuration ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À compiler les aspects avec le compilateur AspectJ complet",
+        "À activer la création automatique de proxys Spring autour des beans ciblés par des aspects",
+        "À exposer les aspects comme endpoints REST",
+        "À transformer tous les beans en aspects"
+      ],
+      "reponse": 1,
+      "explication": "Spring AOP fonctionne par proxys : @EnableAspectJAutoProxy demande à Spring de détecter les @Aspect et d'envelopper les beans correspondants dans des proxys qui exécutent les advices autour des méthodes interceptées."
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence fondamentale entre `git fetch` et `git pull` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Fetch télécharge et intègre, pull ne fait que télécharger",
+        "Fetch télécharge les commits sans toucher à la branche locale, pull télécharge puis intègre automatiquement",
+        "Fetch fonctionne uniquement sur main, pull sur toutes les branches",
+        "Ce sont deux alias de la même commande"
+      ],
+      "reponse": 1,
+      "explication": "Fetch met à jour les références distantes (origin/main) sans modifier votre branche locale ; pull enchaîne fetch puis merge (ou rebase), ce qui modifie la branche et le working directory."
+    },
+    {
+      "question": "Après un `git fetch origin`, qu'est-ce qui a changé dans votre dépôt local ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Votre branche locale contient les nouveaux commits du remote",
+        "Votre working directory est mis à jour avec les derniers fichiers",
+        "Les références remote comme origin/main sont mises à jour, mais votre branche et vos fichiers restent inchangés",
+        "Rien, fetch ne fait que vérifier la connexion au remote"
+      ],
+      "reponse": 2,
+      "explication": "Fetch télécharge les nouveaux commits et avance les références remote (origin/main), mais n'affecte ni votre branche locale ni votre working directory : c'est ce qui le rend sans risque."
+    },
+    {
+      "question": "À quelle séquence de commandes `git pull origin main` est-il équivalent ?",
+      "code": "git pull origin main\n# Équivalent à :\n???",
+      "lang": "bash",
+      "options": [
+        "git fetch origin puis git merge origin/main",
+        "git clone origin puis git checkout main",
+        "git fetch origin puis git reset --hard origin/main",
+        "git merge origin/main puis git fetch origin"
+      ],
+      "reponse": 0,
+      "explication": "Pull n'est qu'un raccourci : un fetch pour télécharger les commits, suivi d'un merge de origin/main dans la branche courante (ou d'un rebase avec `git pull --rebase`)."
+    },
+    {
+      "question": "Vous avez fait un `git fetch origin`. Quelle commande permet de voir les commits reçus du remote avant de les intégrer ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "git status --remote",
+        "git log main..origin/main",
+        "git diff HEAD",
+        "git show origin"
+      ],
+      "reponse": 1,
+      "explication": "La plage `main..origin/main` liste les commits présents sur origin/main mais pas encore dans main : exactement ce qui serait intégré par un merge. C'est le grand intérêt du fetch : inspecter avant d'intégrer."
+    },
+    {
+      "question": "Dans quel cas fetch est-il préférable à pull ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Quand on veut synchroniser rapidement une branche sur laquelle on travaille seul",
+        "Quand on veut examiner les changements distants et éviter les conflits inattendus sur une feature importante",
+        "Quand le remote est indisponible",
+        "Quand on veut mettre à jour le working directory automatiquement"
+      ],
+      "reponse": 1,
+      "explication": "Fetch donne un contrôle total : on voit d'abord ce qui arrive, puis on choisit quand et comment intégrer. Pull convient plutôt aux synchronisations rapides sans risque de conflit."
+    },
+    {
+      "question": "Quel est le principal risque d'un `git pull` lancé sans précaution ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il supprime les branches locales non poussées",
+        "Il déclenche un merge automatique qui peut provoquer des conflits inattendus dans votre travail en cours",
+        "Il écrase le dépôt distant avec vos commits locaux",
+        "Il ne récupère que le dernier commit du remote"
+      ],
+      "reponse": 1,
+      "explication": "Comme pull enchaîne fetch + merge sans étape d'inspection, il peut déclencher des conflits (ou un commit de merge non désiré) au milieu de votre travail — d'où la recommandation de fetch d'abord sur les features importantes."
+    },
+    {
+      "question": "Que fait `git pull --rebase` par rapport à un `git pull` classique ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il télécharge les commits sans les intégrer",
+        "Il remplace le merge final par un rebase : vos commits locaux sont rejoués au-dessus des commits distants",
+        "Il force le remote à accepter vos commits locaux",
+        "Il annule le dernier pull effectué"
+      ],
+      "reponse": 1,
+      "explication": "Avec --rebase, l'étape d'intégration est un rebase au lieu d'un merge : vos commits locaux sont rejoués au-dessus de ceux du remote, ce qui évite les commits de merge et garde un historique linéaire."
+    }
+  ]
+}

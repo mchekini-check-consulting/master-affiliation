@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Que désignent les coordonnées GAV d'un artefact Maven ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Goal, Action, Version",
+        "GroupId, ArtifactId, Version",
+        "GroupId, Archive, Variant",
+        "Global, Artifact, Vendor"
+      ],
+      "reponse": 1,
+      "explication": "GAV = GroupId (organisation, ex : org.springframework), ArtifactId (nom du module, ex : spring-boot-starter-web) et Version (ex : 3.2.0) — le triplet qui identifie un artefact de façon unique."
+    },
+    {
+      "question": "Que signifie une version `1.0-SNAPSHOT` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Une version stable publiée officiellement",
+        "Une version en cours de développement, susceptible d'être re-téléchargée à chaque build",
+        "Une version archivée qui ne peut plus être utilisée",
+        "Une copie de sauvegarde du repository"
+      ],
+      "reponse": 1,
+      "explication": "Le suffixe -SNAPSHOT marque une version de développement, mutable : Maven peut en re-télécharger une version plus récente, contrairement à une release qui est immuable."
+    },
+    {
+      "question": "Quel scope faut-il donner à JUnit pour qu'il ne soit pas embarqué dans l'artefact final ?",
+      "code": "<dependency>\n    <groupId>junit</groupId>\n    <artifactId>junit</artifactId>\n    <version>4.13.2</version>\n    <scope>???</scope>\n</dependency>",
+      "lang": "xml",
+      "options": [
+        "compile",
+        "runtime",
+        "test",
+        "provided"
+      ],
+      "reponse": 2,
+      "explication": "Le scope test limite la dépendance à la compilation et à l'exécution des tests : elle n'est ni exposée au code principal ni embarquée dans le livrable."
+    },
+    {
+      "question": "À quoi sert le bloc `<exclusions>` dans une dépendance ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À empêcher la dépendance d'être mise à jour",
+        "À écarter une dépendance transitive apportée par cette dépendance",
+        "À exclure la dépendance de certains environnements",
+        "À masquer la dépendance dans les rapports Maven"
+      ],
+      "reponse": 1,
+      "explication": "Une exclusion retire une dépendance transitive indésirable — par exemple exclure spring-boot-starter-logging de spring-boot-starter-web pour utiliser un autre framework de logging."
+    },
+    {
+      "question": "Quels éléments suffisent pour déclarer une dépendance minimale ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "groupId, artifactId, version",
+        "groupId, artifactId, version, scope, type, classifier",
+        "artifactId seul",
+        "groupId et scope"
+      ],
+      "reponse": 0,
+      "explication": "Le GAV suffit : scope (compile par défaut), type (jar par défaut), classifier et optional ont des valeurs par défaut et ne sont précisés qu'au besoin."
+    },
+    {
+      "question": "Que fait la déclaration `<version>${jackson.version}</version>` ?",
+      "code": "<dependency>\n    <groupId>com.fasterxml.jackson.core</groupId>\n    <artifactId>jackson-core</artifactId>\n    <version>${jackson.version}</version>\n</dependency>",
+      "lang": "xml",
+      "options": [
+        "Elle télécharge automatiquement la dernière version de Jackson",
+        "Elle référence une propriété Maven définie ailleurs (ex : dans <properties>), centralisant la version",
+        "Elle provoque une erreur, la syntaxe ${} étant réservée au shell",
+        "Elle installe Jackson en scope test"
+      ],
+      "reponse": 1,
+      "explication": "${jackson.version} est une propriété Maven, généralement définie dans <properties> du POM (ou d'un parent) : on centralise la version pour tous les modules Jackson."
+    },
+    {
+      "question": "À quoi sert le `<classifier>` (ex : `sources`) dans une dépendance ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À trier les dépendances par ordre alphabétique",
+        "À distinguer des artefacts dérivés d'un même GAV (sources, javadoc, builds spécifiques)",
+        "À définir la classe principale du JAR",
+        "À forcer la recompilation de la dépendance"
+      ],
+      "reponse": 1,
+      "explication": "Le classifier distingue plusieurs artefacts produits sous le même GAV : le JAR principal, mais aussi -sources.jar, -javadoc.jar ou des variantes par plateforme."
+    }
+  ]
+}

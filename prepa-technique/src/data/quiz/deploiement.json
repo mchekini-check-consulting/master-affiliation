@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est le principe fondamental du GitOps ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Déployer manuellement avec kubectl après chaque merge",
+        "Le dépôt Git est la source de vérité de l'état désiré, et un contrôleur fait converger le cluster vers cet état",
+        "Stocker les images Docker directement dans Git",
+        "Donner à chaque développeur un accès direct au cluster de production"
+      ],
+      "reponse": 1,
+      "explication": "En GitOps, l'état désiré (manifests) vit dans Git. Un contrôleur comme ArgoCD compare en continu cet état avec l'état réel du cluster et applique les différences — plus personne ne pousse de changements à la main."
+    },
+    {
+      "question": "Comment ArgoCD détecte-t-il qu'un déploiement doit être mis à jour ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le pipeline CI lui envoie une commande kubectl apply",
+        "Il interroge régulièrement le dépôt Git de manifests et détecte les écarts (drift) avec l'état du cluster",
+        "Le développeur clique sur « Deploy » dans l'interface Kubernetes",
+        "Il surveille le registry Docker et déploie chaque nouvelle image"
+      ],
+      "reponse": 1,
+      "explication": "ArgoCD fonctionne en mode pull : il scrute le dépôt Git (poll ou webhook), détecte les dérives entre l'état désiré et l'état réel, puis applique les changements dans le cluster."
+    },
+    {
+      "question": "Que provoque cette syncPolicy dans une Application ArgoCD ?",
+      "code": "syncPolicy:\n  automated:\n    prune: true\n    selfHeal: true",
+      "lang": "yaml",
+      "options": [
+        "ArgoCD demande une validation manuelle avant chaque synchronisation",
+        "ArgoCD synchronise automatiquement, supprime les ressources retirées de Git et corrige les modifications manuelles faites sur le cluster",
+        "ArgoCD supprime le namespace à chaque déploiement puis le recrée",
+        "ArgoCD ne fait que des health checks, sans jamais modifier le cluster"
+      ],
+      "reponse": 1,
+      "explication": "`automated` active la synchronisation sans intervention, `prune` supprime les ressources qui n'existent plus dans Git, et `selfHeal` reverte toute modification faite directement sur le cluster : Git reste la seule source de vérité."
+    },
+    {
+      "question": "Un opérateur modifie à la main le nombre de replicas d'un deployment géré par ArgoCD avec selfHeal activé. Que se passe-t-il ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "La modification est conservée et reportée dans Git automatiquement",
+        "ArgoCD détecte la dérive et rétablit la valeur définie dans les manifests Git",
+        "Le deployment est supprimé par sécurité",
+        "ArgoCD envoie une alerte mais laisse la modification en place"
+      ],
+      "reponse": 1,
+      "explication": "C'est l'auto-healing : toute dérive entre le cluster et Git est corrigée dans le sens Git → cluster. Pour changer les replicas durablement, il faut modifier le manifest dans le dépôt."
+    },
+    {
+      "question": "Comment effectue-t-on un rollback avec une approche GitOps ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "En exécutant kubectl rollout undo sur le cluster",
+        "En revenant à un commit précédent du dépôt de manifests (revert), qu'ArgoCD resynchronise",
+        "En redémarrant le contrôleur ArgoCD",
+        "En supprimant l'image fautive du registry"
+      ],
+      "reponse": 1,
+      "explication": "Puisque Git décrit l'état désiré, revenir en arrière consiste à reverter le commit fautif : ArgoCD détecte le changement et ramène le cluster à l'état précédent. Un `kubectl rollout undo` manuel serait annulé par le selfHeal."
+    },
+    {
+      "question": "Pourquoi le GitOps améliore-t-il la sécurité des déploiements ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que les secrets sont stockés en clair dans Git, donc faciles à auditer",
+        "Parce que personne n'a besoin d'un accès direct au cluster : le contrôleur tire les changements depuis Git, et tout passe par des commits tracés",
+        "Parce qu'ArgoCD chiffre automatiquement les images Docker",
+        "Parce que le cluster n'est plus connecté à Internet"
+      ],
+      "reponse": 1,
+      "explication": "Le modèle pull supprime le besoin de distribuer des credentials kubectl au pipeline ou aux développeurs ; chaque changement est un commit versionné, revu et traçable."
+    },
+    {
+      "question": "Dans le manifest Deployment de la fiche, à quoi servent les blocs resources.requests et resources.limits ?",
+      "code": "resources:\n  requests:\n    memory: \"256Mi\"\n    cpu: \"250m\"\n  limits:\n    memory: \"512Mi\"\n    cpu: \"500m\"",
+      "lang": "yaml",
+      "options": [
+        "requests définit les ressources garanties pour planifier le pod, limits plafonne sa consommation maximale",
+        "requests limite le nombre de requêtes HTTP, limits le nombre d'utilisateurs",
+        "Les deux valeurs doivent toujours être identiques pour que le pod démarre",
+        "Ils configurent l'autoscaling horizontal du deployment"
+      ],
+      "reponse": 0,
+      "explication": "Les requests servent au scheduler Kubernetes pour placer le pod sur un nœud disposant des ressources demandées ; les limits plafonnent la consommation (throttling CPU, OOMKill si la mémoire dépasse la limite)."
+    }
+  ]
+}

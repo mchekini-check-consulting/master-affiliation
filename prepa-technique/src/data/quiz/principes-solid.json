@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Que signifie le S de SOLID (Single Responsibility Principle) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Une classe ne doit contenir qu'une seule méthode publique",
+        "Une classe ne doit avoir qu'une seule raison de changer",
+        "Un projet ne doit avoir qu'un seul point d'entrée",
+        "Une méthode ne doit avoir qu'un seul paramètre"
+      ],
+      "reponse": 1,
+      "explication": "SRP ne compte pas les méthodes mais les responsabilités : si une classe gère données, validation, persistance et notification, quatre raisons différentes peuvent la faire changer."
+    },
+    {
+      "question": "Une classe User contient setName(), isValidEmail(), saveToDatabase() et sendWelcomeEmail(). Quel principe est violé et comment corriger ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "OCP : il faut rendre la classe final",
+        "SRP : extraire EmailValidator, UserRepository et NotificationService en classes dédiées",
+        "LSP : il faut faire hériter User d'une classe abstraite",
+        "DIP : il faut rendre les méthodes statiques"
+      ],
+      "reponse": 1,
+      "explication": "Quatre responsabilités cohabitent (données, validation, persistance, notification). On les sépare en classes dédiées : chacune n'a plus qu'une raison de changer."
+    },
+    {
+      "question": "Comment le pattern Strategy aide-t-il à respecter le principe Open/Closed ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il empêche l'héritage des classes de calcul",
+        "Il permet d'ajouter un nouveau comportement en créant une implémentation, sans modifier le code existant",
+        "Il regroupe tous les cas dans un seul switch bien documenté",
+        "Il rend toutes les classes immuables"
+      ],
+      "reponse": 1,
+      "explication": "Avec une interface DiscountStrategy et une classe par type de remise, ajouter GOLD = créer GoldCustomerDiscount. La chaîne de if/else, elle, obligeait à modifier la méthode à chaque nouveau type."
+    },
+    {
+      "question": "Quel principe SOLID ce code viole-t-il ?",
+      "code": "class Penguin extends Bird {\n  @Override\n  public void fly() {\n    throw new UnsupportedOperationException(\"Penguins cannot fly!\");\n  }\n}",
+      "lang": "java",
+      "options": [
+        "Single Responsibility : Penguin a trop de responsabilités",
+        "Open/Closed : Penguin modifie le code de Bird",
+        "Liskov Substitution : Penguin ne peut pas remplacer Bird sans casser le contrat",
+        "Dependency Inversion : Penguin dépend d'une classe concrète"
+      ],
+      "reponse": 2,
+      "explication": "Tout code qui appelle bird.fly() explose si on lui passe un Penguin : la sous-classe ne respecte pas le contrat de la classe de base. La solution : restructurer la hiérarchie (FlyingBird / SwimmingBird avec move())."
+    },
+    {
+      "question": "Quel est le signe d'alerte typique d'une violation de l'Interface Segregation Principle ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Une interface avec une seule méthode",
+        "Des classes forcées d'implémenter des méthodes inutiles, souvent avec UnsupportedOperationException",
+        "Une classe qui implémente plusieurs interfaces",
+        "Une interface sans Javadoc"
+      ],
+      "reponse": 1,
+      "explication": "Quand Designer doit implémenter code() et test() qu'il ne supporte pas, l'interface Worker est trop large : il faut la découper en interfaces fines (Workable, Codable, Designable…)."
+    },
+    {
+      "question": "Que recommande le Dependency Inversion Principle ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Que les modules de bas niveau instancient les modules de haut niveau",
+        "De dépendre d'abstractions (interfaces) plutôt que de classes concrètes",
+        "D'inverser l'ordre des paramètres des constructeurs",
+        "De remplacer toutes les classes par des interfaces"
+      ],
+      "reponse": 1,
+      "explication": "NotificationManager ne doit pas faire `new EmailService()` : il reçoit des implémentations de l'interface NotificationService par injection, ce qui permet d'en changer et de tester avec des mocks."
+    },
+    {
+      "question": "Pourquoi l'injection de dépendances facilite-t-elle les tests unitaires ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Elle rend les tests plus rapides en désactivant le garbage collector",
+        "Elle permet de remplacer les dépendances réelles par des mocks lors du test",
+        "Elle génère automatiquement les tests à partir des interfaces",
+        "Elle supprime le besoin d'assertions"
+      ],
+      "reponse": 1,
+      "explication": "Puisque la classe reçoit ses dépendances (au lieu de les créer), le test peut lui fournir des doublures contrôlées et vérifier le comportement en isolation."
+    },
+    {
+      "question": "Vous voyez une longue chaîne de if/else sur un champ `customerType` pour calculer une remise. Quels principes sont menacés ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "OCP (chaque nouveau type impose une modification) et, indirectement, SRP",
+        "Uniquement LSP",
+        "Uniquement ISP",
+        "Aucun : les if/else sont recommandés par SOLID"
+      ],
+      "reponse": 0,
+      "explication": "La méthode doit être rouverte à chaque nouveau type (violation OCP) et concentre toutes les règles de remise (SRP fragilisé). Le duo interface + implémentations par type corrige les deux."
+    }
+  ]
+}

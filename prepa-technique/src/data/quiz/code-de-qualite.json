@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quels sont les 4 piliers d'un code de qualité ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Rapide, compact, optimisé, documenté",
+        "Maintenable, testable, lisible, extensible",
+        "Typé, compilé, versionné, déployé",
+        "Simple, court, commenté, générique"
+      ],
+      "reponse": 1,
+      "explication": "Un code de qualité est maintenable (facile à faire évoluer), testable (isolable), lisible (compréhensible par tous) et extensible (on peut l'étendre sans le modifier)."
+    },
+    {
+      "question": "Pourquoi une classe `OrderManager` qui valide, calcule le prix, envoie l'email et sauvegarde en base est-elle difficile à maintenir ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce qu'elle contient trop de lignes pour être compilée efficacement",
+        "Parce qu'elle mélange plusieurs responsabilités : tout changement dans l'une risque de casser les autres",
+        "Parce que Java interdit plus de trois dépendances par classe",
+        "Parce que l'envoi d'email doit toujours être asynchrone"
+      ],
+      "reponse": 1,
+      "explication": "Une classe « qui fait tout » a plusieurs raisons de changer. Séparer les responsabilités (validator, calculator, notification, repository) permet de modifier chaque partie sans risque pour les autres."
+    },
+    {
+      "question": "Qu'est-ce qui rend un code difficilement testable ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "L'utilisation d'interfaces et d'abstractions",
+        "L'injection des dépendances par le constructeur",
+        "Des dépendances hardcodées : connexion directe à la base, appel HTTP réel, lecture de l'horloge système",
+        "La présence de méthodes privées"
+      ],
+      "reponse": 2,
+      "explication": "Quand la classe crée elle-même ses dépendances vers le monde extérieur (base, API, horloge), impossible de les remplacer par des mocks : le test devient un test d'intégration fragile."
+    },
+    {
+      "question": "Quel pilier de la qualité ce code viole-t-il principalement ?",
+      "code": "public class Calc {\n    public double calc(List<Item> items, User u) {\n        double t = 0;\n        for (Item i : items) {\n            double p = i.getP();\n            if (u.getT() == 1 && i.getC().equals(\"FOOD\")) p *= 0.9;\n            t += p * i.getQ();\n        }\n        return t > 100 ? t * 0.98 : t;\n    }\n}",
+      "lang": "java",
+      "options": [
+        "La lisibilité : noms cryptiques et magic numbers rendent l'intention obscure",
+        "La testabilité : la méthode dépend de la base de données",
+        "L'extensibilité : on ne peut pas hériter de la classe",
+        "Aucun : le code est correct et concis"
+      ],
+      "reponse": 0,
+      "explication": "`t`, `p`, `getT()`, `0.9`, `0.98`… le code fonctionne mais personne ne peut deviner l'intention. Des noms explicites et des constantes nommées (FOOD_DISCOUNT, BULK_THRESHOLD) le rendraient auto-documenté."
+    },
+    {
+      "question": "Comment rendre testable une règle métier qui dépend de l'heure système (ex. « pas de connexion après 22 h ») ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Lancer les tests uniquement avant 22 h",
+        "Utiliser LocalDateTime.now() directement dans la méthode",
+        "Injecter une abstraction de type TimeProvider que le test peut remplacer par une implémentation contrôlée",
+        "Mettre la règle en commentaire pendant les tests"
+      ],
+      "reponse": 2,
+      "explication": "En injectant un `TimeProvider`, le test fournit une horloge factice et peut vérifier le comportement à 21 h comme à 23 h, de façon déterministe."
+    },
+    {
+      "question": "Dans le `PaymentProcessor` extensible, comment ajoute-t-on le support d'Apple Pay ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "En ajoutant un `else if (type.equals(\"APPLE_PAY\"))` dans processPayment",
+        "En créant une nouvelle classe qui implémente l'interface PaymentMethod, sans toucher au code existant",
+        "En héritant de PaymentProcessor et en surchargeant processPayment",
+        "En modifiant l'enum des types de paiement dans le processeur"
+      ],
+      "reponse": 1,
+      "explication": "C'est le principe Open/Closed : le processeur dépend de l'abstraction `PaymentMethod` et d'une Map d'implémentations. Un nouveau moyen de paiement = une nouvelle classe, zéro modification du code en place."
+    },
+    {
+      "question": "Quel est le signe classique d'une violation du principe Open/Closed dans un code existant ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Des méthodes privées trop nombreuses",
+        "Une longue chaîne de if/else ou de switch sur un type, qu'il faut modifier à chaque nouveau cas",
+        "L'utilisation de BigDecimal au lieu de double",
+        "Des constantes nommées en SNAKE_CASE"
+      ],
+      "reponse": 1,
+      "explication": "Chaque nouveau type impose de rouvrir et modifier la même méthode. Le remède : une abstraction (interface) et le polymorphisme, pour étendre sans modifier."
+    }
+  ]
+}

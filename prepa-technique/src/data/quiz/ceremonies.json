@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "En quelles deux parties se divise le Sprint Planning ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "« Quoi ? » (sélection des stories, Sprint Goal) puis « Comment ? » (décomposition en tâches, estimation)",
+        "Démonstration puis rétrospective",
+        "Estimation puis vote du budget",
+        "Revue du code puis déploiement"
+      ],
+      "reponse": 0,
+      "explication": "La partie 1 répond au « Quoi ? » (review du backlog, Sprint Goal, sélection des stories) et la partie 2 au « Comment ? » (décomposition en tâches, estimation détaillée, planification)."
+    },
+    {
+      "question": "Quelle est la durée maximale du Sprint Planning pour un sprint de 4 semaines ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "2 heures",
+        "4 heures",
+        "8 heures",
+        "Une journée entière sans limite"
+      ],
+      "reponse": 2,
+      "explication": "Le Sprint Planning est timeboxé à 8h pour un sprint de 4 semaines, 4h pour un sprint de 2 semaines — la durée est proportionnelle à la longueur du sprint."
+    },
+    {
+      "question": "Quelle règle s'applique au Daily Scrum ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il dure 30 minutes et sert à résoudre les problèmes techniques",
+        "Il dure 15 minutes maximum, à heure et lieu fixes, sans résolution de problèmes en séance",
+        "Il n'a lieu que lorsque le Scrum Master le juge nécessaire",
+        "Il sert à rendre compte de l'avancement au manager"
+      ],
+      "reponse": 1,
+      "explication": "Le daily est timeboxé à 15 minutes, à heure et lieu fixes, focalisé sur le Sprint Goal. Les problèmes identifiés se traitent après, pas en séance."
+    },
+    {
+      "question": "Lequel de ces comportements est un anti-pattern du Daily Scrum ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Répondre aux trois questions en restant debout",
+        "Signaler un obstacle qui bloque l'équipe",
+        "Transformer le daily en rapport d'avancement au manager",
+        "Se concentrer sur l'objectif du sprint"
+      ],
+      "reponse": 2,
+      "explication": "Le daily appartient à l'équipe de développement : en faire un reporting au manager (ou y résoudre les problèmes, dépasser 15 min, parler hors sprint) est un anti-pattern classique."
+    },
+    {
+      "question": "Quels sont les objectifs de la Sprint Review ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Analyser le processus d'équipe et définir des actions d'amélioration",
+        "Démontrer l'incrément, recueillir les feedbacks et adapter le Product Backlog",
+        "Sélectionner les stories du prochain sprint",
+        "Évaluer individuellement chaque développeur"
+      ],
+      "reponse": 1,
+      "explication": "La review inspecte le produit : démonstration interactive, feedback des stakeholders et adaptation du backlog. L'amélioration du processus relève de la rétrospective."
+    },
+    {
+      "question": "Dans une rétrospective au format Keep / Stop / Start, où classer « les obstacles récurrents qui nous font perdre du temps » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Keep : il faut les conserver",
+        "Start : il faut en créer davantage",
+        "Stop : c'est ce qui pose problème et doit cesser",
+        "Nulle part : la rétrospective ne traite pas les problèmes"
+      ],
+      "reponse": 2,
+      "explication": "Keep = ce qui a bien fonctionné, Stop = ce qui pose problème (pratiques inefficaces, obstacles récurrents, perte de temps), Start = nouvelles idées à tester."
+    },
+    {
+      "question": "Quelle technique d'animation de rétrospective sert à identifier les causes racines d'un problème ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Mad, Sad, Glad",
+        "5 Whys",
+        "Starfish",
+        "Timeline"
+      ],
+      "reponse": 1,
+      "explication": "Les 5 Whys consistent à demander « pourquoi ? » en cascade pour remonter à la cause racine. Mad/Sad/Glad explore les émotions, Starfish nuance (Start, Stop, Continue, More, Less), Timeline retrace les événements."
+    },
+    {
+      "question": "Qui participe obligatoirement au Sprint Planning ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Uniquement le Scrum Master",
+        "Le Product Owner et la Development Team, le Scrum Master facilitant",
+        "Uniquement les stakeholders",
+        "Le manager et le client final"
+      ],
+      "reponse": 1,
+      "explication": "PO et Development Team sont obligatoires (le PO présente les priorités, l'équipe s'engage), le Scrum Master facilite ; les stakeholders sont optionnels sur la partie 1."
+    }
+  ]
+}

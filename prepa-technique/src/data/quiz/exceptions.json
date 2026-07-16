@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la différence entre une checked et une unchecked exception ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les checked exceptions sont plus graves que les unchecked",
+        "Une checked exception doit être capturée ou déclarée avec throws, une unchecked (RuntimeException) non",
+        "Les unchecked exceptions ne peuvent pas être capturées par un try-catch",
+        "Les checked exceptions n'existent que depuis Java 7"
+      ],
+      "reponse": 1,
+      "explication": "Le compilateur impose de gérer (try-catch) ou de déclarer (throws) les checked exceptions comme IOException. Les RuntimeException et leurs sous-classes sont unchecked : leur gestion est optionnelle."
+    },
+    {
+      "question": "NullPointerException est-elle une checked ou une unchecked exception ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Checked : le compilateur oblige à la déclarer",
+        "Unchecked : elle hérite de RuntimeException",
+        "Ni l'une ni l'autre : c'est une Error",
+        "Checked uniquement si la variable est un paramètre de méthode"
+      ],
+      "reponse": 1,
+      "explication": "NullPointerException, comme IllegalArgumentException ou ClassCastException, hérite de RuntimeException : elle est unchecked et signale généralement une erreur de programmation."
+    },
+    {
+      "question": "Quelle affirmation sur le bloc `finally` est correcte ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il ne s'exécute que si une exception a été levée",
+        "Il ne s'exécute que si aucune exception n'a été levée",
+        "Il s'exécute dans tous les cas, exception ou non, même après un return dans le try",
+        "Il s'exécute avant le bloc catch"
+      ],
+      "reponse": 2,
+      "explication": "finally est garanti de s'exécuter que le try réussisse, échoue ou fasse un return : c'est historiquement l'endroit du nettoyage (fermeture de ressources) avant le try-with-resources."
+    },
+    {
+      "question": "Quelle condition doit remplir une classe pour être utilisée dans un try-with-resources ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Hériter de Exception",
+        "Implémenter AutoCloseable (ou Closeable) et donc fournir une méthode close()",
+        "Être déclarée final",
+        "Posséder un constructeur sans argument"
+      ],
+      "reponse": 1,
+      "explication": "Le try-with-resources (Java 7+) appelle automatiquement close() à la sortie du bloc, y compris en cas d'exception : la ressource doit donc implémenter AutoCloseable."
+    },
+    {
+      "question": "Ce code compile-t-il, et pourquoi ?",
+      "code": "try {\n    riskyOperation();\n} catch (Exception e) {\n    System.err.println(\"Erreur générale\");\n} catch (IOException e) {\n    System.err.println(\"Erreur I/O\");\n}",
+      "lang": "java",
+      "options": [
+        "Oui, les catch sont testés du plus général au plus spécifique",
+        "Non : IOException est déjà couverte par le catch (Exception) placé avant, le second catch est inaccessible",
+        "Oui, mais le catch (IOException) ne sera jamais exécuté silencieusement",
+        "Non : on ne peut pas avoir deux blocs catch pour un même try"
+      ],
+      "reponse": 1,
+      "explication": "Les catch sont évalués dans l'ordre : un catch (Exception) en premier rend le catch (IOException) inaccessible et le compilateur refuse (« exception has already been caught »). Il faut mettre les plus spécifiques d'abord."
+    },
+    {
+      "question": "Que permet la syntaxe multi-catch `catch (NullPointerException | ArrayIndexOutOfBoundsException e)` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Capturer la première exception et ignorer la seconde",
+        "Appliquer un même bloc de gestion à plusieurs types d'exceptions sans dupliquer le code (Java 7+)",
+        "Capturer deux exceptions levées simultanément",
+        "Transformer une checked exception en unchecked"
+      ],
+      "reponse": 1,
+      "explication": "Le multi-catch (Java 7+) factorise la gestion commune de plusieurs exceptions sans lien d'héritage direct, en évitant les blocs catch dupliqués."
+    },
+    {
+      "question": "Pourquoi ce code est-il considéré comme une mauvaise pratique ?",
+      "code": "try {\n    return array[index];\n} catch (ArrayIndexOutOfBoundsException e) {\n    return null;\n}",
+      "lang": "java",
+      "options": [
+        "ArrayIndexOutOfBoundsException est une checked exception qui doit être déclarée",
+        "Il utilise une exception pour un contrôle de flux normal : une simple vérification de borne (if) est plus claire et moins coûteuse",
+        "Retourner null dans un catch est interdit par le compilateur",
+        "Le try-catch empêche la JVM d'optimiser les tableaux"
+      ],
+      "reponse": 1,
+      "explication": "Les exceptions signalent des situations exceptionnelles. Un cas prévisible comme un index hors bornes se teste avec if (index < array.length) : c'est plus lisible et évite le coût de construction de l'exception."
+    },
+    {
+      "question": "Comment choisir entre Exception et RuntimeException pour une exception personnalisée ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Toujours RuntimeException, Exception est dépréciée",
+        "Étendre Exception pour un cas récupérable que l'appelant doit explicitement gérer, RuntimeException pour une erreur de programmation ou de validation",
+        "Étendre Error pour être sûr que l'exception ne soit jamais ignorée",
+        "Le choix n'a aucun impact sur les appelants"
+      ],
+      "reponse": 1,
+      "explication": "Une checked exception (extends Exception, ex. InsufficientFundsException) force l'appelant à traiter un cas métier attendu ; une unchecked (extends RuntimeException, ex. InvalidEmailException) convient aux violations de contrat qu'on ne veut pas imposer dans chaque signature."
+    }
+  ]
+}

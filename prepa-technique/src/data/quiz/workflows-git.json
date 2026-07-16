@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Dans GitFlow, quel est le rôle respectif des branches main et develop ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "main sert au développement quotidien, develop à la production",
+        "main reflète la production stable, develop sert d'intégration continue des features",
+        "Les deux sont équivalentes, develop est un simple backup",
+        "develop ne sert qu'aux hotfixes"
+      ],
+      "reponse": 1,
+      "explication": "GitFlow sépare strictement : main contient uniquement le code en production (taggé par release), develop agrège le travail des branches feature en continu."
+    },
+    {
+      "question": "Dans GitFlow, d'où part une branche hotfix et où doit-elle être mergée ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Elle part de develop et est mergée dans develop uniquement",
+        "Elle part de main et est mergée dans main uniquement",
+        "Elle part de main et est mergée dans main ET develop",
+        "Elle part d'une branche release et est mergée dans main"
+      ],
+      "reponse": 2,
+      "explication": "Le hotfix part de main pour corriger la production au plus vite, puis est mergé dans main ET dans develop — sinon le bug corrigé réapparaît à la prochaine release."
+    },
+    {
+      "question": "Pourquoi GitFlow utilise-t-il `git merge --no-ff` pour intégrer les features ?",
+      "code": "git checkout develop\ngit merge --no-ff feature/nouvelle-fonctionnalite",
+      "lang": "bash",
+      "options": [
+        "Pour accélérer le merge sur les gros dépôts",
+        "Pour forcer la création d'un commit de merge et garder la trace de l'existence de la branche",
+        "Pour squasher automatiquement les commits de la feature",
+        "Pour empêcher les conflits de fichiers"
+      ],
+      "reponse": 1,
+      "explication": "--no-ff interdit le fast-forward : même si develop pouvait simplement avancer, un commit de merge est créé, ce qui matérialise la feature dans l'historique et facilite la traçabilité."
+    },
+    {
+      "question": "Quel est le principe central du Trunk-based Development ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Une branche par environnement (dev, staging, prod)",
+        "Une seule branche principale, avec des branches de feature très courtes (moins de 3 jours) mergées fréquemment",
+        "Des branches de feature longues, mergées à chaque release trimestrielle",
+        "Un fork par développeur, synchronisé chaque mois"
+      ],
+      "reponse": 1,
+      "explication": "En trunk-based, tout le monde intègre très fréquemment sur main/trunk : les branches vivent au maximum 2-3 jours, ce qui rend l'intégration continue réelle et limite les conflits."
+    },
+    {
+      "question": "En Trunk-based Development, comment livrer sur main une fonctionnalité encore incomplète sans la montrer aux utilisateurs ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "En gardant la branche feature ouverte jusqu'à la fin du développement",
+        "En la masquant derrière un feature flag désactivé, testé côté code",
+        "En commentant le code avant chaque déploiement",
+        "En déployant seulement les fichiers terminés"
+      ],
+      "reponse": 1,
+      "explication": "Les feature flags permettent de merger et déployer du code incomplet mais inactif : `if (featureFlag.isEnabled('NEW_FEATURE'))` route vers l'ancienne implémentation tant que le flag est éteint."
+    },
+    {
+      "question": "Quel contexte plaide pour GitFlow plutôt que pour le Trunk-based ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Petite équipe DevOps qui déploie plusieurs fois par jour",
+        "Grande équipe (> 10 développeurs) avec des releases planifiées, espacées et un cadre réglementaire strict",
+        "Projet personnel d'un seul développeur",
+        "Startup qui veut un feedback utilisateur le plus rapide possible"
+      ],
+      "reponse": 1,
+      "explication": "GitFlow apporte une structure prévisible (release, hotfix, develop) qui paie dans les grandes équipes, les releases espacées et les contextes réglementés ; son overhead pénalise les petites équipes en déploiement continu."
+    },
+    {
+      "question": "Quel est un inconvénient reconnu de GitFlow ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Impossible de gérer les hotfixes",
+        "L'intégration tardive des branches longues, source de conflits de merge fréquents",
+        "L'absence totale d'historique",
+        "L'interdiction d'utiliser des tags"
+      ],
+      "reponse": 1,
+      "explication": "Avec des branches feature et release qui vivent longtemps, l'intégration arrive tard : les divergences s'accumulent et les conflits de merge deviennent fréquents — exactement ce que le trunk-based cherche à éviter."
+    },
+    {
+      "question": "Quel prérequis rend le Trunk-based Development viable ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Un gel des déploiements pendant les sprints",
+        "Une suite de tests automatisés robuste et une intégration continue systématique",
+        "Une branche develop en plus de main",
+        "Un lead qui merge manuellement toutes les branches"
+      ],
+      "reponse": 1,
+      "explication": "Comme tout le monde pousse fréquemment vers main, seuls des tests automatisés solides et une CI obligatoire empêchent de casser la branche principale — c'est une question de discipline d'équipe."
+    }
+  ]
+}

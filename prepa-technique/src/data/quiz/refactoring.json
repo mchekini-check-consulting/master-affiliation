@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la définition du refactoring selon Martin Fowler ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Réécrire entièrement un module obsolète avec des technologies modernes",
+        "Améliorer la conception d'un code existant sans changer son comportement observable",
+        "Optimiser les performances d'un code en modifiant ses algorithmes",
+        "Corriger les bugs découverts lors des code reviews"
+      ],
+      "reponse": 1,
+      "explication": "Le refactoring change la structure interne (lisibilité, conception) mais jamais le comportement externe : le code fait exactement la même chose après qu'avant."
+    },
+    {
+      "question": "Que dit la « règle des 3 » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Ne jamais refactoriser plus de 3 fichiers à la fois",
+        "La première fois on fait, la deuxième on grimace, la troisième on refactorise",
+        "Toute méthode de plus de 3 paramètres doit être refactorisée",
+        "Un refactoring doit être validé par 3 relecteurs"
+      ],
+      "reponse": 1,
+      "explication": "La règle des 3 tolère une duplication ponctuelle : c'est à la troisième occurrence du même code ou du même irritant qu'il faut refactoriser."
+    },
+    {
+      "question": "Quelle est la règle d'or avant tout refactoring ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Obtenir l'accord écrit du product owner",
+        "Créer une branche dédiée de longue durée",
+        "Disposer de tests automatisés qui servent de filet de sécurité",
+        "Documenter chaque méthode avant de la modifier"
+      ],
+      "reponse": 2,
+      "explication": "Ne jamais refactoriser sans tests automatisés : ils détectent immédiatement toute régression et garantissent que le comportement externe reste inchangé."
+    },
+    {
+      "question": "Vous devez refactoriser du code legacy qui n'a aucun test. Quelle est la première étape recommandée ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Refactoriser prudemment en relisant deux fois chaque changement",
+        "Écrire d'abord des tests de caractérisation qui capturent le comportement actuel",
+        "Supprimer le code legacy et le réécrire from scratch",
+        "Ajouter des logs partout pour surveiller la production"
+      ],
+      "reponse": 1,
+      "explication": "Les tests de caractérisation figent le comportement existant (même s'il est imparfait) et créent le filet de sécurité indispensable avant de toucher au code."
+    },
+    {
+      "question": "Cette méthode enchaîne validation, calcul et sauvegarde dans un seul bloc. Quelle technique de refactoring s'applique en premier ?",
+      "code": "public void processOrder(Order order) {\n    // Validation\n    if (order.getItems().isEmpty()) { throw new IllegalArgumentException(\"Order is empty\"); }\n    // Calcul du total\n    double total = 0;\n    for (OrderItem item : order.getItems()) {\n        total += item.getPrice() * item.getQuantity();\n    }\n    order.setTotal(total);\n    // Sauvegarde\n    orderRepository.save(order);\n}",
+      "lang": "java",
+      "options": [
+        "Introduce Parameter Object",
+        "Extract Method : extraire validation, calcul et sauvegarde dans des méthodes nommées",
+        "Replace Conditional with Polymorphism",
+        "Extract Class : déplacer la méthode dans une nouvelle classe"
+      ],
+      "reponse": 1,
+      "explication": "Les commentaires « Validation », « Calcul », « Sauvegarde » signalent des blocs à extraire : validateOrder(), calculateTotal() et saveAndNotify() rendent la méthode principale lisible."
+    },
+    {
+      "question": "Quel problème résout la technique « Replace Conditional with Polymorphism » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les boucles imbriquées difficiles à lire",
+        "Les cascades de if/else ou switch sur un type, remplacées par des implémentations spécifiques d'une interface",
+        "Les méthodes qui reçoivent trop de paramètres",
+        "Les classes qui cumulent plusieurs responsabilités"
+      ],
+      "reponse": 1,
+      "explication": "Au lieu de tester le type (PREMIUM, GOLD, SILVER…) dans une cascade de conditions, chaque type implémente l'interface et porte sa propre règle : ajouter un type n'exige plus de modifier la condition."
+    },
+    {
+      "question": "Lequel de ces comportements est un piège classique du refactoring ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Refactoriser par petites étapes en testant à chaque fois",
+        "Committer fréquemment pour pouvoir revenir en arrière",
+        "Mélanger refactoring et nouvelles fonctionnalités dans le même changement",
+        "Pratiquer le pair programming pendant le refactoring"
+      ],
+      "reponse": 2,
+      "explication": "Une chose à la fois : mélanger refactoring et features rend impossible de savoir si une régression vient de la restructuration ou du nouveau comportement, et complique la revue."
+    }
+  ]
+}

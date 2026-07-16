@@ -1,0 +1,173 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import Quiz from '../../components/Quiz.astro';
+import type { Question } from '../../components/Quiz.astro';
+import { categories } from '../../data/categories';
+
+export async function getStaticPaths() {
+  const fiches = await getCollection('fiches');
+  return fiches.map((fiche) => ({
+    params: {
+      categorie: fiche.data.categorie,
+      slug: fiche.id.split('/').pop(),
+    },
+    props: { fiche },
+  }));
+}
+
+const { fiche } = Astro.props;
+const { Content } = await render(fiche);
+
+const categorie = categories.find((c) => c.slug === fiche.data.categorie)!;
+
+// Quiz associé (fichier JSON du même slug, s'il existe)
+const slug = fiche.id.split('/').pop()!;
+const quizFiles = import.meta.glob<{ questions: Question[] }>(
+  '../../data/quiz/*.json'
+);
+const quizLoader = quizFiles[`../../data/quiz/${slug}.json`];
+const quiz = quizLoader ? (await quizLoader()).questions : null;
+
+// Fiche précédente / suivante dans le parcours de la catégorie
+const fichesCategorie = (await getCollection('fiches'))
+  .filter((f) => f.data.categorie === fiche.data.categorie)
+  .sort((a, b) => a.data.ordre - b.data.ordre);
+const index = fichesCategorie.findIndex((f) => f.id === fiche.id);
+const precedente = fichesCategorie[index - 1];
+const suivante = fichesCategorie[index + 1];
+const lien = (f: (typeof fichesCategorie)[number]) =>
+  `/${f.data.categorie}/${f.id.split('/').pop()}/`;
+---
+
+<Layout
+  title={`${fiche.data.title} — ${categorie.label} | Prépa Technique`}
+  description={fiche.data.description}
+>
+  <Sidebar actif={fiche.id} />
+  <main class="page">
+    <article>
+      <header class="fiche-tete">
+        <p class="eyebrow">
+          {categorie.label} · Fiche {String(fiche.data.ordre).padStart(2, '0')}
+        </p>
+        <h1>{fiche.data.title}</h1>
+        <p class="fiche-description">{fiche.data.description}</p>
+      </header>
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      {quiz && <Quiz questions={quiz} />}
+
+      <nav class="fiche-pied" aria-label="Fiches voisines">
+        {
+          precedente ? (
+            <a class="voisine" href={lien(precedente)} rel="prev">
+              <span>← Fiche précédente</span>
+              {precedente.data.title}
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          suivante && (
+            <a class="voisine voisine--suivante" href={lien(suivante)} rel="next">
+              <span>Fiche suivante →</span>
+              {suivante.data.title}
+            </a>
+          )
+        }
+      </nav>
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .page {
+    margin-left: var(--sidebar-l);
+    padding: 3rem clamp(1.25rem, 5vw, 4.5rem) 5rem;
+  }
+
+  article {
+    max-width: var(--contenu-max);
+    margin-inline: auto;
+  }
+
+  @media (max-width: 900px) {
+    .page {
+      margin-left: 0;
+      padding-top: 4rem;
+    }
+  }
+
+  .fiche-tete {
+    max-width: var(--contenu-max);
+    margin-bottom: 2rem;
+  }
+
+  .eyebrow {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--bic);
+    margin: 0 0 0.5rem;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    font-weight: 750;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.6rem;
+  }
+
+  .fiche-description {
+    font-size: 1.125rem;
+    color: var(--estompe);
+    margin: 0;
+    max-width: 38rem;
+  }
+
+  .fiche-pied {
+    max-width: var(--contenu-max);
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--trait);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .voisine {
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    color: var(--encre);
+    max-width: 46%;
+  }
+
+  .voisine:hover {
+    color: var(--bic);
+  }
+
+  .voisine span {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--estompe);
+    margin-bottom: 0.2rem;
+  }
+
+  .voisine--suivante {
+    text-align: right;
+    margin-left: auto;
+  }
+</style>

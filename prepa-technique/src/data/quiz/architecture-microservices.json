@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelle caractéristique est fondamentale dans une architecture microservices ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Tous les services partagent la même base de données pour garantir la cohérence",
+        "Chaque service est autonome, déployable indépendamment et possède ses propres données",
+        "Tous les services doivent être écrits dans le même langage",
+        "Les services communiquent uniquement via des appels de méthodes directs"
+      ],
+      "reponse": 1,
+      "explication": "L'autonomie est le cœur du modèle : déploiement indépendant, données privées par service et communication via APIs (REST, gRPC, messaging)."
+    },
+    {
+      "question": "Quelle stratégie de découpage des services est recommandée ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Par couche technique : un service UI, un service Business Logic, un service Data Access",
+        "Par technologie : un service Java, un service Node.js, un service Python",
+        "Par domaine métier (Bounded Context DDD) : catalogue, commandes, paiements…",
+        "Par taille d'équipe : un service par développeur"
+      ],
+      "reponse": 2,
+      "explication": "La séparation fonctionnelle par domaine métier (DDD) donne des services cohésifs et faiblement couplés ; le découpage technique crée du couplage fort où chaque changement métier traverse plusieurs services."
+    },
+    {
+      "question": "Qu'est-ce qu'un « distributed monolith » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Un monolithe déployé sur plusieurs serveurs derrière un load balancer",
+        "Des microservices si couplés qu'ils doivent être déployés ensemble, cumulant les inconvénients des deux mondes",
+        "Un monolithe qui expose plusieurs APIs REST",
+        "Une base de données répliquée sur plusieurs data centers"
+      ],
+      "reponse": 1,
+      "explication": "C'est le piège classique : on paie la complexité opérationnelle des microservices (réseau, monitoring distribué) sans gagner l'indépendance de déploiement, à cause d'un couplage fort entre services."
+    },
+    {
+      "question": "Que se passe-t-il quand un Circuit Breaker est à l'état Open ?",
+      "code": "@CircuitBreaker(name = \"userService\")\npublic User getUser(String userId) {\n    return userServiceClient.getUser(userId);\n}",
+      "lang": "java",
+      "options": [
+        "Les requêtes passent normalement vers le service",
+        "Les requêtes sont bloquées avec un retour immédiat, sans appeler le service défaillant",
+        "Les requêtes sont mises en file d'attente jusqu'au retour du service",
+        "Une seule requête de test est envoyée pour vérifier la récupération"
+      ],
+      "reponse": 1,
+      "explication": "À l'état Open, le circuit court-circuite les appels pour éviter la cascade de pannes. Après un délai, il passe en Half-Open pour tester la récupération : CLOSED → OPEN → HALF_OPEN → CLOSED."
+    },
+    {
+      "question": "Pourquoi le Saga Pattern est-il nécessaire en microservices ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que les transactions ACID globales n'existent pas entre services : on enchaîne des transactions locales avec compensation en cas d'échec",
+        "Pour accélérer les requêtes SQL distribuées",
+        "Pour documenter l'historique des déploiements",
+        "Pour chiffrer les communications entre services"
+      ],
+      "reponse": 0,
+      "explication": "Chaque service ayant sa propre base, une opération métier traversant plusieurs services (inventaire, paiement, livraison) est gérée en transactions locales ; en cas d'échec, des actions de compensation annulent les étapes déjà réalisées."
+    },
+    {
+      "question": "Dans quel cas privilégier la communication asynchrone (messaging, événements) entre services ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Pour une validation immédiate lors d'une interaction utilisateur",
+        "Pour une requête temps réel dont la réponse est bloquante",
+        "Pour les traitements en arrière-plan, notifications et événements métier",
+        "Pour toutes les communications, la communication synchrone étant obsolète"
+      ],
+      "reponse": 2,
+      "explication": "L'asynchrone (RabbitMQ, Kafka…) découple les services et améliore la résilience : idéal pour les traitements différés et les événements métier. Le synchrone (REST, gRPC) reste adapté au temps réel et aux validations immédiates."
+    },
+    {
+      "question": "Quelles responsabilités relèvent d'une API Gateway ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Stocker les données partagées entre microservices",
+        "Servir de point d'entrée unique : routage, authentification, rate limiting, monitoring",
+        "Orchestrer les transactions distribuées entre services",
+        "Compiler et déployer automatiquement les services"
+      ],
+      "reponse": 1,
+      "explication": "L'API Gateway (Kong, Zuul, AWS API Gateway) centralise l'entrée des requêtes clients : routage vers les bons services, authentification/autorisation, rate limiting, logging et transformation de données."
+    },
+    {
+      "question": "À quoi sert le header X-Correlation-ID propagé de service en service ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À authentifier les appels entre services internes",
+        "À versionner les APIs pour la backward compatibility",
+        "À suivre une même requête à travers tous les services via les logs, pour le debugging et l'analyse de performance",
+        "À équilibrer la charge entre les instances d'un service"
+      ],
+      "reponse": 2,
+      "explication": "Un identifiant unique est généré à l'entrée (gateway) puis propagé et loggé par chaque service : on peut ainsi reconstituer le parcours complet d'une requête dans le système distribué."
+    }
+  ]
+}

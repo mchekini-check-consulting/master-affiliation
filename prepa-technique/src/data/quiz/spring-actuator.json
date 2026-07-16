@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "À quoi sert Spring Boot Actuator ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À générer automatiquement les contrôleurs REST de l'application",
+        "À monitorer et gérer l'application en production via des endpoints HTTP/JMX prêts à l'emploi",
+        "À exécuter des traitements par lots planifiés",
+        "À sécuriser les endpoints avec OAuth2"
+      ],
+      "reponse": 1,
+      "explication": "Actuator expose des endpoints de monitoring et de gestion (santé, métriques, environnement, loggers…) sans code supplémentaire : c'est l'outillage de production de Spring Boot."
+    },
+    {
+      "question": "Que renvoie l'endpoint `/actuator/health` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les métriques CPU et mémoire de la JVM",
+        "L'état de santé de l'application et de ses dépendances (base de données, disque…)",
+        "La liste des beans chargés dans le contexte",
+        "Le dump des threads en cours d'exécution"
+      ],
+      "reponse": 1,
+      "explication": "/actuator/health agrège des indicateurs de santé (UP/DOWN) de l'application et de ses dépendances. C'est typiquement l'endpoint utilisé par les load balancers et Kubernetes pour les probes."
+    },
+    {
+      "question": "Quel endpoint consultez-vous pour analyser un blocage de threads (deadlock suspecté) en production ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "/actuator/metrics",
+        "/actuator/mappings",
+        "/actuator/threaddump",
+        "/actuator/configprops"
+      ],
+      "reponse": 2,
+      "explication": "/actuator/threaddump renvoie l'état de tous les threads de la JVM (stack traces, verrous), ce qui permet de diagnostiquer blocages et deadlocks. /actuator/heapdump joue le même rôle pour la mémoire."
+    },
+    {
+      "question": "Que fait cette configuration ?",
+      "code": "management:\n  endpoints:\n    web:\n      exposure:\n        include: prometheus",
+      "lang": "yaml",
+      "options": [
+        "Elle installe automatiquement un serveur Prometheus dans l'application",
+        "Elle expose l'endpoint /actuator/prometheus sur HTTP pour que Prometheus vienne collecter les métriques",
+        "Elle envoie les logs de l'application vers Prometheus",
+        "Elle désactive tous les endpoints sauf /actuator/health"
+      ],
+      "reponse": 1,
+      "explication": "exposure.include contrôle quels endpoints Actuator sont exposés en HTTP. Avec la dépendance micrometer-registry-prometheus, /actuator/prometheus publie les métriques au format attendu par le scraping Prometheus."
+    },
+    {
+      "question": "Pourquoi ne faut-il pas exposer tous les endpoints Actuator publiquement en production ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que cela ralentit fortement l'application",
+        "Parce que certains endpoints révèlent des données sensibles (/actuator/env) ou permettent des actions dangereuses (/actuator/shutdown)",
+        "Parce que les endpoints ne fonctionnent qu'en environnement de développement",
+        "Parce que Prometheus refuse de collecter plus de trois endpoints"
+      ],
+      "reponse": 1,
+      "explication": "/actuator/env peut exposer variables d'environnement et secrets, et /actuator/shutdown (POST) arrête l'application. On n'expose que le nécessaire via exposure.include et on protège le reste (réseau, authentification)."
+    },
+    {
+      "question": "Quelle particularité a l'endpoint `/actuator/shutdown` par rapport aux autres ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il est accessible uniquement en JMX, jamais en HTTP",
+        "Il s'invoque en POST et déclenche l'arrêt gracieux de l'application",
+        "Il redémarre l'application au lieu de l'arrêter",
+        "Il est activé par défaut sur toutes les applications Spring Boot"
+      ],
+      "reponse": 1,
+      "explication": "C'est un endpoint d'action, pas de lecture : on l'appelle en POST et il arrête proprement l'application. Vu sa dangerosité, il est désactivé par défaut et doit rester strictement protégé."
+    },
+    {
+      "question": "Quel est le rôle de l'encoder Logstash dans la configuration Logback pour la stack ELK ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Compresser les logs pour économiser de l'espace disque",
+        "Formater les logs en JSON structuré (timestamp, niveau, logger, message, MDC) pour l'ingestion par ELK",
+        "Envoyer les logs directement dans la base de données de l'application",
+        "Traduire automatiquement les messages de log en anglais"
+      ],
+      "reponse": 1,
+      "explication": "La stack ELK (Elasticsearch, Logstash, Kibana) exploite des logs structurés : l'encoder LoggingEventCompositeJsonEncoder produit du JSON avec des champs normalisés, bien plus facile à indexer et à requêter que du texte brut."
+    },
+    {
+      "question": "Vous voulez passer un logger en DEBUG en production sans redémarrer l'application. Quel endpoint le permet ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "/actuator/loggers, qui permet de lire et modifier la configuration des loggers à chaud",
+        "/actuator/info, qui expose la version de l'application",
+        "/actuator/beans, qui liste les beans du contexte",
+        "/actuator/httptrace, qui trace les requêtes HTTP"
+      ],
+      "reponse": 0,
+      "explication": "/actuator/loggers est en lecture ET écriture : un POST sur /actuator/loggers/{nom} change le niveau du logger à chaud, sans redéploiement — précieux pour diagnostiquer un incident en production."
+    }
+  ]
+}

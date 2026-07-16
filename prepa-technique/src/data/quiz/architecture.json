@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est le rôle de l'API Gateway (Kong, Zuul) dans une architecture microservices ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Stocker les données partagées entre les services",
+        "Servir de point d'entrée unique qui route les requêtes et centralise l'authentification",
+        "Exécuter les traitements batch de l'application",
+        "Remplacer le frontend pour les clients mobiles"
+      ],
+      "reponse": 1,
+      "explication": "L'API Gateway est la porte d'entrée unique du système : elle route les requêtes du frontend vers les bons microservices et centralise les préoccupations transverses comme l'authentification, au lieu de les dupliquer dans chaque service."
+    },
+    {
+      "question": "Dans cette architecture, à quoi sert l'IDP (Keycloak, Auth0) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À équilibrer la charge entre les microservices",
+        "À gérer les identités et délivrer les tokens d'authentification",
+        "À indexer les documents dans Elasticsearch",
+        "À superviser les métriques des services"
+      ],
+      "reponse": 1,
+      "explication": "L'Identity Provider gère les identités des utilisateurs et émet les tokens (par exemple JWT via OpenID Connect) que l'API Gateway vérifie avant de laisser passer les requêtes vers les services."
+    },
+    {
+      "question": "Quelle est la différence entre la communication synchrone et asynchrone entre services ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "La communication synchrone passe toujours par une base de données partagée",
+        "En synchrone (REST), l'appelant attend la réponse ; en asynchrone (Kafka), il publie un événement sans attendre que le destinataire le traite",
+        "L'asynchrone est plus rapide car il n'y a pas de réseau",
+        "Le synchrone est réservé aux échanges entre bases de données"
+      ],
+      "reponse": 1,
+      "explication": "En REST, l'appelant est bloqué jusqu'à la réponse et subit les pannes du destinataire ; avec Kafka, l'événement est publié dans un topic et consommé plus tard, ce qui découple les services dans le temps."
+    },
+    {
+      "question": "Dans l'architecture de la fiche, comment la SCPI Invest API communique-t-elle avec le Partner Service ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Par des appels REST directs via l'API Gateway",
+        "Par des événements publiés dans Kafka",
+        "Par des fichiers déposés dans un bucket S3",
+        "Par une base PostgreSQL partagée"
+      ],
+      "reponse": 1,
+      "explication": "Le diagramme montre un échange asynchrone : SCPI Invest API → Kafka → Partner Service. Les événements métier transitent par le broker, pas par des appels REST directs."
+    },
+    {
+      "question": "Quel est le rôle du Batch Service dans cette architecture ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Envoyer les notifications push, email et SMS",
+        "Traiter des fichiers stockés dans S3 et alimenter PostgreSQL, MongoDB et Elasticsearch",
+        "Authentifier les utilisateurs auprès de l'IDP",
+        "Servir de reverse proxy devant le frontend"
+      ],
+      "reponse": 1,
+      "explication": "Le Batch Service consomme des fichiers déposés dans le bucket S3 et les ingère dans les différents datastores : PostgreSQL, MongoDB et Elasticsearch."
+    },
+    {
+      "question": "Pourquoi utiliser un broker comme Kafka plutôt qu'un appel REST direct entre deux microservices ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que Kafka chiffre automatiquement toutes les données métier",
+        "Pour découpler les services : si le consommateur est indisponible, les événements sont conservés et traités à son retour",
+        "Parce que REST ne peut pas transporter de JSON",
+        "Pour éviter d'avoir à documenter les APIs"
+      ],
+      "reponse": 1,
+      "explication": "Le broker joue le rôle de tampon durable : le producteur publie sans dépendre de la disponibilité du consommateur, qui rattrape son retard en relisant le topic. Un appel REST direct échouerait si le service cible est en panne."
+    },
+    {
+      "question": "Quel composant collecte et visualise les métriques de l'ensemble des services ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "L'API Gateway, qui journalise toutes les requêtes",
+        "Elasticsearch, qui indexe les métriques",
+        "Le couple Prometheus/Grafana, vers lequel tous les services exposent leurs métriques",
+        "Le bucket S3, qui archive les logs"
+      ],
+      "reponse": 2,
+      "explication": "Dans le diagramme, tous les services alimentent le bloc Monitoring : Prometheus collecte et stocke les métriques, Grafana les visualise sous forme de dashboards."
+    }
+  ]
+}

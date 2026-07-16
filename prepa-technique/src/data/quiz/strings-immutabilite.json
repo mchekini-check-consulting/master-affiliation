@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Que signifie l'immutabilité d'une String en Java ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Une String ne peut pas être null",
+        "Une fois créée, une String ne peut pas être modifiée : toute « modification » crée un nouvel objet",
+        "Une String ne peut être assignée qu'une seule fois à une variable",
+        "Une String est automatiquement supprimée après utilisation"
+      ],
+      "reponse": 1,
+      "explication": "Le contenu d'une String est figé à sa création. str = str + \" World\" ne modifie pas l'originale : une nouvelle String est créée et la variable pointe dessus (son hashCode change d'ailleurs)."
+    },
+    {
+      "question": "Qu'affiche ce code ?",
+      "code": "String s1 = \"Hello\";\nString s2 = \"Hello\";\nString s3 = new String(\"Hello\");\n\nSystem.out.println(s1 == s2);\nSystem.out.println(s1 == s3);",
+      "lang": "java",
+      "options": [
+        "true puis true",
+        "false puis false",
+        "true puis false",
+        "false puis true"
+      ],
+      "reponse": 2,
+      "explication": "Les littéraux identiques partagent la même référence du String Pool (s1 == s2 est true), alors que new String() crée toujours un nouvel objet hors du pool (s1 == s3 est false, même si equals() renverrait true)."
+    },
+    {
+      "question": "Quelle est la différence entre StringBuilder et StringBuffer ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "StringBuffer est immuable, StringBuilder est mutable",
+        "StringBuilder est thread-safe, StringBuffer ne l'est pas",
+        "StringBuffer a des méthodes synchronisées (thread-safe mais plus lent), StringBuilder non (plus rapide)",
+        "StringBuilder n'existe que depuis Java 11"
+      ],
+      "reponse": 2,
+      "explication": "Les deux offrent la même API mutable, mais StringBuffer synchronise ses méthodes, ce qui le rend thread-safe au prix de la performance. En mono-thread, StringBuilder est le choix recommandé."
+    },
+    {
+      "question": "Pourquoi la concaténation avec + dans une boucle est-elle une mauvaise pratique ?",
+      "code": "String result = \"\";\nfor (String item : items) {\n    result += item + \", \";\n}",
+      "lang": "java",
+      "options": [
+        "Elle provoque une erreur de compilation à partir de 100 itérations",
+        "Chaque itération crée de nouveaux objets String temporaires : complexité O(n²) et pression mémoire",
+        "Le résultat final est incorrect car les Strings sont immuables",
+        "Elle n'est problématique qu'en environnement multi-thread"
+      ],
+      "reponse": 1,
+      "explication": "String étant immuable, chaque += recopie tout le contenu accumulé dans une nouvelle String. Avec un StringBuilder, on réutilise un buffer interne et on reste en O(n)."
+    },
+    {
+      "question": "Pourquoi écrire `\"expected\".equals(userInput)` plutôt que `userInput.equals(\"expected\")` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "C'est plus rapide car le littéral est dans le String Pool",
+        "Cela évite une NullPointerException si userInput est null",
+        "equals() ne fonctionne que si le littéral est à gauche",
+        "Cela force une comparaison insensible à la casse"
+      ],
+      "reponse": 1,
+      "explication": "Si userInput est null, userInput.equals(...) lève une NullPointerException. En appelant equals() sur le littéral (jamais null), la comparaison renvoie simplement false."
+    },
+    {
+      "question": "Que fait la méthode `intern()` sur une String ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Elle rend la String mutable temporairement",
+        "Elle retourne la référence du String Pool pour ce contenu, en l'y ajoutant si nécessaire",
+        "Elle supprime la String du pool pour libérer de la mémoire",
+        "Elle copie la String dans la mémoire de la pile (stack)"
+      ],
+      "reponse": 1,
+      "explication": "intern() garantit une référence unique par contenu via le pool : après s4 = s3.intern(), s4 == \"Hello\" est true. À utiliser avec parcimonie, un usage massif peut causer des fuites."
+    },
+    {
+      "question": "Quel est le résultat de ce code ?",
+      "code": "String data = \"Java,Python,JavaScript\";\nSystem.out.println(data.substring(5, 11));",
+      "lang": "java",
+      "options": [
+        "\"Python\"",
+        "\",Python\"",
+        "\"Python,\"",
+        "\"ython,P\""
+      ],
+      "reponse": 0,
+      "explication": "substring(debut, fin) inclut l'index de début et exclut l'index de fin : les caractères 5 à 10 de \"Java,Python,JavaScript\" forment \"Python\"."
+    }
+  ]
+}

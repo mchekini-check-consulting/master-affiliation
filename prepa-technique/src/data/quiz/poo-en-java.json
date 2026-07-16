@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quels sont les 4 piliers de la POO ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Encapsulation, héritage, polymorphisme, abstraction",
+        "Classes, objets, méthodes, attributs",
+        "Composition, agrégation, association, dépendance",
+        "Encapsulation, compilation, instanciation, sérialisation"
+      ],
+      "reponse": 0,
+      "explication": "Les 4 piliers sont l'encapsulation (masquer l'implémentation), l'héritage (réutiliser le code), le polymorphisme (une interface, plusieurs implémentations) et l'abstraction (simplifier la complexité)."
+    },
+    {
+      "question": "Pourquoi déclarer `balance` en private et n'y accéder que via des méthodes ?",
+      "code": "public class BankAccount {\n    private double balance;\n\n    public void deposit(double amount) {\n        if (amount > 0) {\n            balance += amount;\n        }\n    }\n}",
+      "lang": "java",
+      "options": [
+        "Pour améliorer les performances d'accès à l'attribut",
+        "Pour appliquer l'encapsulation : contrôler et valider tout accès à l'état interne",
+        "Parce que Java interdit les attributs publics",
+        "Pour permettre l'héritage de l'attribut"
+      ],
+      "reponse": 1,
+      "explication": "C'est l'encapsulation : l'état interne est masqué et tout accès passe par des méthodes qui peuvent valider (ici, refuser un montant négatif) — l'invariant de la classe est protégé."
+    },
+    {
+      "question": "Qu'illustre ce code ?",
+      "code": "Shape shape = new Circle(5);\ndouble area = shape.area();",
+      "lang": "java",
+      "options": [
+        "L'encapsulation : Circle masque son rayon",
+        "Le polymorphisme : la méthode area() exécutée est celle de l'implémentation réelle (Circle)",
+        "La composition : Shape contient un Circle",
+        "La surcharge : deux méthodes area() avec des signatures différentes"
+      ],
+      "reponse": 1,
+      "explication": "La variable est typée Shape mais référence un Circle : à l'exécution, c'est le area() de Circle qui est appelé. C'est le polymorphisme (dispatch dynamique), à ne pas confondre avec la surcharge."
+    },
+    {
+      "question": "Quelle est la différence clé entre une classe abstraite et une interface en Java ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Une interface peut avoir des attributs d'instance, pas une classe abstraite",
+        "Une classe abstraite peut avoir un constructeur, de l'état et des méthodes concrètes ; une interface définit un contrat (une classe peut en implémenter plusieurs)",
+        "Une classe abstraite ne peut contenir que des méthodes abstraites",
+        "Il n'y a aucune différence depuis Java 8"
+      ],
+      "reponse": 1,
+      "explication": "La classe abstraite porte de l'état (attributs, constructeur) et du code concret, mais une classe ne peut en étendre qu'une seule. L'interface est un contrat : implémentation multiple possible, et méthodes default depuis Java 8."
+    },
+    {
+      "question": "Qu'est-ce qu'une méthode `default` dans une interface ?",
+      "code": "public interface Electric {\n    void charge();\n    default void showBatteryLevel() {\n        System.out.println(\"Battery: 80%\");\n    }\n}",
+      "lang": "java",
+      "options": [
+        "Une méthode appelée automatiquement à l'instanciation",
+        "Une méthode avec une implémentation fournie par l'interface, que les classes peuvent hériter ou redéfinir",
+        "Une méthode accessible uniquement dans le même package",
+        "Une méthode statique de l'interface"
+      ],
+      "reponse": 1,
+      "explication": "Depuis Java 8, une interface peut fournir une implémentation par défaut : les classes implémentantes en héritent sans être obligées de la redéfinir."
+    },
+    {
+      "question": "Pourquoi préférer la composition à l'héritage ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que l'héritage est déprécié en Java moderne",
+        "Parce que la composition (« has-a ») couple moins fortement les classes et reste plus flexible que l'héritage (« is-a »)",
+        "Parce que la composition est plus rapide à l'exécution",
+        "Parce que l'héritage empêche d'utiliser des interfaces"
+      ],
+      "reponse": 1,
+      "explication": "La composition assemble des comportements par délégation (Car possède un Engine) sans figer une hiérarchie : moins de couplage, plus de flexibilité. L'héritage se réserve aux vraies relations « is-a »."
+    },
+    {
+      "question": "Dans ce code, que fait l'appel `super.start()` ?",
+      "code": "public class SportsCar extends Car {\n    @Override\n    public void start() {\n        super.start();\n        System.out.println(\"Turbo activated!\");\n    }\n}",
+      "lang": "java",
+      "options": [
+        "Il crée une nouvelle instance de Car",
+        "Il appelle la version de start() définie dans la classe parente Car avant d'ajouter le comportement propre",
+        "Il redémarre l'objet courant",
+        "Il appelle start() sur toutes les sous-classes de Car"
+      ],
+      "reponse": 1,
+      "explication": "`super.start()` invoque l'implémentation héritée de la classe mère : la méthode redéfinie étend le comportement du parent au lieu de le remplacer entièrement."
+    },
+    {
+      "question": "Que renvoie `car1.equals(car2)` pour deux objets Car créés séparément, sans redéfinition de equals ?",
+      "code": "Car car1 = new Car(\"Toyota\", \"Camry\", 2023);\nCar car2 = new Car(\"Honda\", \"Civic\", 2022);\nSystem.out.println(car1.equals(car2));",
+      "lang": "java",
+      "options": [
+        "true, car les deux sont des Car",
+        "false, car le equals hérité d'Object compare les références, et ce sont deux objets distincts",
+        "true si les attributs ont les mêmes types",
+        "Une erreur de compilation : equals n'est pas défini dans Car"
+      ],
+      "reponse": 1,
+      "explication": "Sans redéfinition, equals() hérite du comportement d'Object : comparaison de références (comme ==). Deux instances distinctes renvoient donc false, même à contenu identique."
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quel est le principal avantage des génériques introduits en Java 5 ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Ils accélèrent l'exécution des collections à l'exécution",
+        "Ils déplacent la détection des erreurs de type de l'exécution vers la compilation",
+        "Ils permettent d'ajouter plusieurs types dans une même liste en toute sécurité",
+        "Ils suppriment le besoin d'utiliser des interfaces"
+      ],
+      "reponse": 1,
+      "explication": "Sans génériques, un mauvais cast provoquait une ClassCastException à l'exécution. Avec List<String>, ajouter un Integer est refusé dès la compilation et les casts deviennent inutiles."
+    },
+    {
+      "question": "Que signifie la contrainte dans `public static <T extends Comparable<T>> T max(T a, T b)` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "T doit être une sous-classe abstraite de Comparable",
+        "T peut être n'importe quel type, Comparable est juste une valeur par défaut",
+        "T doit implémenter Comparable<T>, ce qui garantit que compareTo() est disponible",
+        "La méthode ne peut être appelée qu'avec des String"
+      ],
+      "reponse": 2,
+      "explication": "Le bounded type parameter <T extends Comparable<T>> restreint T aux types comparables entre eux : le compilateur autorise alors l'appel a.compareTo(b) dans le corps de la méthode."
+    },
+    {
+      "question": "Selon la règle PECS, quand utiliser `? extends T` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Quand on écrit dans la collection (Consumer)",
+        "Quand on lit depuis la collection (Producer)",
+        "Quand on veut à la fois lire et écrire",
+        "Uniquement pour les types primitifs"
+      ],
+      "reponse": 1,
+      "explication": "PECS : Producer Extends, Consumer Super. Une List<? extends Number> produit des Number qu'on peut lire, mais on ne peut rien y écrire car son type exact est inconnu."
+    },
+    {
+      "question": "Pourquoi cette ligne ne compile-t-elle pas ?",
+      "code": "public static double sum(List<? extends Number> numbers) {\n    numbers.add(Integer.valueOf(5)); // ERREUR\n    ...\n}",
+      "lang": "java",
+      "options": [
+        "Integer n'hérite pas de Number",
+        "Il faut utiliser add(5) avec l'autoboxing",
+        "La liste pourrait être une List<Double> : le compilateur interdit d'y insérer un Integer",
+        "Les listes passées en paramètre sont toujours en lecture seule en Java"
+      ],
+      "reponse": 2,
+      "explication": "Avec ? extends Number, le type réel de la liste est inconnu (Integer ? Double ?). Pour préserver la type safety, le compilateur interdit toute écriture (sauf null)."
+    },
+    {
+      "question": "Que peut-on faire avec un paramètre `List<? super Integer> list` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Ajouter des Integer et lire les éléments comme des Object",
+        "Lire des Integer mais rien ajouter",
+        "Ajouter n'importe quel Number, y compris des Double",
+        "Ni lire ni écrire : ce type ne sert qu'aux déclarations"
+      ],
+      "reponse": 0,
+      "explication": "Consumer Super : la liste est typée Integer, Number ou Object, donc y écrire un Integer est toujours sûr. En lecture, on ne peut garantir que le type Object."
+    },
+    {
+      "question": "Qu'affiche ce code, et pourquoi ?",
+      "code": "List<String> stringList = new ArrayList<String>();\nList<Integer> intList = new ArrayList<Integer>();\n\nSystem.out.println(stringList.getClass() == intList.getClass());",
+      "lang": "java",
+      "options": [
+        "false, car les deux listes ont des types génériques différents",
+        "true, car le type erasure supprime les types génériques : à l'exécution les deux sont des ArrayList",
+        "Erreur de compilation : on ne peut pas comparer deux classes",
+        "false, car getClass() retourne une nouvelle instance à chaque appel"
+      ],
+      "reponse": 1,
+      "explication": "Par type erasure, les paramètres génériques n'existent que pour le compilateur. Dans le bytecode, List<String> et List<Integer> deviennent le même type brut ArrayList : les deux getClass() sont identiques."
+    },
+    {
+      "question": "Pourquoi ne peut-on pas écrire `new T()` dans une classe générique, et quelle est la solution classique ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que T est toujours abstrait ; il faut utiliser une interface",
+        "Parce que le type T est effacé à l'exécution ; on passe un Class<T> en paramètre pour instancier via réflexion",
+        "Parce que les constructeurs génériques sont interdits ; il faut une factory statique non générique",
+        "On peut écrire new T() depuis Java 8"
+      ],
+      "reponse": 1,
+      "explication": "À l'exécution, T n'existe plus (type erasure) : la JVM ne sait pas quel constructeur appeler. La solution est de fournir explicitement un Class<T> (ex : Factory(Class<T> type)) et d'instancier par réflexion."
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "questions": [
+    {
+      "question": "Quel est l'ordre correct du cycle TDD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Coder, tester, débugger",
+        "Rouge (test qui échoue), Vert (code minimal), Refactor (amélioration)",
+        "Vert (code), Rouge (test), Refactor",
+        "Refactor, Rouge, Vert"
+      ],
+      "reponse": 1,
+      "explication": "TDD commence toujours par un test qui échoue (rouge), puis le minimum de code pour le faire passer (vert), et enfin l'amélioration du code à tests constants (refactor)."
+    },
+    {
+      "question": "Pourquoi écrit-on le test AVANT le code en TDD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que les tests sont plus rapides à écrire que le code",
+        "Pour forcer la réflexion sur les exigences et le comportement attendu avant l'implémentation",
+        "Pour éviter d'avoir à écrire de la documentation",
+        "Parce que Jest refuse d'exécuter des tests écrits après le code"
+      ],
+      "reponse": 1,
+      "explication": "Écrire le test d'abord oblige à clarifier ce que le code doit faire (API, entrées, sorties) avant de se demander comment le faire."
+    },
+    {
+      "question": "En phase verte, quelle quantité de code faut-il écrire ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "L'implémentation complète et optimisée de la fonctionnalité",
+        "Le minimum de code nécessaire pour faire passer le test",
+        "Tout le code prévu au sprint",
+        "Uniquement des interfaces, sans implémentation"
+      ],
+      "reponse": 1,
+      "explication": "L'objectif de la phase verte est de valider rapidement que le test est correct : on écrit le strict minimum, les améliorations viennent en phase de refactor."
+    },
+    {
+      "question": "Vous lancez ce test alors qu'aucune classe Calculator n'existe encore. Que se passe-t-il, et est-ce normal en TDD ?",
+      "code": "test('should add two numbers', () => {\n  const calculator = new Calculator();\n  const result = calculator.add(2, 3);\n  expect(result).toBe(5);\n});",
+      "lang": "js",
+      "options": [
+        "Le test passe car Jest crée la classe automatiquement",
+        "Le test échoue (Calculator n'existe pas) : c'est la phase rouge attendue du cycle",
+        "Le test échoue : c'est une erreur, il fallait écrire Calculator d'abord",
+        "Jest ignore silencieusement le test"
+      ],
+      "reponse": 1,
+      "explication": "C'est exactement la phase rouge : le test échoue parce que le code n'existe pas encore. Cet échec initial prouve que le test vérifie réellement quelque chose."
+    },
+    {
+      "question": "Que signifie « refactorer » dans le cycle TDD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Réécrire les tests pour qu'ils passent",
+        "Améliorer le code (duplication, lisibilité) sans changer son comportement, tests toujours verts",
+        "Ajouter de nouvelles fonctionnalités non testées",
+        "Supprimer les tests devenus inutiles"
+      ],
+      "reponse": 1,
+      "explication": "Le refactor améliore la structure interne (ex. ajouter la validation des arguments de add) à comportement constant : les tests existants doivent rester verts et servent de filet de sécurité."
+    },
+    {
+      "question": "Quel est le risque si on saute la phase rouge (on écrit le code puis le test) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le code sera forcément plus lent",
+        "On ne sait pas si le test peut échouer : il peut passer pour de mauvaises raisons et ne rien vérifier",
+        "Jest refusera d'exécuter la suite de tests",
+        "Le refactoring devient impossible"
+      ],
+      "reponse": 1,
+      "explication": "Un test jamais vu rouge n'a pas prouvé sa valeur : une assertion mal écrite ou un mauvais câblage peut le faire passer en permanence, donnant une fausse confiance."
+    }
+  ]
+}

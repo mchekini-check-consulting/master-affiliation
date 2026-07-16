@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la visibilité d'un membre déclaré `protected` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Uniquement la classe qui le déclare",
+        "Le même package et les sous-classes",
+        "Uniquement les sous-classes, même package exclu",
+        "Tout le projet, comme public"
+      ],
+      "reponse": 1,
+      "explication": "protected combine la visibilité package-private (tout le package) et l'accès depuis les sous-classes, même situées dans un autre package."
+    },
+    {
+      "question": "Qu'affiche ce code ?",
+      "code": "public class Counter {\n    private static int count = 0;\n    public Counter() { count++; }\n    public static int getCount() { return count; }\n}\n\nCounter c1 = new Counter();\nCounter c2 = new Counter();\nSystem.out.println(Counter.getCount());",
+      "lang": "java",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "Erreur de compilation : getCount() nécessite une instance"
+      ],
+      "reponse": 2,
+      "explication": "count est une variable de classe (static) partagée par toutes les instances : chaque constructeur l'incrémente, et la méthode statique s'appelle directement sur la classe, sans instance."
+    },
+    {
+      "question": "Que se passe-t-il avec `final List<String> list = new ArrayList<>();` si on appelle ensuite `list.add(\"item\")` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Erreur de compilation : une liste finale est immuable",
+        "Exception UnsupportedOperationException à l'exécution",
+        "Ça fonctionne : final fige la référence, pas le contenu de l'objet",
+        "Ça fonctionne, mais la liste redevient vide à la fin du bloc"
+      ],
+      "reponse": 2,
+      "explication": "final interdit seulement la réassignation de la référence (list = new ArrayList<>() échouerait). L'objet pointé reste modifiable : add() est parfaitement légal."
+    },
+    {
+      "question": "Depuis Java 8, que peut contenir une interface en plus des méthodes abstraites ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Des constructeurs et des variables d'instance",
+        "Des méthodes default et des méthodes static avec implémentation",
+        "Uniquement des constantes, rien d'autre n'a changé",
+        "Des méthodes protected pour ses implémentations"
+      ],
+      "reponse": 1,
+      "explication": "Java 8 introduit les méthodes default (implémentation héritée par les classes qui implémentent l'interface) et les méthodes static. Une interface n'a en revanche ni constructeur ni état d'instance."
+    },
+    {
+      "question": "Que garantit le mot-clé `synchronized` sur une méthode ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "La méthode s'exécute plus vite grâce à une optimisation JVM",
+        "Un seul thread à la fois peut exécuter la méthode sur une même instance",
+        "La méthode ne peut plus lever d'exception",
+        "Les variables locales de la méthode deviennent visibles par tous les threads"
+      ],
+      "reponse": 1,
+      "explication": "synchronized pose un verrou (sur this pour une méthode d'instance) : les autres threads attendent que le verrou soit libéré, ce qui garantit l'exclusion mutuelle."
+    },
+    {
+      "question": "Un champ `volatile int count` est incrémenté avec `count++` par plusieurs threads. Est-ce thread-safe ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Oui, volatile rend toutes les opérations atomiques",
+        "Non : volatile garantit la visibilité de la valeur, pas l'atomicité de count++ (lecture + calcul + écriture)",
+        "Oui, à condition que count soit aussi private",
+        "Non, car volatile ne fonctionne que sur les boolean"
+      ],
+      "reponse": 1,
+      "explication": "volatile assure que chaque thread voit la dernière valeur écrite, mais count++ reste trois opérations distinctes : deux threads peuvent lire la même valeur et écraser mutuellement leur incrément. Il faut synchronized ou AtomicInteger."
+    },
+    {
+      "question": "Pourquoi une méthode static ne peut-elle pas accéder directement à une variable d'instance ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que les variables d'instance sont toujours private",
+        "Parce qu'une méthode static appartient à la classe et peut être appelée sans qu'aucune instance n'existe",
+        "Parce que les méthodes static sont exécutées avant le constructeur",
+        "Elle le peut, à condition d'utiliser le mot-clé this"
+      ],
+      "reponse": 1,
+      "explication": "Une méthode static s'exécute au niveau de la classe : il n'y a pas de this, donc pas d'instance dont lire les champs. Elle ne peut accéder qu'aux membres static."
+    }
+  ]
+}

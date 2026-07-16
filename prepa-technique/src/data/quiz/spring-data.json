@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quel est l'objectif principal de Spring Data ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Remplacer SQL par un langage propriétaire obligatoire",
+        "Simplifier l'accès aux données en générant automatiquement les requêtes courantes via des repositories",
+        "Fournir un serveur de base de données embarqué",
+        "Synchroniser automatiquement plusieurs bases entre elles"
+      ],
+      "reponse": 1,
+      "explication": "Spring Data fournit une abstraction repository commune : on déclare une interface, et les opérations CRUD ainsi que les requêtes dérivées du nom des méthodes sont implémentées automatiquement."
+    },
+    {
+      "question": "Que faut-il écrire pour implémenter la méthode findByEmail de ce repository ?",
+      "code": "public interface UserRepository extends JpaRepository<User, Long> {\n    Optional<User> findByEmail(String email);\n}",
+      "lang": "java",
+      "options": [
+        "Une classe UserRepositoryImpl avec la requête JDBC",
+        "Une requête @Query obligatoire au-dessus de la méthode",
+        "Rien : Spring Data dérive la requête du nom de la méthode et fournit l'implémentation",
+        "Un fichier XML de mapping Hibernate"
+      ],
+      "reponse": 2,
+      "explication": "C'est le principe des requêtes dérivées : Spring Data analyse le nom de la méthode (findBy + propriété Email) et génère la requête au démarrage, sans aucune implémentation manuelle."
+    },
+    {
+      "question": "Quel couple d'annotations rend une classe persistable par JPA avec une clé primaire auto-générée ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "@Component sur la classe et @Autowired sur l'id",
+        "@Entity sur la classe, @Id et @GeneratedValue sur la clé primaire",
+        "@Repository sur la classe et @Column sur l'id",
+        "@Table sur la classe et @PrimaryKey sur l'id"
+      ],
+      "reponse": 1,
+      "explication": "@Entity déclare la classe comme entité JPA ; @Id marque la clé primaire et @GeneratedValue (ex. strategy = IDENTITY) délègue sa génération à la base."
+    },
+    {
+      "question": "Quelles méthodes obtient-on gratuitement en étendant JpaRepository<User, Long> ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Uniquement save et findAll",
+        "Aucune, il faut toutes les déclarer",
+        "save, findById, findAll, deleteById, count, existsById, entre autres",
+        "Seulement les méthodes commençant par findBy"
+      ],
+      "reponse": 2,
+      "explication": "JpaRepository fournit tout le CRUD standard hérité : save, findById, findAll, deleteById, count, existsById… sans une ligne d'implémentation."
+    },
+    {
+      "question": "Que retourne l'appel suivant ?",
+      "code": "Pageable pageable = PageRequest.of(0, 20, Sort.by(\"createdAt\").descending());\nPage<User> page = userRepository.findByStatus(UserStatus.ACTIVE, pageable);",
+      "lang": "java",
+      "options": [
+        "Tous les utilisateurs actifs, sans limite",
+        "La première page de 20 utilisateurs actifs triés du plus récent au plus ancien, avec les métadonnées de pagination",
+        "Les 20 derniers utilisateurs, quel que soit leur statut",
+        "Une exception, car findByStatus n'accepte pas de Pageable"
+      ],
+      "reponse": 1,
+      "explication": "PageRequest.of(0, 20, sort) demande la page 0 de taille 20 ; l'objet Page contient les éléments et les métadonnées (nombre total d'éléments, de pages, etc.)."
+    },
+    {
+      "question": "À quoi sert @Enumerated(EnumType.STRING) sur un champ enum d'une entité ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À convertir l'enum en JSON dans les réponses HTTP",
+        "À stocker le nom de la constante enum en base plutôt que son index ordinal",
+        "À interdire les valeurs nulles pour ce champ",
+        "À indexer la colonne pour accélérer les recherches"
+      ],
+      "reponse": 1,
+      "explication": "Par défaut JPA stocke l'ordinal (position numérique), fragile si l'ordre des constantes change ; EnumType.STRING stocke le nom (ex. \"ACTIVE\"), plus robuste et lisible."
+    },
+    {
+      "question": "Pourquoi annoter le service (et non le repository) avec @Transactional ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que @Transactional est interdit sur les interfaces",
+        "Parce que la transaction doit englober l'ensemble de l'opération métier, qui peut enchaîner plusieurs appels au repository",
+        "Parce que les repositories ne touchent jamais à la base",
+        "Pour désactiver le cache de premier niveau d'Hibernate"
+      ],
+      "reponse": 1,
+      "explication": "La frontière transactionnelle se place au niveau du cas d'usage : dans createUser, la vérification existsByEmail et le save doivent s'exécuter dans la même transaction pour rester cohérents."
+    },
+    {
+      "question": "Que se passe-t-il au démarrage si une méthode de repository référence une propriété inexistante (ex. findByEmial) ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "L'application démarre et la méthode retournera toujours une liste vide",
+        "L'erreur n'apparaît qu'au premier appel de la méthode en production",
+        "Le démarrage de l'application échoue : Spring Data ne peut pas dériver la requête",
+        "Spring Data crée automatiquement la colonne manquante"
+      ],
+      "reponse": 2,
+      "explication": "Les requêtes dérivées sont construites au démarrage lors de la création des repositories : une propriété introuvable dans l'entité provoque une exception immédiate, ce qui détecte l'erreur très tôt."
+    }
+  ]
+}

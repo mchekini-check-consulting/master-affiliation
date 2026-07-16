@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Que signifie l'Inversion de Contrôle (IoC) dans Spring ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le développeur contrôle manuellement le cycle de vie de chaque objet",
+        "Le conteneur Spring prend en charge la création et la gestion des objets à la place du code applicatif",
+        "Les contrôleurs web inversent le sens des requêtes HTTP",
+        "Les objets sont créés uniquement à la compilation"
+      ],
+      "reponse": 1,
+      "explication": "Avec l'IoC, ce n'est plus la classe qui instancie ses dépendances avec `new` : c'est le conteneur Spring qui crée les beans, gère leur cycle de vie et les fournit là où ils sont nécessaires."
+    },
+    {
+      "question": "Quel mode d'injection de dépendances est recommandé et pourquoi ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Field Injection, car elle est la plus concise",
+        "Setter Injection, car elle permet de modifier les dépendances à chaud",
+        "Constructor Injection, car elle rend les dépendances explicites, permet le final et facilite les tests",
+        "Aucune, il faut instancier les dépendances avec new"
+      ],
+      "reponse": 2,
+      "explication": "L'injection par constructeur garantit que l'objet est créé avec toutes ses dépendances obligatoires, autorise les champs `final` et permet d'instancier la classe en test sans conteneur Spring."
+    },
+    {
+      "question": "Quel est le principal bénéfice de l'injection de dépendances sur la conception du code ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Elle accélère l'exécution des méthodes",
+        "Elle réduit le couplage entre les classes et centralise la configuration",
+        "Elle supprime le besoin d'interfaces",
+        "Elle rend le code compatible avec toutes les bases de données"
+      ],
+      "reponse": 1,
+      "explication": "Une classe ne connaît plus l'implémentation concrète de ses dépendances : elle déclare ce dont elle a besoin et le conteneur fournit le bean, ce qui découple les classes et facilite le remplacement des implémentations."
+    },
+    {
+      "question": "Quelle est la différence entre @Component et @Service ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "@Service crée un bean singleton, @Component un bean prototype",
+        "@Service est une spécialisation de @Component destinée à la couche service, sémantiquement plus précise",
+        "@Component ne peut pas être injecté avec @Autowired",
+        "@Service démarre automatiquement un serveur web"
+      ],
+      "reponse": 1,
+      "explication": "@Service, @Repository et @Controller sont des spécialisations de @Component : techniquement ce sont tous des beans, mais l'annotation précise le rôle de la classe dans l'architecture en couches."
+    },
+    {
+      "question": "À quoi sert l'annotation @Qualifier ?",
+      "code": "@Autowired\n@Qualifier(\"emailNotifier\")\nprivate Notifier notifier;",
+      "lang": "java",
+      "options": [
+        "À valider les paramètres d'une méthode",
+        "À choisir quel bean injecter quand plusieurs beans du même type existent",
+        "À qualifier un bean comme prioritaire au démarrage",
+        "À restreindre l'accès au bean à certains rôles"
+      ],
+      "reponse": 1,
+      "explication": "Si plusieurs implémentations de `Notifier` sont des beans, @Autowired seul est ambigu : @Qualifier désigne le bean à injecter par son nom."
+    },
+    {
+      "question": "Quelle annotation choisir pour une classe d'accès aux données, et quel avantage spécifique apporte-t-elle ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "@Controller, car elle gère les requêtes vers la base",
+        "@Repository, qui ajoute notamment la traduction des exceptions de persistance",
+        "@Autowired, qui connecte automatiquement la classe à la base",
+        "@Service, obligatoire pour utiliser JPA"
+      ],
+      "reponse": 1,
+      "explication": "@Repository marque la couche d'accès aux données et active la traduction des exceptions techniques (JDBC, JPA) en exceptions Spring unifiées (DataAccessException)."
+    },
+    {
+      "question": "Pourquoi la Field Injection est-elle déconseillée par rapport à la Constructor Injection ?",
+      "code": "@Autowired\nprivate UserService userService;",
+      "lang": "java",
+      "options": [
+        "Elle est plus lente à l'exécution",
+        "Elle ne fonctionne qu'avec les beans singleton",
+        "Elle cache les dépendances et complique les tests unitaires sans conteneur Spring",
+        "Elle est supprimée depuis Spring 5"
+      ],
+      "reponse": 2,
+      "explication": "Avec l'injection de champ, impossible d'instancier la classe avec ses dépendances sans réflexion ou conteneur : les dépendances sont invisibles dans l'API de la classe et le champ ne peut pas être `final`."
+    }
+  ]
+}

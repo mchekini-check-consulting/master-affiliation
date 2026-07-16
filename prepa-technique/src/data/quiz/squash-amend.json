@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Que fait un squash sur une branche feature contenant les commits D, E et F ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il supprime D, E et F ainsi que leurs changements",
+        "Il fusionne D, E et F en un seul commit X qui contient tous leurs changements",
+        "Il pousse D, E et F sur main un par un",
+        "Il renomme les messages de D, E et F"
+      ],
+      "reponse": 1,
+      "explication": "Le squash combine plusieurs commits en un seul : le code final est identique, mais l'historique ne contient plus qu'un commit X regroupant les changements de D, E et F."
+    },
+    {
+      "question": "Dans un rebase interactif, que signifie ce contenu d'éditeur ?",
+      "code": "pick d1f2e3a Premier commit\nsquash a4b5c6d Deuxième commit\nsquash e7f8g9h Troisième commit",
+      "lang": "text",
+      "options": [
+        "Les trois commits sont conservés tels quels",
+        "Le premier commit est conservé et les deux suivants sont fusionnés dedans",
+        "Le premier commit est supprimé, les deux autres conservés",
+        "Les trois commits sont dupliqués sur main"
+      ],
+      "reponse": 1,
+      "explication": "`pick` conserve le commit de base ; chaque ligne `squash` fusionne le commit dans le précédent. Résultat : un seul commit combinant les trois."
+    },
+    {
+      "question": "Quelle particularité a `git merge --squash feature-branch` par rapport à un merge classique ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il crée un commit de merge avec deux parents",
+        "Il applique tous les changements de la feature en staging sans créer de commit de merge : un commit unique doit être créé ensuite",
+        "Il supprime la branche feature automatiquement",
+        "Il rebase la feature avant de la merger"
+      ],
+      "reponse": 1,
+      "explication": "--squash ramène l'ensemble des changements de la branche dans l'index de main, sans lien d'historique ni commit automatique : on committe ensuite soi-même un commit unique."
+    },
+    {
+      "question": "Quelle séquence réalise un squash « manuel » des 3 derniers commits ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "git reset --hard HEAD~3 puis git commit",
+        "git reset --soft HEAD~3 puis git commit -m \"Feature complète\"",
+        "git revert HEAD~3 puis git commit",
+        "git stash puis git stash pop"
+      ],
+      "reponse": 1,
+      "explication": "reset --soft recule HEAD de 3 commits en gardant tous les changements stagés ; un seul commit suffit alors pour les regrouper. --hard perdrait les changements."
+    },
+    {
+      "question": "Vous venez de committer mais vous avez oublié un fichier. Comment l'ajouter au dernier commit sans changer son message ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "git add fichier-oublie.txt puis git commit --amend --no-edit",
+        "git add fichier-oublie.txt puis git commit -m \"fix\"",
+        "git stash -u puis git stash pop",
+        "git cherry-pick HEAD"
+      ],
+      "reponse": 0,
+      "explication": "--amend remplace le dernier commit en y intégrant ce qui est stagé ; --no-edit conserve le message existant. Le fichier oublié rejoint ainsi le commit initial."
+    },
+    {
+      "question": "Pourquoi ne faut-il jamais squasher ou amender des commits déjà poussés sur une branche partagée ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que Git bloque le push suivant définitivement",
+        "Parce que ces opérations réécrivent l'historique : les nouveaux SHA divergent de ceux qu'ont déjà les collègues",
+        "Parce que le squash supprime les tags de la branche",
+        "Parce que l'amend ne fonctionne que hors ligne"
+      ],
+      "reponse": 1,
+      "explication": "Squash et amend créent de nouveaux commits (nouveaux SHA) à la place des anciens. Si l'historique était déjà partagé, les copies des autres développeurs divergent — même règle d'or que pour le rebase."
+    },
+    {
+      "question": "Quelle commande permet de corriger uniquement le message du dernier commit ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "git commit --amend -m \"Nouveau message\"",
+        "git rebase --message \"Nouveau message\"",
+        "git reset --soft HEAD",
+        "git revert --edit HEAD"
+      ],
+      "reponse": 0,
+      "explication": "Avec --amend et -m, le dernier commit est remplacé par un commit identique portant le nouveau message. Pour un commit plus ancien, il faudrait passer par un rebase interactif (reword)."
+    },
+    {
+      "question": "Quelle pratique est cohérente avec un bon usage du squash en équipe ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Squasher toute la branche develop chaque semaine",
+        "Squasher ses commits de travail (wip, fix typo…) avant de merger la feature vers main",
+        "Amender les commits des collègues pour uniformiser les messages",
+        "Squasher après le push pour nettoyer le remote"
+      ],
+      "reponse": 1,
+      "explication": "Le squash s'utilise sur ses commits locaux, avant l'intégration : on présente à main un historique propre (un commit logique par feature), sans jamais réécrire ce qui est déjà partagé."
+    }
+  ]
+}

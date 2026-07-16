@@ -1,0 +1,82 @@
+{
+  "questions": [
+    {
+      "question": "Parmi ces points, lequel fait partie de la checklist d'une code review ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Vérifier que l'auteur a bien plus de deux ans d'ancienneté",
+        "Vérifier la présence de tests unitaires pour le nouveau code",
+        "Vérifier que la PR contient au moins 500 lignes",
+        "Vérifier que le code a été écrit dans l'IDE officiel de l'équipe"
+      ],
+      "reponse": 1,
+      "explication": "La checklist porte sur le code lui-même : nommage, fonctions courtes, tests, documentation, gestion d'erreurs, sécurité, SOLID, DRY — jamais sur la personne ou des critères arbitraires."
+    },
+    {
+      "question": "Vous repérez un bloc de code commenté (ancienne implémentation) dans une PR. Que faire ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le laisser : il pourra resservir plus tard",
+        "Demander sa suppression : le code mort pollue la lecture, et Git conserve déjà l'historique",
+        "Demander de le déplacer dans un fichier séparé",
+        "Le convertir en Javadoc"
+      ],
+      "reponse": 1,
+      "explication": "« Pas de code mort ou commenté » fait partie de la checklist : l'historique Git rend ces reliquats inutiles, et ils sèment le doute chez le prochain lecteur."
+    },
+    {
+      "question": "Quelle formulation de commentaire de review est la plus constructive ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "« Ce code est illisible, à refaire. »",
+        "« Cette fonction fait plusieurs choses. Pourrait-on la diviser en fonctions plus petites pour améliorer la lisibilité ? »",
+        "« Encore une fonction trop longue, comme d'habitude. »",
+        "« Je réécrirai cette partie moi-même après le merge. »"
+      ],
+      "reponse": 1,
+      "explication": "Un feedback constructif est formulé comme une suggestion ou une question sur le code, jamais comme un jugement sur la personne ; il explique le bénéfice attendu (ici la lisibilité)."
+    },
+    {
+      "question": "Pourquoi laisser aussi des commentaires positifs (« Excellente utilisation du pattern Strategy ici ! ») lors d'une review ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Pour compenser statistiquement les commentaires négatifs",
+        "Parce que l'outil de review exige un ratio de commentaires positifs",
+        "Pour renforcer les bonnes pratiques et entretenir une dynamique d'équipe saine",
+        "Pour accélérer le merge automatique de la PR"
+      ],
+      "reponse": 2,
+      "explication": "Valoriser un bon choix de conception encourage sa réutilisation et rappelle que la review est un échange bienveillant, pas un tribunal."
+    },
+    {
+      "question": "Sur le plan de la sécurité, que doit vérifier en priorité un reviewer ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Que les mots de passe des développeurs sont assez longs",
+        "Que les entrées utilisateur sont validées",
+        "Que le code est obfusqué avant le déploiement",
+        "Que les logs sont désactivés en production"
+      ],
+      "reponse": 1,
+      "explication": "La checklist cite explicitement la validation des entrées utilisateur : c'est la première ligne de défense contre les injections et les données corrompues."
+    },
+    {
+      "question": "Au-delà de la détection de bugs, quel est l'autre grand bénéfice d'une code review ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Réduire le nombre de commits dans l'historique",
+        "Le partage de connaissances et l'homogénéisation des pratiques dans l'équipe",
+        "Éviter d'avoir à écrire des tests unitaires",
+        "Mesurer la productivité individuelle des développeurs"
+      ],
+      "reponse": 1,
+      "explication": "La review diffuse la connaissance du code et des bonnes pratiques : chaque PR relue est une occasion d'apprendre, pour l'auteur comme pour le reviewer."
+    }
+  ]
+}

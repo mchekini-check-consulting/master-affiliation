@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la hiérarchie des concepts dans Spring Batch ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Un Step contient plusieurs Jobs, chaque Job traite un Chunk",
+        "Un Job contient un ou plusieurs Steps ; chaque Step traite les données par Chunks",
+        "Un Chunk contient plusieurs Jobs exécutés en parallèle",
+        "Job, Step et Chunk sont trois noms pour la même unité de traitement"
+      ],
+      "reponse": 1,
+      "explication": "Le Job est l'unité de traitement complète, composée de Steps enchaînés (start/next). Au sein d'un Step, les données sont traitées par blocs (chunks) pour optimiser les performances."
+    },
+    {
+      "question": "Que signifie `chunk(10)` dans cette définition de step ?",
+      "code": "stepBuilderFactory.get(\"step1\")\n    .<UserCsv, User>chunk(10)\n    .reader(reader())\n    .processor(processor())\n    .writer(writer())\n    .build();",
+      "lang": "java",
+      "options": [
+        "Le step s'arrête après avoir traité 10 éléments",
+        "Les éléments sont lus et transformés un par un, puis écrits par paquets de 10 dans une transaction",
+        "10 threads traitent le fichier en parallèle",
+        "Le reader lit 10 fichiers CSV différents"
+      ],
+      "reponse": 1,
+      "explication": "Le chunk définit la taille du bloc : read et process s'appliquent élément par élément, puis le writer reçoit les 10 éléments d'un coup et la transaction est validée. Cela réduit le coût des écritures et des commits."
+    },
+    {
+      "question": "Quels sont les trois composants d'un step orienté chunk ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Controller, Service, Repository",
+        "Reader (lecture), Processor (transformation), Writer (écriture)",
+        "Producer, Consumer, Broker",
+        "Mapper, Reducer, Combiner"
+      ],
+      "reponse": 1,
+      "explication": "Le pattern de Spring Batch : l'ItemReader lit la source (fichier, base…), l'ItemProcessor transforme ou filtre chaque élément, l'ItemWriter écrit le bloc vers la destination."
+    },
+    {
+      "question": "À quoi sert le `RunIdIncrementer` ajouté au job ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À numéroter les lignes du fichier CSV lu",
+        "À incrémenter un paramètre run.id pour pouvoir relancer le même job avec des paramètres différents",
+        "À augmenter la taille du chunk à chaque exécution",
+        "À paralléliser les steps du job"
+      ],
+      "reponse": 1,
+      "explication": "Spring Batch identifie une instance de job par son nom + ses paramètres, et refuse de relancer une instance déjà terminée. Le RunIdIncrementer ajoute un run.id incrémenté qui rend chaque lancement unique."
+    },
+    {
+      "question": "Quel composant utilise-t-on pour lire un fichier CSV ligne à ligne et le mapper vers des objets ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "JdbcBatchItemWriter",
+        "FlatFileItemReader avec un fieldSetMapper",
+        "JobExecutionListenerSupport",
+        "TestEntityManager"
+      ],
+      "reponse": 1,
+      "explication": "FlatFileItemReader lit les fichiers plats (CSV) : on déclare les colonnes (names) et un FieldSetMapper (ici BeanWrapperFieldSetMapper) qui convertit chaque ligne en objet UserCsv."
+    },
+    {
+      "question": "Quel est le rôle de l'ItemProcessor dans l'exemple d'import d'utilisateurs ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Écrire les utilisateurs en base via un INSERT",
+        "Transformer chaque UserCsv lu en User (majuscules sur les noms, minuscules sur l'email) avant écriture",
+        "Découper le fichier CSV en chunks de 10 lignes",
+        "Planifier l'exécution du job toutes les nuits"
+      ],
+      "reponse": 1,
+      "explication": "L'ItemProcessor<UserCsv, User> reçoit chaque élément lu et retourne l'élément transformé destiné au writer. C'est là qu'on place la logique de transformation, de validation ou de filtrage."
+    },
+    {
+      "question": "Quand la méthode `afterJob(JobExecution jobExecution)` du listener est-elle appelée, et que vérifie l'exemple ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Après chaque chunk écrit, pour vérifier la taille du bloc",
+        "À la fin de l'exécution du job, en contrôlant que le statut est BatchStatus.COMPLETED avant de vérifier les données",
+        "Avant le démarrage du job, pour vider la table users",
+        "À chaque erreur de lecture, pour relancer le reader"
+      ],
+      "reponse": 1,
+      "explication": "Un JobExecutionListener est notifié au début (beforeJob) et à la fin (afterJob) du job. L'exemple ne vérifie les résultats en base que si jobExecution.getStatus() == BatchStatus.COMPLETED, c'est-à-dire si le job s'est terminé avec succès."
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Pourquoi utilise-t-on l'échelle de Fibonacci (1, 2, 3, 5, 8, 13, 21…) pour les story points ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce qu'elle facilite la conversion en heures",
+        "Parce que l'écart croissant entre les valeurs reflète l'incertitude grandissante des grosses stories",
+        "Parce que Jira ne propose que ces valeurs",
+        "Parce qu'elle garantit des sprints de taille identique"
+      ],
+      "reponse": 1,
+      "explication": "Plus une story est grosse, moins l'estimation est précise : inutile de débattre entre 12 et 13 points. L'écart croissant de Fibonacci matérialise cette incertitude."
+    },
+    {
+      "question": "Que mesure un story point ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Un nombre d'heures de développement fixe",
+        "Le nombre de lignes de code à écrire",
+        "Une estimation relative combinant complexité, effort, incertitude et dépendances",
+        "La priorité métier de la story"
+      ],
+      "reponse": 2,
+      "explication": "Le story point est relatif, pas absolu : on compare les stories entre elles selon la complexité, l'effort, l'incertitude et les dépendances — sans conversion en heures."
+    },
+    {
+      "question": "Une story est estimée à 21 points ou plus. Que recommandent les bonnes pratiques ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "L'affecter au développeur le plus expérimenté",
+        "La planifier sur deux sprints consécutifs",
+        "La découper en stories plus petites",
+        "L'estimer en jours plutôt qu'en points"
+      ],
+      "reponse": 2,
+      "explication": "Au-delà de 13-21 points, l'incertitude est trop grande : la story doit être découpée en éléments plus petits, estimables et livrables dans un sprint."
+    },
+    {
+      "question": "Au Planning Poker, pourquoi les cartes sont-elles révélées simultanément ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Pour gagner du temps",
+        "Pour éviter l'effet d'ancrage où le premier avis influence les autres",
+        "Pour empêcher le PO de voter",
+        "Pour désigner automatiquement la moyenne comme estimation"
+      ],
+      "reponse": 1,
+      "explication": "Chacun choisit sa carte en secret puis révélation simultanée : personne n'est influencé par l'estimation d'un collègue (effet d'ancrage), et les écarts déclenchent une discussion."
+    },
+    {
+      "question": "Lors d'un Planning Poker, les votes divergent fortement. Que fait l'équipe ?",
+      "code": "Story : \"Ajouter un système de notation produit\"\n\nAlice : 5    Bob : 8    Carol : 3    Dave : 5",
+      "lang": "text",
+      "options": [
+        "On retient la moyenne arithmétique (5,25 arrondi à 5)",
+        "On retient l'estimation du développeur senior",
+        "Les votes extrêmes s'expliquent, on discute puis on revote jusqu'au consensus",
+        "Le PO tranche seul"
+      ],
+      "reponse": 2,
+      "explication": "Les écarts révèlent des incompréhensions : Bob pensait à l'intégration des avis clients, Carol à une UI simple. Après clarification, l'équipe revote et converge (ici sur 5)."
+    },
+    {
+      "question": "Quel usage de la vélocité est un piège à éviter ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Planifier la capacité du prochain sprint",
+        "Faire des prévisions de livraison",
+        "Comparer les vélocités de deux équipes pour évaluer leur performance",
+        "Détecter une anomalie quand la vélocité chute brutalement"
+      ],
+      "reponse": 2,
+      "explication": "Les points sont relatifs à chaque équipe : 25 points chez l'une ne valent pas 25 points chez l'autre. Comparer les équipes (ou mettre la pression sur la vélocité) pervertit l'outil."
+    },
+    {
+      "question": "Combien de sprints faut-il généralement pour qu'une vélocité se stabilise et devienne fiable ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "1 sprint suffit",
+        "3 à 5 sprints",
+        "10 à 15 sprints",
+        "Elle n'est jamais utilisable en planification"
+      ],
+      "reponse": 1,
+      "explication": "On calcule la moyenne des points terminés sur 3 à 5 sprints : c'est le temps nécessaire pour lisser les variations (composition d'équipe, obstacles, apprentissage)."
+    },
+    {
+      "question": "Quelle technique est idéale pour estimer rapidement de gros epics sans entrer dans le détail ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le T-Shirt Sizing (XS, S, M, L, XL)",
+        "Le chiffrage en heures par le chef de projet",
+        "Le Dot Voting",
+        "Le burndown chart"
+      ],
+      "reponse": 0,
+      "explication": "Le T-Shirt Sizing classe grossièrement par tailles (XS à XL) : parfait pour dégrossir des epics. Le Dot Voting sert plutôt à prioriser, et l'Affinity Estimation à traiter de gros backlogs par regroupement."
+    }
+  ]
+}

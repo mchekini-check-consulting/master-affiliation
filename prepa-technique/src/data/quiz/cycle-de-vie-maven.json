@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quels sont les trois cycles de vie principaux de Maven ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "build, test, release",
+        "default, clean, site",
+        "compile, package, deploy",
+        "init, build, publish"
+      ],
+      "reponse": 1,
+      "explication": "Maven définit trois cycles de vie : default (construction du projet), clean (nettoyage) et site (documentation). compile, package et deploy sont des phases du cycle default, pas des cycles."
+    },
+    {
+      "question": "Que se passe-t-il quand vous lancez `mvn package` ?",
+      "code": "mvn package",
+      "lang": "bash",
+      "options": [
+        "Seule la phase package est exécutée",
+        "Toutes les phases précédentes du cycle default (validate, compile, test…) sont exécutées, puis package",
+        "Le projet est installé dans le repository local",
+        "Le projet est déployé vers le repository distant"
+      ],
+      "reponse": 1,
+      "explication": "Exécuter une phase déclenche toutes les phases qui la précèdent dans le cycle : mvn package valide, compile et teste avant de créer le JAR/WAR. install et deploy viennent après package."
+    },
+    {
+      "question": "Quelle est la différence entre les phases `install` et `deploy` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "install compile le code, deploy exécute les tests",
+        "install installe l'artefact dans le repository local, deploy le publie vers le repository distant",
+        "install déploie en production, deploy en pré-production",
+        "Aucune, ce sont des alias"
+      ],
+      "reponse": 1,
+      "explication": "install copie l'artefact dans le repository local (~/.m2) pour les autres projets de la machine ; deploy le publie vers un repository distant partagé (Nexus, Artifactory…)."
+    },
+    {
+      "question": "Dans quel ordre s'exécutent ces phases du cycle default ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "compile → validate → package → test",
+        "validate → compile → test → package",
+        "test → compile → validate → package",
+        "package → compile → test → validate"
+      ],
+      "reponse": 1,
+      "explication": "L'ordre du cycle default est fixe : validate (le projet est correct) → compile (code source) → test (tests unitaires) → package (JAR/WAR) → verify → install → deploy."
+    },
+    {
+      "question": "À quoi sert le cycle de vie `clean` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À supprimer les dépendances inutilisées du POM",
+        "À nettoyer le projet (supprimer les fichiers générés par les builds précédents)",
+        "À reformater le code source",
+        "À vider le repository local ~/.m2"
+      ],
+      "reponse": 1,
+      "explication": "Le cycle clean (pre-clean, clean, post-clean) supprime les artefacts du build précédent, typiquement le répertoire target/. Il ne touche ni au POM ni au repository local."
+    },
+    {
+      "question": "Quelle phase exécute les tests d'intégration dans le cycle default ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "test, juste après compile",
+        "verify, juste avant install",
+        "integration-test, entre pre-integration-test et post-integration-test, après package",
+        "deploy, en toute fin de cycle"
+      ],
+      "reponse": 2,
+      "explication": "Les tests unitaires tournent en phase test (avant package) ; les tests d'intégration en phase integration-test, encadrée par pre/post-integration-test, après le packaging."
+    },
+    {
+      "question": "Quel cycle de vie contient la phase `site-deploy` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le cycle default",
+        "Le cycle clean",
+        "Le cycle site",
+        "Aucun, cette phase n'existe pas"
+      ],
+      "reponse": 2,
+      "explication": "Le cycle site (pre-site, site, post-site, site-deploy) génère et publie la documentation du projet — à ne pas confondre avec deploy du cycle default qui publie l'artefact."
+    }
+  ]
+}

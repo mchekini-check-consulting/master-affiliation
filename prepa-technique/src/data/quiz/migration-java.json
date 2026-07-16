@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Quelles sont les trois phases d'une stratégie de migration Java ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Compilation, tests, déploiement",
+        "Analyse, planification, exécution",
+        "Backup, migration, rollback",
+        "Audit, refactoring, documentation"
+      ],
+      "reponse": 1,
+      "explication": "On commence par analyser le code existant (dépendances, APIs dépréciées), puis on planifie (roadmap, risques), et enfin on exécute une migration progressive avec tests et validation."
+    },
+    {
+      "question": "Quel outil du JDK permet de détecter les APIs dépréciées destinées à être supprimées ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "jdeps",
+        "jdeprscan",
+        "javap",
+        "jconsole"
+      ],
+      "reponse": 1,
+      "explication": "`jdeprscan --for-removal myapp.jar` liste les usages d'APIs dépréciées marquées pour suppression ; jdeps, lui, analyse les dépendances."
+    },
+    {
+      "question": "Que fait cette commande ?",
+      "code": "jdeps --list-deps myapp.jar",
+      "lang": "bash",
+      "options": [
+        "Elle supprime les dépendances inutilisées du jar",
+        "Elle liste les dépendances (modules/packages) dont dépend l'application",
+        "Elle met à jour les dépendances vers leur dernière version",
+        "Elle vérifie la signature du jar"
+      ],
+      "reponse": 1,
+      "explication": "jdeps est l'outil d'analyse statique des dépendances du JDK : il liste les modules et packages requis par l'application, une étape clé de l'audit avant migration."
+    },
+    {
+      "question": "Votre application utilise `javax.xml.bind` et casse en passant à Java 11. Quelle est la solution ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Rétrograder définitivement vers Java 8",
+        "Ajouter explicitement les dépendances JAXB (jaxb-api, jaxb-runtime) au projet",
+        "Activer un flag JVM pour réactiver les modules Java EE",
+        "Recompiler avec l'option --release 8"
+      ],
+      "reponse": 1,
+      "explication": "Les modules Java EE (JAXB, activation…) ont été retirés du JDK en Java 11 : il faut les ajouter comme dépendances Maven/Gradle explicites."
+    },
+    {
+      "question": "À quoi sert l'option `--add-opens` lors d'une migration ?",
+      "code": "java --add-opens java.base/java.lang=ALL-UNNAMED MyApp",
+      "lang": "bash",
+      "options": [
+        "À ouvrir plus de connexions réseau simultanées",
+        "À autoriser l'accès par réflexion aux classes internes d'un module restreint",
+        "À charger des classes depuis plusieurs classpaths",
+        "À activer le mode debug de la JVM"
+      ],
+      "reponse": 1,
+      "explication": "Le système de modules (Java 9+) restreint l'accès par réflexion aux internals du JDK ; --add-opens ouvre un package d'un module aux classes du classpath (ALL-UNNAMED)."
+    },
+    {
+      "question": "Quel garbage collector est devenu le GC par défaut depuis Java 9 ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parallel GC",
+        "ZGC",
+        "G1GC",
+        "Shenandoah"
+      ],
+      "reponse": 2,
+      "explication": "G1GC est le GC par défaut depuis Java 9. On peut revenir à l'ancien avec -XX:+UseParallelGC, ou adopter les GC à faible latence comme ZGC (Java 11+) ou Shenandoah."
+    },
+    {
+      "question": "Quel élément fait partie de la checklist AVANT la migration ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Monitoring renforcé",
+        "Tests de performance",
+        "Plan de rollback",
+        "Formation des équipes"
+      ],
+      "reponse": 2,
+      "explication": "Avant de migrer : audit du code, tests de régression, backup et plan de rollback. Les tests de performance, le monitoring renforcé et la formation viennent après la migration."
+    }
+  ]
+}

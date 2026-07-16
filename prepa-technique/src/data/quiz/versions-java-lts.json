@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelles sont les versions LTS de Java citées dans la fiche ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Java 7, 9, 13 et 19",
+        "Java 8, 11, 17 et 21",
+        "Java 8, 10, 16 et 20",
+        "Java 9, 12, 15 et 18"
+      ],
+      "reponse": 1,
+      "explication": "Les versions Long Term Support sont Java 8 (2014), 11 (2018), 17 (2021) et 21 (2023). Les autres versions sont des releases intermédiaires au support court."
+    },
+    {
+      "question": "Quelle version de Java a introduit les expressions lambda et la Stream API ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Java 7",
+        "Java 8",
+        "Java 11",
+        "Java 17"
+      ],
+      "reponse": 1,
+      "explication": "Java 8 (2014) est la « révolution des lambdas » : expressions lambda, Stream API, interfaces fonctionnelles, Optional et nouvelle API Date/Time."
+    },
+    {
+      "question": "Que permet le mot-clé `var` introduit pour les variables locales ?",
+      "code": "var list = List.of(\"Java\", \"11\", \"LTS\");\nvar map = Map.of(\"version\", 11);",
+      "lang": "java",
+      "options": [
+        "Déclarer une variable dont le type peut changer à l'exécution",
+        "Laisser le compilateur inférer le type de la variable locale à la compilation",
+        "Créer une variable globale accessible partout",
+        "Déclarer une constante immuable"
+      ],
+      "reponse": 1,
+      "explication": "`var` (utilisable en LTS depuis Java 11) délègue l'inférence du type au compilateur : la variable reste typée statiquement, seul le type explicite disparaît du code."
+    },
+    {
+      "question": "Quel est l'apport principal des Records introduits avec Java 17 LTS ?",
+      "code": "public record Person(String name, int age) {}",
+      "lang": "java",
+      "options": [
+        "Ils permettent l'héritage multiple entre classes",
+        "Ils réduisent le boilerplate des classes de données (constructeur, accesseurs, equals, hashCode)",
+        "Ils remplacent les interfaces fonctionnelles",
+        "Ils rendent toutes les méthodes statiques"
+      ],
+      "reponse": 1,
+      "explication": "Un record est une classe de données concise : le compilateur génère le constructeur, les accesseurs (name(), age()), equals, hashCode et toString."
+    },
+    {
+      "question": "Quelle nouveauté majeure de Java 21 est issue du Project Loom ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les Sealed Classes",
+        "Les Text Blocks",
+        "Les Virtual Threads",
+        "Le HTTP Client API"
+      ],
+      "reponse": 2,
+      "explication": "Java 21 introduit les Virtual Threads (Project Loom) : des threads légers gérés par la JVM qui permettent de lancer des milliers de tâches concurrentes à faible coût."
+    },
+    {
+      "question": "Que renvoie ce switch de Java 21 si `obj` vaut null ?",
+      "code": "String result = switch (obj) {\n    case Integer i -> \"Integer: \" + i;\n    case String s -> \"String: \" + s;\n    case null -> \"null value\";\n    default -> \"Unknown type\";\n};",
+      "lang": "java",
+      "options": [
+        "Il lance une NullPointerException",
+        "\"Unknown type\"",
+        "\"null value\"",
+        "Il ne compile pas : null est interdit dans un switch"
+      ],
+      "reponse": 2,
+      "explication": "Le pattern matching pour switch de Java 21 accepte un case null explicite ; sans ce case, un switch sur null lancerait une NullPointerException."
+    },
+    {
+      "question": "Qu'a supprimé Java 11 qui casse fréquemment les applications lors d'une montée de version depuis Java 8 ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "La Stream API",
+        "Les modules Java EE (javax.xml.bind, etc.)",
+        "L'API Date/Time",
+        "Le garbage collector G1"
+      ],
+      "reponse": 1,
+      "explication": "Java 11 a retiré les modules Java EE du JDK (JAXB, activation…) : les applications qui les utilisaient doivent désormais les ajouter comme dépendances externes."
+    },
+    {
+      "question": "Quelle recommandation la fiche donne-t-elle pour le choix de version ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Rester sur Java 8 tant qu'il est supporté",
+        "Toujours utiliser la dernière version non-LTS pour avoir les nouveautés",
+        "Java 21 LTS pour les nouveaux projets, Java 17 minimum pour les projets existants",
+        "Java 11 pour tous les projets sans exception"
+      ],
+      "reponse": 2,
+      "explication": "La recommandation : démarrer les nouveaux projets sur Java 21 LTS et planifier la migration des projets existants vers au moins Java 17, les deux LTS les plus récentes."
+    }
+  ]
+}

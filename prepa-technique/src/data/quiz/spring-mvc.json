@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Dans le pattern MVC de Spring, quel est le rôle du Controller ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Stocker les données et la logique métier",
+        "Générer le HTML des pages",
+        "Recevoir les requêtes HTTP, déléguer au métier et choisir la réponse (vue ou données)",
+        "Gérer les connexions à la base de données"
+      ],
+      "reponse": 2,
+      "explication": "Le Controller est le point d'entrée des requêtes : il les reçoit, appelle les services (Model) et retourne soit un nom de vue, soit directement des données (REST)."
+    },
+    {
+      "question": "Quelle est la différence entre @Controller et @RestController ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "@RestController n'accepte que les requêtes GET",
+        "@RestController = @Controller + @ResponseBody : la valeur de retour est écrite dans le corps de la réponse (JSON) au lieu d'être résolue comme nom de vue",
+        "@Controller est déprécié depuis Spring 5",
+        "@RestController ne peut pas être injecté avec des dépendances"
+      ],
+      "reponse": 1,
+      "explication": "Avec @Controller, un String retourné est interprété comme un nom de vue à rendre ; avec @RestController, chaque méthode se comporte comme si elle était annotée @ResponseBody et retourne directement les données sérialisées."
+    },
+    {
+      "question": "Que retourne cette méthode au client HTTP ?",
+      "code": "@Controller\n@RequestMapping(\"/users\")\npublic class UserController {\n    @GetMapping\n    public String listUsers(Model model) {\n        model.addAttribute(\"users\", userService.findAll());\n        return \"users/list\";\n    }\n}",
+      "lang": "java",
+      "options": [
+        "La chaîne de caractères \"users/list\" en texte brut",
+        "La liste des utilisateurs en JSON",
+        "La page HTML rendue par la vue nommée users/list, alimentée par le Model",
+        "Une erreur 404, car aucune vue n'est précisée"
+      ],
+      "reponse": 2,
+      "explication": "Dans un @Controller, le String retourné est un nom logique de vue : le ViewResolver localise le template users/list et le rend avec les attributs du Model."
+    },
+    {
+      "question": "À quoi sert l'annotation @PathVariable ?",
+      "code": "@GetMapping(\"/{id}\")\npublic ResponseEntity<User> getUser(@PathVariable Long id) { ... }",
+      "lang": "java",
+      "options": [
+        "À lire un paramètre de query string (?id=42)",
+        "À extraire une valeur du chemin de l'URL (/api/users/42) vers un paramètre de méthode",
+        "À lire une valeur du corps de la requête",
+        "À injecter une variable d'environnement"
+      ],
+      "reponse": 1,
+      "explication": "@PathVariable lie un segment dynamique de l'URL (déclaré entre accolades dans le mapping) au paramètre de la méthode ; pour la query string on utiliserait @RequestParam."
+    },
+    {
+      "question": "Quel est le rôle de @RequestBody dans une méthode de contrôleur REST ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Il valide automatiquement les champs de l'objet",
+        "Il désérialise le corps de la requête (JSON) en objet Java",
+        "Il ajoute l'objet au Model pour la vue",
+        "Il transforme la réponse en XML"
+      ],
+      "reponse": 1,
+      "explication": "@RequestBody demande à Spring de convertir le corps de la requête HTTP (typiquement du JSON, via Jackson) en objet Java ; la validation, elle, est déclenchée par @Valid."
+    },
+    {
+      "question": "Quel code HTTP est le plus approprié en réponse à la création réussie d'une ressource via POST ?",
+      "code": "@PostMapping\npublic ResponseEntity<User> createUser(@Valid @RequestBody User user) {\n    User savedUser = userService.save(user);\n    return ResponseEntity.status(???).body(savedUser);\n}",
+      "lang": "java",
+      "options": [
+        "200 OK",
+        "201 Created",
+        "204 No Content",
+        "302 Found"
+      ],
+      "reponse": 1,
+      "explication": "Par convention REST, la création d'une ressource répond 201 Created (HttpStatus.CREATED), idéalement avec la ressource créée dans le corps et/ou son URL dans l'en-tête Location."
+    },
+    {
+      "question": "À quoi sert l'annotation @CrossOrigin(origins = \"http://localhost:3000\") ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À rediriger les requêtes vers localhost:3000",
+        "À autoriser les requêtes CORS provenant de cette origine (ex. un front React en développement)",
+        "À limiter le contrôleur aux requêtes locales",
+        "À configurer un proxy inverse vers le front-end"
+      ],
+      "reponse": 1,
+      "explication": "Les navigateurs bloquent par défaut les appels AJAX entre origines différentes ; @CrossOrigin ajoute les en-têtes CORS qui autorisent le front (ici servi sur le port 3000) à appeler l'API."
+    },
+    {
+      "question": "Que se passe-t-il si findById ne trouve pas l'utilisateur dans ce REST controller ?",
+      "code": "@GetMapping(\"/{id}\")\npublic ResponseEntity<User> getUser(@PathVariable Long id) {\n    return userService.findById(id)\n        .map(ResponseEntity::ok)\n        .orElse(ResponseEntity.notFound().build());\n}",
+      "lang": "java",
+      "options": [
+        "Une exception NullPointerException est levée",
+        "Le client reçoit une réponse 200 avec un corps vide",
+        "Le client reçoit une réponse 404 Not Found sans corps",
+        "Spring redirige vers une page d'erreur HTML"
+      ],
+      "reponse": 2,
+      "explication": "findById retourne un Optional : s'il est vide, orElse fournit ResponseEntity.notFound().build(), soit une réponse HTTP 404 propre — le pattern idiomatique pour une ressource absente."
+    }
+  ]
+}

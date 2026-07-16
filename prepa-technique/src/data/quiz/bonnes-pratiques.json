@@ -1,0 +1,108 @@
+{
+  "questions": [
+    {
+      "question": "Quelle est la convention Java pour nommer une constante ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "camelCase : maxRetryCount",
+        "PascalCase : MaxRetryCount",
+        "SNAKE_CASE majuscule : MAX_RETRY_COUNT",
+        "kebab-case : max-retry-count"
+      ],
+      "reponse": 2,
+      "explication": "En Java : classes en PascalCase, méthodes et variables en camelCase, constantes en SNAKE_CASE majuscule, packages en minuscules."
+    },
+    {
+      "question": "Que recommande le principe KISS ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Optimiser chaque méthode dès l'écriture, même au prix de la lisibilité",
+        "Privilégier la solution la plus simple qui répond au besoin",
+        "Réduire le nombre de classes au strict minimum",
+        "Écrire le moins de tests possible"
+      ],
+      "reponse": 1,
+      "explication": "KISS (Keep It Simple, Stupid) : si une solution simple existe, l'utiliser. La suroptimisation prématurée (ex. bitwise pour tester le week-end) complexifie sans bénéfice réel."
+    },
+    {
+      "question": "Quel est le principal risque d'une logique de validation dupliquée dans plusieurs méthodes ou classes ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le programme devient plus lent à l'exécution",
+        "Le compilateur refuse le code dupliqué",
+        "Lors d'une correction, on oublie un des exemplaires : les comportements divergent",
+        "La mémoire consommée double à chaque duplication"
+      ],
+      "reponse": 2,
+      "explication": "C'est le cœur de DRY : une règle dupliquée doit être corrigée partout à la fois. Extraire la logique commune (méthode privée, classe utilitaire) garantit un point de modification unique."
+    },
+    {
+      "question": "Quel problème ce code pose-t-il ?",
+      "code": "try {\n    FileInputStream file = new FileInputStream(path);\n    // Traitement...\n} catch (Exception e) {\n    // rien\n}",
+      "lang": "java",
+      "options": [
+        "Il ne compile pas : un catch ne peut pas être vide",
+        "Il avale l'exception (erreur masquée) et ne ferme jamais le flux ouvert",
+        "FileInputStream ne peut pas être utilisé dans un try",
+        "catch (Exception e) est interdit depuis Java 8"
+      ],
+      "reponse": 1,
+      "explication": "Un catch vide masque l'erreur réelle et le flux n'est jamais fermé (fuite de ressource). Il faut un try-with-resources, des catch spécifiques, une journalisation avec contexte et une ré-encapsulation en exception métier."
+    },
+    {
+      "question": "À quoi sert le try-with-resources en Java ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À réessayer automatiquement l'opération en cas d'échec",
+        "À fermer automatiquement les ressources (flux, connexions) à la fin du bloc, même en cas d'exception",
+        "À attraper toutes les exceptions sans écrire de catch",
+        "À limiter la mémoire utilisée par le bloc try"
+      ],
+      "reponse": 1,
+      "explication": "Toute ressource AutoCloseable déclarée dans les parenthèses du try est fermée automatiquement, y compris quand une exception est levée — fini les finally oubliés."
+    },
+    {
+      "question": "Dans un bloc try, dans quel ordre déclarer les catch ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Les exceptions génériques d'abord, les spécifiques ensuite",
+        "Les exceptions spécifiques d'abord, les génériques ensuite",
+        "Par ordre alphabétique des classes d'exception",
+        "L'ordre n'a aucune importance"
+      ],
+      "reponse": 1,
+      "explication": "Un catch générique placé en premier capterait tout : les catch spécifiques (FileNotFoundException avant IOException) deviendraient du code mort — le compilateur le refuse d'ailleurs."
+    },
+    {
+      "question": "Pourquoi remplacer `timer.schedule(task, 86400000)` par `timer.schedule(task, ONE_DAY_IN_MILLIS)` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "La constante rend l'exécution plus rapide",
+        "86400000 dépasse la capacité d'un int en Java",
+        "La constante nommée documente la signification de la valeur et centralise sa modification",
+        "Les littéraux numériques sont dépréciés en Java"
+      ],
+      "reponse": 2,
+      "explication": "86400000 est un magic number : personne ne devine qu'il s'agit d'un jour en millisecondes. Une constante nommée rend le code auto-documenté et évite les recopies erronées."
+    },
+    {
+      "question": "Quel outil ou pratique aide à garantir un formatage cohérent dans une équipe ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Laisser chaque développeur suivre son propre style",
+        "Un formateur automatique (Google Java Format) et des hooks pre-commit",
+        "Interdire les revues de code sur le style",
+        "Limiter les fichiers à 50 lignes maximum"
+      ],
+      "reponse": 1,
+      "explication": "Un outil de formatage automatique, appliqué via hooks pre-commit et un `.editorconfig` partagé, élimine les débats de style et les diffs parasites dans les PR."
+    }
+  ]
+}

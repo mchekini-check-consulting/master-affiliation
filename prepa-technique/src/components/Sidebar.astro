@@ -1,0 +1,208 @@
+---
+import { getCollection } from 'astro:content';
+import { categories } from '../data/categories';
+
+interface Props {
+  // id de la fiche active, ex. "git/merge-vs-rebase" (vide sur l'accueil)
+  actif?: string;
+}
+
+const { actif = '' } = Astro.props;
+
+const fiches = await getCollection('fiches');
+const parCategorie = categories.map((cat) => ({
+  ...cat,
+  fiches: fiches
+    .filter((f) => f.data.categorie === cat.slug)
+    .sort((a, b) => a.data.ordre - b.data.ordre),
+}));
+---
+
+<button class="sommaire-toggle" aria-expanded="false" aria-controls="sommaire">
+  Sommaire
+</button>
+
+<nav id="sommaire" class="sommaire" aria-label="Sommaire des fiches">
+  <a class="logo" href="/">
+    <span class="logo-titre">Prépa Technique</span>
+    <span class="logo-sous">Le cahier de révision des entretiens</span>
+  </a>
+
+  {
+    parCategorie.map((cat) => (
+      <section class="cat">
+        <h2 class="cat-titre">
+          {cat.label}
+          <span class="cat-compte">{cat.fiches.length} fiches</span>
+        </h2>
+        <ol class="cat-liste">
+          {cat.fiches.map((f) => (
+            <li>
+              <a
+                href={`/${cat.slug}/${f.id.split('/').pop()}/`}
+                aria-current={f.id === actif ? 'page' : undefined}
+              >
+                <span class="fiche-num">
+                  {String(f.data.ordre).padStart(2, '0')}
+                </span>
+                {f.data.title}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+</nav>
+
+<script>
+  const toggle = document.querySelector('.sommaire-toggle');
+  const sommaire = document.getElementById('sommaire');
+  toggle?.addEventListener('click', () => {
+    const ouvert = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!ouvert));
+    sommaire?.classList.toggle('sommaire--ouvert', !ouvert);
+  });
+</script>
+
+<style>
+  .sommaire {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--sidebar-l);
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem 2.5rem;
+    background: var(--blanc);
+    border-right: 1px solid var(--trait);
+    font-family: var(--f-display);
+  }
+
+  .logo {
+    display: block;
+    text-decoration: none;
+    color: var(--encre);
+    margin-bottom: 1.75rem;
+  }
+
+  .logo-titre {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+  }
+
+  .logo-titre::after {
+    content: '';
+    display: block;
+    width: 3.5rem;
+    height: 5px;
+    margin-top: 2px;
+    background: var(--surligneur);
+    border-radius: 2px;
+    transform: rotate(-1.5deg);
+  }
+
+  .logo-sous {
+    display: block;
+    margin-top: 0.45rem;
+    font-size: 0.75rem;
+    color: var(--estompe);
+  }
+
+  .cat {
+    margin-bottom: 1.4rem;
+  }
+
+  .cat-titre {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--encre);
+    margin: 0 0 0.35rem;
+  }
+
+  .cat-compte {
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.6875rem;
+    color: var(--estompe);
+  }
+
+  .cat-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cat-liste a {
+    display: flex;
+    gap: 0.55rem;
+    align-items: baseline;
+    padding: 0.28rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.855rem;
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .fiche-num {
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    color: var(--estompe);
+  }
+
+  .cat-liste a:hover {
+    background: var(--bic-doux);
+    color: var(--bic);
+  }
+
+  .cat-liste a[aria-current='page'] {
+    background: var(--bic);
+    color: var(--blanc);
+    font-weight: 600;
+  }
+
+  .cat-liste a[aria-current='page'] .fiche-num {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .sommaire-toggle {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .sommaire-toggle {
+      display: block;
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 30;
+      font-family: var(--f-display);
+      font-weight: 650;
+      font-size: 0.875rem;
+      padding: 0.45rem 0.9rem;
+      background: var(--encre);
+      color: var(--blanc);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .sommaire {
+      inset: 0;
+      width: 100%;
+      z-index: 20;
+      display: none;
+      padding-top: 3.5rem;
+    }
+
+    .sommaire--ouvert {
+      display: block;
+    }
+  }
+</style>

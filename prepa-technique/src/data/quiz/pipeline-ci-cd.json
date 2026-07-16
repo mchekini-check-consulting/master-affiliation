@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Dans quel ordre s'enchaînent les stages essentiels d'un pipeline CI/CD ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Build → Checkout → Tests → Déploiement → Push",
+        "Checkout → Tests unitaires → Tests d'intégration → Build de l'image → Push registry → Déploiement",
+        "Tests → Déploiement → Build → Checkout → Push",
+        "Checkout → Build de l'image → Déploiement → Tests unitaires"
+      ],
+      "reponse": 1,
+      "explication": "On récupère d'abord le code, on le valide (tests unitaires puis intégration), et seulement ensuite on construit l'image, on la publie sur le registry et on déploie. Tester avant de builder évite de publier des images cassées."
+    },
+    {
+      "question": "Pourquoi les tests unitaires s'exécutent-ils avant les tests d'intégration dans le pipeline ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Parce que les tests d'intégration ne fonctionnent que sur l'image Docker finale",
+        "Parce qu'ils sont rapides et isolés : ils font échouer le pipeline tôt, avant de démarrer des services coûteux",
+        "Parce que GitLab CI impose cet ordre par défaut",
+        "Parce que les tests unitaires nécessitent une base de données"
+      ],
+      "reponse": 1,
+      "explication": "Principe du « fail fast » : les tests unitaires ne demandent aucune infrastructure et détectent la majorité des régressions en quelques secondes, alors que les tests d'intégration démarrent des services (PostgreSQL, Redis, docker-compose)."
+    },
+    {
+      "question": "Que fait cette étape du pipeline ?",
+      "code": "docker build -t app:${{ github.sha }} .\ndocker tag app:${{ github.sha }} app:latest",
+      "lang": "bash",
+      "options": [
+        "Elle pousse deux images différentes sur le registry",
+        "Elle construit l'image taguée avec le SHA du commit, puis lui ajoute aussi le tag latest",
+        "Elle construit deux images distinctes, une par tag",
+        "Elle déploie l'image sur Kubernetes"
+      ],
+      "reponse": 1,
+      "explication": "Une seule image est construite, identifiée de manière unique par le SHA du commit ; `docker tag` lui ajoute un alias `latest`. Le tag SHA garantit la traçabilité et permet de rollbacker vers une version précise."
+    },
+    {
+      "question": "Dans la configuration GitLab CI de la fiche, quelle différence y a-t-il entre le déploiement staging et le déploiement production ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le staging utilise ArgoCD, la production utilise kubectl",
+        "Le staging se déclenche sur develop automatiquement ; la production se déclenche sur main et exige une action manuelle (when: manual)",
+        "Seul le staging exécute les tests avant de déployer",
+        "La production déploie une image différente de celle du staging"
+      ],
+      "reponse": 1,
+      "explication": "`only: develop` vs `only: main` sélectionnent la branche déclencheuse, et `when: manual` sur la production impose une validation humaine avant la mise en production — un garde-fou classique."
+    },
+    {
+      "question": "À quoi sert la commande `kubectl rollout status deployment/app` après un `kubectl set image` ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "À redémarrer tous les pods du deployment",
+        "À attendre et vérifier que le déploiement de la nouvelle image s'est bien terminé, et faire échouer le job sinon",
+        "À afficher les logs de l'application déployée",
+        "À annuler le déploiement en cas d'erreur de compilation"
+      ],
+      "reponse": 1,
+      "explication": "`rollout status` bloque jusqu'à ce que le rollout aboutisse (ou échoue). Sans elle, le job du pipeline passerait au vert même si les nouveaux pods ne démarrent jamais."
+    },
+    {
+      "question": "Quel est l'intérêt de déclarer `services: postgres:13, redis:6` dans le job de tests d'intégration GitLab CI ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Installer PostgreSQL et Redis sur les serveurs de production",
+        "Fournir au job des conteneurs de dépendances éphémères pour tester les vraies interactions avec la base et le cache",
+        "Accélérer les tests unitaires grâce au cache Redis",
+        "Sauvegarder les résultats de tests dans PostgreSQL"
+      ],
+      "reponse": 1,
+      "explication": "Les `services` GitLab CI démarrent des conteneurs jetables à côté du job : les tests d'intégration s'exécutent contre une vraie base et un vrai cache, puis tout est détruit à la fin du job."
+    },
+    {
+      "question": "Où l'image Docker est-elle publiée à l'étape « Push Registry » ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Directement dans le cluster Kubernetes",
+        "Dans le dépôt Git, à côté du code source",
+        "Dans un registre d'images comme Docker Hub, Harbor ou ECR",
+        "Sur le poste du développeur qui a poussé le commit"
+      ],
+      "reponse": 2,
+      "explication": "Le registry (Docker Hub, Harbor, ECR…) est le dépôt central des images : Kubernetes viendra y télécharger l'image référencée par le deployment au moment du déploiement."
+    }
+  ]
+}

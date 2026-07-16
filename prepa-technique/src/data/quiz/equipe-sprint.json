@@ -1,0 +1,95 @@
+{
+  "questions": [
+    {
+      "question": "Qui est responsable de la gestion et de la priorisation du Product Backlog ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Le Scrum Master",
+        "Le Product Owner",
+        "La Development Team",
+        "Les stakeholders"
+      ],
+      "reponse": 1,
+      "explication": "Le PO définit la vision produit, gère le Product Backlog, priorise les fonctionnalités et fait l'interface avec les stakeholders."
+    },
+    {
+      "question": "Quel est le rôle principal du Scrum Master ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Diriger l'équipe et assigner les tâches",
+        "Valider les livrables auprès du client",
+        "Faciliter les cérémonies, supprimer les obstacles et protéger l'équipe",
+        "Écrire les User Stories"
+      ],
+      "reponse": 2,
+      "explication": "Le Scrum Master est un « servant leader » : il facilite, coache et lève les obstacles. Il ne dirige pas l'équipe — c'est un piège d'entretien classique."
+    },
+    {
+      "question": "Quelle est la taille recommandée d'une Development Team Scrum ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "1 à 2 personnes",
+        "3 à 9 personnes",
+        "10 à 15 personnes",
+        "Aucune limite tant que le budget suit"
+      ],
+      "reponse": 1,
+      "explication": "Une équipe de 3 à 9 personnes, pluridisciplinaire et auto-organisée, reste assez petite pour communiquer efficacement et assez grande pour livrer un incrément."
+    },
+    {
+      "question": "Quelles sont les 3 questions traitées lors du Daily Scrum ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Combien de points restent ? Qui est en retard ? Que dira le client ?",
+        "Ce que j'ai fait hier, ce que je vais faire, mes obstacles",
+        "Quoi livrer ? Comment livrer ? Quand livrer ?",
+        "Keep, Stop, Start"
+      ],
+      "reponse": 1,
+      "explication": "Le daily (15 min) synchronise l'équipe autour de trois questions : fait hier, prévu aujourd'hui, obstacles. Keep/Stop/Start relève de la rétrospective."
+    },
+    {
+      "question": "Quelle est la durée maximale recommandée du Sprint Planning pour un sprint de 2 semaines ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "15 minutes",
+        "1 heure",
+        "4 heures",
+        "8 heures"
+      ],
+      "reponse": 2,
+      "explication": "Pour un sprint de 2 semaines, le Sprint Planning est limité à 4 heures (8 heures pour un sprint de 4 semaines). On y sélectionne les stories et on définit le Sprint Goal."
+    },
+    {
+      "question": "Quelle différence entre Sprint Review et Sprint Retrospective ?",
+      "code": null,
+      "lang": null,
+      "options": [
+        "Aucune, ce sont deux noms pour la même réunion",
+        "La review inspecte le produit (démo, feedback), la rétrospective inspecte le processus d'équipe",
+        "La review est réservée aux managers, la rétrospective aux développeurs",
+        "La rétrospective a lieu en début de sprint, la review à la fin"
+      ],
+      "reponse": 1,
+      "explication": "La Sprint Review porte sur l'incrément produit (démonstration, feedback des stakeholders, adaptation du backlog) ; la rétrospective porte sur la façon de travailler de l'équipe."
+    },
+    {
+      "question": "Une équipe a terminé 23, 27 et 25 story points sur ses trois derniers sprints. Comment utiliser cette information ?",
+      "code": "Sprint 1 : 23 points\nSprint 2 : 27 points\nSprint 3 : 25 points",
+      "lang": "text",
+      "options": [
+        "Exiger 30 points au sprint suivant pour progresser",
+        "Planifier le prochain sprint autour de 25 points, la vélocité moyenne",
+        "Comparer avec l'équipe voisine pour évaluer la performance",
+        "Convertir les points en heures pour facturer le client"
+      ],
+      "reponse": 1,
+      "explication": "La vélocité (moyenne des points terminés sur 3-5 sprints, ici 25) sert à planifier des sprints réalistes et à prévoir les livraisons — pas à mettre la pression ni à comparer des équipes."
+    }
+  ]
+}
