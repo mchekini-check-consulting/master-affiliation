@@ -15,7 +15,7 @@ on:
   workflow_call:
     inputs:
       project:
-        description: "Nom du répertoire du projet (ex: site-a)"
+        description: "Nom du répertoire du projet (ex: parents-malins)"
         required: true
         type: string
 

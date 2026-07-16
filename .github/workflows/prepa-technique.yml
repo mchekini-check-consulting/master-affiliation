@@ -1,11 +1,11 @@
-# Pipeline du projet site-b : ne se déclenche que si site-b/ change sur main.
-name: site-b
+# Pipeline du projet prepa-technique : ne se déclenche que si prepa-technique/ change sur main.
+name: prepa-technique
 
 on:
   push:
     branches: [main]
     paths:
-      - "site-b/**"
+      - "prepa-technique/**"
   workflow_dispatch:
 
 permissions:
@@ -16,5 +16,5 @@ jobs:
   deploy:
     uses: ./.github/workflows/_deploy-project.yml
     with:
-      project: site-b
+      project: prepa-technique
     secrets: inherit

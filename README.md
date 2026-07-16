@@ -13,17 +13,13 @@ master-affiliation/
 ├── .env                      # Configuration : port et tag d'image de chaque site
 ├── .github/workflows/
 │   ├── _deploy-project.yml   # Workflow réutilisable (build → GHCR → deploy VM)
-│   ├── site-a.yml            # Pipeline site-a (déclenchée si site-a/** change)
-│   ├── site-b.yml            # Pipeline site-b (déclenchée si site-b/** change)
 │   ├── hi-tech-academy.yml   # Pipeline hi-tech-academy (déclenchée si hi-tech-academy/** change)
 │   ├── parents-malins.yml    # Pipeline parents-malins (déclenchée si parents-malins/** change)
+│   ├── prepa-technique.yml   # Pipeline prepa-technique (déclenchée si prepa-technique/** change)
 │   └── my-way.yml            # Pipeline my-way (fullstack : images back + front)
-├── site-a/                   # Projet temporaire A (port 3001)
-│   ├── Dockerfile            # Build Astro → nginx
-│   └── src/                  # Code du site
-├── site-b/                   # Projet temporaire B (port 3002)
 ├── hi-tech-academy/          # Hi-Tech Academy (hi-tech-academy.fr) — React/Vite + Base44, servi en SPA
 ├── parents-malins/           # Parents Malins (parents-malins.fr) — Astro statique → nginx
+├── prepa-technique/          # Prépa Technique (preparation.check-consulting.net) — Astro statique → nginx
 └── my-way/                   # My Way (freelance-now.fr) — Angular + Spring Boot + PostgreSQL
     ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
     └── front/                # Front Angular (Dockerfile multi-stage Node → nginx, proxifie /api)
@@ -32,7 +28,7 @@ master-affiliation/
 ## Développement local
 
 ```bash
-cd site-a
+cd parents-malins
 npm install
 npm run dev        # http://localhost:4321
 npm run build      # génère dist/
@@ -42,15 +38,13 @@ Tout lancer avec Docker :
 
 ```bash
 docker compose up -d --build
-# site-a → http://localhost:3001
-# site-b → http://localhost:3002
 ```
 
 ## CI/CD
 
 - Branche de déploiement : `main`.
-- Chaque projet a sa pipeline, filtrée sur son répertoire (`paths: site-a/**`).
-  Un push qui ne touche que `site-a/` ne rebuild et ne redéploie **que** site-a.
+- Chaque projet a sa pipeline, filtrée sur son répertoire (`paths: parents-malins/**`).
+  Un push qui ne touche que `parents-malins/` ne rebuild et ne redéploie **que** parents-malins.
 - La pipeline : build de l'image → push sur GHCR
   (`ghcr.io/mchekini-check-consulting/master-affiliation/<projet>`, tags
   `latest` + SHA du commit) → SSH sur la VM → `docker compose pull <projet> &&
@@ -76,16 +70,9 @@ docker compose up -d --build
 
 ## Ajouter un nouveau projet
 
-1. Copier un projet existant : `cp -r site-a mon-site` puis adapter
+1. Copier un projet existant : `cp -r parents-malins mon-site` puis adapter
    `package.json` (name), `astro.config.mjs` (site) et `robots.txt`.
 2. Ajouter un service dans le `docker-compose.yml` racine (copier le bloc
-   `site-a`) et déclarer son port dans le `.env` racine.
-3. Copier `.github/workflows/site-a.yml` → `mon-site.yml` et remplacer
-   `site-a` par `mon-site`.
-
-## Remplacer un projet temporaire par une vraie niche
-
-Les projets `site-a` / `site-b` sont des coquilles de test : il suffit de
-remplacer le contenu de `src/` et de mettre à jour le domaine dans
-`astro.config.mjs` et `public/robots.txt`. L'infra (Docker, pipeline, compose)
-ne change pas.
+   `parents-malins`) et déclarer son tag d'image dans le `.env` racine.
+3. Copier `.github/workflows/parents-malins.yml` → `mon-site.yml` et remplacer
+   `parents-malins` par `mon-site`.
