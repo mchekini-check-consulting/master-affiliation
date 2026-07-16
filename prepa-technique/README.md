@@ -7,17 +7,6 @@ Site orienté SEO — [preparation.check-consulting.net](https://preparation.che
 - **Image** : `ghcr.io/mchekini-check-consulting/master-affiliation/prepa-technique`.
 - **Pipeline** : `.github/workflows/prepa-technique.yml` (déclenchée si `prepa-technique/**` change sur `main`).
 
-## Initialiser le projet Astro
-
-Le code applicatif n'est pas encore généré. Depuis ce dossier :
-
-```bash
-npm create astro@latest . -- --template minimal
-```
-
-Puis renseigner le domaine dans `astro.config.mjs` (`site: "https://preparation.check-consulting.net"`)
-et créer `public/robots.txt`.
-
 ## Développement local
 
 ```bash
