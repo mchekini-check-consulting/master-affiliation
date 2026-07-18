@@ -143,7 +143,8 @@ public final class RegistrationDtos {
             String companyName,
             boolean hasNeedsAnalysis,
             Integer needsAnalysisScore,
-            Integer needsAnalysisMaxScore) {
+            Integer needsAnalysisMaxScore,
+            boolean hasCertificate) {
 
         static AdminListItem from(RegistrationRequest r) {
             NeedsAnalysis na = r.getNeedsAnalysis();
@@ -161,7 +162,51 @@ public final class RegistrationDtos {
                     r.getCompanyName(),
                     na != null,
                     na != null ? na.getScore() : null,
-                    na != null ? na.getMaxScore() : null);
+                    na != null ? na.getMaxScore() : null,
+                    r.getCertificate() != null);
+        }
+    }
+
+    // --- Certificats de réalisation --------------------------------------
+    public record IssueCertificateRequest(
+            @NotNull LocalDate sessionStartDate,
+            @NotNull LocalDate sessionEndDate,
+            @NotNull Integer durationHours) {
+    }
+
+    public record CertificateView(
+            UUID id,
+            Instant issuedAt,
+            LocalDate sessionStartDate,
+            LocalDate sessionEndDate,
+            int durationHours,
+            UUID registrationId,
+            String formationId,
+            String formationTitle,
+            ApplicantType applicantType,
+            String civility,
+            String firstName,
+            String lastName,
+            String email,
+            String companyName) {
+
+        static CertificateView from(Certificate c) {
+            RegistrationRequest r = c.getRegistration();
+            return new CertificateView(
+                    c.getId(),
+                    c.getIssuedAt(),
+                    c.getSessionStartDate(),
+                    c.getSessionEndDate(),
+                    c.getDurationHours(),
+                    r.getId(),
+                    r.getFormationId(),
+                    r.getFormationTitle(),
+                    r.getApplicantType(),
+                    r.getCivility(),
+                    r.getFirstName(),
+                    r.getLastName(),
+                    r.getEmail(),
+                    r.getCompanyName());
         }
     }
 
@@ -202,7 +247,8 @@ public final class RegistrationDtos {
             String diplomaTitle,
             String currentPosition,
             boolean needsAdaptation,
-            NeedsAnalysisView needsAnalysis) {
+            NeedsAnalysisView needsAnalysis,
+            CertificateView certificate) {
 
         static AdminDetail from(RegistrationRequest r) {
             return new AdminDetail(
@@ -242,7 +288,8 @@ public final class RegistrationDtos {
                     r.getDiplomaTitle(),
                     r.getCurrentPosition(),
                     r.isNeedsAdaptation(),
-                    r.getNeedsAnalysis() != null ? NeedsAnalysisView.from(r.getNeedsAnalysis()) : null);
+                    r.getNeedsAnalysis() != null ? NeedsAnalysisView.from(r.getNeedsAnalysis()) : null,
+                    r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null);
         }
     }
 

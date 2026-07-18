@@ -100,6 +100,10 @@ public class RegistrationRequest {
     @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
     private NeedsAnalysis needsAnalysis;
 
+    // --- Certificat de réalisation (demandes validées) ------------------
+    @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Certificate certificate;
+
     public UUID getId() { return id; }
 
     public Instant getCreatedAt() { return createdAt; }
@@ -209,4 +213,7 @@ public class RegistrationRequest {
 
     public NeedsAnalysis getNeedsAnalysis() { return needsAnalysis; }
     public void setNeedsAnalysis(NeedsAnalysis needsAnalysis) { this.needsAnalysis = needsAnalysis; }
+
+    public Certificate getCertificate() { return certificate; }
+    public void setCertificate(Certificate certificate) { this.certificate = certificate; }
 }

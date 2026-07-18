@@ -2,6 +2,8 @@ package fr.hitechacademy.registration;
 
 import fr.hitechacademy.registration.RegistrationDtos.AdminDetail;
 import fr.hitechacademy.registration.RegistrationDtos.AdminListItem;
+import fr.hitechacademy.registration.RegistrationDtos.CertificateView;
+import fr.hitechacademy.registration.RegistrationDtos.IssueCertificateRequest;
 import fr.hitechacademy.registration.RegistrationDtos.StatusUpdateRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -30,9 +32,11 @@ import java.util.UUID;
 public class RegistrationAdminController {
 
     private final RegistrationRepository repository;
+    private final CertificateRepository certificateRepository;
 
-    public RegistrationAdminController(RegistrationRepository repository) {
+    public RegistrationAdminController(RegistrationRepository repository, CertificateRepository certificateRepository) {
         this.repository = repository;
+        this.certificateRepository = certificateRepository;
     }
 
     // Permet au front de vérifier les identifiants saisis sur l'écran de connexion
@@ -65,6 +69,46 @@ public class RegistrationAdminController {
         r.setStatus(body.status());
         r.setDecidedAt(Instant.now());
         return AdminDetail.from(repository.save(r));
+    }
+
+    // --- Certificats de réalisation ---------------------------------
+
+    @GetMapping("/certificates")
+    @Transactional(readOnly = true)
+    public List<CertificateView> listCertificates() {
+        return certificateRepository.findAllByOrderByIssuedAtDesc().stream()
+                .map(CertificateView::from)
+                .toList();
+    }
+
+    @PostMapping("/registrations/{id}/certificate")
+    @Transactional
+    public CertificateView issueCertificate(@PathVariable UUID id, @Valid @RequestBody IssueCertificateRequest body) {
+        RegistrationRequest r = find(id);
+        if (r.getStatus() != RegistrationStatus.VALIDATED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le certificat ne peut être émis que pour une demande validée");
+        }
+        if (r.getCertificate() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Un certificat a déjà été émis pour cette demande");
+        }
+        if (body.sessionEndDate().isBefore(body.sessionStartDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La date de fin de session doit être postérieure ou égale à la date de début");
+        }
+        if (body.durationHours() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La durée doit être positive");
+        }
+
+        Certificate c = new Certificate();
+        c.setRegistration(r);
+        c.setSessionStartDate(body.sessionStartDate());
+        c.setSessionEndDate(body.sessionEndDate());
+        c.setDurationHours(body.durationHours());
+        r.setCertificate(c);
+        repository.save(r);
+        return CertificateView.from(r.getCertificate());
     }
 
     private RegistrationRequest find(UUID id) {

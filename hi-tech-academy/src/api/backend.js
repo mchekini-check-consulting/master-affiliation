@@ -79,3 +79,11 @@ export function adminGetRegistration(auth, id) {
 export function adminUpdateStatus(auth, id, status) {
   return request(`/admin/registrations/${id}/status`, { method: 'POST', body: { status }, auth });
 }
+
+export function adminListCertificates(auth) {
+  return request('/admin/certificates', { auth });
+}
+
+export function adminIssueCertificate(auth, registrationId, payload) {
+  return request(`/admin/registrations/${registrationId}/certificate`, { method: 'POST', body: payload, auth });
+}

@@ -1,66 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, CheckCircle2, LogOut, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
-import {
-  adminCheckCredentials,
-  adminGetRegistration,
-  adminListRegistrations,
-  adminUpdateStatus,
-  clearAuth,
-  getStoredAuth,
-  storeAuth,
-} from '@/api/backend';
-
-const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
-
-const APPLICANT_LABELS = {
-  COMPANY: 'Entreprise',
-  INDEPENDENT: 'Indépendant',
-  INDIVIDUAL: 'Particulier',
-};
-
-const STATUS_META = {
-  PENDING: { label: 'En attente', background: '#fdf3e2', color: '#8a5a00' },
-  VALIDATED: { label: 'Validée', background: '#e5f6ec', color: '#116632' },
-  REFUSED: { label: 'Refusée', background: '#fdecec', color: '#a12626' },
-};
-
-function formatDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('fr-FR', {
-    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
-  });
-}
-
-function StatusBadge({ status }) {
-  const meta = STATUS_META[status] ?? { label: status, background: '#f0f3fa', color: '#6b7a9b' };
-  return (
-    <span
-      className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold"
-      style={{ background: meta.background, color: meta.color, ...headingFont }}>
-      {meta.label}
-    </span>
-  );
-}
-
-function Field({ label, value }) {
-  if (value === null || value === undefined || value === '' || value === false) return null;
-  return (
-    <div>
-      <p className="text-[11px] uppercase tracking-wide font-semibold" style={{ color: '#6b7a9b', ...headingFont }}>{label}</p>
-      <p className="text-sm" style={{ color: '#001a4a', ...bodyFont }}>{value === true ? 'Oui' : value}</p>
-    </div>
-  );
-}
-
-function Card({ title, children }) {
-  return (
-    <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-      <h3 className="font-bold text-sm mb-4" style={{ color: '#001a4a', ...headingFont }}>{title}</h3>
-      {children}
-    </div>
-  );
-}
+import React, { useEffect, useState } from 'react';
+import { Award, GraduationCap, Inbox, LogOut, ShieldCheck, UsersRound } from 'lucide-react';
+import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
+import { bodyFont, headingFont } from '@/pages/admin/common';
+import RequestsView from '@/pages/admin/RequestsView';
+import FormationsView from '@/pages/admin/FormationsView';
+import LearnersView from '@/pages/admin/LearnersView';
+import CertificatesView from '@/pages/admin/CertificatesView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
 function LoginScreen({ onLoggedIn }) {
@@ -97,7 +42,7 @@ function LoginScreen({ onLoggedIn }) {
             Administration
           </h1>
           <p className="text-xs mt-1" style={{ color: '#6b7a9b', ...bodyFont }}>
-            Hi-Tech Academy — demandes d'inscription
+            Hi-Tech Academy — organisme de formation
           </p>
         </div>
 
@@ -142,296 +87,19 @@ function LoginScreen({ onLoggedIn }) {
   );
 }
 
-// --- Détail d'une demande --------------------------------------------
-function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
-  const [detail, setDetail] = useState(null);
-  const [error, setError] = useState(null);
-  const [updating, setUpdating] = useState(false);
-
-  const load = useCallback(() => {
-    adminGetRegistration(auth, id).then(setDetail).catch((e) => setError(e.message));
-  }, [auth, id]);
-
-  useEffect(load, [load]);
-
-  const decide = async (status) => {
-    setUpdating(true);
-    setError(null);
-    try {
-      const updated = await adminUpdateStatus(auth, id, status);
-      setDetail(updated);
-      onStatusChanged();
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  if (error && !detail) {
-    return <p className="text-sm" style={{ color: '#a12626', ...bodyFont }}>{error}</p>;
-  }
-  if (!detail) {
-    return <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>;
-  }
-
-  const isCompany = detail.applicant_type !== 'INDIVIDUAL';
-  const na = detail.needs_analysis;
-  const address = [detail.address_line, detail.address_complement, detail.postal_code, detail.city, detail.country]
-    .filter(Boolean).join(', ');
-
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex items-center gap-2 text-sm font-semibold mb-5"
-        style={{ color: '#005064', ...headingFont }}>
-        <ArrowLeft className="w-4 h-4" />
-        Retour à la liste
-      </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h2 className="text-xl font-bold" style={{ color: '#001a4a', ...headingFont }}>
-            {detail.first_name} {detail.last_name}
-            {detail.company_name ? ` — ${detail.company_name}` : ''}
-          </h2>
-          <p className="text-sm mt-1" style={{ color: '#6b7a9b', ...bodyFont }}>
-            {APPLICANT_LABELS[detail.applicant_type]} · Demande du {formatDate(detail.created_at)} ·
-            Formation : <strong>{detail.formation_title}</strong>
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <StatusBadge status={detail.status} />
-          {detail.status === 'PENDING' && (
-            <>
-              <button
-                type="button"
-                disabled={updating}
-                onClick={() => decide('VALIDATED')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-50"
-                style={{ background: '#116632', color: 'white', ...headingFont }}>
-                <CheckCircle2 className="w-4 h-4" />
-                Valider
-              </button>
-              <button
-                type="button"
-                disabled={updating}
-                onClick={() => decide('REFUSED')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-50"
-                style={{ background: '#a12626', color: 'white', ...headingFont }}>
-                <XCircle className="w-4 h-4" />
-                Refuser
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <p className="text-xs mb-4 rounded-xl px-4 py-3" style={{ background: '#fdecec', color: '#a12626', ...bodyFont }}>
-          {error}
-        </p>
-      )}
-
-      <div className="grid md:grid-cols-2 gap-5">
-        {isCompany && (
-          <Card title="Informations de l'entreprise">
-            <div className="space-y-3">
-              <Field label="Nom de l'entreprise" value={detail.company_name} />
-              <Field label="Adresse" value={address} />
-              <Field label="N° SIRET" value={detail.siret} />
-              <Field label="NAF" value={detail.naf} />
-              <Field label="Typologie du client" value={detail.client_typology} />
-              <Field label="Forme juridique" value={detail.legal_form} />
-              <Field label="Email de facturation" value={detail.billing_email} />
-            </div>
-          </Card>
-        )}
-
-        <Card title={isCompany ? "Référent de l'entreprise" : 'Informations personnelles'}>
-          <div className="space-y-3">
-            <Field label="Civilité" value={detail.civility} />
-            <Field label="Prénom" value={detail.first_name} />
-            <Field label="Nom" value={detail.last_name} />
-            <Field label="Adresse email" value={detail.email} />
-            <Field label="N° de téléphone" value={detail.phone} />
-            <Field label="Fonction" value={detail.job_title} />
-            {!isCompany && <Field label="Adresse" value={address} />}
-            <Field label="Notes complémentaires" value={detail.notes} />
-          </div>
-        </Card>
-
-        {!isCompany && (
-          <Card title="Informations complémentaires">
-            <div className="space-y-3">
-              <Field label="N° de téléphone 2" value={detail.phone2} />
-              <Field label="Type de stagiaire" value={detail.trainee_type} />
-              <Field label="Date de naissance" value={detail.birth_date} />
-              <Field label="Ville de naissance" value={detail.birth_city} />
-              <Field label="Département de naissance" value={detail.birth_department} />
-              <Field label="Nationalité" value={detail.nationality} />
-              <Field label="N° de sécurité sociale" value={detail.social_security_number} />
-              <Field label="Niveau de diplôme" value={detail.diploma_level} />
-              <Field label="Intitulé du diplôme" value={detail.diploma_title} />
-              <Field label="Poste occupé" value={detail.current_position} />
-              <Field label="Besoins d'adaptation (handicap, contraintes...)" value={detail.needs_adaptation} />
-            </div>
-          </Card>
-        )}
-
-        <Card title="Questionnaire d'analyse du besoin">
-          {na ? (
-            <div className="space-y-3">
-              <div
-                className="rounded-xl px-4 py-3 text-sm font-bold inline-block"
-                style={{ background: '#f0f3fa', color: '#005064', ...headingFont }}>
-                Note de positionnement : {na.score} / {na.max_score}
-              </div>
-              <Field label="Répondu le" value={formatDate(na.submitted_at)} />
-              <Field label="Entreprise / fonction" value={na.company_role} />
-              <Field label="Financeur envisagé" value={na.funder} />
-              <Field label="Activité et environnement technique" value={na.activity_context} />
-              <Field label="Besoin / problème à résoudre" value={na.problem_to_solve} />
-              <Field label="Objectifs attendus" value={na.expected_objectives} />
-              <Field label="Niveau Linux" value={na.level_linux} />
-              <Field label="Niveau Docker / conteneurs" value={na.level_docker} />
-              <Field label="Niveau Kubernetes" value={na.level_kubernetes} />
-              <Field label="Cas d'usage à traiter" value={na.specific_use_case} />
-              <Field label="Contraintes de planning" value={na.planning_constraints} />
-              <Field label="Besoin d'aménagement (handicap)" value={na.needs_adaptation} />
-              <Field label="Précisions sur l'aménagement" value={na.adaptation_details} />
-            </div>
-          ) : (
-            <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
-              Le questionnaire n'a pas encore été renseigné par l'apprenant.
-            </p>
-          )}
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-// --- Liste des demandes ----------------------------------------------
-function RegistrationList({ auth, onSelect }) {
-  const [items, setItems] = useState(null);
-  const [error, setError] = useState(null);
-
-  const load = useCallback(() => {
-    setError(null);
-    adminListRegistrations(auth).then(setItems).catch((e) => setError(e.message));
-  }, [auth]);
-
-  useEffect(load, [load]);
-
-  const pendingCount = useMemo(
-    () => (items ?? []).filter((i) => i.status === 'PENDING').length,
-    [items]
-  );
-
-  if (error) {
-    return <p className="text-sm" style={{ color: '#a12626', ...bodyFont }}>{error}</p>;
-  }
-  if (!items) {
-    return <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>;
-  }
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-5">
-        <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
-          {items.length} demande{items.length > 1 ? 's' : ''} — {pendingCount} en attente
-        </p>
-        <button
-          type="button"
-          onClick={load}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold"
-          style={{ color: '#005064', ...headingFont }}>
-          <RefreshCw className="w-4 h-4" />
-          Actualiser
-        </button>
-      </div>
-
-      {items.length === 0 ? (
-        <div className="rounded-2xl p-10 text-center" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-          <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
-            Aucune demande d'inscription reçue pour le moment.
-          </p>
-        </div>
-      ) : (
-        <div className="rounded-2xl overflow-x-auto" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-          <table className="w-full text-left" style={{ minWidth: 760 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
-                {['Date', 'Demandeur', 'Profil', 'Formation', 'Questionnaire', 'Statut'].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-[11px] uppercase tracking-wide font-semibold"
-                    style={{ color: '#6b7a9b', ...headingFont }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr
-                  key={item.id}
-                  onClick={() => onSelect(item.id)}
-                  className="cursor-pointer transition-colors hover:bg-[#f7f9fd]"
-                  style={{ borderBottom: '1px solid #f0f3fa' }}>
-                  <td className="px-4 py-3.5 text-xs whitespace-nowrap" style={{ color: '#6b7a9b', ...bodyFont }}>
-                    {formatDate(item.created_at)}
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <p className="text-sm font-semibold" style={{ color: '#001a4a', ...headingFont }}>
-                      {item.first_name} {item.last_name}
-                    </p>
-                    <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
-                      {item.company_name || item.email}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3.5 text-sm" style={{ color: '#001a4a', ...bodyFont }}>
-                    {APPLICANT_LABELS[item.applicant_type]}
-                  </td>
-                  <td className="px-4 py-3.5 text-sm" style={{ color: '#001a4a', ...bodyFont }}>
-                    {item.formation_title}
-                  </td>
-                  <td className="px-4 py-3.5">
-                    {item.has_needs_analysis ? (
-                      <span
-                        className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold"
-                        style={{ background: '#e5f6ec', color: '#116632', ...headingFont }}>
-                        Répondu — {item.needs_analysis_score}/{item.needs_analysis_max_score}
-                      </span>
-                    ) : (
-                      <span
-                        className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold"
-                        style={{ background: '#f0f3fa', color: '#6b7a9b', ...headingFont }}>
-                        Non répondu
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <StatusBadge status={item.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
+// --- Navigation de la sidebar ----------------------------------------
+const NAV_ITEMS = [
+  { key: 'formations', label: 'Formations', icon: GraduationCap },
+  { key: 'requests', label: 'Demandes à traiter', icon: Inbox },
+  { key: 'learners', label: 'Dossiers apprenants', icon: UsersRound },
+  { key: 'certificates', label: 'Certificats de réalisation', icon: Award },
+];
 
 // --- Page /admin ------------------------------------------------------
 export default function Admin() {
   const [auth, setAuth] = useState(getStoredAuth);
-  const [selectedId, setSelectedId] = useState(null);
-  const [listVersion, setListVersion] = useState(0);
+  const [view, setView] = useState('requests');
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
 
   useEffect(() => {
     document.title = 'Administration — Hi-Tech Academy';
@@ -441,7 +109,14 @@ export default function Admin() {
   const logout = () => {
     clearAuth();
     setAuth(null);
-    setSelectedId(null);
+    setView('requests');
+    setSelectedRequestId(null);
+  };
+
+  // Depuis les autres vues : ouvrir une demande précise dans « Demandes à traiter »
+  const openRequest = (id) => {
+    setSelectedRequestId(id);
+    setView('requests');
   };
 
   if (!auth) {
@@ -449,37 +124,81 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#f7f9fd' }}>
-      <header className="px-4 sm:px-8 py-4 flex items-center justify-between" style={{ background: 'white', borderBottom: '1px solid #e0e8f4' }}>
-        <div className="flex items-center gap-2.5">
-          <ShieldCheck className="w-6 h-6" style={{ color: '#005064' }} />
+    <div className="min-h-screen flex" style={{ background: '#f7f9fd' }}>
+
+      {/* Sidebar */}
+      <aside
+        className="w-64 shrink-0 flex flex-col sticky top-0 h-screen"
+        style={{ background: '#001a4a' }}>
+        <div className="px-5 py-6 flex items-center gap-2.5">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm"
+            style={{ background: '#005064', color: 'white', ...headingFont }}>
+            HT
+          </div>
           <div>
-            <h1 className="text-base font-bold leading-tight" style={{ color: '#001a4a', ...headingFont }}>
-              Administration — Demandes d'inscription
-            </h1>
-            <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>{auth.email}</p>
+            <p className="text-sm font-bold leading-tight" style={{ color: 'white', ...headingFont }}>
+              Hi-Tech Academy
+            </p>
+            <p className="text-[11px]" style={{ color: '#8ba0c4', ...bodyFont }}>Administration</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={logout}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold"
-          style={{ color: '#a12626', ...headingFont }}>
-          <LogOut className="w-4 h-4" />
-          Se déconnecter
-        </button>
-      </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
-        {selectedId ? (
-          <RegistrationDetail
-            auth={auth}
-            id={selectedId}
-            onBack={() => setSelectedId(null)}
-            onStatusChanged={() => setListVersion((v) => v + 1)} />
-        ) : (
-          <RegistrationList key={listVersion} auth={auth} onSelect={setSelectedId} />
-        )}
+        <nav className="flex-1 px-3 space-y-1">
+          {NAV_ITEMS.map(({ key, label, icon: Icon }) => {
+            const active = view === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  setView(key);
+                  if (key !== 'requests') setSelectedRequestId(null);
+                }}
+                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition-colors"
+                style={{
+                  background: active ? '#005064' : 'transparent',
+                  color: active ? 'white' : '#8ba0c4',
+                  ...headingFont,
+                }}>
+                <Icon className="w-[18px] h-[18px] shrink-0" />
+                {label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="px-3 pb-5 pt-3" style={{ borderTop: '1px solid rgba(139,160,196,0.2)' }}>
+          <p className="px-3.5 pb-2 text-[11px] truncate" style={{ color: '#8ba0c4', ...bodyFont }}>
+            {auth.email}
+          </p>
+          <button
+            type="button"
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-left"
+            style={{ color: '#f0a5a5', ...headingFont }}>
+            <LogOut className="w-[18px] h-[18px]" />
+            Se déconnecter
+          </button>
+        </div>
+      </aside>
+
+      {/* Contenu */}
+      <main className="flex-1 min-w-0 px-5 sm:px-8 py-8 overflow-x-hidden">
+        <div className="max-w-6xl mx-auto">
+          {view === 'formations' && (
+            <FormationsView auth={auth} onOpenRequests={() => setView('requests')} />
+          )}
+          {view === 'requests' && (
+            <RequestsView auth={auth} selectedId={selectedRequestId} onSelect={setSelectedRequestId} />
+          )}
+          {view === 'learners' && (
+            <LearnersView auth={auth} onOpenRequest={openRequest} />
+          )}
+          {view === 'certificates' && (
+            <CertificatesView auth={auth} />
+          )}
+        </div>
       </main>
     </div>
   );
