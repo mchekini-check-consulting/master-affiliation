@@ -12,6 +12,9 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import Inscription from './pages/Inscription';
+import AnalyseBesoin from './pages/AnalyseBesoin';
+import Admin from './pages/Admin';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -43,6 +46,9 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<Home />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/inscription/:formationId" element={<Inscription />} />
+      <Route path="/inscription/demande/:requestId/questionnaire" element={<AnalyseBesoin />} />
+      <Route path="/admin" element={<Admin />} />
       <Route path="/mentions-legales" element={<LegalNotices />} />
       <Route path="/politique-confidentialite" element={<PrivacyPolicy />} />
       <Route path="/conditions-vente" element={<TermsAndConditions />} />

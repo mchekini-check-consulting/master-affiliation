@@ -1,3 +1,8 @@
 node_modules
 dist
 Dockerfile
+# Backend : image séparée (back/Dockerfile), exclu de l'image du front
+back
+# Documents de travail non servis par le site (les PDF publics sont dans public/documents)
+documents_source
+documents_finaux

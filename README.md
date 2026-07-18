@@ -13,11 +13,12 @@ master-affiliation/
 ├── .env                      # Configuration : port et tag d'image de chaque site
 ├── .github/workflows/
 │   ├── _deploy-project.yml   # Workflow réutilisable (build → GHCR → deploy VM)
-│   ├── hi-tech-academy.yml   # Pipeline hi-tech-academy (déclenchée si hi-tech-academy/** change)
+│   ├── hi-tech-academy.yml   # Pipeline hi-tech-academy (fullstack : images front + back)
 │   ├── parents-malins.yml    # Pipeline parents-malins (déclenchée si parents-malins/** change)
 │   ├── prepa-technique.yml   # Pipeline prepa-technique (déclenchée si prepa-technique/** change)
 │   └── my-way.yml            # Pipeline my-way (fullstack : images back + front)
-├── hi-tech-academy/          # Hi-Tech Academy (hi-tech-academy.fr) — React/Vite + Base44, servi en SPA
+├── hi-tech-academy/          # Hi-Tech Academy (hi-tech-academy.fr) — React/Vite (SPA) + Spring Boot + PostgreSQL
+│   └── back/                 # API Spring Boot : demandes d'inscription, analyse du besoin, espace admin
 ├── parents-malins/           # Parents Malins (parents-malins.fr) — Astro statique → nginx
 ├── prepa-technique/          # Prépa Technique (preparation.check-consulting.net) — Astro statique → nginx
 └── my-way/                   # My Way (freelance-now.fr) — Angular + Spring Boot + PostgreSQL

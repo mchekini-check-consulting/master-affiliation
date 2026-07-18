@@ -1,4 +1,6 @@
 # Pipeline du projet hi-tech-academy : ne se déclenche que si hi-tech-academy/ change sur main.
+# Fullstack : build des 2 images (front + back) puis redémarrage des services
+# du projet uniquement (la BDD est créée au premier déploiement).
 name: hi-tech-academy
 
 on:
@@ -6,6 +8,7 @@ on:
     branches: [main]
     paths:
       - "hi-tech-academy/**"
+      - ".github/workflows/hi-tech-academy.yml"
   workflow_dispatch:
 
 permissions:
@@ -13,8 +16,69 @@ permissions:
   packages: write
 
 jobs:
+  build-and-push:
+    name: Build & push hi-tech-academy ${{ matrix.component.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component:
+          # Le front vit à la racine du dossier, le back dans back/
+          - { image: hi-tech-academy, context: ./hi-tech-academy }
+          - { image: hi-tech-academy-back, context: ./hi-tech-academy/back }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.component.context }}
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.component.image }}:latest
+            ghcr.io/${{ github.repository }}/${{ matrix.component.image }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.component.image }}
+          cache-to: type=gha,scope=${{ matrix.component.image }},mode=max
+
   deploy:
-    uses: ./.github/workflows/_deploy-project.yml
-    with:
-      project: hi-tech-academy
-    secrets: inherit
+    name: Deploy hi-tech-academy sur la VM
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Redémarrer uniquement les services du projet
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            set -e
+            REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+            if [ ! -d /opt/master-affiliation/.git ]; then
+              sudo mkdir -p /opt/master-affiliation
+              sudo chown "$(id -u):$(id -g)" /opt/master-affiliation
+              git clone "$REPO_URL" /opt/master-affiliation
+            fi
+            cd /opt/master-affiliation
+            git remote set-url origin "$REPO_URL"
+            git fetch origin main
+            git reset --hard origin/main
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Retry : les images tout juste poussées peuvent mettre quelques
+            # secondes à être disponibles sur GHCR
+            for i in 1 2 3 4 5; do
+              docker compose pull hi-tech-academy hi-tech-academy-back && break
+              echo "pull raté (tentative $i), nouvel essai dans 15s..." && sleep 15
+            done
+            docker compose up -d hi-tech-academy-db hi-tech-academy-back hi-tech-academy
+            docker image prune -f
