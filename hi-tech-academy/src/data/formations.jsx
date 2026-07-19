@@ -89,6 +89,16 @@ export const formations = [
             <li>Inscription par e-mail (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>), téléphone (<a href="tel:+33751474135" className="underline">07 51 47 41 35</a>) ou via le formulaire de contact du site.</li>
             <li>Délai d'accès : 1 jour minimum entre la demande et le début de la formation (hors prise en charge financeur).</li>
             <li>Ouverture de la session à partir de 1 participant.</li>
+            <li>
+              Avant l'entrée en formation, chaque apprenant reçoit le{' '}
+              <a href="/documents/qualiopi/Livret_accueil_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                livret d'accueil (PDF)
+              </a>{' '}
+              et le{' '}
+              <a href="/documents/qualiopi/Reglement_interieur_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                règlement intérieur (PDF)
+              </a>.
+            </li>
           </ul>
         ),
       },
@@ -102,8 +112,13 @@ export const formations = [
               l'inscription, le référent handicap étudie avec le candidat les aménagements nécessaires et mobilise
               si besoin son réseau de partenaires.
             </p>
-            <p>
+            <p className="mb-2">
               <strong>Référent handicap :</strong> Mahdi CHEKINI — <a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a> — <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>
+            </p>
+            <p>
+              <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                Consulter notre politique d'accessibilité (PDF)
+              </a>
             </p>
           </>
         ),

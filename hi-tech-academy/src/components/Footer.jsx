@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, Facebook, Instagram, Linkedin, Youtube, Twitter } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, FileText, Facebook, Instagram, Linkedin, Youtube, Twitter } from 'lucide-react';
 import MarqueeStrip from '@/components/MarqueeStrip';
 
 const BRAND_COLOR = '#005064';
@@ -19,6 +19,13 @@ const liens = [
   { label: 'Mentions légales', href: '/mentions-legales' },
   { label: 'Politique de confidentialité', href: '/politique-confidentialite' },
   { label: 'Conditions générales de vente', href: '/conditions-vente' },
+];
+
+// Documents Qualiopi publics (PDF servis depuis public/documents/qualiopi/)
+const documents = [
+  { label: "Livret d'accueil", href: '/documents/qualiopi/Livret_accueil_V1.0.pdf' },
+  { label: 'Règlement intérieur', href: '/documents/qualiopi/Reglement_interieur_V1.0.pdf' },
+  { label: "Politique d'accessibilité", href: '/documents/qualiopi/Accessibilite_handicap_V1.0.pdf' },
 ];
 
 const socials = [
@@ -120,6 +127,28 @@ export default function Footer() {
               Nous formons la prochaine génération d'ingénieurs logiciels, de data scientists et de leaders technologiques à travers des programmes intensifs et un mentorat d'élite.
             </p>
 
+            {/* Documents remis aux apprenants (PDF) */}
+            <h4
+              className="text-white font-semibold text-xs sm:text-sm uppercase tracking-widest mb-4"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            >
+              Documents utiles
+            </h4>
+            <ul className="space-y-2.5 sm:space-y-3">
+              {documents.map(d => (
+                <li key={d.label}>
+                  <a
+                    href={d.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/55 text-xs sm:text-sm hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <FileText className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(248,177,2,0.6)' }} />
+                    {d.label} (PDF)
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* 2 — Nos formations */}
