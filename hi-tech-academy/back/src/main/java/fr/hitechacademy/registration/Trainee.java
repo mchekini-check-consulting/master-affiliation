@@ -87,10 +87,17 @@ public class Trainee {
     @OneToOne(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
     private PositioningTest positioningTest;
 
+    // Évaluation finale du salarié (envoyée par l'admin)
+    @OneToOne(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private FinalEvaluation finalEvaluation;
+
     public UUID getId() { return id; }
 
     public PositioningTest getPositioningTest() { return positioningTest; }
     public void setPositioningTest(PositioningTest positioningTest) { this.positioningTest = positioningTest; }
+
+    public FinalEvaluation getFinalEvaluation() { return finalEvaluation; }
+    public void setFinalEvaluation(FinalEvaluation finalEvaluation) { this.finalEvaluation = finalEvaluation; }
 
     public RegistrationRequest getRegistration() { return registration; }
     public void setRegistration(RegistrationRequest registration) { this.registration = registration; }

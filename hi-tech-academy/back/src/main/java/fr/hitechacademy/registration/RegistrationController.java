@@ -5,6 +5,7 @@ import fr.hitechacademy.registration.RegistrationDtos.CreateRegistrationRequest;
 import fr.hitechacademy.registration.RegistrationDtos.CreatedResponse;
 import fr.hitechacademy.registration.RegistrationDtos.NeedsAnalysisRequest;
 import fr.hitechacademy.registration.RegistrationDtos.PublicView;
+import fr.hitechacademy.registration.RegistrationDtos.FinalEvaluationRequest;
 import fr.hitechacademy.registration.RegistrationDtos.PositioningTestRequest;
 import fr.hitechacademy.registration.RegistrationDtos.SponsorSurveyRequest;
 import fr.hitechacademy.registration.RegistrationDtos.TraineeCreatedResponse;
@@ -107,7 +108,9 @@ public class RegistrationController {
                 r.getNeedsAnalysis() != null,
                 r.getSponsorSurvey() != null,
                 r.getPositioningTest() != null,
-                r.getTrainees().size());
+                r.getTrainees().size(),
+                r.getFinalEvaluation() != null,
+                r.getFinalEvaluation() != null && r.getFinalEvaluation().isSubmitted());
     }
 
     /** Contenu du test de positionnement — sans les bonnes réponses. */
@@ -248,6 +251,83 @@ public class RegistrationController {
                         .findFirst()
                         .map(Trainee::getId)
                         .orElse(null));
+    }
+
+    /** QCM d'évaluation finale — sans le corrigé. */
+    @GetMapping("/final-evaluation")
+    public Map<String, Object> finalEvaluationContent() {
+        return Map.of(
+                "questions", FinalEvaluationCatalog.QUESTIONS.stream()
+                        .map(q -> Map.of(
+                                "id", q.id(),
+                                "text", q.text(),
+                                "options", q.options()))
+                        .toList());
+    }
+
+    /** Soumission de l'évaluation finale du demandeur (une seule tentative). */
+    @PostMapping("/{id}/final-evaluation")
+    @Transactional
+    public Map<String, Integer> submitFinalEvaluation(@PathVariable UUID id,
+                                                      @Valid @RequestBody FinalEvaluationRequest body) {
+        RegistrationRequest r = find(id);
+        FinalEvaluation fe = r.getFinalEvaluation();
+        gradeFinalEvaluation(fe, body);
+        repository.save(r);
+        return Map.of("score", fe.getScore(), "max_score", fe.getMaxScore());
+    }
+
+    /** Soumission de l'évaluation finale d'un apprenant salarié. */
+    @PostMapping("/{id}/trainees/{traineeId}/final-evaluation")
+    @Transactional
+    public Map<String, Integer> submitTraineeFinalEvaluation(@PathVariable UUID id, @PathVariable UUID traineeId,
+                                                             @Valid @RequestBody FinalEvaluationRequest body) {
+        RegistrationRequest r = find(id);
+        Trainee t = r.getTrainees().stream()
+                .filter(x -> x.getId().equals(traineeId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Apprenant introuvable"));
+        FinalEvaluation fe = t.getFinalEvaluation();
+        gradeFinalEvaluation(fe, body);
+        repository.save(r);
+        return Map.of("score", fe.getScore(), "max_score", fe.getMaxScore());
+    }
+
+    // Corrige et enregistre la soumission (l'invitation doit avoir été envoyée)
+    private static void gradeFinalEvaluation(FinalEvaluation fe, FinalEvaluationRequest body) {
+        if (fe == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "L'évaluation n'a pas été envoyée pour cet apprenant");
+        }
+        if (fe.isSubmitted()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "L'évaluation a déjà été passée : une seule tentative est autorisée");
+        }
+        List<FinalEvaluationCatalog.QcmQuestion> catalog = FinalEvaluationCatalog.QUESTIONS;
+        if (body.answers().size() != catalog.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "L'évaluation comporte " + catalog.size() + " questions");
+        }
+        int score = 0;
+        StringBuilder answers = new StringBuilder();
+        for (int i = 0; i < catalog.size(); i++) {
+            Integer chosen = body.answers().get(i);
+            if (chosen == null || chosen < 0 || chosen >= catalog.get(i).options().size()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Réponse invalide à la question " + catalog.get(i).id());
+            }
+            if (chosen == catalog.get(i).correctIndex()) {
+                score++;
+            }
+            if (i > 0) {
+                answers.append(',');
+            }
+            answers.append(chosen);
+        }
+        fe.setAnswers(answers.toString());
+        fe.setScore(score);
+        fe.setMaxScore(catalog.size());
+        fe.setSubmittedAt(java.time.Instant.now());
     }
 
     /** Test de positionnement du demandeur (particulier / indépendant). */

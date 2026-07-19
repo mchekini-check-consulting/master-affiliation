@@ -64,6 +64,26 @@ export function submitTraineePositioningTest(id, traineeId, payload) {
   return request(`/registrations/${id}/trainees/${traineeId}/positioning-test`, { method: 'POST', body: payload });
 }
 
+export function getFinalEvaluationContent() {
+  return request('/registrations/final-evaluation');
+}
+
+export function submitFinalEvaluation(id, payload) {
+  return request(`/registrations/${id}/final-evaluation`, { method: 'POST', body: payload });
+}
+
+export function submitTraineeFinalEvaluation(id, traineeId, payload) {
+  return request(`/registrations/${id}/trainees/${traineeId}/final-evaluation`, { method: 'POST', body: payload });
+}
+
+export function adminSendFinalEvaluation(auth, id) {
+  return request(`/admin/registrations/${id}/final-evaluation/send`, { method: 'POST', auth });
+}
+
+export function adminSendTraineeFinalEvaluation(auth, id, traineeId) {
+  return request(`/admin/registrations/${id}/trainees/${traineeId}/final-evaluation/send`, { method: 'POST', auth });
+}
+
 // --- Espace admin (basic auth) ---------------------------------------
 const AUTH_STORAGE_KEY = 'hta-admin-auth';
 

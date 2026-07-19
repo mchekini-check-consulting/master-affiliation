@@ -26,16 +26,19 @@ public class MailService {
     private final boolean enabled;
     private final String from;
     private final String adminRecipient;
+    private final String baseUrl;
 
     public MailService(
             JavaMailSender mailSender,
             @Value("${spring.mail.password}") String password,
             @Value("${spring.mail.username}") String from,
-            @Value("${app.mail.admin-recipient}") String adminRecipient) {
+            @Value("${app.mail.admin-recipient}") String adminRecipient,
+            @Value("${app.base-url}") String baseUrl) {
         this.mailSender = mailSender;
         this.enabled = password != null && !password.isBlank();
         this.from = from;
         this.adminRecipient = adminRecipient;
+        this.baseUrl = baseUrl;
         if (!enabled) {
             log.warn("MAIL_PASSWORD non défini : envoi d'emails désactivé");
         }
@@ -117,6 +120,31 @@ public class MailService {
                     "Votre demande d'inscription — " + r.getFormationTitle(),
                     body.formatted(greeting, r.getLastName(), r.getFormationTitle()));
         }
+    }
+
+    /** Invitation à passer le QCM d'évaluation finale (envoyée par l'admin). */
+    @Async
+    public void sendFinalEvaluationInvitation(String to, String firstName, String lastName,
+                                              String formationTitle, String evaluationPath) {
+        String body = """
+                Bonjour %s %s,
+
+                Dans le cadre de votre formation « %s », merci de compléter
+                le QCM d'évaluation finale des acquis (10 questions, environ 10 minutes,
+                une seule tentative) :
+
+                %s
+
+                Le résultat sera reporté sur votre attestation de fin de formation.
+
+                Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Bonne réussite,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        send(to,
+                "Évaluation finale — " + formationTitle,
+                body.formatted(firstName, lastName, formationTitle, baseUrl + evaluationPath));
     }
 
     private void send(String to, String subject, String body) {

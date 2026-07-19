@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, CheckCircle2, Copy, Download, Eye, RefreshCw, XCircle } from 'lucide-react';
-import { adminGetRegistration, adminListRegistrations, adminUpdateStatus } from '@/api/backend';
+import { ArrowLeft, CheckCircle2, Copy, Download, Eye, RefreshCw, Send, XCircle } from 'lucide-react';
+import {
+  adminGetRegistration, adminListRegistrations, adminSendFinalEvaluation,
+  adminSendTraineeFinalEvaluation, adminUpdateStatus,
+} from '@/api/backend';
 import { downloadCertificatePdf } from '@/lib/certificatePdf';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import {
@@ -166,10 +169,28 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
-  const [openSurvey, setOpenSurvey] = useState(null); // 'needs' | 'sponsor' | 'test' | null
+  const [openSurvey, setOpenSurvey] = useState(null); // 'needs' | 'sponsor' | 'test' | 'finalEval' | null
   const [openTrainee, setOpenTrainee] = useState(null); // analyse du besoin d'un salarié
   const [openTraineeTest, setOpenTraineeTest] = useState(null); // test d'un salarié
+  const [openTraineeFinalEval, setOpenTraineeFinalEval] = useState(null); // évaluation finale d'un salarié
+  const [sendingEval, setSendingEval] = useState(null); // 'self' | traineeId | null
   const [linkCopied, setLinkCopied] = useState(false);
+
+  // Envoi (ou renvoi) du QCM d'évaluation finale par email
+  const sendFinalEval = async (traineeId) => {
+    setSendingEval(traineeId ?? 'self');
+    setError(null);
+    try {
+      const updated = traineeId
+        ? await adminSendTraineeFinalEvaluation(auth, id, traineeId)
+        : await adminSendFinalEvaluation(auth, id);
+      setDetail(updated);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSendingEval(null);
+    }
+  };
 
   const load = useCallback(() => {
     adminGetRegistration(auth, id).then(setDetail).catch((e) => setError(e.message));
@@ -386,6 +407,25 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           </Card>
         )}
 
+        {!isCompany && (
+          <Card title="Évaluation finale (QCM)">
+            <div className="space-y-3">
+              <FinalEvaluationStatus
+                evaluation={detail.final_evaluation}
+                canSend={detail.status === 'VALIDATED'}
+                sending={sendingEval === 'self'}
+                onSend={() => sendFinalEval(null)}
+                onView={() => setOpenSurvey('finalEval')} />
+              {detail.final_evaluation?.submitted_at && (
+                <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
+                  Passée le {formatDate(detail.final_evaluation.submitted_at)} — la partie mise en
+                  pratique est évaluée par le formateur.
+                </p>
+              )}
+            </div>
+          </Card>
+        )}
+
         {isCompany && (
           <Card title="Analyse du besoin — représentant de l'entreprise">
             {detail.sponsor_survey ? (
@@ -444,7 +484,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
               <table className="w-full text-left">
                 <thead>
                   <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
-                    {['Salarié', 'Poste', 'Analyse du besoin', 'Test de positionnement', ''].map((h, i) => (
+                    {['Salarié', 'Poste', 'Analyse du besoin', 'Test de positionnement', 'Évaluation finale', ''].map((h, i) => (
                       <th
                         key={i}
                         className="px-3 py-2 text-[11px] uppercase tracking-wide font-semibold"
@@ -498,6 +538,15 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
                         ) : (
                           <Badge>Non passé</Badge>
                         )}
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <FinalEvaluationStatus
+                          evaluation={t.final_evaluation}
+                          canSend={detail.status === 'VALIDATED'}
+                          sending={sendingEval === t.id}
+                          onSend={() => sendFinalEval(t.id)}
+                          onView={() => setOpenTraineeFinalEval(t)}
+                          compact />
                       </td>
                       <td className="px-3 py-3 text-xs whitespace-nowrap text-right" style={{ color: '#6b7a9b', ...bodyFont }}>
                         {formatDate(t.submitted_at)}
@@ -559,6 +608,20 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           formationTitle={detail.formation_title}
           onClose={() => setOpenTraineeTest(null)} />
       )}
+      {openSurvey === 'finalEval' && detail.final_evaluation?.questions && (
+        <FinalEvaluationModal
+          evaluation={detail.final_evaluation}
+          subjectName={`${detail.first_name} ${detail.last_name}`}
+          formationTitle={detail.formation_title}
+          onClose={() => setOpenSurvey(null)} />
+      )}
+      {openTraineeFinalEval?.final_evaluation?.questions && (
+        <FinalEvaluationModal
+          evaluation={openTraineeFinalEval.final_evaluation}
+          subjectName={`${openTraineeFinalEval.first_name} ${openTraineeFinalEval.last_name} (salarié de ${detail.company_name})`}
+          formationTitle={detail.formation_title}
+          onClose={() => setOpenTraineeFinalEval(null)} />
+      )}
     </div>
   );
 }
@@ -607,6 +670,83 @@ function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
         <Answer question="Cas d'usage ou objectif précis pour cette formation" answer={test.expectations} />
       </SurveySection>
     </SurveyModal>
+  );
+}
+
+// --- Résultats de l'évaluation finale, grand format --------------------
+function FinalEvaluationModal({ evaluation, subjectName, formationTitle, onClose }) {
+  return (
+    <SurveyModal
+      title={`Évaluation finale — ${subjectName}`}
+      subtitle={formationTitle}
+      submittedAt={evaluation.submitted_at}
+      badge={
+        <span
+          className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
+          style={{ background: '#F8B102', color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          Note au QCM : {evaluation.score} / {evaluation.max_score}
+        </span>
+      }
+      onClose={onClose}>
+      <SurveySection title={`Partie A — QCM (${evaluation.questions.length} questions)`}>
+        {evaluation.questions.map((q) => (
+          <QcmAnswer key={q.id} item={q} />
+        ))}
+      </SurveySection>
+      <p className="text-xs mb-6" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+        La partie B (mise en pratique sur AKS) est évaluée par le formateur pendant la session ;
+        le total /20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).
+      </p>
+    </SurveyModal>
+  );
+}
+
+// État + actions d'une évaluation finale (carte demandeur ou ligne salarié)
+function FinalEvaluationStatus({ evaluation, canSend, sending, onSend, onView, compact = false }) {
+  if (evaluation?.submitted_at) {
+    return (
+      <span className="inline-flex items-center gap-2 flex-wrap">
+        <Badge tone="info">{evaluation.score}/{evaluation.max_score}</Badge>
+        <button
+          type="button"
+          onClick={onView}
+          className="inline-flex items-center gap-1 text-sm font-semibold"
+          style={{ color: '#005064', ...headingFont }}>
+          <Eye className="w-4 h-4" />
+          Voir
+        </button>
+      </span>
+    );
+  }
+  if (evaluation) {
+    return (
+      <span className="inline-flex items-center gap-2 flex-wrap">
+        <Badge tone="warning">Envoyée le {formatDay(evaluation.invited_at)}</Badge>
+        <button
+          type="button"
+          disabled={sending}
+          onClick={onSend}
+          className="inline-flex items-center gap-1 text-sm font-semibold disabled:opacity-50"
+          style={{ color: '#005064', ...headingFont }}>
+          <Send className="w-4 h-4" />
+          Renvoyer
+        </button>
+      </span>
+    );
+  }
+  if (!canSend) {
+    return <Badge>{compact ? '—' : 'Envoyable après validation de la demande'}</Badge>;
+  }
+  return (
+    <button
+      type="button"
+      disabled={sending}
+      onClick={onSend}
+      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-50"
+      style={{ background: '#005064', color: 'white', ...headingFont }}>
+      <Send className="w-4 h-4" />
+      {sending ? 'Envoi…' : compact ? 'Envoyer' : 'Envoyer le quiz par email'}
+    </button>
   );
 }
 

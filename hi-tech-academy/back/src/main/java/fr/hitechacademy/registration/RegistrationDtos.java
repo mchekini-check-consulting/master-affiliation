@@ -74,7 +74,9 @@ public final class RegistrationDtos {
             boolean hasNeedsAnalysis,
             boolean hasSponsorSurvey,
             boolean hasPositioningTest,
-            int traineesCount) {
+            int traineesCount,
+            boolean finalEvaluationInvited,
+            boolean finalEvaluationSubmitted) {
     }
 
     // --- Questionnaire d'analyse du besoin (public) --------------------
@@ -197,6 +199,48 @@ public final class RegistrationDtos {
         }
     }
 
+    // --- Évaluation finale (QCM envoyé par l'admin) ----------------------
+    public record FinalEvaluationRequest(@NotNull List<Integer> answers) {
+    }
+
+    public record FinalEvaluationView(
+            Instant invitedAt,
+            Instant submittedAt,
+            Integer score,
+            Integer maxScore,
+            List<QcmAnswerView> questions) {
+
+        static FinalEvaluationView from(FinalEvaluation fe) {
+            List<QcmAnswerView> questions = null;
+            if (fe.isSubmitted() && fe.getAnswers() != null) {
+                List<Integer> chosen = new ArrayList<>();
+                for (String part : fe.getAnswers().split(",")) {
+                    try {
+                        chosen.add(Integer.parseInt(part.trim()));
+                    } catch (NumberFormatException e) {
+                        chosen.add(null);
+                    }
+                }
+                questions = new ArrayList<>();
+                List<FinalEvaluationCatalog.QcmQuestion> catalog = FinalEvaluationCatalog.QUESTIONS;
+                for (int i = 0; i < catalog.size(); i++) {
+                    FinalEvaluationCatalog.QcmQuestion q = catalog.get(i);
+                    Integer answer = i < chosen.size() ? chosen.get(i) : null;
+                    questions.add(new QcmAnswerView(
+                            q.id(), "QCM", q.text(), q.options(),
+                            answer, q.correctIndex(),
+                            answer != null && answer == q.correctIndex()));
+                }
+            }
+            return new FinalEvaluationView(
+                    fe.getInvitedAt(),
+                    fe.getSubmittedAt(),
+                    fe.getScore(),
+                    fe.getMaxScore(),
+                    questions);
+        }
+    }
+
     // --- Questionnaire apprenant salarié (public, demandes COMPANY) ------
     public record TraineeRequest(
             @NotBlank String firstName,
@@ -234,7 +278,8 @@ public final class RegistrationDtos {
             String planningConstraints,
             int score,
             int maxScore,
-            PositioningTestView positioningTest) {
+            PositioningTestView positioningTest,
+            FinalEvaluationView finalEvaluation) {
 
         static TraineeView from(Trainee t) {
             return new TraineeView(
@@ -256,7 +301,8 @@ public final class RegistrationDtos {
                     t.getPlanningConstraints(),
                     t.getScore(),
                     t.getMaxScore(),
-                    t.getPositioningTest() != null ? PositioningTestView.from(t.getPositioningTest()) : null);
+                    t.getPositioningTest() != null ? PositioningTestView.from(t.getPositioningTest()) : null,
+                    t.getFinalEvaluation() != null ? FinalEvaluationView.from(t.getFinalEvaluation()) : null);
         }
     }
 
@@ -446,7 +492,8 @@ public final class RegistrationDtos {
             CertificateView certificate,
             SponsorSurveyView sponsorSurvey,
             List<TraineeView> trainees,
-            PositioningTestView positioningTest) {
+            PositioningTestView positioningTest,
+            FinalEvaluationView finalEvaluation) {
 
         static AdminDetail from(RegistrationRequest r) {
             return new AdminDetail(
@@ -490,7 +537,8 @@ public final class RegistrationDtos {
                     r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null,
                     r.getSponsorSurvey() != null ? SponsorSurveyView.from(r.getSponsorSurvey()) : null,
                     r.getTrainees().stream().map(TraineeView::from).toList(),
-                    r.getPositioningTest() != null ? PositioningTestView.from(r.getPositioningTest()) : null);
+                    r.getPositioningTest() != null ? PositioningTestView.from(r.getPositioningTest()) : null,
+                    r.getFinalEvaluation() != null ? FinalEvaluationView.from(r.getFinalEvaluation()) : null);
         }
     }
 

@@ -57,6 +57,9 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
 - `/inscription/demande/:id/test-positionnement` — test de positionnement (étape
   2/2, QCM corrigé côté serveur, note /6, non éliminatoire ; `?trainee=<id>` pour
   un salarié). La demande n'est transmise qu'après les deux étapes.
+- `/inscription/demande/:id/evaluation-finale` — QCM d'évaluation finale (10
+  questions, une seule tentative, note /10 ; `?trainee=<id>` pour un salarié).
+  Accessible via le lien envoyé par email depuis l'admin (demande validée).
 - `/inscription/demande/:id/questionnaire-commanditaire` — analyse du besoin du
   représentant de l'entreprise (obligatoire pour une entreprise qui inscrit ses
   salariés) ; fournit ensuite le lien apprenant à partager aux salariés
@@ -91,6 +94,11 @@ ALTER TABLE registration_requests ADD CONSTRAINT registration_requests_status_ch
 | GET | `/registrations/positioning-test` | public | Contenu du test de positionnement (sans les bonnes réponses) |
 | POST | `/registrations/{id}/positioning-test` | public | Test du demandeur, corrigé serveur (particulier/indépendant ; INCOMPLETE → PENDING) |
 | POST | `/registrations/{id}/trainees/{tid}/positioning-test` | public | Test d'un apprenant salarié, corrigé serveur |
+| GET | `/registrations/final-evaluation` | public | QCM d'évaluation finale (sans corrigé) |
+| POST | `/registrations/{id}/final-evaluation` | public | Soumission de l'évaluation (invitation requise, une tentative) |
+| POST | `/registrations/{id}/trainees/{tid}/final-evaluation` | public | Idem pour un apprenant salarié |
+| POST | `/admin/registrations/{id}/final-evaluation/send` | basic auth | Envoi (ou renvoi) du QCM par email au demandeur (demande validée) |
+| POST | `/admin/registrations/{id}/trainees/{tid}/final-evaluation/send` | basic auth | Idem pour un salarié |
 | GET | `/admin/me` | basic auth | Vérification des identifiants |
 | GET | `/admin/registrations` | basic auth | Liste des demandes |
 | GET | `/admin/registrations/{id}` | basic auth | Détail + questionnaire + note |

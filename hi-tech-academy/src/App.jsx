@@ -17,6 +17,7 @@ import AnalyseBesoin from './pages/AnalyseBesoin';
 import QuestionnaireCommanditaire from './pages/QuestionnaireCommanditaire';
 import ApprenantQuestionnaire from './pages/ApprenantQuestionnaire';
 import TestPositionnement from './pages/TestPositionnement';
+import EvaluationFinale from './pages/EvaluationFinale';
 import Admin from './pages/Admin';
 // Add page imports here
 
@@ -54,6 +55,7 @@ const AuthenticatedApp = () => {
       <Route path="/inscription/demande/:requestId/questionnaire-commanditaire" element={<QuestionnaireCommanditaire />} />
       <Route path="/inscription/demande/:requestId/apprenant" element={<ApprenantQuestionnaire />} />
       <Route path="/inscription/demande/:requestId/test-positionnement" element={<TestPositionnement />} />
+      <Route path="/inscription/demande/:requestId/evaluation-finale" element={<EvaluationFinale />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/mentions-legales" element={<LegalNotices />} />
       <Route path="/politique-confidentialite" element={<PrivacyPolicy />} />

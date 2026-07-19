@@ -83,6 +83,69 @@ public class RegistrationAdminController {
         return AdminDetail.from(saved);
     }
 
+    // --- Évaluation finale : envoi du QCM à un apprenant choisi -------
+
+    @PostMapping("/registrations/{id}/final-evaluation/send")
+    @Transactional
+    public AdminDetail sendFinalEvaluation(@PathVariable UUID id) {
+        RegistrationRequest r = find(id);
+        if (r.getApplicantType() == ApplicantType.COMPANY) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Pour une entreprise, l'évaluation s'envoie à chaque salarié");
+        }
+        requireValidated(r);
+        FinalEvaluation fe = r.getFinalEvaluation();
+        if (fe != null && fe.isSubmitted()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "L'évaluation a déjà été passée");
+        }
+        if (fe == null) {
+            fe = new FinalEvaluation();
+            fe.setRegistration(r);
+            r.setFinalEvaluation(fe);
+        } else {
+            fe.setInvitedAt(Instant.now()); // renvoi de l'invitation
+        }
+        RegistrationRequest saved = repository.save(r);
+        mailService.sendFinalEvaluationInvitation(
+                r.getEmail(), r.getFirstName(), r.getLastName(), r.getFormationTitle(),
+                "/inscription/demande/" + r.getId() + "/evaluation-finale");
+        return AdminDetail.from(saved);
+    }
+
+    @PostMapping("/registrations/{id}/trainees/{traineeId}/final-evaluation/send")
+    @Transactional
+    public AdminDetail sendTraineeFinalEvaluation(@PathVariable UUID id, @PathVariable UUID traineeId) {
+        RegistrationRequest r = find(id);
+        requireValidated(r);
+        Trainee t = r.getTrainees().stream()
+                .filter(x -> x.getId().equals(traineeId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Apprenant introuvable"));
+        FinalEvaluation fe = t.getFinalEvaluation();
+        if (fe != null && fe.isSubmitted()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "L'évaluation a déjà été passée par cet apprenant");
+        }
+        if (fe == null) {
+            fe = new FinalEvaluation();
+            fe.setTrainee(t);
+            t.setFinalEvaluation(fe);
+        } else {
+            fe.setInvitedAt(Instant.now());
+        }
+        RegistrationRequest saved = repository.save(r);
+        mailService.sendFinalEvaluationInvitation(
+                t.getEmail(), t.getFirstName(), t.getLastName(), r.getFormationTitle(),
+                "/inscription/demande/" + r.getId() + "/evaluation-finale?trainee=" + t.getId());
+        return AdminDetail.from(saved);
+    }
+
+    private static void requireValidated(RegistrationRequest r) {
+        if (r.getStatus() != RegistrationStatus.VALIDATED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "L'évaluation finale ne peut être envoyée que pour une demande validée");
+        }
+    }
+
     // --- Certificats de réalisation ---------------------------------
 
     @GetMapping("/certificates")

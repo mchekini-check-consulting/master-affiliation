@@ -121,6 +121,10 @@ public class RegistrationRequest {
     @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
     private PositioningTest positioningTest;
 
+    // --- Évaluation finale (particulier / indépendant) ------------------
+    @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
+    private FinalEvaluation finalEvaluation;
+
     public UUID getId() { return id; }
 
     public Instant getCreatedAt() { return createdAt; }
@@ -241,6 +245,9 @@ public class RegistrationRequest {
 
     public PositioningTest getPositioningTest() { return positioningTest; }
     public void setPositioningTest(PositioningTest positioningTest) { this.positioningTest = positioningTest; }
+
+    public FinalEvaluation getFinalEvaluation() { return finalEvaluation; }
+    public void setFinalEvaluation(FinalEvaluation finalEvaluation) { this.finalEvaluation = finalEvaluation; }
 
     /**
      * Questionnaires obligatoires renseignés ? Entreprise : questionnaire du
