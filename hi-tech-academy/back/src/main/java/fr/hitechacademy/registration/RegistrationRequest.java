@@ -33,7 +33,7 @@ public class RegistrationRequest {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RegistrationStatus status = RegistrationStatus.PENDING;
+    private RegistrationStatus status = RegistrationStatus.INCOMPLETE;
 
     private Instant decidedAt;
 
@@ -103,6 +103,10 @@ public class RegistrationRequest {
     // --- Certificat de réalisation (demandes validées) ------------------
     @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
     private Certificate certificate;
+
+    // --- Questionnaire des attentes du commanditaire (COMPANY) ----------
+    @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
+    private SponsorSurvey sponsorSurvey;
 
     public UUID getId() { return id; }
 
@@ -216,4 +220,15 @@ public class RegistrationRequest {
 
     public Certificate getCertificate() { return certificate; }
     public void setCertificate(Certificate certificate) { this.certificate = certificate; }
+
+    public SponsorSurvey getSponsorSurvey() { return sponsorSurvey; }
+    public void setSponsorSurvey(SponsorSurvey sponsorSurvey) { this.sponsorSurvey = sponsorSurvey; }
+
+    /**
+     * Questionnaire obligatoire renseigné ? Entreprise : questionnaire
+     * commanditaire ; particulier / indépendant : analyse du besoin.
+     */
+    public boolean requiredSurveyCompleted() {
+        return applicantType == ApplicantType.COMPANY ? sponsorSurvey != null : needsAnalysis != null;
+    }
 }

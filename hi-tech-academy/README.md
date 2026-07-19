@@ -42,9 +42,13 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
 
 - `/` — accueil (sections hero, formations, timeline, FAQ, blog…)
 - `/inscription/:formationId` — demande d'inscription (3 profils : entreprise,
-  indépendant, particulier), enregistrée en base via `POST /api/registrations`
+  indépendant, particulier), enregistrée en base via `POST /api/registrations`.
+  La demande reste `INCOMPLETE` (non transmise à l'admin) tant que le
+  questionnaire obligatoire n'est pas renseigné.
 - `/inscription/demande/:id/questionnaire` — questionnaire d'analyse du besoin
-  (proposé après l'envoi de la demande ; note calculée sur l'auto-évaluation)
+  (obligatoire pour particulier / indépendant ; note calculée sur l'auto-évaluation)
+- `/inscription/demande/:id/questionnaire-commanditaire` — questionnaire des
+  attentes du commanditaire (obligatoire pour une entreprise qui inscrit ses salariés)
 - `/admin` — espace admin (basic auth) : liste des demandes, détail d'un
   apprenant avec réponses au questionnaire et note, validation / refus
 - `/mentions-legales`, `/politique-confidentialite`, `/conditions-vente`
@@ -55,7 +59,8 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
 |---|---|---|---|
 | POST | `/registrations` | public | Dépôt d'une demande d'inscription |
 | GET | `/registrations/{id}/public` | public | Suivi minimal (page questionnaire) |
-| POST | `/registrations/{id}/needs-analysis` | public | Réponses à l'analyse du besoin |
+| POST | `/registrations/{id}/needs-analysis` | public | Réponses à l'analyse du besoin (INCOMPLETE → PENDING) |
+| POST | `/registrations/{id}/sponsor-survey` | public | Attentes du commanditaire, entreprises uniquement (INCOMPLETE → PENDING) |
 | GET | `/admin/me` | basic auth | Vérification des identifiants |
 | GET | `/admin/registrations` | basic auth | Liste des demandes |
 | GET | `/admin/registrations/{id}` | basic auth | Détail + questionnaire + note |

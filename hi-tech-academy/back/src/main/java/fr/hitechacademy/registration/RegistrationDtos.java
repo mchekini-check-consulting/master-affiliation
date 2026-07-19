@@ -59,7 +59,7 @@ public final class RegistrationDtos {
     public record CreatedResponse(UUID id, RegistrationStatus status) {
     }
 
-    // --- Suivi public d'une demande (page questionnaire) ---------------
+    // --- Suivi public d'une demande (pages questionnaires) --------------
     public record PublicView(
             UUID id,
             RegistrationStatus status,
@@ -69,7 +69,8 @@ public final class RegistrationDtos {
             String firstName,
             String lastName,
             String companyName,
-            boolean hasNeedsAnalysis) {
+            boolean hasNeedsAnalysis,
+            boolean hasSponsorSurvey) {
     }
 
     // --- Questionnaire d'analyse du besoin (public) --------------------
@@ -128,6 +129,52 @@ public final class RegistrationDtos {
         }
     }
 
+    // --- Questionnaire des attentes du commanditaire (public) -----------
+    public record SponsorSurveyRequest(
+            String trainingReason,
+            Integer traineeCount,
+            String traineeProfiles,
+            String expectedSkills,
+            String successCriteria,
+            String applicationProject,
+            String planningConstraints,
+            String funding,
+            Boolean needsAdaptation,
+            String adaptationDetails,
+            String comments) {
+    }
+
+    public record SponsorSurveyView(
+            Instant submittedAt,
+            String trainingReason,
+            Integer traineeCount,
+            String traineeProfiles,
+            String expectedSkills,
+            String successCriteria,
+            String applicationProject,
+            String planningConstraints,
+            String funding,
+            boolean needsAdaptation,
+            String adaptationDetails,
+            String comments) {
+
+        static SponsorSurveyView from(SponsorSurvey s) {
+            return new SponsorSurveyView(
+                    s.getSubmittedAt(),
+                    s.getTrainingReason(),
+                    s.getTraineeCount(),
+                    s.getTraineeProfiles(),
+                    s.getExpectedSkills(),
+                    s.getSuccessCriteria(),
+                    s.getApplicationProject(),
+                    s.getPlanningConstraints(),
+                    s.getFunding(),
+                    s.isNeedsAdaptation(),
+                    s.getAdaptationDetails(),
+                    s.getComments());
+        }
+    }
+
     // --- Espace admin ---------------------------------------------------
     public record AdminListItem(
             UUID id,
@@ -144,7 +191,8 @@ public final class RegistrationDtos {
             boolean hasNeedsAnalysis,
             Integer needsAnalysisScore,
             Integer needsAnalysisMaxScore,
-            boolean hasCertificate) {
+            boolean hasCertificate,
+            boolean hasSponsorSurvey) {
 
         static AdminListItem from(RegistrationRequest r) {
             NeedsAnalysis na = r.getNeedsAnalysis();
@@ -163,7 +211,8 @@ public final class RegistrationDtos {
                     na != null,
                     na != null ? na.getScore() : null,
                     na != null ? na.getMaxScore() : null,
-                    r.getCertificate() != null);
+                    r.getCertificate() != null,
+                    r.getSponsorSurvey() != null);
         }
     }
 
@@ -248,7 +297,8 @@ public final class RegistrationDtos {
             String currentPosition,
             boolean needsAdaptation,
             NeedsAnalysisView needsAnalysis,
-            CertificateView certificate) {
+            CertificateView certificate,
+            SponsorSurveyView sponsorSurvey) {
 
         static AdminDetail from(RegistrationRequest r) {
             return new AdminDetail(
@@ -289,7 +339,8 @@ public final class RegistrationDtos {
                     r.getCurrentPosition(),
                     r.isNeedsAdaptation(),
                     r.getNeedsAnalysis() != null ? NeedsAnalysisView.from(r.getNeedsAnalysis()) : null,
-                    r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null);
+                    r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null,
+                    r.getSponsorSurvey() != null ? SponsorSurveyView.from(r.getSponsorSurvey()) : null);
         }
     }
 

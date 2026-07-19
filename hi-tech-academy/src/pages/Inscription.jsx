@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Building2, UserRound, BriefcaseBusiness, ArrowRight, CheckCircle2, ClipboardList } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Building2, UserRound, BriefcaseBusiness, ArrowRight } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -179,13 +179,13 @@ const emptyForm = {
 
 export default function Inscription() {
   const { formationId } = useParams();
+  const navigate = useNavigate();
   const formation = getFormationById(formationId);
 
   const [mode, setMode] = useState('COMPANY');
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  const [created, setCreated] = useState(null);
 
   useEffect(() => {
     document.title = "Demande d'inscription — Hi-Tech Academy";
@@ -261,52 +261,17 @@ export default function Inscription() {
         needs_adaptation: !isCompanyMode ? form.needsAdaptation : false,
       };
       const result = await createRegistration(payload);
-      setCreated(result);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // La demande n'est transmise qu'après le questionnaire obligatoire :
+      // on enchaîne directement dessus, sans écran de confirmation.
+      const surveyPath = mode === 'COMPANY'
+        ? `/inscription/demande/${result.id}/questionnaire-commanditaire`
+        : `/inscription/demande/${result.id}/questionnaire`;
+      navigate(surveyPath);
     } catch (e) {
       setSubmitError(e.message);
-    } finally {
       setSubmitting(false);
     }
   };
-
-  // --- Écran de confirmation (étape 2 : demande en attente) -----------
-  if (created) {
-    return (
-      <div className="min-h-screen" style={{ background: '#f7f9fd' }}>
-        <TopBar />
-        <Header />
-        <main className="pt-32 pb-20">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6">
-            <Stepper current={1} />
-            <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-              <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#005064' }} />
-              <h1 className="text-2xl font-bold mb-3" style={{ color: '#001a4a', ...headingFont }}>
-                Votre demande a bien été envoyée
-              </h1>
-              <p className="text-sm mb-2" style={{ color: '#6b7a9b', ...bodyFont }}>
-                Votre demande d'inscription à la formation <strong>{formation.title}</strong> est en attente
-                de validation. Nous revenons vers vous sous 24 h ouvrées.
-              </p>
-              <p className="text-sm mb-8" style={{ color: '#6b7a9b', ...bodyFont }}>
-                Pour préparer au mieux votre formation, merci de compléter dès maintenant le
-                questionnaire d'analyse du besoin (5 minutes).
-              </p>
-              <Link
-                to={`/inscription/demande/${created.id}/questionnaire`}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm"
-                style={{ background: '#005064', color: 'white', ...headingFont }}>
-                <ClipboardList className="w-4 h-4" />
-                Répondre au questionnaire d'analyse du besoin
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   // --- Formulaire (étape 1) -------------------------------------------
   return (
@@ -469,9 +434,14 @@ export default function Inscription() {
                 disabled={missingFields.length > 0 || submitting}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: '#005064', color: 'white', ...headingFont }}>
-                {submitting ? 'Envoi en cours…' : 'Émettre ma demande'}
+                {submitting ? 'Envoi en cours…' : 'Continuer vers le questionnaire'}
                 <ArrowRight className="w-4 h-4" />
               </button>
+              <p className="text-xs text-center mt-3" style={{ color: '#6b7a9b', ...bodyFont }}>
+                Dernière étape après ce formulaire : un court questionnaire{' '}
+                {mode === 'COMPANY' ? 'sur vos attentes' : "d'analyse du besoin"} (obligatoire).
+                Votre demande ne sera transmise qu'une fois le questionnaire complété.
+              </p>
             </div>
           </div>
 

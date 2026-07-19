@@ -4,60 +4,35 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getRegistrationPublic, submitNeedsAnalysis } from '@/api/backend';
-import { SectionTitle, Stepper, TextAreaField, TextField } from '@/pages/Inscription';
+import { getRegistrationPublic, submitSponsorSurvey } from '@/api/backend';
+import { SectionTitle, SelectField, Stepper, TextAreaField, TextField } from '@/pages/Inscription';
 
 const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
-// Niveaux d'auto-évaluation du questionnaire « Analyse du besoin – V1.0 »
-const LEVELS = [
-  { key: 'levelLinux', label: 'Linux (ligne de commande)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', label: 'Docker / conteneurs', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', label: 'Kubernetes', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+const FUNDING_OPTIONS = [
+  'OPCO (Atlas ou autre)',
+  "Fonds propres de l'entreprise",
+  'Autre / à définir',
 ];
 
-function RadioGroup({ label, options, value, onChange }) {
-  return (
-    <div>
-      <p className="text-sm font-semibold mb-2" style={{ color: '#001a4a', ...headingFont }}>{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {options.map((option) => (
-          <button
-            key={option}
-            type="button"
-            onClick={() => onChange(option)}
-            className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={{
-              border: value === option ? '1.5px solid #005064' : '1px solid #e0e8f4',
-              background: value === option ? '#f0f3fa' : 'white',
-              color: value === option ? '#005064' : '#6b7a9b',
-              ...headingFont,
-            }}>
-            {option}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 const emptyAnswers = {
-  companyRole: '',
-  funder: '',
-  activityContext: '',
-  problemToSolve: '',
-  expectedObjectives: '',
-  levelLinux: '',
-  levelDocker: '',
-  levelKubernetes: '',
-  specificUseCase: '',
+  trainingReason: '',
+  traineeCount: '',
+  traineeProfiles: '',
+  expectedSkills: '',
+  successCriteria: '',
+  applicationProject: '',
   planningConstraints: '',
+  funding: '',
   needsAdaptation: false,
   adaptationDetails: '',
+  comments: '',
 };
 
-export default function AnalyseBesoin() {
+// Questionnaire des attentes du commanditaire : rempli par l'entreprise qui
+// inscrit ses salariés, obligatoire avant transmission de la demande.
+export default function QuestionnaireCommanditaire() {
   const { requestId } = useParams();
   const navigate = useNavigate();
 
@@ -69,17 +44,18 @@ export default function AnalyseBesoin() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    document.title = "Analyse du besoin — Hi-Tech Academy";
+    document.title = 'Questionnaire commanditaire — Hi-Tech Academy';
     getRegistrationPublic(requestId)
       .then(setRegistration)
       .catch((e) => setLoadError(e.status === 404 ? "Demande d'inscription introuvable." : e.message));
     return () => { document.title = 'Hi-Tech Academy'; };
   }, [requestId]);
 
-  // Les demandes d'entreprise passent par le questionnaire commanditaire
+  // Ce questionnaire est réservé aux demandes d'entreprise ; les autres
+  // profils répondent à l'analyse du besoin.
   useEffect(() => {
-    if (registration?.applicant_type === 'COMPANY') {
-      navigate(`/inscription/demande/${requestId}/questionnaire-commanditaire`, { replace: true });
+    if (registration && registration.applicant_type !== 'COMPANY') {
+      navigate(`/inscription/demande/${requestId}/questionnaire`, { replace: true });
     }
   }, [registration, requestId, navigate]);
 
@@ -87,9 +63,9 @@ export default function AnalyseBesoin() {
 
   const missing = useMemo(() => {
     const list = [];
-    if (!answers.levelLinux) list.push('Niveau Linux');
-    if (!answers.levelDocker) list.push('Niveau Docker');
-    if (!answers.levelKubernetes) list.push('Niveau Kubernetes');
+    if (!answers.trainingReason.trim()) list.push('Contexte et objectif de la formation');
+    if (!answers.traineeCount || Number(answers.traineeCount) < 1) list.push('Nombre de salariés concernés');
+    if (!answers.expectedSkills.trim()) list.push('Compétences attendues');
     return list;
   }, [answers]);
 
@@ -99,20 +75,18 @@ export default function AnalyseBesoin() {
     setSubmitError(null);
     try {
       const clean = (v) => (typeof v === 'string' && v.trim() === '' ? null : v);
-      await submitNeedsAnalysis(requestId, {
-        beneficiary_name: `${registration.first_name} ${registration.last_name}`,
-        company_role: clean(answers.companyRole),
-        funder: clean(answers.funder),
-        activity_context: clean(answers.activityContext),
-        problem_to_solve: clean(answers.problemToSolve),
-        expected_objectives: clean(answers.expectedObjectives),
-        level_linux: answers.levelLinux,
-        level_docker: answers.levelDocker,
-        level_kubernetes: answers.levelKubernetes,
-        specific_use_case: clean(answers.specificUseCase),
+      await submitSponsorSurvey(requestId, {
+        training_reason: answers.trainingReason.trim(),
+        trainee_count: Number(answers.traineeCount),
+        trainee_profiles: clean(answers.traineeProfiles),
+        expected_skills: answers.expectedSkills.trim(),
+        success_criteria: clean(answers.successCriteria),
+        application_project: clean(answers.applicationProject),
         planning_constraints: clean(answers.planningConstraints),
+        funding: clean(answers.funding),
         needs_adaptation: answers.needsAdaptation,
         adaptation_details: answers.needsAdaptation ? clean(answers.adaptationDetails) : null,
+        comments: clean(answers.comments),
       });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -149,7 +123,7 @@ export default function AnalyseBesoin() {
     );
   }
 
-  if (submitted || registration.has_needs_analysis) {
+  if (submitted || registration.has_sponsor_survey) {
     return shell(
       <>
         <Stepper current={1} />
@@ -164,8 +138,9 @@ export default function AnalyseBesoin() {
               : 'Le questionnaire a déjà été renseigné pour cette demande.'}
           </p>
           <p className="text-sm mb-6" style={{ color: '#6b7a9b', ...bodyFont }}>
-            Votre demande d'inscription à la formation <strong>{registration.formation_title}</strong> est
-            maintenant transmise et en attente de validation. Nous revenons vers vous sous 24 h ouvrées.
+            La demande d'inscription de <strong>{registration.company_name}</strong> à la formation{' '}
+            <strong>{registration.formation_title}</strong> est maintenant transmise et en attente de
+            validation. Nous revenons vers vous sous 24 h ouvrées.
           </p>
           <Link
             to="/"
@@ -188,11 +163,11 @@ export default function AnalyseBesoin() {
           {registration.formation_title}
         </span>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#001a4a', ...headingFont }}>
-          Analyse du besoin
+          Vos attentes en tant que commanditaire
         </h1>
         <p className="text-sm max-w-xl mx-auto" style={{ color: '#6b7a9b', ...bodyFont }}>
-          Ce questionnaire recueille et analyse votre besoin, en lien avec votre entreprise et/ou votre
-          financeur, afin de valider les objectifs et d'adapter la formation.
+          Vous inscrivez des salariés de <strong>{registration.company_name}</strong> à cette formation.
+          Ce court questionnaire nous permet de comprendre vos attentes et d'adapter la session.
         </p>
       </div>
 
@@ -207,69 +182,74 @@ export default function AnalyseBesoin() {
 
       <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
 
-        <SectionTitle>1. Identité</SectionTitle>
-        <div className="space-y-4">
-          <TextField
-            label="Nom et prénom du bénéficiaire"
-            value={`${registration.first_name} ${registration.last_name}`}
-            onChange={() => {}} />
-          <TextField label="Entreprise / fonction" value={answers.companyRole} onChange={set('companyRole')}
-            placeholder={registration.company_name || ''} />
-          <TextField label="Financeur envisagé (OPCO Atlas / AGEFICE / autre)" value={answers.funder} onChange={set('funder')} />
-        </div>
-
-        <SectionTitle>2. Contexte et besoin</SectionTitle>
+        <SectionTitle>1. Votre projet de formation</SectionTitle>
         <div className="space-y-4">
           <TextAreaField
-            label="Décrivez votre activité et votre environnement technique actuel"
-            value={answers.activityContext}
-            onChange={set('activityContext')} />
-          <TextAreaField
-            label="Quel est le besoin / problème que la formation doit aider à résoudre ?"
-            value={answers.problemToSolve}
-            onChange={set('problemToSolve')} />
-          <TextAreaField
-            label="Objectifs attendus par l'entreprise à l'issue de la formation"
-            value={answers.expectedObjectives}
-            onChange={set('expectedObjectives')} />
+            label="Dans quel contexte s'inscrit cette formation et quel objectif poursuivez-vous ? *"
+            placeholder="Ex : montée en compétences de l'équipe avant la migration de nos applications vers Kubernetes…"
+            value={answers.trainingReason}
+            onChange={set('trainingReason')} />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <TextField
+              label="Nombre de salariés concernés"
+              required
+              type="number"
+              value={answers.traineeCount}
+              onChange={set('traineeCount')} />
+            <TextField
+              label="Profils / fonctions des salariés"
+              placeholder="Ex : développeurs backend, ingénieurs DevOps…"
+              value={answers.traineeProfiles}
+              onChange={set('traineeProfiles')} />
+          </div>
         </div>
 
-        <SectionTitle>3. Niveau de départ (auto-évaluation)</SectionTitle>
-        <div className="space-y-5">
-          {LEVELS.map(({ key, label, options }) => (
-            <RadioGroup
-              key={key}
-              label={label}
-              options={options}
-              value={answers[key]}
-              onChange={set(key)} />
-          ))}
-        </div>
-
-        <SectionTitle>4. Attentes et besoins spécifiques</SectionTitle>
+        <SectionTitle>2. Vos attentes</SectionTitle>
         <div className="space-y-4">
           <TextAreaField
-            label="Avez-vous un cas d'usage précis à traiter pendant la formation ?"
-            value={answers.specificUseCase}
-            onChange={set('specificUseCase')} />
+            label="Quelles compétences vos salariés doivent-ils maîtriser à l'issue de la formation ? *"
+            value={answers.expectedSkills}
+            onChange={set('expectedSkills')} />
+          <TextAreaField
+            label="À quoi jugerez-vous que la formation est une réussite pour l'entreprise ?"
+            value={answers.successCriteria}
+            onChange={set('successCriteria')} />
+          <TextAreaField
+            label="Y a-t-il un projet concret sur lequel les acquis seront appliqués après la formation ?"
+            value={answers.applicationProject}
+            onChange={set('applicationProject')} />
+        </div>
+
+        <SectionTitle>3. Organisation et financement</SectionTitle>
+        <div className="space-y-4">
+          <TextAreaField
+            label="Contraintes de planning ou d'organisation (périodes à éviter, disponibilité des équipes…)"
+            value={answers.planningConstraints}
+            onChange={set('planningConstraints')} />
+          <SelectField
+            label="Mode de financement envisagé"
+            value={answers.funding}
+            onChange={set('funding')}
+            options={FUNDING_OPTIONS} />
           <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#001a4a', ...bodyFont }}>
             <input
               type="checkbox"
               checked={answers.needsAdaptation}
               onChange={(e) => set('needsAdaptation')(e.target.checked)}
               className="mt-0.5 accent-[#005064]" />
-            Êtes-vous en situation de handicap nécessitant un aménagement de la formation ?
+            Un ou plusieurs salariés sont en situation de handicap nécessitant un aménagement
           </label>
           {answers.needsAdaptation && (
             <TextAreaField
-              label="Précisez vos besoins d'aménagement (rythme, supports, outils d'assistance…)"
+              label="Précisez les besoins d'aménagement"
               value={answers.adaptationDetails}
               onChange={set('adaptationDetails')} />
           )}
+          <TextAreaField
+            label="Autres remarques ou attentes"
+            value={answers.comments}
+            onChange={set('comments')} />
         </div>
-
-        <SectionTitle>5. Contraintes</SectionTitle>
-        <TextAreaField label="Contraintes de planning" value={answers.planningConstraints} onChange={set('planningConstraints')} />
 
         <div className="mt-8">
           {missing.length > 0 && (
@@ -288,7 +268,7 @@ export default function AnalyseBesoin() {
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: '#005064', color: 'white', ...headingFont }}>
-            {submitting ? 'Envoi en cours…' : 'Envoyer mes réponses'}
+            {submitting ? 'Envoi en cours…' : 'Envoyer mes réponses et transmettre ma demande'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

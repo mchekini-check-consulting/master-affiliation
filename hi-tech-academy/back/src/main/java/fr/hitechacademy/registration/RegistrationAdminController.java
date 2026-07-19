@@ -48,7 +48,9 @@ public class RegistrationAdminController {
     @GetMapping("/registrations")
     @Transactional(readOnly = true)
     public List<AdminListItem> list() {
-        return repository.findAllByOrderByCreatedAtDesc().stream()
+        // Les demandes INCOMPLETE (questionnaire obligatoire non renseigné)
+        // ne sont pas encore transmises à l'admin.
+        return repository.findAllByStatusNotOrderByCreatedAtDesc(RegistrationStatus.INCOMPLETE).stream()
                 .map(AdminListItem::from)
                 .toList();
     }
@@ -62,10 +64,14 @@ public class RegistrationAdminController {
     @PostMapping("/registrations/{id}/status")
     @Transactional
     public AdminDetail updateStatus(@PathVariable UUID id, @Valid @RequestBody StatusUpdateRequest body) {
-        if (body.status() == RegistrationStatus.PENDING) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Une demande ne peut être repassée en attente");
+        if (body.status() != RegistrationStatus.VALIDATED && body.status() != RegistrationStatus.REFUSED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Statut cible invalide : VALIDATED ou REFUSED attendu");
         }
         RegistrationRequest r = find(id);
+        if (r.getStatus() == RegistrationStatus.INCOMPLETE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La demande ne peut être traitée : le questionnaire obligatoire n'a pas été renseigné");
+        }
         r.setStatus(body.status());
         r.setDecidedAt(Instant.now());
         return AdminDetail.from(repository.save(r));

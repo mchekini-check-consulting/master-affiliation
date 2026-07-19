@@ -4,6 +4,7 @@ import fr.hitechacademy.registration.RegistrationDtos.CreateRegistrationRequest;
 import fr.hitechacademy.registration.RegistrationDtos.CreatedResponse;
 import fr.hitechacademy.registration.RegistrationDtos.NeedsAnalysisRequest;
 import fr.hitechacademy.registration.RegistrationDtos.PublicView;
+import fr.hitechacademy.registration.RegistrationDtos.SponsorSurveyRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +96,8 @@ public class RegistrationController {
                 r.getFirstName(),
                 r.getLastName(),
                 r.getCompanyName(),
-                r.getNeedsAnalysis() != null);
+                r.getNeedsAnalysis() != null,
+                r.getSponsorSurvey() != null);
     }
 
     @PostMapping("/{id}/needs-analysis")
@@ -129,7 +131,48 @@ public class RegistrationController {
         na.setMaxScore(9);
 
         r.setNeedsAnalysis(na);
+        completeIfRequiredSurveyDone(r);
         repository.save(r);
+    }
+
+    @PostMapping("/{id}/sponsor-survey")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
+    public void submitSponsorSurvey(@PathVariable UUID id, @RequestBody SponsorSurveyRequest body) {
+        RegistrationRequest r = find(id);
+        if (r.getApplicantType() != ApplicantType.COMPANY) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le questionnaire commanditaire est réservé aux demandes d'entreprise");
+        }
+        if (r.getSponsorSurvey() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Le questionnaire a déjà été renseigné pour cette demande");
+        }
+
+        SponsorSurvey s = new SponsorSurvey();
+        s.setRegistration(r);
+        s.setTrainingReason(body.trainingReason());
+        s.setTraineeCount(body.traineeCount());
+        s.setTraineeProfiles(body.traineeProfiles());
+        s.setExpectedSkills(body.expectedSkills());
+        s.setSuccessCriteria(body.successCriteria());
+        s.setApplicationProject(body.applicationProject());
+        s.setPlanningConstraints(body.planningConstraints());
+        s.setFunding(body.funding());
+        s.setNeedsAdaptation(Boolean.TRUE.equals(body.needsAdaptation()));
+        s.setAdaptationDetails(body.adaptationDetails());
+        s.setComments(body.comments());
+
+        r.setSponsorSurvey(s);
+        completeIfRequiredSurveyDone(r);
+        repository.save(r);
+    }
+
+    // Le questionnaire obligatoire vient d'être renseigné : la demande est
+    // transmise à l'admin (INCOMPLETE -> PENDING).
+    private static void completeIfRequiredSurveyDone(RegistrationRequest r) {
+        if (r.getStatus() == RegistrationStatus.INCOMPLETE && r.requiredSurveyCompleted()) {
+            r.setStatus(RegistrationStatus.PENDING);
+        }
     }
 
     private RegistrationRequest find(UUID id) {

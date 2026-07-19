@@ -106,7 +106,13 @@ function LearnerDetail({ learner, onBack, onOpenRequest }) {
                   {r.formation_title}
                 </td>
                 <td className="px-3 py-3">
-                  {r.has_needs_analysis ? (
+                  {r.applicant_type === 'COMPANY' ? (
+                    r.has_sponsor_survey ? (
+                      <Badge tone="success">Commanditaire — répondu</Badge>
+                    ) : (
+                      <Badge>Non répondu</Badge>
+                    )
+                  ) : r.has_needs_analysis ? (
                     <Badge tone="success">Répondu — {r.needs_analysis_score}/{r.needs_analysis_max_score}</Badge>
                   ) : (
                     <Badge>Non répondu</Badge>
@@ -218,6 +224,8 @@ export default function LearnersView({ auth, onOpenRequest }) {
                   <td className="px-4 py-3.5">
                     {learner.score !== null ? (
                       <Badge tone="success">{learner.score}/{learner.maxScore}</Badge>
+                    ) : learner.applicantType === 'COMPANY' ? (
+                      <Badge tone="info">Commanditaire</Badge>
                     ) : (
                       <Badge>Non répondu</Badge>
                     )}
