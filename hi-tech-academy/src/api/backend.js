@@ -48,6 +48,10 @@ export function submitSponsorSurvey(id, payload) {
   return request(`/registrations/${id}/sponsor-survey`, { method: 'POST', body: payload });
 }
 
+export function submitTrainee(id, payload) {
+  return request(`/registrations/${id}/trainees`, { method: 'POST', body: payload });
+}
+
 // --- Espace admin (basic auth) ---------------------------------------
 const AUTH_STORAGE_KEY = 'hta-admin-auth';
 

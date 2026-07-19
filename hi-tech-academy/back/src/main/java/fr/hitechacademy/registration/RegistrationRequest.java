@@ -8,11 +8,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -107,6 +111,11 @@ public class RegistrationRequest {
     // --- Questionnaire des attentes du commanditaire (COMPANY) ----------
     @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
     private SponsorSurvey sponsorSurvey;
+
+    // --- Apprenants salariés et leurs questionnaires (COMPANY) ----------
+    @OneToMany(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("submittedAt ASC")
+    private List<Trainee> trainees = new ArrayList<>();
 
     public UUID getId() { return id; }
 
@@ -223,6 +232,8 @@ public class RegistrationRequest {
 
     public SponsorSurvey getSponsorSurvey() { return sponsorSurvey; }
     public void setSponsorSurvey(SponsorSurvey sponsorSurvey) { this.sponsorSurvey = sponsorSurvey; }
+
+    public List<Trainee> getTrainees() { return trainees; }
 
     /**
      * Questionnaire obligatoire renseigné ? Entreprise : questionnaire

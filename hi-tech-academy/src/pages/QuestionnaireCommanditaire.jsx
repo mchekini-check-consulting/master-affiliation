@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Copy, Users } from 'lucide-react';
 import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -18,6 +18,7 @@ const FUNDING_OPTIONS = [
 
 const emptyAnswers = {
   trainingReason: '',
+  needOrigin: '',
   traineeCount: '',
   traineeProfiles: '',
   expectedSkills: '',
@@ -42,6 +43,7 @@ export default function QuestionnaireCommanditaire() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     document.title = 'Questionnaire commanditaire — Hi-Tech Academy';
@@ -77,6 +79,7 @@ export default function QuestionnaireCommanditaire() {
       const clean = (v) => (typeof v === 'string' && v.trim() === '' ? null : v);
       await submitSponsorSurvey(requestId, {
         training_reason: answers.trainingReason.trim(),
+        need_origin: clean(answers.needOrigin),
         trainee_count: Number(answers.traineeCount),
         trainee_profiles: clean(answers.traineeProfiles),
         expected_skills: answers.expectedSkills.trim(),
@@ -124,6 +127,15 @@ export default function QuestionnaireCommanditaire() {
   }
 
   if (submitted || registration.has_sponsor_survey) {
+    const traineeLink = `${window.location.origin}/inscription/demande/${requestId}/apprenant`;
+    const copyTraineeLink = async () => {
+      try {
+        await navigator.clipboard.writeText(traineeLink);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 3000);
+      } catch { /* clipboard indisponible : le lien reste sélectionnable */ }
+    };
+
     return shell(
       <>
         <Stepper current={1} />
@@ -142,6 +154,39 @@ export default function QuestionnaireCommanditaire() {
             <strong>{registration.formation_title}</strong> est maintenant transmise et en attente de
             validation. Nous revenons vers vous sous 24 h ouvrées.
           </p>
+
+          {/* Lien à partager aux salariés : chacun remplit son analyse du besoin */}
+          <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: '#f0f3fa', border: '1px solid #e0e8f4' }}>
+            <p className="flex items-center gap-2 text-sm font-bold mb-2" style={{ color: '#001a4a', ...headingFont }}>
+              <Users className="w-4 h-4" style={{ color: '#005064' }} />
+              Dernière chose : le questionnaire de vos salariés
+            </p>
+            <p className="text-sm mb-3" style={{ color: '#6b7a9b', ...bodyFont }}>
+              Chaque salarié inscrit doit remplir son propre questionnaire d'analyse du besoin
+              (niveau de départ, attentes — 5 minutes). Transmettez-leur ce lien :
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <code
+                className="flex-1 min-w-0 truncate text-xs px-3 py-2.5 rounded-lg"
+                style={{ background: 'white', color: '#005064', border: '1px solid #e0e8f4' }}>
+                {traineeLink}
+              </code>
+              <button
+                type="button"
+                onClick={copyTraineeLink}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-bold shrink-0"
+                style={{ background: '#005064', color: 'white', ...headingFont }}>
+                <Copy className="w-4 h-4" />
+                {linkCopied ? 'Copié !' : 'Copier le lien'}
+              </button>
+            </div>
+            {registration.trainees_count > 0 && (
+              <p className="text-xs mt-3" style={{ color: '#116632', ...bodyFont }}>
+                ✓ {registration.trainees_count} salarié{registration.trainees_count > 1 ? 's ont' : ' a'} déjà répondu.
+              </p>
+            )}
+          </div>
+
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-sm font-bold"
@@ -189,6 +234,11 @@ export default function QuestionnaireCommanditaire() {
             placeholder="Ex : montée en compétences de l'équipe avant la migration de nos applications vers Kubernetes…"
             value={answers.trainingReason}
             onChange={set('trainingReason')} />
+          <TextAreaField
+            label="Comment ce besoin de formation a-t-il été identifié ?"
+            placeholder="Ex : entretiens annuels, plan de développement des compétences, nouveau projet, évolution technologique…"
+            value={answers.needOrigin}
+            onChange={set('needOrigin')} />
           <div className="grid sm:grid-cols-2 gap-4">
             <TextField
               label="Nombre de salariés concernés"

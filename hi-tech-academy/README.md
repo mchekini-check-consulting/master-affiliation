@@ -52,8 +52,11 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
   questionnaire obligatoire n'est pas renseigné.
 - `/inscription/demande/:id/questionnaire` — questionnaire d'analyse du besoin
   (obligatoire pour particulier / indépendant ; note calculée sur l'auto-évaluation)
-- `/inscription/demande/:id/questionnaire-commanditaire` — questionnaire des
-  attentes du commanditaire (obligatoire pour une entreprise qui inscrit ses salariés)
+- `/inscription/demande/:id/questionnaire-commanditaire` — analyse du besoin du
+  représentant de l'entreprise (obligatoire pour une entreprise qui inscrit ses
+  salariés) ; fournit ensuite le lien apprenant à partager aux salariés
+- `/inscription/demande/:id/apprenant` — analyse du besoin individuelle de chaque
+  salarié inscrit (identité + auto-évaluation, note /9 ; demandes entreprise uniquement)
 - `/admin` — espace admin (basic auth) : liste des demandes, détail d'un
   apprenant avec réponses au questionnaire et note, validation / refus
 - `/mentions-legales`, `/politique-confidentialite`, `/conditions-vente`
@@ -65,7 +68,8 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
 | POST | `/registrations` | public | Dépôt d'une demande d'inscription |
 | GET | `/registrations/{id}/public` | public | Suivi minimal (page questionnaire) |
 | POST | `/registrations/{id}/needs-analysis` | public | Réponses à l'analyse du besoin (INCOMPLETE → PENDING) |
-| POST | `/registrations/{id}/sponsor-survey` | public | Attentes du commanditaire, entreprises uniquement (INCOMPLETE → PENDING) |
+| POST | `/registrations/{id}/sponsor-survey` | public | Analyse du besoin du représentant, entreprises uniquement (INCOMPLETE → PENDING) |
+| POST | `/registrations/{id}/trainees` | public | Analyse du besoin d'un apprenant salarié (entreprises uniquement, un par email) |
 | GET | `/admin/me` | basic auth | Vérification des identifiants |
 | GET | `/admin/registrations` | basic auth | Liste des demandes |
 | GET | `/admin/registrations/{id}` | basic auth | Détail + questionnaire + note |

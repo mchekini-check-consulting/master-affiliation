@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/registrations/*/public").permitAll()
                         .requestMatchers(HttpMethod.POST, "/registrations/*/needs-analysis").permitAll()
                         .requestMatchers(HttpMethod.POST, "/registrations/*/sponsor-survey").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/registrations/*/trainees").permitAll()
                         .requestMatchers("/actuator/health/**", "/actuator/health").permitAll()
                         // Dispatch d'erreur Spring (sinon les 400/404/409 publics ressortent en 401)
                         .requestMatchers("/error").permitAll()

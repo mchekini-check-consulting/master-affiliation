@@ -86,7 +86,7 @@ export default function FormationsView({ auth, onOpenRequests }) {
               <div className="mt-4 flex items-center gap-4">
                 <button
                   type="button"
-                  onClick={onOpenRequests}
+                  onClick={() => onOpenRequests(formation.id)}
                   className="inline-flex items-center gap-1.5 text-sm font-semibold"
                   style={{ color: '#005064', ...headingFont }}>
                   <Users className="w-4 h-4" />

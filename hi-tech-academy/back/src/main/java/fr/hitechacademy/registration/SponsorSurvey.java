@@ -36,6 +36,9 @@ public class SponsorSurvey {
     @Column(length = 4000)
     private String trainingReason;        // pourquoi cette formation, contexte du projet
 
+    @Column(length = 4000)
+    private String needOrigin;            // comment le besoin a été identifié (Qualiopi ind. 4)
+
     private Integer traineeCount;         // nombre de salariés concernés
 
     @Column(length = 4000)
@@ -75,6 +78,9 @@ public class SponsorSurvey {
 
     public String getTrainingReason() { return trainingReason; }
     public void setTrainingReason(String trainingReason) { this.trainingReason = trainingReason; }
+
+    public String getNeedOrigin() { return needOrigin; }
+    public void setNeedOrigin(String needOrigin) { this.needOrigin = needOrigin; }
 
     public Integer getTraineeCount() { return traineeCount; }
     public void setTraineeCount(Integer traineeCount) { this.traineeCount = traineeCount; }

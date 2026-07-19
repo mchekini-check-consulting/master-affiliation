@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -70,7 +71,8 @@ public final class RegistrationDtos {
             String lastName,
             String companyName,
             boolean hasNeedsAnalysis,
-            boolean hasSponsorSurvey) {
+            boolean hasSponsorSurvey,
+            int traineesCount) {
     }
 
     // --- Questionnaire d'analyse du besoin (public) --------------------
@@ -129,9 +131,71 @@ public final class RegistrationDtos {
         }
     }
 
+    // --- Questionnaire apprenant salarié (public, demandes COMPANY) ------
+    public record TraineeRequest(
+            @NotBlank String firstName,
+            @NotBlank String lastName,
+            @NotBlank @Email String email,
+            String jobTitle,
+            String activityContext,
+            String problemToSolve,
+            String expectedObjectives,
+            String levelLinux,
+            String levelDocker,
+            String levelKubernetes,
+            String specificUseCase,
+            Boolean needsAdaptation,
+            String adaptationDetails,
+            String planningConstraints) {
+    }
+
+    public record TraineeView(
+            UUID id,
+            Instant submittedAt,
+            String firstName,
+            String lastName,
+            String email,
+            String jobTitle,
+            String activityContext,
+            String problemToSolve,
+            String expectedObjectives,
+            String levelLinux,
+            String levelDocker,
+            String levelKubernetes,
+            String specificUseCase,
+            boolean needsAdaptation,
+            String adaptationDetails,
+            String planningConstraints,
+            int score,
+            int maxScore) {
+
+        static TraineeView from(Trainee t) {
+            return new TraineeView(
+                    t.getId(),
+                    t.getSubmittedAt(),
+                    t.getFirstName(),
+                    t.getLastName(),
+                    t.getEmail(),
+                    t.getJobTitle(),
+                    t.getActivityContext(),
+                    t.getProblemToSolve(),
+                    t.getExpectedObjectives(),
+                    t.getLevelLinux(),
+                    t.getLevelDocker(),
+                    t.getLevelKubernetes(),
+                    t.getSpecificUseCase(),
+                    t.isNeedsAdaptation(),
+                    t.getAdaptationDetails(),
+                    t.getPlanningConstraints(),
+                    t.getScore(),
+                    t.getMaxScore());
+        }
+    }
+
     // --- Questionnaire des attentes du commanditaire (public) -----------
     public record SponsorSurveyRequest(
             String trainingReason,
+            String needOrigin,
             Integer traineeCount,
             String traineeProfiles,
             String expectedSkills,
@@ -147,6 +211,7 @@ public final class RegistrationDtos {
     public record SponsorSurveyView(
             Instant submittedAt,
             String trainingReason,
+            String needOrigin,
             Integer traineeCount,
             String traineeProfiles,
             String expectedSkills,
@@ -162,6 +227,7 @@ public final class RegistrationDtos {
             return new SponsorSurveyView(
                     s.getSubmittedAt(),
                     s.getTrainingReason(),
+                    s.getNeedOrigin(),
                     s.getTraineeCount(),
                     s.getTraineeProfiles(),
                     s.getExpectedSkills(),
@@ -192,7 +258,9 @@ public final class RegistrationDtos {
             Integer needsAnalysisScore,
             Integer needsAnalysisMaxScore,
             boolean hasCertificate,
-            boolean hasSponsorSurvey) {
+            boolean hasSponsorSurvey,
+            int traineesCount,
+            Integer expectedTraineesCount) {
 
         static AdminListItem from(RegistrationRequest r) {
             NeedsAnalysis na = r.getNeedsAnalysis();
@@ -212,7 +280,9 @@ public final class RegistrationDtos {
                     na != null ? na.getScore() : null,
                     na != null ? na.getMaxScore() : null,
                     r.getCertificate() != null,
-                    r.getSponsorSurvey() != null);
+                    r.getSponsorSurvey() != null,
+                    r.getTrainees().size(),
+                    r.getSponsorSurvey() != null ? r.getSponsorSurvey().getTraineeCount() : null);
         }
     }
 
@@ -298,7 +368,8 @@ public final class RegistrationDtos {
             boolean needsAdaptation,
             NeedsAnalysisView needsAnalysis,
             CertificateView certificate,
-            SponsorSurveyView sponsorSurvey) {
+            SponsorSurveyView sponsorSurvey,
+            List<TraineeView> trainees) {
 
         static AdminDetail from(RegistrationRequest r) {
             return new AdminDetail(
@@ -340,7 +411,8 @@ public final class RegistrationDtos {
                     r.isNeedsAdaptation(),
                     r.getNeedsAnalysis() != null ? NeedsAnalysisView.from(r.getNeedsAnalysis()) : null,
                     r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null,
-                    r.getSponsorSurvey() != null ? SponsorSurveyView.from(r.getSponsorSurvey()) : null);
+                    r.getSponsorSurvey() != null ? SponsorSurveyView.from(r.getSponsorSurvey()) : null,
+                    r.getTrainees().stream().map(TraineeView::from).toList());
         }
     }
 

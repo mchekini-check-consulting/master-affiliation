@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, CheckCircle2, Download, Eye, RefreshCw, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Copy, Download, Eye, RefreshCw, XCircle } from 'lucide-react';
 import { adminGetRegistration, adminListRegistrations, adminUpdateStatus } from '@/api/backend';
 import { downloadCertificatePdf } from '@/lib/certificatePdf';
 import SurveyModal, { Answer, LevelAnswer, SurveySection } from './SurveyModal';
@@ -67,18 +67,19 @@ function NeedsAnalysisModal({ detail, onClose }) {
   );
 }
 
-// --- Réponses du questionnaire commanditaire, grand format -------------
+// --- Réponses du représentant de l'entreprise, grand format ------------
 function SponsorSurveyModal({ detail, onClose }) {
   const s = detail.sponsor_survey;
   return (
     <SurveyModal
-      title="Attentes du commanditaire"
+      title="Analyse du besoin — représentant de l'entreprise"
       subtitle={`${detail.company_name} — ${detail.formation_title}`}
       submittedAt={s.submitted_at}
       onClose={onClose}>
 
       <SurveySection title="1. Le projet de formation">
         <Answer question="Contexte et objectif de la formation pour l'entreprise" answer={s.training_reason} />
+        <Answer question="Comment le besoin de formation a été identifié" answer={s.need_origin} />
         <Answer question="Nombre de salariés concernés" answer={s.trainee_count} />
         <Answer question="Profils / fonctions des salariés à former" answer={s.trainee_profiles} />
       </SurveySection>
@@ -102,12 +103,72 @@ function SponsorSurveyModal({ detail, onClose }) {
   );
 }
 
+// --- Réponses d'un apprenant salarié, grand format ---------------------
+function TraineeModal({ detail, trainee, onClose }) {
+  return (
+    <SurveyModal
+      title={`Analyse du besoin — ${trainee.first_name} ${trainee.last_name}`}
+      subtitle={`Salarié de ${detail.company_name} — ${detail.formation_title}`}
+      submittedAt={trainee.submitted_at}
+      badge={
+        <span
+          className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
+          style={{ background: '#F8B102', color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          Note de positionnement : {trainee.score} / {trainee.max_score}
+        </span>
+      }
+      onClose={onClose}>
+
+      <SurveySection title="1. Identité">
+        <Answer question="Nom et prénom" answer={`${trainee.first_name} ${trainee.last_name}`} />
+        <Answer question="Adresse email" answer={trainee.email} />
+        <Answer question="Poste occupé" answer={trainee.job_title} />
+      </SurveySection>
+
+      <SurveySection title="2. Contexte et besoin">
+        <Answer question="Activité et environnement technique actuel" answer={trainee.activity_context} />
+        <Answer question="Besoin / problème que la formation doit aider à résoudre" answer={trainee.problem_to_solve} />
+        <Answer question="Attentes personnelles vis-à-vis de la formation" answer={trainee.expected_objectives} />
+      </SurveySection>
+
+      <SurveySection title="3. Niveau de départ (auto-évaluation)">
+        <LevelAnswer
+          question="Linux (ligne de commande)"
+          options={['Débutant', 'Intermédiaire', 'Confirmé']}
+          value={trainee.level_linux} />
+        <LevelAnswer
+          question="Docker / conteneurs"
+          options={['Débutant', 'Intermédiaire', 'Confirmé']}
+          value={trainee.level_docker} />
+        <LevelAnswer
+          question="Kubernetes"
+          options={['Aucune notion', 'Notions', 'Déjà utilisé']}
+          value={trainee.level_kubernetes} />
+      </SurveySection>
+
+      <SurveySection title="4. Attentes et besoins spécifiques">
+        <Answer question="Cas d'usage précis à traiter pendant la formation" answer={trainee.specific_use_case} />
+        <Answer question="Situation de handicap nécessitant un aménagement" answer={trainee.needs_adaptation} />
+        {trainee.needs_adaptation && (
+          <Answer question="Besoins d'aménagement précisés" answer={trainee.adaptation_details} />
+        )}
+      </SurveySection>
+
+      <SurveySection title="5. Contraintes">
+        <Answer question="Contraintes de planning" answer={trainee.planning_constraints} />
+      </SurveySection>
+    </SurveyModal>
+  );
+}
+
 // --- Détail d'une demande --------------------------------------------
 export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
   const [openSurvey, setOpenSurvey] = useState(null); // 'needs' | 'sponsor' | null
+  const [openTrainee, setOpenTrainee] = useState(null); // apprenant salarié affiché en grand format
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const load = useCallback(() => {
     adminGetRegistration(auth, id).then(setDetail).catch((e) => setError(e.message));
@@ -243,35 +304,41 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           </Card>
         )}
 
-        <Card title="Questionnaire d'analyse du besoin">
-          {na ? (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <span
-                  className="rounded-xl px-4 py-2.5 text-sm font-bold inline-block"
-                  style={{ background: '#f0f3fa', color: '#005064', ...headingFont }}>
-                  Note : {na.score} / {na.max_score}
-                </span>
-                <Badge tone="success">Répondu le {formatDate(na.submitted_at)}</Badge>
+        {!isCompany && (
+          <Card title={
+            detail.applicant_type === 'INDEPENDENT'
+              ? "Analyse du besoin — dirigeant (apprenant)"
+              : "Analyse du besoin — apprenant"
+          }>
+            {na ? (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span
+                    className="rounded-xl px-4 py-2.5 text-sm font-bold inline-block"
+                    style={{ background: '#f0f3fa', color: '#005064', ...headingFont }}>
+                    Note : {na.score} / {na.max_score}
+                  </span>
+                  <Badge tone="success">Répondu le {formatDate(na.submitted_at)}</Badge>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenSurvey('needs')}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold"
+                  style={{ background: '#005064', color: 'white', ...headingFont }}>
+                  <Eye className="w-4 h-4" />
+                  Voir les réponses du questionnaire
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setOpenSurvey('needs')}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold"
-                style={{ background: '#005064', color: 'white', ...headingFont }}>
-                <Eye className="w-4 h-4" />
-                Voir les réponses du questionnaire
-              </button>
-            </div>
-          ) : (
-            <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
-              Le questionnaire n'a pas encore été renseigné par l'apprenant.
-            </p>
-          )}
-        </Card>
+            ) : (
+              <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
+                Le questionnaire n'a pas encore été renseigné par l'apprenant.
+              </p>
+            )}
+          </Card>
+        )}
 
         {isCompany && (
-          <Card title="Questionnaire des attentes du commanditaire">
+          <Card title="Analyse du besoin — représentant de l'entreprise">
             {detail.sponsor_survey ? (
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center gap-3">
@@ -293,6 +360,86 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
               <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
                 Le questionnaire n'a pas encore été renseigné par l'entreprise.
               </p>
+            )}
+          </Card>
+        )}
+
+        {isCompany && (
+          <Card title="Apprenants (salariés) — analyses du besoin individuelles" className="md:col-span-2">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <Badge tone={detail.trainees.length > 0 ? 'success' : 'warning'}>
+                {detail.trainees.length}
+                {detail.sponsor_survey?.trainee_count ? ` / ${detail.sponsor_survey.trainee_count}` : ''} salarié{detail.trainees.length > 1 ? 's ont' : ' a'} répondu
+              </Badge>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(`${window.location.origin}/inscription/demande/${detail.id}/apprenant`);
+                    setLinkCopied(true);
+                    setTimeout(() => setLinkCopied(false), 3000);
+                  } catch { /* clipboard indisponible */ }
+                }}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                style={{ color: '#005064', ...headingFont }}>
+                <Copy className="w-4 h-4" />
+                {linkCopied ? 'Lien copié !' : 'Copier le lien du questionnaire salarié'}
+              </button>
+            </div>
+
+            {detail.trainees.length === 0 ? (
+              <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
+                Aucun salarié n'a encore rempli son questionnaire — partagez le lien ci-dessus à l'entreprise.
+              </p>
+            ) : (
+              <table className="w-full text-left">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
+                    {['Salarié', 'Poste', 'Note', 'Répondu le', ''].map((h, i) => (
+                      <th
+                        key={i}
+                        className="px-3 py-2 text-[11px] uppercase tracking-wide font-semibold"
+                        style={{ color: '#6b7a9b', ...headingFont }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {detail.trainees.map((t) => (
+                    <tr key={t.id} style={{ borderBottom: '1px solid #f0f3fa' }}>
+                      <td className="px-3 py-3">
+                        <p className="text-sm font-semibold" style={{ color: '#001a4a', ...headingFont }}>
+                          {t.first_name} {t.last_name}
+                          {t.needs_adaptation && (
+                            <span className="ml-2 align-middle"><Badge tone="warning">Aménagement</Badge></span>
+                          )}
+                        </p>
+                        <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>{t.email}</p>
+                      </td>
+                      <td className="px-3 py-3 text-sm" style={{ color: '#001a4a', ...bodyFont }}>
+                        {t.job_title || '—'}
+                      </td>
+                      <td className="px-3 py-3">
+                        <Badge tone="info">{t.score}/{t.max_score}</Badge>
+                      </td>
+                      <td className="px-3 py-3 text-xs whitespace-nowrap" style={{ color: '#6b7a9b', ...bodyFont }}>
+                        {formatDate(t.submitted_at)}
+                      </td>
+                      <td className="px-3 py-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setOpenTrainee(t)}
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap"
+                          style={{ color: '#005064', ...headingFont }}>
+                          <Eye className="w-4 h-4" />
+                          Voir les réponses
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </Card>
         )}
@@ -329,16 +476,25 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
       {openSurvey === 'sponsor' && detail.sponsor_survey && (
         <SponsorSurveyModal detail={detail} onClose={() => setOpenSurvey(null)} />
       )}
+      {openTrainee && (
+        <TraineeModal detail={detail} trainee={openTrainee} onClose={() => setOpenTrainee(null)} />
+      )}
     </div>
   );
 }
 
 // --- Liste des demandes ----------------------------------------------
-export default function RequestsView({ auth, selectedId, onSelect }) {
+export default function RequestsView({ auth, selectedId, onSelect, initialFormation }) {
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [formationFilter, setFormationFilter] = useState(initialFormation ?? 'ALL');
   const [reloadKey, setReloadKey] = useState(0);
+
+  // La vue Formations peut ouvrir les demandes pré-filtrées sur une formation
+  useEffect(() => {
+    if (initialFormation) setFormationFilter(initialFormation);
+  }, [initialFormation]);
 
   const load = useCallback(() => {
     setError(null);
@@ -347,9 +503,17 @@ export default function RequestsView({ auth, selectedId, onSelect }) {
 
   useEffect(load, [load, reloadKey]);
 
+  const formations = useMemo(() => {
+    const byId = new Map();
+    for (const i of items ?? []) byId.set(i.formation_id, i.formation_title);
+    return [...byId.entries()].map(([id, title]) => ({ id, title }));
+  }, [items]);
+
   const filtered = useMemo(
-    () => (items ?? []).filter((i) => statusFilter === 'ALL' || i.status === statusFilter),
-    [items, statusFilter]
+    () => (items ?? []).filter((i) =>
+      (statusFilter === 'ALL' || i.status === statusFilter) &&
+      (formationFilter === 'ALL' || i.formation_id === formationFilter)),
+    [items, statusFilter, formationFilter]
   );
   const pendingCount = useMemo(() => (items ?? []).filter((i) => i.status === 'PENDING').length, [items]);
 
@@ -389,7 +553,7 @@ export default function RequestsView({ auth, selectedId, onSelect }) {
           </button>
         } />
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex flex-wrap items-center gap-2 mb-5">
         {FILTERS.map(({ key, label }) => (
           <button
             key={key}
@@ -405,6 +569,18 @@ export default function RequestsView({ auth, selectedId, onSelect }) {
             {label}
           </button>
         ))}
+        {formations.length > 1 && (
+          <select
+            value={formationFilter}
+            onChange={(e) => setFormationFilter(e.target.value)}
+            className="ml-auto px-3.5 py-1.5 rounded-full text-xs font-semibold outline-none"
+            style={{ border: '1px solid #e0e8f4', background: 'white', color: '#005064', ...headingFont }}>
+            <option value="ALL">Toutes les formations</option>
+            {formations.map((f) => (
+              <option key={f.id} value={f.id}>{f.title}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {filtered.length === 0 ? (
@@ -450,11 +626,16 @@ export default function RequestsView({ auth, selectedId, onSelect }) {
                   </td>
                   <td className="px-4 py-3.5">
                     {item.applicant_type === 'COMPANY' ? (
-                      item.has_sponsor_survey ? (
-                        <Badge tone="success">Commanditaire — répondu</Badge>
-                      ) : (
-                        <Badge>Non répondu</Badge>
-                      )
+                      <div className="flex flex-wrap gap-1.5">
+                        {item.has_sponsor_survey ? (
+                          <Badge tone="success">Représentant ✓</Badge>
+                        ) : (
+                          <Badge>Représentant : non répondu</Badge>
+                        )}
+                        <Badge tone={item.trainees_count > 0 ? 'success' : 'warning'}>
+                          {item.trainees_count}{item.expected_trainees_count ? `/${item.expected_trainees_count}` : ''} salarié{item.trainees_count > 1 ? 's' : ''}
+                        </Badge>
+                      </div>
                     ) : item.has_needs_analysis ? (
                       <Badge tone="success">Répondu — {item.needs_analysis_score}/{item.needs_analysis_max_score}</Badge>
                     ) : (

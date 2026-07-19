@@ -6,6 +6,7 @@ import fr.hitechacademy.registration.RegistrationDtos.CreatedResponse;
 import fr.hitechacademy.registration.RegistrationDtos.NeedsAnalysisRequest;
 import fr.hitechacademy.registration.RegistrationDtos.PublicView;
 import fr.hitechacademy.registration.RegistrationDtos.SponsorSurveyRequest;
+import fr.hitechacademy.registration.RegistrationDtos.TraineeRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,7 +101,8 @@ public class RegistrationController {
                 r.getLastName(),
                 r.getCompanyName(),
                 r.getNeedsAnalysis() != null,
-                r.getSponsorSurvey() != null);
+                r.getSponsorSurvey() != null,
+                r.getTrainees().size());
     }
 
     @PostMapping("/{id}/needs-analysis")
@@ -157,6 +159,7 @@ public class RegistrationController {
         SponsorSurvey s = new SponsorSurvey();
         s.setRegistration(r);
         s.setTrainingReason(body.trainingReason());
+        s.setNeedOrigin(body.needOrigin());
         s.setTraineeCount(body.traineeCount());
         s.setTraineeProfiles(body.traineeProfiles());
         s.setExpectedSkills(body.expectedSkills());
@@ -174,6 +177,50 @@ public class RegistrationController {
         if (transmitted) {
             mailService.notifyAdminNewRequest(r);
         }
+    }
+
+    /**
+     * Questionnaire d'analyse du besoin d'un apprenant salarié (demandes
+     * d'entreprise) : chaque salarié inscrit remplit le sien via le lien
+     * partagé par le référent.
+     */
+    @PostMapping("/{id}/trainees")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
+    public void submitTrainee(@PathVariable UUID id, @Valid @RequestBody TraineeRequest body) {
+        RegistrationRequest r = find(id);
+        if (r.getApplicantType() != ApplicantType.COMPANY) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le questionnaire apprenant est réservé aux demandes d'entreprise");
+        }
+        boolean alreadySubmitted = r.getTrainees().stream()
+                .anyMatch(t -> t.getEmail().equalsIgnoreCase(body.email().trim()));
+        if (alreadySubmitted) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Un questionnaire a déjà été renseigné avec cette adresse email");
+        }
+
+        Trainee t = new Trainee();
+        t.setRegistration(r);
+        t.setFirstName(body.firstName().trim());
+        t.setLastName(body.lastName().trim());
+        t.setEmail(body.email().trim());
+        t.setJobTitle(body.jobTitle());
+        t.setActivityContext(body.activityContext());
+        t.setProblemToSolve(body.problemToSolve());
+        t.setExpectedObjectives(body.expectedObjectives());
+        t.setLevelLinux(body.levelLinux());
+        t.setLevelDocker(body.levelDocker());
+        t.setLevelKubernetes(body.levelKubernetes());
+        t.setSpecificUseCase(body.specificUseCase());
+        t.setNeedsAdaptation(Boolean.TRUE.equals(body.needsAdaptation()));
+        t.setAdaptationDetails(body.adaptationDetails());
+        t.setPlanningConstraints(body.planningConstraints());
+        t.setScore(levelPoints(body.levelLinux()) + levelPoints(body.levelDocker()) + levelPoints(body.levelKubernetes()));
+        t.setMaxScore(9);
+
+        r.getTrainees().add(t);
+        repository.save(r);
     }
 
     // Le questionnaire obligatoire vient d'être renseigné : la demande est

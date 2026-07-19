@@ -102,6 +102,7 @@ export default function Admin() {
   const [auth, setAuth] = useState(getStoredAuth);
   const [view, setView] = useState('requests');
   const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [requestsFormationFilter, setRequestsFormationFilter] = useState(null);
 
   useEffect(() => {
     document.title = 'Administration — Hi-Tech Academy';
@@ -189,10 +190,19 @@ export default function Admin() {
       <main className="flex-1 min-w-0 px-5 sm:px-8 py-8 overflow-x-hidden">
         <div className="max-w-6xl mx-auto">
           {view === 'formations' && (
-            <FormationsView auth={auth} onOpenRequests={() => setView('requests')} />
+            <FormationsView
+              auth={auth}
+              onOpenRequests={(formationId) => {
+                setRequestsFormationFilter(formationId ?? null);
+                setView('requests');
+              }} />
           )}
           {view === 'requests' && (
-            <RequestsView auth={auth} selectedId={selectedRequestId} onSelect={setSelectedRequestId} />
+            <RequestsView
+              auth={auth}
+              selectedId={selectedRequestId}
+              onSelect={setSelectedRequestId}
+              initialFormation={requestsFormationFilter} />
           )}
           {view === 'learners' && (
             <LearnersView auth={auth} onOpenRequest={openRequest} />
