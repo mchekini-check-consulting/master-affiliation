@@ -18,5 +18,9 @@ npm-debug.log*
 # NOTE : le .env racine est volontairement versionné : il contient la
 # configuration des projets (ports, tags), pas de secrets.
 
+# Secrets locaux au serveur (mots de passe SMTP, etc.) : jamais versionnés,
+# le git reset --hard des déploiements ne les touche pas.
+.env.secrets
+
 # Notes de travail locales (jamais versionnées)
 prompt

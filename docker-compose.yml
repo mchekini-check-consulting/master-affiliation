@@ -99,9 +99,15 @@ services:
       ADMIN_EMAIL: ${HI_TECH_ACADEMY_ADMIN_EMAIL:-me.chekini@gmail.com}
       ADMIN_PASSWORD: ${HI_TECH_ACADEMY_ADMIN_PASSWORD:-test}
       # Envoi d'emails (SMTP Google Workspace). Sans mot de passe, les
-      # envois sont désactivés — la vraie valeur vit dans le .env du serveur.
+      # envois sont désactivés. MAIL_PASSWORD vient de .env.secrets (voir
+      # ci-dessous) : le .env versionné est écrasé par le git reset --hard
+      # de chaque déploiement, il ne peut pas porter de secret.
       MAIL_USERNAME: ${HI_TECH_ACADEMY_MAIL_USERNAME:-contact@hi-techacademy.fr}
-      MAIL_PASSWORD: ${HI_TECH_ACADEMY_MAIL_PASSWORD:-}
+    # Secrets locaux au serveur (fichier non versionné, survit aux
+    # déploiements) : contient MAIL_PASSWORD=<mot de passe d'application>
+    env_file:
+      - path: ./.env.secrets
+        required: false
     networks:
       - hi-tech-academy-net
     depends_on:

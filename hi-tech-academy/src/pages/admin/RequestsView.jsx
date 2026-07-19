@@ -197,7 +197,11 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
     return <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>;
   }
 
-  const isCompany = detail.applicant_type !== 'INDIVIDUAL';
+  // COMPANY = entreprise inscrivant ses salariés (questionnaire représentant
+  // + apprenants). L'indépendant a des infos entreprise mais reste l'apprenant :
+  // il a sa propre analyse du besoin, pas de salariés.
+  const isCompany = detail.applicant_type === 'COMPANY';
+  const hasCompanyInfo = detail.applicant_type !== 'INDIVIDUAL';
   const na = detail.needs_analysis;
   const certificate = detail.certificate;
   const address = [detail.address_line, detail.address_complement, detail.postal_code, detail.city, detail.country]
@@ -259,7 +263,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
       )}
 
       <div className="grid md:grid-cols-2 gap-5">
-        {isCompany && (
+        {hasCompanyInfo && (
           <Card title="Informations de l'entreprise">
             <div className="space-y-3">
               <Field label="Nom de l'entreprise" value={detail.company_name} />
@@ -273,7 +277,13 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           </Card>
         )}
 
-        <Card title={isCompany ? "Référent de l'entreprise" : 'Informations personnelles'}>
+        <Card title={
+          isCompany
+            ? "Référent de l'entreprise"
+            : detail.applicant_type === 'INDEPENDENT'
+              ? "Dirigeant (apprenant)"
+              : 'Informations personnelles'
+        }>
           <div className="space-y-3">
             <Field label="Civilité" value={detail.civility} />
             <Field label="Prénom" value={detail.first_name} />
@@ -281,12 +291,12 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
             <Field label="Adresse email" value={detail.email} />
             <Field label="N° de téléphone" value={detail.phone} />
             <Field label="Fonction" value={detail.job_title} />
-            {!isCompany && <Field label="Adresse" value={address} />}
+            {!hasCompanyInfo && <Field label="Adresse" value={address} />}
             <Field label="Notes complémentaires" value={detail.notes} />
           </div>
         </Card>
 
-        {!isCompany && (
+        {!hasCompanyInfo && (
           <Card title="Informations complémentaires">
             <div className="space-y-3">
               <Field label="N° de téléphone 2" value={detail.phone2} />
