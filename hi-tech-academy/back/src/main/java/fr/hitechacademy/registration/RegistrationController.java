@@ -1,5 +1,6 @@
 package fr.hitechacademy.registration;
 
+import fr.hitechacademy.mail.MailService;
 import fr.hitechacademy.registration.RegistrationDtos.CreateRegistrationRequest;
 import fr.hitechacademy.registration.RegistrationDtos.CreatedResponse;
 import fr.hitechacademy.registration.RegistrationDtos.NeedsAnalysisRequest;
@@ -28,9 +29,11 @@ import java.util.UUID;
 public class RegistrationController {
 
     private final RegistrationRepository repository;
+    private final MailService mailService;
 
-    public RegistrationController(RegistrationRepository repository) {
+    public RegistrationController(RegistrationRepository repository, MailService mailService) {
         this.repository = repository;
+        this.mailService = mailService;
     }
 
     @PostMapping
@@ -131,8 +134,11 @@ public class RegistrationController {
         na.setMaxScore(9);
 
         r.setNeedsAnalysis(na);
-        completeIfRequiredSurveyDone(r);
+        boolean transmitted = completeIfRequiredSurveyDone(r);
         repository.save(r);
+        if (transmitted) {
+            mailService.notifyAdminNewRequest(r);
+        }
     }
 
     @PostMapping("/{id}/sponsor-survey")
@@ -163,16 +169,22 @@ public class RegistrationController {
         s.setComments(body.comments());
 
         r.setSponsorSurvey(s);
-        completeIfRequiredSurveyDone(r);
+        boolean transmitted = completeIfRequiredSurveyDone(r);
         repository.save(r);
+        if (transmitted) {
+            mailService.notifyAdminNewRequest(r);
+        }
     }
 
     // Le questionnaire obligatoire vient d'être renseigné : la demande est
-    // transmise à l'admin (INCOMPLETE -> PENDING).
-    private static void completeIfRequiredSurveyDone(RegistrationRequest r) {
+    // transmise à l'admin (INCOMPLETE -> PENDING). Retourne true si la
+    // transition a eu lieu (déclenche la notification email).
+    private static boolean completeIfRequiredSurveyDone(RegistrationRequest r) {
         if (r.getStatus() == RegistrationStatus.INCOMPLETE && r.requiredSurveyCompleted()) {
             r.setStatus(RegistrationStatus.PENDING);
+            return true;
         }
+        return false;
     }
 
     private RegistrationRequest find(UUID id) {

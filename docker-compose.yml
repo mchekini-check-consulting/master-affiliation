@@ -98,6 +98,10 @@ services:
       DB_PASSWORD: ${HI_TECH_ACADEMY_DB_PASSWORD:-changeme}
       ADMIN_EMAIL: ${HI_TECH_ACADEMY_ADMIN_EMAIL:-me.chekini@gmail.com}
       ADMIN_PASSWORD: ${HI_TECH_ACADEMY_ADMIN_PASSWORD:-test}
+      # Envoi d'emails (SMTP Google Workspace). Sans mot de passe, les
+      # envois sont désactivés — la vraie valeur vit dans le .env du serveur.
+      MAIL_USERNAME: ${HI_TECH_ACADEMY_MAIL_USERNAME:-contact@hi-techacademy.fr}
+      MAIL_PASSWORD: ${HI_TECH_ACADEMY_MAIL_PASSWORD:-}
     networks:
       - hi-tech-academy-net
     depends_on:

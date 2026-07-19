@@ -19,7 +19,12 @@ Application fullstack de Hi-Tech Academy :
 - **Pipeline** : `.github/workflows/hi-tech-academy.yml` (déclenchée si `hi-tech-academy/**`
   change sur `main` ; build des 2 images puis redémarrage des services du projet)
 - **Variables serveur** (`.env` racine) : `HI_TECH_ACADEMY_DB_PASSWORD`,
-  `HI_TECH_ACADEMY_ADMIN_EMAIL` / `HI_TECH_ACADEMY_ADMIN_PASSWORD` (accès `/admin`)
+  `HI_TECH_ACADEMY_ADMIN_EMAIL` / `HI_TECH_ACADEMY_ADMIN_PASSWORD` (accès `/admin`),
+  `HI_TECH_ACADEMY_MAIL_PASSWORD` (mot de passe d'application Google de
+  `contact@hi-techacademy.fr` — sans lui, les emails sont désactivés)
+- **Emails** (SMTP Google Workspace) : notification à `contact@hi-techacademy.fr`
+  quand une demande est transmise (questionnaire complété), email au demandeur
+  lors de la validation ou du refus de sa demande
 
 ## Commandes utiles
 

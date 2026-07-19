@@ -1,5 +1,6 @@
 package fr.hitechacademy.registration;
 
+import fr.hitechacademy.mail.MailService;
 import fr.hitechacademy.registration.RegistrationDtos.AdminDetail;
 import fr.hitechacademy.registration.RegistrationDtos.AdminListItem;
 import fr.hitechacademy.registration.RegistrationDtos.CertificateView;
@@ -33,10 +34,13 @@ public class RegistrationAdminController {
 
     private final RegistrationRepository repository;
     private final CertificateRepository certificateRepository;
+    private final MailService mailService;
 
-    public RegistrationAdminController(RegistrationRepository repository, CertificateRepository certificateRepository) {
+    public RegistrationAdminController(RegistrationRepository repository, CertificateRepository certificateRepository,
+                                       MailService mailService) {
         this.repository = repository;
         this.certificateRepository = certificateRepository;
+        this.mailService = mailService;
     }
 
     // Permet au front de vérifier les identifiants saisis sur l'écran de connexion
@@ -74,7 +78,9 @@ public class RegistrationAdminController {
         }
         r.setStatus(body.status());
         r.setDecidedAt(Instant.now());
-        return AdminDetail.from(repository.save(r));
+        RegistrationRequest saved = repository.save(r);
+        mailService.notifyApplicantDecision(saved);
+        return AdminDetail.from(saved);
     }
 
     // --- Certificats de réalisation ---------------------------------
