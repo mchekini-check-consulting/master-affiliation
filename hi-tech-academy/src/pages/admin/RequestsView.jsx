@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, CheckCircle2, Copy, Download, Eye, RefreshCw, XCircle } from 'lucide-react';
 import { adminGetRegistration, adminListRegistrations, adminUpdateStatus } from '@/api/backend';
 import { downloadCertificatePdf } from '@/lib/certificatePdf';
-import SurveyModal, { Answer, LevelAnswer, SurveySection } from './SurveyModal';
+import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import {
   APPLICANT_LABELS, Badge, Card, EmptyState, Field, StatusBadge, ViewHeader,
   bodyFont, formatDate, formatDay, headingFont,
@@ -166,8 +166,9 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
-  const [openSurvey, setOpenSurvey] = useState(null); // 'needs' | 'sponsor' | null
-  const [openTrainee, setOpenTrainee] = useState(null); // apprenant salarié affiché en grand format
+  const [openSurvey, setOpenSurvey] = useState(null); // 'needs' | 'sponsor' | 'test' | null
+  const [openTrainee, setOpenTrainee] = useState(null); // analyse du besoin d'un salarié
+  const [openTraineeTest, setOpenTraineeTest] = useState(null); // test d'un salarié
   const [linkCopied, setLinkCopied] = useState(false);
 
   const load = useCallback(() => {
@@ -347,6 +348,44 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           </Card>
         )}
 
+        {!isCompany && (
+          <Card title={
+            detail.applicant_type === 'INDEPENDENT'
+              ? "Test de positionnement — dirigeant (apprenant)"
+              : "Test de positionnement — apprenant"
+          }>
+            {detail.positioning_test ? (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span
+                    className="rounded-xl px-4 py-2.5 text-sm font-bold inline-block"
+                    style={{ background: '#f0f3fa', color: '#005064', ...headingFont }}>
+                    Note : {detail.positioning_test.score} / {detail.positioning_test.max_score}
+                  </span>
+                  <Badge tone="success">Passé le {formatDate(detail.positioning_test.submitted_at)}</Badge>
+                </div>
+                {detail.positioning_test.self_level && (
+                  <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
+                    Auto-évaluation : {detail.positioning_test.self_level}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setOpenSurvey('test')}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold"
+                  style={{ background: '#005064', color: 'white', ...headingFont }}>
+                  <Eye className="w-4 h-4" />
+                  Voir les réponses du test
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
+                Le test n'a pas encore été passé par l'apprenant.
+              </p>
+            )}
+          </Card>
+        )}
+
         {isCompany && (
           <Card title="Analyse du besoin — représentant de l'entreprise">
             {detail.sponsor_survey ? (
@@ -405,7 +444,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
               <table className="w-full text-left">
                 <thead>
                   <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
-                    {['Salarié', 'Poste', 'Note', 'Répondu le', ''].map((h, i) => (
+                    {['Salarié', 'Poste', 'Analyse du besoin', 'Test de positionnement', ''].map((h, i) => (
                       <th
                         key={i}
                         className="px-3 py-2 text-[11px] uppercase tracking-wide font-semibold"
@@ -430,21 +469,38 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
                       <td className="px-3 py-3 text-sm" style={{ color: '#001a4a', ...bodyFont }}>
                         {t.job_title || '—'}
                       </td>
-                      <td className="px-3 py-3">
-                        <Badge tone="info">{t.score}/{t.max_score}</Badge>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-2">
+                          <Badge tone="info">{t.score}/{t.max_score}</Badge>
+                          <button
+                            type="button"
+                            onClick={() => setOpenTrainee(t)}
+                            className="inline-flex items-center gap-1 text-sm font-semibold"
+                            style={{ color: '#005064', ...headingFont }}>
+                            <Eye className="w-4 h-4" />
+                            Voir
+                          </button>
+                        </span>
                       </td>
-                      <td className="px-3 py-3 text-xs whitespace-nowrap" style={{ color: '#6b7a9b', ...bodyFont }}>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        {t.positioning_test ? (
+                          <span className="inline-flex items-center gap-2">
+                            <Badge tone="info">{t.positioning_test.score}/{t.positioning_test.max_score}</Badge>
+                            <button
+                              type="button"
+                              onClick={() => setOpenTraineeTest(t)}
+                              className="inline-flex items-center gap-1 text-sm font-semibold"
+                              style={{ color: '#005064', ...headingFont }}>
+                              <Eye className="w-4 h-4" />
+                              Voir
+                            </button>
+                          </span>
+                        ) : (
+                          <Badge>Non passé</Badge>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 text-xs whitespace-nowrap text-right" style={{ color: '#6b7a9b', ...bodyFont }}>
                         {formatDate(t.submitted_at)}
-                      </td>
-                      <td className="px-3 py-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => setOpenTrainee(t)}
-                          className="inline-flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap"
-                          style={{ color: '#005064', ...headingFont }}>
-                          <Eye className="w-4 h-4" />
-                          Voir les réponses
-                        </button>
                       </td>
                     </tr>
                   ))}
@@ -486,10 +542,71 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
       {openSurvey === 'sponsor' && detail.sponsor_survey && (
         <SponsorSurveyModal detail={detail} onClose={() => setOpenSurvey(null)} />
       )}
+      {openSurvey === 'test' && detail.positioning_test && (
+        <PositioningTestModal
+          test={detail.positioning_test}
+          subjectName={`${detail.first_name} ${detail.last_name}`}
+          formationTitle={detail.formation_title}
+          onClose={() => setOpenSurvey(null)} />
+      )}
       {openTrainee && (
         <TraineeModal detail={detail} trainee={openTrainee} onClose={() => setOpenTrainee(null)} />
       )}
+      {openTraineeTest?.positioning_test && (
+        <PositioningTestModal
+          test={openTraineeTest.positioning_test}
+          subjectName={`${openTraineeTest.first_name} ${openTraineeTest.last_name} (salarié de ${detail.company_name})`}
+          formationTitle={detail.formation_title}
+          onClose={() => setOpenTraineeTest(null)} />
+      )}
     </div>
+  );
+}
+
+// --- Réponses au test de positionnement, grand format ------------------
+// subjectName : demandeur (particulier / indépendant) ou salarié
+function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
+  const sections = test.questions.reduce((acc, q) => {
+    (acc[q.section] = acc[q.section] ?? []).push(q);
+    return acc;
+  }, {});
+  return (
+    <SurveyModal
+      title={`Test de positionnement — ${subjectName}`}
+      subtitle={formationTitle}
+      submittedAt={test.submitted_at}
+      badge={
+        <span
+          className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
+          style={{ background: '#F8B102', color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          Note : {test.score} / {test.max_score}
+        </span>
+      }
+      onClose={onClose}>
+
+      <SurveySection title="A. Auto-évaluation Kubernetes">
+        <Answer question="Maîtrise actuelle de Kubernetes (déclarée)" answer={test.self_level} />
+      </SurveySection>
+
+      {Object.entries(sections).map(([sectionTitle, questions]) => (
+        <SurveySection key={sectionTitle} title={sectionTitle}>
+          {questions.map((q) => (
+            <QcmAnswer key={q.id} item={q} />
+          ))}
+        </SurveySection>
+      ))}
+
+      <SurveySection title="D. Connaissances Kubernetes (facultatif)">
+        <Answer question="Selon vous, à quoi sert Kubernetes ?" answer={test.kubernetes_purpose} />
+        <Answer
+          question="Termes connus"
+          answer={test.known_terms?.length ? test.known_terms.join(', ') : null} />
+      </SurveySection>
+
+      <SurveySection title="E. Attentes">
+        <Answer question="Cas d'usage ou objectif précis pour cette formation" answer={test.expectations} />
+      </SurveySection>
+    </SurveyModal>
   );
 }
 
@@ -647,7 +764,14 @@ export default function RequestsView({ auth, selectedId, onSelect, initialFormat
                         </Badge>
                       </div>
                     ) : item.has_needs_analysis ? (
-                      <Badge tone="success">Répondu — {item.needs_analysis_score}/{item.needs_analysis_max_score}</Badge>
+                      <div className="flex flex-wrap gap-1.5">
+                        <Badge tone="success">AB {item.needs_analysis_score}/{item.needs_analysis_max_score}</Badge>
+                        {item.positioning_test_score !== null && item.positioning_test_score !== undefined ? (
+                          <Badge tone="success">Test {item.positioning_test_score}/{item.positioning_test_max_score}</Badge>
+                        ) : (
+                          <Badge>Test non passé</Badge>
+                        )}
+                      </div>
                     ) : (
                       <Badge>Non répondu</Badge>
                     )}

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { bodyFont, formatDate, headingFont } from './common';
 
 // Affichage « grand format » des réponses à un questionnaire : une carte par
@@ -53,6 +53,55 @@ export function LevelAnswer({ question, options, value }) {
             Non renseigné
           </span>
         )}
+      </div>
+    </div>
+  );
+}
+
+// Une question de QCM corrigée : la réponse choisie en vert (bonne) ou rouge
+// (mauvaise), la bonne réponse toujours identifiable.
+export function QcmAnswer({ item }) {
+  return (
+    <div className="rounded-2xl px-5 py-4" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <p className="text-sm font-semibold" style={{ color: '#001a4a', ...headingFont }}>
+          {item.id}. {item.question}
+        </p>
+        {item.correct ? (
+          <span
+            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+            style={{ background: '#e5f6ec', color: '#116632', ...headingFont }}>
+            <Check className="w-3.5 h-3.5" /> Bonne réponse
+          </span>
+        ) : (
+          <span
+            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+            style={{ background: '#fdecec', color: '#a12626', ...headingFont }}>
+            <X className="w-3.5 h-3.5" /> Mauvaise réponse
+          </span>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {item.options.map((option, index) => {
+          const chosen = index === item.chosen_index;
+          const correct = index === item.correct_index;
+          return (
+            <span
+              key={option}
+              className="px-4 py-2 rounded-xl text-sm font-semibold"
+              style={{
+                background: chosen ? (correct ? '#116632' : '#a12626') : correct ? '#e5f6ec' : 'white',
+                color: chosen ? 'white' : correct ? '#116632' : '#a3aec7',
+                border: chosen
+                  ? '1.5px solid transparent'
+                  : correct ? '1.5px solid #116632' : '1px solid #e0e8f4',
+                ...headingFont,
+              }}>
+              {option}
+              {chosen ? ' — réponse choisie' : correct && !item.correct ? ' — bonne réponse' : ''}
+            </span>
+          );
+        })}
       </div>
     </div>
   );

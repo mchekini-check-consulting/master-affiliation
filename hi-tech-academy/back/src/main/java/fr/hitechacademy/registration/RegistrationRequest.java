@@ -117,6 +117,10 @@ public class RegistrationRequest {
     @OrderBy("submittedAt ASC")
     private List<Trainee> trainees = new ArrayList<>();
 
+    // --- Test de positionnement (particulier / indépendant) -------------
+    @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PositioningTest positioningTest;
+
     public UUID getId() { return id; }
 
     public Instant getCreatedAt() { return createdAt; }
@@ -235,11 +239,17 @@ public class RegistrationRequest {
 
     public List<Trainee> getTrainees() { return trainees; }
 
+    public PositioningTest getPositioningTest() { return positioningTest; }
+    public void setPositioningTest(PositioningTest positioningTest) { this.positioningTest = positioningTest; }
+
     /**
-     * Questionnaire obligatoire renseigné ? Entreprise : questionnaire
-     * commanditaire ; particulier / indépendant : analyse du besoin.
+     * Questionnaires obligatoires renseignés ? Entreprise : questionnaire du
+     * représentant ; particulier / indépendant : analyse du besoin PUIS test
+     * de positionnement.
      */
     public boolean requiredSurveyCompleted() {
-        return applicantType == ApplicantType.COMPANY ? sponsorSurvey != null : needsAnalysis != null;
+        return applicantType == ApplicantType.COMPANY
+                ? sponsorSurvey != null
+                : needsAnalysis != null && positioningTest != null;
     }
 }

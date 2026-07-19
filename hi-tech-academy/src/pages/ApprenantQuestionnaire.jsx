@@ -106,7 +106,7 @@ export default function ApprenantQuestionnaire() {
     setSubmitError(null);
     try {
       const clean = (v) => (typeof v === 'string' && v.trim() === '' ? null : v);
-      await submitTrainee(requestId, {
+      const created = await submitTrainee(requestId, {
         first_name: answers.firstName.trim(),
         last_name: answers.lastName.trim(),
         email: answers.email.trim(),
@@ -122,8 +122,8 @@ export default function ApprenantQuestionnaire() {
         adaptation_details: answers.needsAdaptation ? clean(answers.adaptationDetails) : null,
         planning_constraints: clean(answers.planningConstraints),
       });
-      setSubmitted(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Étape 2 du parcours salarié : le test de positionnement
+      navigate(`/inscription/demande/${requestId}/test-positionnement?trainee=${created.id}`);
     } catch (e) {
       setSubmitError(e.message);
     } finally {
@@ -207,8 +207,8 @@ export default function ApprenantQuestionnaire() {
         </h1>
         <p className="text-sm max-w-xl mx-auto" style={{ color: '#6b7a9b', ...bodyFont }}>
           Votre entreprise <strong>{registration.company_name}</strong> vous inscrit à cette formation.
-          Ce questionnaire nous permet de connaître votre niveau de départ et vos attentes pour adapter
-          la session. Comptez 5 minutes.
+          Deux étapes pour compléter votre dossier : ce questionnaire d'analyse du besoin, puis un court
+          test de positionnement (non éliminatoire). Comptez 10 minutes en tout.
         </p>
       </div>
 
@@ -296,7 +296,7 @@ export default function ApprenantQuestionnaire() {
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: '#005064', color: 'white', ...headingFont }}>
-            {submitting ? 'Envoi en cours…' : 'Envoyer mes réponses'}
+            {submitting ? 'Envoi en cours…' : 'Continuer vers le test de positionnement'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

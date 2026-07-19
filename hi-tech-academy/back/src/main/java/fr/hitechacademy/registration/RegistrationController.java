@@ -5,7 +5,9 @@ import fr.hitechacademy.registration.RegistrationDtos.CreateRegistrationRequest;
 import fr.hitechacademy.registration.RegistrationDtos.CreatedResponse;
 import fr.hitechacademy.registration.RegistrationDtos.NeedsAnalysisRequest;
 import fr.hitechacademy.registration.RegistrationDtos.PublicView;
+import fr.hitechacademy.registration.RegistrationDtos.PositioningTestRequest;
 import fr.hitechacademy.registration.RegistrationDtos.SponsorSurveyRequest;
+import fr.hitechacademy.registration.RegistrationDtos.TraineeCreatedResponse;
 import fr.hitechacademy.registration.RegistrationDtos.TraineeRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -102,7 +106,23 @@ public class RegistrationController {
                 r.getCompanyName(),
                 r.getNeedsAnalysis() != null,
                 r.getSponsorSurvey() != null,
+                r.getPositioningTest() != null,
                 r.getTrainees().size());
+    }
+
+    /** Contenu du test de positionnement — sans les bonnes réponses. */
+    @GetMapping("/positioning-test")
+    public Map<String, Object> positioningTestContent() {
+        return Map.of(
+                "self_levels", PositioningTestCatalog.SELF_LEVELS,
+                "known_terms", PositioningTestCatalog.KNOWN_TERMS,
+                "questions", PositioningTestCatalog.QUESTIONS.stream()
+                        .map(q -> Map.of(
+                                "id", q.id(),
+                                "section", q.section(),
+                                "text", q.text(),
+                                "options", q.options()))
+                        .toList());
     }
 
     @PostMapping("/{id}/needs-analysis")
@@ -187,7 +207,7 @@ public class RegistrationController {
     @PostMapping("/{id}/trainees")
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
-    public void submitTrainee(@PathVariable UUID id, @Valid @RequestBody TraineeRequest body) {
+    public TraineeCreatedResponse submitTrainee(@PathVariable UUID id, @Valid @RequestBody TraineeRequest body) {
         RegistrationRequest r = find(id);
         if (r.getApplicantType() != ApplicantType.COMPANY) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -221,6 +241,93 @@ public class RegistrationController {
 
         r.getTrainees().add(t);
         repository.save(r);
+        // L'id permet d'enchaîner sur le test de positionnement du salarié
+        return new TraineeCreatedResponse(
+                r.getTrainees().stream()
+                        .filter(saved -> saved.getEmail().equalsIgnoreCase(body.email().trim()))
+                        .findFirst()
+                        .map(Trainee::getId)
+                        .orElse(null));
+    }
+
+    /** Test de positionnement du demandeur (particulier / indépendant). */
+    @PostMapping("/{id}/positioning-test")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
+    public void submitPositioningTest(@PathVariable UUID id, @Valid @RequestBody PositioningTestRequest body) {
+        RegistrationRequest r = find(id);
+        if (r.getApplicantType() == ApplicantType.COMPANY) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Pour une entreprise, le test est passé par chaque salarié");
+        }
+        if (r.getPositioningTest() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Le test a déjà été passé pour cette demande");
+        }
+        PositioningTest pt = buildPositioningTest(body);
+        pt.setRegistration(r);
+        r.setPositioningTest(pt);
+        boolean transmitted = completeIfRequiredSurveyDone(r);
+        repository.save(r);
+        if (transmitted) {
+            mailService.notifyAdminNewRequest(r);
+        }
+    }
+
+    /** Test de positionnement d'un apprenant salarié (demandes entreprise). */
+    @PostMapping("/{id}/trainees/{traineeId}/positioning-test")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
+    public void submitTraineePositioningTest(@PathVariable UUID id, @PathVariable UUID traineeId,
+                                             @Valid @RequestBody PositioningTestRequest body) {
+        RegistrationRequest r = find(id);
+        Trainee t = r.getTrainees().stream()
+                .filter(x -> x.getId().equals(traineeId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Apprenant introuvable"));
+        if (t.getPositioningTest() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Le test a déjà été passé par cet apprenant");
+        }
+        PositioningTest pt = buildPositioningTest(body);
+        pt.setTrainee(t);
+        t.setPositioningTest(pt);
+        repository.save(r);
+    }
+
+    // Corrige le QCM côté serveur à partir du catalogue
+    private static PositioningTest buildPositioningTest(PositioningTestRequest body) {
+        List<PositioningTestCatalog.QcmQuestion> catalog = PositioningTestCatalog.QUESTIONS;
+        if (body.answers().size() != catalog.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le test comporte " + catalog.size() + " questions");
+        }
+        int score = 0;
+        StringBuilder answers = new StringBuilder();
+        for (int i = 0; i < catalog.size(); i++) {
+            Integer chosen = body.answers().get(i);
+            if (chosen == null || chosen < 0 || chosen >= catalog.get(i).options().size()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Réponse invalide à la question " + catalog.get(i).id());
+            }
+            if (chosen == catalog.get(i).correctIndex()) {
+                score++;
+            }
+            if (i > 0) {
+                answers.append(',');
+            }
+            answers.append(chosen);
+        }
+
+        PositioningTest pt = new PositioningTest();
+        pt.setSelfLevel(body.selfLevel());
+        pt.setAnswers(answers.toString());
+        pt.setKubernetesPurpose(body.kubernetesPurpose());
+        pt.setKnownTerms(body.knownTerms() == null || body.knownTerms().isEmpty()
+                ? null
+                : String.join(";", body.knownTerms()));
+        pt.setExpectations(body.expectations());
+        pt.setScore(score);
+        pt.setMaxScore(catalog.size());
+        return pt;
     }
 
     // Le questionnaire obligatoire vient d'être renseigné : la demande est

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,6 +73,7 @@ public final class RegistrationDtos {
             String companyName,
             boolean hasNeedsAnalysis,
             boolean hasSponsorSurvey,
+            boolean hasPositioningTest,
             int traineesCount) {
     }
 
@@ -131,6 +133,70 @@ public final class RegistrationDtos {
         }
     }
 
+    // --- Test de positionnement (public) ---------------------------------
+    public record PositioningTestRequest(
+            String selfLevel,
+            @NotNull List<Integer> answers,
+            String kubernetesPurpose,
+            List<String> knownTerms,
+            String expectations) {
+    }
+
+    /** Une question corrigée : réponse choisie + bonne réponse (vue admin). */
+    public record QcmAnswerView(
+            int id,
+            String section,
+            String question,
+            List<String> options,
+            Integer chosenIndex,
+            int correctIndex,
+            boolean correct) {
+    }
+
+    public record PositioningTestView(
+            Instant submittedAt,
+            String selfLevel,
+            String kubernetesPurpose,
+            List<String> knownTerms,
+            String expectations,
+            int score,
+            int maxScore,
+            List<QcmAnswerView> questions) {
+
+        static PositioningTestView from(PositioningTest pt) {
+            List<Integer> chosen = new ArrayList<>();
+            for (String part : pt.getAnswers().split(",")) {
+                try {
+                    chosen.add(Integer.parseInt(part.trim()));
+                } catch (NumberFormatException e) {
+                    chosen.add(null);
+                }
+            }
+            List<QcmAnswerView> questions = new ArrayList<>();
+            List<PositioningTestCatalog.QcmQuestion> catalog = PositioningTestCatalog.QUESTIONS;
+            for (int i = 0; i < catalog.size(); i++) {
+                PositioningTestCatalog.QcmQuestion q = catalog.get(i);
+                Integer answer = i < chosen.size() ? chosen.get(i) : null;
+                questions.add(new QcmAnswerView(
+                        q.id(), q.section(), q.text(), q.options(),
+                        answer, q.correctIndex(),
+                        answer != null && answer == q.correctIndex()));
+            }
+            List<String> terms = pt.getKnownTerms() == null || pt.getKnownTerms().isBlank()
+                    ? List.of()
+                    : List.of(pt.getKnownTerms().split(";"));
+            return new PositioningTestView(
+                    pt.getSubmittedAt(),
+                    pt.getSelfLevel(),
+                    pt.getKubernetesPurpose(),
+                    terms,
+                    pt.getExpectations(),
+                    pt.getScore(),
+                    pt.getMaxScore(),
+                    questions);
+        }
+    }
+
     // --- Questionnaire apprenant salarié (public, demandes COMPANY) ------
     public record TraineeRequest(
             @NotBlank String firstName,
@@ -167,7 +233,8 @@ public final class RegistrationDtos {
             String adaptationDetails,
             String planningConstraints,
             int score,
-            int maxScore) {
+            int maxScore,
+            PositioningTestView positioningTest) {
 
         static TraineeView from(Trainee t) {
             return new TraineeView(
@@ -188,8 +255,12 @@ public final class RegistrationDtos {
                     t.getAdaptationDetails(),
                     t.getPlanningConstraints(),
                     t.getScore(),
-                    t.getMaxScore());
+                    t.getMaxScore(),
+                    t.getPositioningTest() != null ? PositioningTestView.from(t.getPositioningTest()) : null);
         }
+    }
+
+    public record TraineeCreatedResponse(UUID id) {
     }
 
     // --- Questionnaire des attentes du commanditaire (public) -----------
@@ -260,10 +331,13 @@ public final class RegistrationDtos {
             boolean hasCertificate,
             boolean hasSponsorSurvey,
             int traineesCount,
-            Integer expectedTraineesCount) {
+            Integer expectedTraineesCount,
+            Integer positioningTestScore,
+            Integer positioningTestMaxScore) {
 
         static AdminListItem from(RegistrationRequest r) {
             NeedsAnalysis na = r.getNeedsAnalysis();
+            PositioningTest pt = r.getPositioningTest();
             return new AdminListItem(
                     r.getId(),
                     r.getCreatedAt(),
@@ -282,7 +356,9 @@ public final class RegistrationDtos {
                     r.getCertificate() != null,
                     r.getSponsorSurvey() != null,
                     r.getTrainees().size(),
-                    r.getSponsorSurvey() != null ? r.getSponsorSurvey().getTraineeCount() : null);
+                    r.getSponsorSurvey() != null ? r.getSponsorSurvey().getTraineeCount() : null,
+                    pt != null ? pt.getScore() : null,
+                    pt != null ? pt.getMaxScore() : null);
         }
     }
 
@@ -369,7 +445,8 @@ public final class RegistrationDtos {
             NeedsAnalysisView needsAnalysis,
             CertificateView certificate,
             SponsorSurveyView sponsorSurvey,
-            List<TraineeView> trainees) {
+            List<TraineeView> trainees,
+            PositioningTestView positioningTest) {
 
         static AdminDetail from(RegistrationRequest r) {
             return new AdminDetail(
@@ -412,7 +489,8 @@ public final class RegistrationDtos {
                     r.getNeedsAnalysis() != null ? NeedsAnalysisView.from(r.getNeedsAnalysis()) : null,
                     r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null,
                     r.getSponsorSurvey() != null ? SponsorSurveyView.from(r.getSponsorSurvey()) : null,
-                    r.getTrainees().stream().map(TraineeView::from).toList());
+                    r.getTrainees().stream().map(TraineeView::from).toList(),
+                    r.getPositioningTest() != null ? PositioningTestView.from(r.getPositioningTest()) : null);
         }
     }
 

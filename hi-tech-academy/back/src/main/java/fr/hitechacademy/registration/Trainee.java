@@ -1,5 +1,6 @@
 package fr.hitechacademy.registration;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
@@ -81,7 +83,14 @@ public class Trainee {
     @Column(nullable = false)
     private int maxScore;
 
+    // Test de positionnement du salarié (étape 2 de son parcours)
+    @OneToOne(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PositioningTest positioningTest;
+
     public UUID getId() { return id; }
+
+    public PositioningTest getPositioningTest() { return positioningTest; }
+    public void setPositioningTest(PositioningTest positioningTest) { this.positioningTest = positioningTest; }
 
     public RegistrationRequest getRegistration() { return registration; }
     public void setRegistration(RegistrationRequest registration) { this.registration = registration; }

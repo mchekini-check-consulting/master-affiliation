@@ -53,7 +53,10 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
   La demande reste `INCOMPLETE` (non transmise à l'admin) tant que le
   questionnaire obligatoire n'est pas renseigné.
 - `/inscription/demande/:id/questionnaire` — questionnaire d'analyse du besoin
-  (obligatoire pour particulier / indépendant ; note calculée sur l'auto-évaluation)
+  (étape 1/2 pour particulier / indépendant ; note calculée sur l'auto-évaluation)
+- `/inscription/demande/:id/test-positionnement` — test de positionnement (étape
+  2/2, QCM corrigé côté serveur, note /6, non éliminatoire ; `?trainee=<id>` pour
+  un salarié). La demande n'est transmise qu'après les deux étapes.
 - `/inscription/demande/:id/questionnaire-commanditaire` — analyse du besoin du
   représentant de l'entreprise (obligatoire pour une entreprise qui inscrit ses
   salariés) ; fournit ensuite le lien apprenant à partager aux salariés
@@ -85,6 +88,9 @@ ALTER TABLE registration_requests ADD CONSTRAINT registration_requests_status_ch
 | POST | `/registrations/{id}/needs-analysis` | public | Réponses à l'analyse du besoin (INCOMPLETE → PENDING) |
 | POST | `/registrations/{id}/sponsor-survey` | public | Analyse du besoin du représentant, entreprises uniquement (INCOMPLETE → PENDING) |
 | POST | `/registrations/{id}/trainees` | public | Analyse du besoin d'un apprenant salarié (entreprises uniquement, un par email) |
+| GET | `/registrations/positioning-test` | public | Contenu du test de positionnement (sans les bonnes réponses) |
+| POST | `/registrations/{id}/positioning-test` | public | Test du demandeur, corrigé serveur (particulier/indépendant ; INCOMPLETE → PENDING) |
+| POST | `/registrations/{id}/trainees/{tid}/positioning-test` | public | Test d'un apprenant salarié, corrigé serveur |
 | GET | `/admin/me` | basic auth | Vérification des identifiants |
 | GET | `/admin/registrations` | basic auth | Liste des demandes |
 | GET | `/admin/registrations/{id}` | basic auth | Détail + questionnaire + note |

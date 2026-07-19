@@ -52,6 +52,18 @@ export function submitTrainee(id, payload) {
   return request(`/registrations/${id}/trainees`, { method: 'POST', body: payload });
 }
 
+export function getPositioningTestContent() {
+  return request('/registrations/positioning-test');
+}
+
+export function submitPositioningTest(id, payload) {
+  return request(`/registrations/${id}/positioning-test`, { method: 'POST', body: payload });
+}
+
+export function submitTraineePositioningTest(id, traineeId, payload) {
+  return request(`/registrations/${id}/trainees/${traineeId}/positioning-test`, { method: 'POST', body: payload });
+}
+
 // --- Espace admin (basic auth) ---------------------------------------
 const AUTH_STORAGE_KEY = 'hta-admin-auth';
 

@@ -76,10 +76,14 @@ export default function AnalyseBesoin() {
     return () => { document.title = 'Hi-Tech Academy'; };
   }, [requestId]);
 
-  // Les demandes d'entreprise passent par le questionnaire commanditaire
+  // Les demandes d'entreprise passent par le questionnaire commanditaire ;
+  // si l'analyse du besoin est déjà faite mais pas le test de positionnement,
+  // on reprend le parcours à l'étape 2.
   useEffect(() => {
     if (registration?.applicant_type === 'COMPANY') {
       navigate(`/inscription/demande/${requestId}/questionnaire-commanditaire`, { replace: true });
+    } else if (registration?.has_needs_analysis && !registration?.has_positioning_test) {
+      navigate(`/inscription/demande/${requestId}/test-positionnement`, { replace: true });
     }
   }, [registration, requestId, navigate]);
 
@@ -99,7 +103,7 @@ export default function AnalyseBesoin() {
     setSubmitError(null);
     try {
       const clean = (v) => (typeof v === 'string' && v.trim() === '' ? null : v);
-      await submitNeedsAnalysis(requestId, {
+      const payload = {
         beneficiary_name: `${registration.first_name} ${registration.last_name}`,
         company_role: clean(answers.companyRole),
         funder: clean(answers.funder),
@@ -113,9 +117,10 @@ export default function AnalyseBesoin() {
         planning_constraints: clean(answers.planningConstraints),
         needs_adaptation: answers.needsAdaptation,
         adaptation_details: answers.needsAdaptation ? clean(answers.adaptationDetails) : null,
-      });
-      setSubmitted(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+      await submitNeedsAnalysis(requestId, payload);
+      // Étape suivante obligatoire : le test de positionnement
+      navigate(`/inscription/demande/${requestId}/test-positionnement`);
     } catch (e) {
       setSubmitError(e.message);
     } finally {
@@ -144,6 +149,13 @@ export default function AnalyseBesoin() {
   }
 
   if (!registration) {
+    return shell(
+      <p className="text-center text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>
+    );
+  }
+
+  // Analyse faite mais test manquant : redirection en cours (effet ci-dessus)
+  if (registration.has_needs_analysis && !registration.has_positioning_test) {
     return shell(
       <p className="text-center text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>
     );
@@ -201,8 +213,8 @@ export default function AnalyseBesoin() {
       <p
         className="text-sm rounded-xl px-4 py-3.5 mb-6"
         style={{ background: '#fdf3e2', color: '#8a5a00', ...bodyFont }}>
-        <strong>Dernière étape obligatoire :</strong> votre demande d'inscription ne sera transmise
-        qu'une fois ce questionnaire complété et envoyé.
+        <strong>Étape 1/2 obligatoire :</strong> votre demande d'inscription ne sera transmise
+        qu'une fois ce questionnaire puis le test de positionnement complétés.
       </p>
 
       <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
@@ -288,7 +300,7 @@ export default function AnalyseBesoin() {
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: '#005064', color: 'white', ...headingFont }}>
-            {submitting ? 'Envoi en cours…' : 'Envoyer mes réponses'}
+            {submitting ? 'Envoi en cours…' : 'Continuer vers le test de positionnement'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
