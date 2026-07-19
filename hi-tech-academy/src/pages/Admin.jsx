@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Award, GraduationCap, Inbox, LogOut, ShieldCheck, UsersRound } from 'lucide-react';
+import { Award, FolderOpen, GraduationCap, Inbox, LogOut, ShieldCheck, UsersRound } from 'lucide-react';
 import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
 import { bodyFont, headingFont } from '@/pages/admin/common';
 import RequestsView from '@/pages/admin/RequestsView';
 import FormationsView from '@/pages/admin/FormationsView';
 import LearnersView from '@/pages/admin/LearnersView';
 import CertificatesView from '@/pages/admin/CertificatesView';
+import DocumentsView from '@/pages/admin/DocumentsView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
 function LoginScreen({ onLoggedIn }) {
@@ -93,6 +94,7 @@ const NAV_ITEMS = [
   { key: 'requests', label: 'Demandes à traiter', icon: Inbox },
   { key: 'learners', label: 'Dossiers apprenants', icon: UsersRound },
   { key: 'certificates', label: 'Certificats de réalisation', icon: Award },
+  { key: 'documents', label: 'Documents Qualiopi', icon: FolderOpen },
 ];
 
 // --- Page /admin ------------------------------------------------------
@@ -197,6 +199,9 @@ export default function Admin() {
           )}
           {view === 'certificates' && (
             <CertificatesView auth={auth} />
+          )}
+          {view === 'documents' && (
+            <DocumentsView />
           )}
         </div>
       </main>
