@@ -61,6 +61,19 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
   apprenant avec réponses au questionnaire et note, validation / refus
 - `/mentions-legales`, `/politique-confidentialite`, `/conditions-vente`
 
+## Base de données — piège `ddl-auto=update`
+
+Hibernate crée des contraintes SQL `CHECK` sur les colonnes enum
+(`@Enumerated(STRING)`) mais **ne les met jamais à jour** : ajouter une valeur
+à un enum (ex. `RegistrationStatus.INCOMPLETE` le 19/07/2026) exige un
+correctif manuel sur la base de production :
+
+```sql
+ALTER TABLE registration_requests DROP CONSTRAINT registration_requests_status_check;
+ALTER TABLE registration_requests ADD CONSTRAINT registration_requests_status_check
+  CHECK (status IN ('INCOMPLETE','PENDING','VALIDATED','REFUSED'));
+```
+
 ## API (`back/`, contexte `/api`, JSON snake_case)
 
 | Méthode | Route | Accès | Description |
