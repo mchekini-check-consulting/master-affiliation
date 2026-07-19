@@ -89,17 +89,46 @@ export function downloadCertificatePdf(certificate) {
     `pour une durée totale de ${certificate.duration_hours} heures.`;
   doc.text(doc.splitTextToSize(body, contentWidth), margin, y, { lineHeightFactor: 1.6 });
 
-  y += 34;
+  // Résultats de l'évaluation des acquis et atteinte des objectifs
+  // (grille du document « Évaluation finale – V1.0 », seuil indicatif 60 %)
+  y += 30;
+  if (certificate.total_score !== null && certificate.total_score !== undefined) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11.5);
+    doc.setTextColor('#001a4a');
+    doc.text("Évaluation des acquis", margin, y);
+    y += 7;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor('#1a1a2e');
+    const results =
+      `QCM d'évaluation finale : ${certificate.qcm_score} / 10 — ` +
+      `Mise en pratique : ${certificate.practical_score} / 10 — ` +
+      `Total : ${certificate.total_score} / 20.`;
+    doc.text(doc.splitTextToSize(results, contentWidth), margin, y, { lineHeightFactor: 1.5 });
+    y += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(certificate.objectives_achieved ? '#116632' : '#a12626');
+    doc.text(
+      certificate.objectives_achieved
+        ? 'Objectifs de la formation : ATTEINTS (seuil indicatif de 60 % dépassé).'
+        : 'Objectifs de la formation : NON ATTEINTS (seuil indicatif de 60 % non atteint).',
+      margin, y);
+    doc.setTextColor('#1a1a2e');
+    y += 12;
+  }
+
   const mention =
     `Cette attestation est délivrée pour servir et valoir ce que de droit. ` +
     `L'assiduité du stagiaire est justifiée par les feuilles d'émargement par demi-journée ` +
     `et les rapports de connexion à la classe virtuelle.`;
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(10.5);
   doc.setTextColor('#444455');
   doc.text(doc.splitTextToSize(mention, contentWidth), margin, y, { lineHeightFactor: 1.5 });
 
   // Date et signature
-  y += 30;
+  y += 24;
   doc.setFontSize(11);
   doc.setTextColor('#1a1a2e');
   doc.text(`Fait à Paris, le ${formatDateFr(certificate.issued_at)}`, margin, y);

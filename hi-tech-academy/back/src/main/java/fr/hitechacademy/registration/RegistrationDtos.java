@@ -379,11 +379,15 @@ public final class RegistrationDtos {
             int traineesCount,
             Integer expectedTraineesCount,
             Integer positioningTestScore,
-            Integer positioningTestMaxScore) {
+            Integer positioningTestMaxScore,
+            Integer finalEvaluationScore,
+            Integer finalEvaluationMaxScore) {
 
         static AdminListItem from(RegistrationRequest r) {
             NeedsAnalysis na = r.getNeedsAnalysis();
             PositioningTest pt = r.getPositioningTest();
+            FinalEvaluation fe = r.getFinalEvaluation();
+            boolean feSubmitted = fe != null && fe.isSubmitted();
             return new AdminListItem(
                     r.getId(),
                     r.getCreatedAt(),
@@ -404,7 +408,9 @@ public final class RegistrationDtos {
                     r.getTrainees().size(),
                     r.getSponsorSurvey() != null ? r.getSponsorSurvey().getTraineeCount() : null,
                     pt != null ? pt.getScore() : null,
-                    pt != null ? pt.getMaxScore() : null);
+                    pt != null ? pt.getMaxScore() : null,
+                    feSubmitted ? fe.getScore() : null,
+                    feSubmitted ? fe.getMaxScore() : null);
         }
     }
 
@@ -412,7 +418,11 @@ public final class RegistrationDtos {
     public record IssueCertificateRequest(
             @NotNull LocalDate sessionStartDate,
             @NotNull LocalDate sessionEndDate,
-            @NotNull Integer durationHours) {
+            @NotNull Integer durationHours,
+            // Note QCM : reprise automatiquement de l'évaluation finale si
+            // elle a été passée ; sinon cette valeur saisie est requise
+            Integer qcmScore,
+            @NotNull Integer practicalScore) {
     }
 
     public record CertificateView(
@@ -421,6 +431,10 @@ public final class RegistrationDtos {
             LocalDate sessionStartDate,
             LocalDate sessionEndDate,
             int durationHours,
+            Integer qcmScore,
+            Integer practicalScore,
+            Integer totalScore,
+            Boolean objectivesAchieved,
             UUID registrationId,
             String formationId,
             String formationTitle,
@@ -439,6 +453,10 @@ public final class RegistrationDtos {
                     c.getSessionStartDate(),
                     c.getSessionEndDate(),
                     c.getDurationHours(),
+                    c.getQcmScore(),
+                    c.getPracticalScore(),
+                    c.getTotalScore(),
+                    c.getObjectivesAchieved(),
                     r.getId(),
                     r.getFormationId(),
                     r.getFormationTitle(),

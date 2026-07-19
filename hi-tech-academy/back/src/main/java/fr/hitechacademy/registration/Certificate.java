@@ -43,7 +43,28 @@ public class Certificate {
     @Column(nullable = false)
     private int durationHours;
 
+    // Évaluation des acquis reportée sur le certificat (grille du document
+    // « Évaluation finale – V1.0 » : QCM /10 + mise en pratique /10,
+    // objectifs atteints si total >= 60 %). Nullables pour les certificats
+    // émis avant cette évolution.
+    private Integer qcmScore;
+    private Integer practicalScore;
+    private Integer totalScore;
+    private Boolean objectivesAchieved;
+
     public UUID getId() { return id; }
+
+    public Integer getQcmScore() { return qcmScore; }
+    public void setQcmScore(Integer qcmScore) { this.qcmScore = qcmScore; }
+
+    public Integer getPracticalScore() { return practicalScore; }
+    public void setPracticalScore(Integer practicalScore) { this.practicalScore = practicalScore; }
+
+    public Integer getTotalScore() { return totalScore; }
+    public void setTotalScore(Integer totalScore) { this.totalScore = totalScore; }
+
+    public Boolean getObjectivesAchieved() { return objectivesAchieved; }
+    public void setObjectivesAchieved(Boolean objectivesAchieved) { this.objectivesAchieved = objectivesAchieved; }
 
     public RegistrationRequest getRegistration() { return registration; }
     public void setRegistration(RegistrationRequest registration) { this.registration = registration; }

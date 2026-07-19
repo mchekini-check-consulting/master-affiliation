@@ -12,8 +12,17 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [hours, setHours] = useState('7');
+  // Note QCM : récupérée automatiquement de l'évaluation finale si passée,
+  // saisie manuelle sinon ; mise en pratique toujours saisie (partie B)
+  const qcmAuto = registration.final_evaluation_score !== null && registration.final_evaluation_score !== undefined;
+  const [qcmScore, setQcmScore] = useState(qcmAuto ? String(registration.final_evaluation_score) : '');
+  const [practicalScore, setPracticalScore] = useState('');
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const total = qcmScore !== '' && practicalScore !== ''
+    ? Number(qcmScore) + Number(practicalScore)
+    : null;
 
   const submit = async (e) => {
     e.preventDefault();
@@ -24,6 +33,8 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
         session_start_date: startDate,
         session_end_date: endDate || startDate,
         duration_hours: Number(hours),
+        qcm_score: qcmAuto ? null : Number(qcmScore),
+        practical_score: Number(practicalScore),
       });
       downloadCertificatePdf(certificate);
       onIssued();
@@ -78,6 +89,47 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
             <input type="number" min="1" required value={hours} onChange={(e) => setHours(e.target.value)}
               className={inputClass} style={inputStyle} />
           </label>
+
+          {/* Évaluation des acquis (grille : QCM /10 + mise en pratique /10) */}
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+                QCM d'évaluation finale / 10 <span style={{ color: '#c2410c' }}>*</span>
+              </span>
+              <input
+                type="number" min="0" max="10" required value={qcmScore}
+                onChange={(e) => setQcmScore(e.target.value)}
+                disabled={qcmAuto}
+                className={`${inputClass} disabled:opacity-70`} style={inputStyle} />
+              <span className="block text-[11px] mt-1" style={{ color: qcmAuto ? '#116632' : '#8a5a00', ...bodyFont }}>
+                {qcmAuto ? '✓ Récupérée automatiquement du QCM passé en ligne' : 'QCM non passé en ligne : saisir la note'}
+              </span>
+            </label>
+            <label className="block">
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+                Mise en pratique / 10 <span style={{ color: '#c2410c' }}>*</span>
+              </span>
+              <input
+                type="number" min="0" max="10" required value={practicalScore}
+                onChange={(e) => setPracticalScore(e.target.value)}
+                className={inputClass} style={inputStyle} />
+              <span className="block text-[11px] mt-1" style={{ color: '#6b7a9b', ...bodyFont }}>
+                Partie B évaluée par le formateur (5+3+2 points)
+              </span>
+            </label>
+          </div>
+
+          {total !== null && (
+            <p
+              className="text-sm rounded-xl px-4 py-3 font-semibold"
+              style={{
+                background: total >= 12 ? '#e5f6ec' : '#fdecec',
+                color: total >= 12 ? '#116632' : '#a12626',
+                ...headingFont,
+              }}>
+              Total : {total} / 20 — objectifs {total >= 12 ? 'ATTEINTS' : 'NON ATTEINTS'} (seuil 60 %)
+            </p>
+          )}
         </div>
 
         {error && (
@@ -161,9 +213,14 @@ export default function CertificatesView({ auth }) {
                     {r.first_name} {r.last_name}
                     {r.company_name ? ` — ${r.company_name}` : ''}
                   </p>
-                  <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
+                  <p className="text-xs mb-1.5" style={{ color: '#6b7a9b', ...bodyFont }}>
                     {r.formation_title} · {APPLICANT_LABELS[r.applicant_type]} · validée
                   </p>
+                  {r.final_evaluation_score !== null && r.final_evaluation_score !== undefined ? (
+                    <Badge tone="success">QCM passé — {r.final_evaluation_score}/{r.final_evaluation_max_score}</Badge>
+                  ) : (
+                    <Badge tone="warning">QCM d'évaluation finale non passé</Badge>
+                  )}
                 </div>
                 <button
                   type="button"
@@ -186,7 +243,7 @@ export default function CertificatesView({ auth }) {
           <table className="w-full text-left" style={{ minWidth: 720 }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
-                {['Émis le', 'Apprenant', 'Formation', 'Session', 'Durée', ''].map((h, i) => (
+                {['Émis le', 'Apprenant', 'Formation', 'Session', 'Résultat', ''].map((h, i) => (
                   <th
                     key={i}
                     className="px-4 py-3 text-[11px] uppercase tracking-wide font-semibold"
@@ -219,7 +276,16 @@ export default function CertificatesView({ auth }) {
                       : `${formatDay(c.session_start_date)} → ${formatDay(c.session_end_date)}`}
                   </td>
                   <td className="px-4 py-3.5">
-                    <Badge tone="info">{c.duration_hours} h</Badge>
+                    {c.total_score !== null && c.total_score !== undefined ? (
+                      <span className="inline-flex items-center gap-1.5 flex-wrap">
+                        <Badge tone="info">{c.total_score}/20</Badge>
+                        <Badge tone={c.objectives_achieved ? 'success' : 'warning'}>
+                          {c.objectives_achieved ? 'Objectifs atteints' : 'Non atteints'}
+                        </Badge>
+                      </span>
+                    ) : (
+                      <Badge tone="info">{c.duration_hours} h</Badge>
+                    )}
                   </td>
                   <td className="px-4 py-3.5 text-right">
                     <button

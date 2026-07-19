@@ -566,6 +566,11 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
               <Field
                 label="Session"
                 value={`du ${formatDay(certificate.session_start_date)} au ${formatDay(certificate.session_end_date)} — ${certificate.duration_hours} h`} />
+              {certificate.total_score !== null && certificate.total_score !== undefined && (
+                <Field
+                  label="Évaluation des acquis"
+                  value={`QCM ${certificate.qcm_score}/10 · Pratique ${certificate.practical_score}/10 · Total ${certificate.total_score}/20 — objectifs ${certificate.objectives_achieved ? 'atteints' : 'non atteints'}`} />
+              )}
               <button
                 type="button"
                 onClick={() => downloadCertificatePdf(certificate)}

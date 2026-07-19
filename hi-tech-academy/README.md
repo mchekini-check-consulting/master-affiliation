@@ -103,3 +103,5 @@ ALTER TABLE registration_requests ADD CONSTRAINT registration_requests_status_ch
 | GET | `/admin/registrations` | basic auth | Liste des demandes |
 | GET | `/admin/registrations/{id}` | basic auth | Détail + questionnaire + note |
 | POST | `/admin/registrations/{id}/status` | basic auth | Valider (`VALIDATED`) / refuser (`REFUSED`) |
+| POST | `/admin/registrations/{id}/certificate` | basic auth | Émettre le certificat de réalisation : dates de session, durée, note QCM (reprise automatiquement de l'évaluation finale si passée), mise en pratique /10 → total /20 et objectifs atteints/non atteints (seuil 60 %) reportés sur le PDF |
+| GET | `/admin/certificates` | basic auth | Liste des certificats émis |

@@ -176,11 +176,27 @@ public class RegistrationAdminController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La durée doit être positive");
         }
 
+        // Résultats de l'évaluation des acquis (grille : QCM /10 + mise en
+        // pratique /10, objectifs atteints à partir de 60 % du total)
+        FinalEvaluation fe = r.getFinalEvaluation();
+        Integer qcmScore = fe != null && fe.isSubmitted() ? fe.getScore() : body.qcmScore();
+        if (qcmScore == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le QCM d'évaluation finale n'a pas été passé : renseignez la note QCM manuellement");
+        }
+        if (qcmScore < 0 || qcmScore > 10 || body.practicalScore() < 0 || body.practicalScore() > 10) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Les notes doivent être comprises entre 0 et 10");
+        }
+
         Certificate c = new Certificate();
         c.setRegistration(r);
         c.setSessionStartDate(body.sessionStartDate());
         c.setSessionEndDate(body.sessionEndDate());
         c.setDurationHours(body.durationHours());
+        c.setQcmScore(qcmScore);
+        c.setPracticalScore(body.practicalScore());
+        c.setTotalScore(qcmScore + body.practicalScore());
+        c.setObjectivesAchieved(c.getTotalScore() >= 12); // seuil Qualiopi indicatif : 60 % de 20
         r.setCertificate(c);
         repository.save(r);
         return CertificateView.from(r.getCertificate());
