@@ -175,6 +175,10 @@ public class RegistrationAdminController {
         if (body.durationHours() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La durée doit être positive");
         }
+        if (body.attendedHours() <= 0 || body.attendedHours() > body.durationHours()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La durée réalisée par l'apprenant doit être comprise entre 1 h et la durée de la formation");
+        }
 
         // Résultats de l'évaluation des acquis (grille : QCM /10 + mise en
         // pratique /10, objectifs atteints à partir de 60 % du total)
@@ -193,6 +197,7 @@ public class RegistrationAdminController {
         c.setSessionStartDate(body.sessionStartDate());
         c.setSessionEndDate(body.sessionEndDate());
         c.setDurationHours(body.durationHours());
+        c.setAttendedHours(body.attendedHours());
         c.setQcmScore(qcmScore);
         c.setPracticalScore(body.practicalScore());
         c.setTotalScore(qcmScore + body.practicalScore());

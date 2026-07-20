@@ -43,6 +43,10 @@ public class Certificate {
     @Column(nullable = false)
     private int durationHours;
 
+    // Durée effectivement réalisée par l'apprenant (assiduité), demandée à
+    // l'émission — peut être inférieure à la durée de la formation
+    private Integer attendedHours;
+
     // Évaluation des acquis reportée sur le certificat (grille du document
     // « Évaluation finale – V1.0 » : QCM /10 + mise en pratique /10,
     // objectifs atteints si total >= 60 %). Nullables pour les certificats
@@ -53,6 +57,9 @@ public class Certificate {
     private Boolean objectivesAchieved;
 
     public UUID getId() { return id; }
+
+    public Integer getAttendedHours() { return attendedHours; }
+    public void setAttendedHours(Integer attendedHours) { this.attendedHours = attendedHours; }
 
     public Integer getQcmScore() { return qcmScore; }
     public void setQcmScore(Integer qcmScore) { this.qcmScore = qcmScore; }

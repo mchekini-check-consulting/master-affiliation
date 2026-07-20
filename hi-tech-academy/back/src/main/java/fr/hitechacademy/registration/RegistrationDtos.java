@@ -419,6 +419,7 @@ public final class RegistrationDtos {
             @NotNull LocalDate sessionStartDate,
             @NotNull LocalDate sessionEndDate,
             @NotNull Integer durationHours,
+            @NotNull Integer attendedHours,
             // Note QCM : reprise automatiquement de l'évaluation finale si
             // elle a été passée ; sinon cette valeur saisie est requise
             Integer qcmScore,
@@ -431,6 +432,7 @@ public final class RegistrationDtos {
             LocalDate sessionStartDate,
             LocalDate sessionEndDate,
             int durationHours,
+            Integer attendedHours,
             Integer qcmScore,
             Integer practicalScore,
             Integer totalScore,
@@ -453,6 +455,7 @@ public final class RegistrationDtos {
                     c.getSessionStartDate(),
                     c.getSessionEndDate(),
                     c.getDurationHours(),
+                    c.getAttendedHours(),
                     c.getQcmScore(),
                     c.getPracticalScore(),
                     c.getTotalScore(),

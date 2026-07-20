@@ -186,9 +186,9 @@ export default function Admin() {
         </div>
       </aside>
 
-      {/* Contenu */}
+      {/* Contenu : pleine largeur à côté de la sidebar */}
       <main className="flex-1 min-w-0 px-5 sm:px-8 py-8 overflow-x-hidden">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full">
           {view === 'formations' && (
             <FormationsView
               auth={auth}

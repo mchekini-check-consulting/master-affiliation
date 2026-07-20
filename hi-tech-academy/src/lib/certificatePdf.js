@@ -17,10 +17,10 @@ function formatDateFr(iso) {
 }
 
 /**
- * Génère et télécharge le PDF d'un certificat de réalisation à partir des
- * données renvoyées par GET /api/admin/certificates.
+ * Construit le PDF d'un certificat de réalisation à partir des données
+ * renvoyées par l'API admin (téléchargement ou visualisation navigateur).
  */
-export function downloadCertificatePdf(certificate) {
+function buildCertificatePdf(certificate) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 22;
@@ -82,16 +82,20 @@ export function downloadCertificatePdf(certificate) {
   y += 12;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11.5);
+  const attended = certificate.attended_hours ?? certificate.duration_hours;
+  const attendanceRate = Math.round((attended / certificate.duration_hours) * 100);
   const body =
     `a suivi l'action de formation « ${certificate.formation_title} », ` +
     `action concourant au développement des compétences (art. L.6313-1 du Code du travail), ` +
     `réalisée à distance (classe virtuelle) ${period}, ` +
-    `pour une durée totale de ${certificate.duration_hours} heures.`;
+    `d'une durée totale de ${certificate.duration_hours} heures. ` +
+    `Durée effectivement réalisée par le stagiaire : ${attended} heure${attended > 1 ? 's' : ''} ` +
+    `sur ${certificate.duration_hours} (assiduité de ${attendanceRate} %).`;
   doc.text(doc.splitTextToSize(body, contentWidth), margin, y, { lineHeightFactor: 1.6 });
 
   // Résultats de l'évaluation des acquis et atteinte des objectifs
   // (grille du document « Évaluation finale – V1.0 », seuil indicatif 60 %)
-  y += 30;
+  y += 38;
   if (certificate.total_score !== null && certificate.total_score !== undefined) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11.5);
@@ -149,7 +153,21 @@ export function downloadCertificatePdf(certificate) {
   doc.text(`${ORG.name} – ${ORG.address} – ${ORG.siret}`, pageWidth / 2, footerY - 1, { align: 'center' });
   doc.text(`${ORG.nda} – ${ORG.contact}`, pageWidth / 2, footerY + 3, { align: 'center' });
 
-  const fileName = `Certificat_realisation_${certificate.last_name}_${certificate.first_name}.pdf`
+  return doc;
+}
+
+function certificateFileName(certificate) {
+  return `Certificat_realisation_${certificate.last_name}_${certificate.first_name}.pdf`
     .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '_');
-  doc.save(fileName);
+}
+
+/** Télécharge le PDF du certificat. */
+export function downloadCertificatePdf(certificate) {
+  buildCertificatePdf(certificate).save(certificateFileName(certificate));
+}
+
+/** Ouvre le PDF du certificat dans un nouvel onglet du navigateur. */
+export function viewCertificatePdf(certificate) {
+  const url = buildCertificatePdf(certificate).output('bloburl');
+  window.open(url, '_blank', 'noopener');
 }

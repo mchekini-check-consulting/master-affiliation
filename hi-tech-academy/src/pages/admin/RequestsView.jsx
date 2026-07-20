@@ -4,7 +4,7 @@ import {
   adminGetRegistration, adminListRegistrations, adminSendFinalEvaluation,
   adminSendTraineeFinalEvaluation, adminUpdateStatus,
 } from '@/api/backend';
-import { downloadCertificatePdf } from '@/lib/certificatePdf';
+import { downloadCertificatePdf, viewCertificatePdf } from '@/lib/certificatePdf';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import {
   APPLICANT_LABELS, Badge, Card, EmptyState, Field, StatusBadge, ViewHeader,
@@ -565,20 +565,30 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
               <Field label="Émis le" value={formatDate(certificate.issued_at)} />
               <Field
                 label="Session"
-                value={`du ${formatDay(certificate.session_start_date)} au ${formatDay(certificate.session_end_date)} — ${certificate.duration_hours} h`} />
+                value={`du ${formatDay(certificate.session_start_date)} au ${formatDay(certificate.session_end_date)} — ${certificate.duration_hours} h${certificate.attended_hours != null ? ` (réalisées : ${certificate.attended_hours} h)` : ''}`} />
               {certificate.total_score !== null && certificate.total_score !== undefined && (
                 <Field
                   label="Évaluation des acquis"
                   value={`QCM ${certificate.qcm_score}/10 · Pratique ${certificate.practical_score}/10 · Total ${certificate.total_score}/20 — objectifs ${certificate.objectives_achieved ? 'atteints' : 'non atteints'}`} />
               )}
-              <button
-                type="button"
-                onClick={() => downloadCertificatePdf(certificate)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold"
-                style={{ background: '#005064', color: 'white', ...headingFont }}>
-                <Download className="w-4 h-4" />
-                Télécharger le PDF
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => viewCertificatePdf(certificate)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold"
+                  style={{ background: '#005064', color: 'white', ...headingFont }}>
+                  <Eye className="w-4 h-4" />
+                  Visualiser le PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => downloadCertificatePdf(certificate)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold"
+                  style={{ background: '#f0f3fa', color: '#005064', border: '1.5px solid #005064', ...headingFont }}>
+                  <Download className="w-4 h-4" />
+                  Télécharger le PDF
+                </button>
+              </div>
             </div>
           ) : (
             <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>

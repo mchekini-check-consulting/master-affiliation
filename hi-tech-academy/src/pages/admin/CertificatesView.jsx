@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Award, Download, RefreshCw, X } from 'lucide-react';
+import { Award, Download, Eye, RefreshCw, X } from 'lucide-react';
 import { adminIssueCertificate, adminListCertificates, adminListRegistrations } from '@/api/backend';
-import { downloadCertificatePdf } from '@/lib/certificatePdf';
+import { downloadCertificatePdf, viewCertificatePdf } from '@/lib/certificatePdf';
 import {
   APPLICANT_LABELS, Badge, Card, EmptyState, ViewHeader,
   bodyFont, formatDate, formatDay, headingFont,
@@ -12,6 +12,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [hours, setHours] = useState('7');
+  const [attendedHours, setAttendedHours] = useState('7');
   // Note QCM : récupérée automatiquement de l'évaluation finale si passée,
   // saisie manuelle sinon ; mise en pratique toujours saisie (partie B)
   const qcmAuto = registration.final_evaluation_score !== null && registration.final_evaluation_score !== undefined;
@@ -33,6 +34,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
         session_start_date: startDate,
         session_end_date: endDate || startDate,
         duration_hours: Number(hours),
+        attended_hours: Number(attendedHours),
         qcm_score: qcmAuto ? null : Number(qcmScore),
         practical_score: Number(practicalScore),
       });
@@ -82,13 +84,27 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
                 className={inputClass} style={inputStyle} />
             </label>
           </div>
-          <label className="block">
-            <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
-              Durée réalisée (heures) <span style={{ color: '#c2410c' }}>*</span>
-            </span>
-            <input type="number" min="1" required value={hours} onChange={(e) => setHours(e.target.value)}
-              className={inputClass} style={inputStyle} />
-          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+                Durée de la formation (h) <span style={{ color: '#c2410c' }}>*</span>
+              </span>
+              <input type="number" min="1" required value={hours} onChange={(e) => setHours(e.target.value)}
+                className={inputClass} style={inputStyle} />
+            </label>
+            <label className="block">
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+                Durée réalisée par l'apprenant (h) <span style={{ color: '#c2410c' }}>*</span>
+              </span>
+              <input
+                type="number" min="1" max={hours || undefined} required value={attendedHours}
+                onChange={(e) => setAttendedHours(e.target.value)}
+                className={inputClass} style={inputStyle} />
+              <span className="block text-[11px] mt-1" style={{ color: '#6b7a9b', ...bodyFont }}>
+                Assiduité constatée (émargements, rapports de connexion)
+              </span>
+            </label>
+          </div>
 
           {/* Évaluation des acquis (grille : QCM /10 + mise en pratique /10) */}
           <div className="grid grid-cols-2 gap-3">
@@ -274,6 +290,11 @@ export default function CertificatesView({ auth }) {
                     {c.session_start_date === c.session_end_date
                       ? formatDay(c.session_start_date)
                       : `${formatDay(c.session_start_date)} → ${formatDay(c.session_end_date)}`}
+                    {c.attended_hours != null && (
+                      <span className="block text-xs" style={{ color: '#6b7a9b' }}>
+                        {c.attended_hours}/{c.duration_hours} h réalisées
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3.5">
                     {c.total_score !== null && c.total_score !== undefined ? (
@@ -287,15 +308,25 @@ export default function CertificatesView({ auth }) {
                       <Badge tone="info">{c.duration_hours} h</Badge>
                     )}
                   </td>
-                  <td className="px-4 py-3.5 text-right">
-                    <button
-                      type="button"
-                      onClick={() => downloadCertificatePdf(c)}
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                      style={{ color: '#005064', ...headingFont }}>
-                      <Download className="w-4 h-4" />
-                      PDF
-                    </button>
+                  <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                    <span className="inline-flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => viewCertificatePdf(c)}
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                        style={{ color: '#005064', ...headingFont }}>
+                        <Eye className="w-4 h-4" />
+                        Visualiser
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => downloadCertificatePdf(c)}
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                        style={{ color: '#005064', ...headingFont }}>
+                        <Download className="w-4 h-4" />
+                        Télécharger
+                      </button>
+                    </span>
                   </td>
                 </tr>
               ))}
