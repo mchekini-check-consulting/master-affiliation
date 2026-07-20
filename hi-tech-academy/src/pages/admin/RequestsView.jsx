@@ -5,7 +5,7 @@ import {
   adminSendTraineeFinalEvaluation, adminUpdateStatus,
 } from '@/api/backend';
 import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
-import { exportNeedsAnalysisPdf, exportPositioningTestPdf } from '@/lib/surveyPdf';
+import { exportNeedsAnalysisPdf, exportPositioningTestPdf, exportSponsorSurveyPdf } from '@/lib/surveyPdf';
 import PdfViewer from './PdfViewer';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import {
@@ -85,6 +85,10 @@ function SponsorSurveyModal({ detail, onClose }) {
       title="Analyse du besoin — représentant de l'entreprise"
       subtitle={`${detail.company_name} — ${detail.formation_title}`}
       submittedAt={s.submitted_at}
+      onExportPdf={() => exportSponsorSurveyPdf(s, {
+        company: detail.company_name,
+        formationTitle: detail.formation_title,
+      })}
       onClose={onClose}>
 
       <SurveySection title="1. Le projet de formation">

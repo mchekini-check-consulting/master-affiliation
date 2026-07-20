@@ -199,6 +199,39 @@ export function exportNeedsAnalysisPdf(na, subject) {
   w.finish(safeFileName(['Analyse_du_besoin', subject.name]));
 }
 
+/**
+ * Exporte le questionnaire des attentes du commanditaire (rempli par le
+ * représentant de l'entreprise qui inscrit ses salariés). `s` : la vue
+ * sponsor_survey de l'API ; `subject` : { company, formationTitle }.
+ */
+export function exportSponsorSurveyPdf(s, subject) {
+  const w = new PdfWriter("ANALYSE DU BESOIN — COMMANDITAIRE", subject.formationTitle);
+  w.meta(`Entreprise : ${subject.company}`);
+  w.meta(`Répondu le : ${formatDateFr(s.submitted_at)}`);
+
+  w.section('1. Le projet de formation');
+  w.qa("Contexte et objectif de la formation pour l'entreprise", s.training_reason);
+  w.qa('Comment le besoin de formation a été identifié', s.need_origin);
+  w.qa('Nombre de salariés concernés', s.trainee_count);
+  w.qa('Profils / fonctions des salariés à former', s.trainee_profiles);
+
+  w.section("2. Les attentes de l'entreprise");
+  w.qa("Compétences attendues à l'issue de la formation", s.expected_skills);
+  w.qa("Critères de réussite pour l'entreprise", s.success_criteria);
+  w.qa("Projet concret d'application des acquis", s.application_project);
+
+  w.section('3. Organisation et financement');
+  w.qa("Contraintes de planning ou d'organisation", s.planning_constraints);
+  w.qa('Mode de financement envisagé', s.funding);
+  w.qa('Salarié(s) en situation de handicap nécessitant un aménagement', s.needs_adaptation);
+  if (s.needs_adaptation) {
+    w.qa("Besoins d'aménagement précisés", s.adaptation_details);
+  }
+  w.qa('Autres remarques ou attentes', s.comments);
+
+  w.finish(safeFileName(['Analyse_du_besoin_commanditaire', subject.company]));
+}
+
 /** Exporte un test de positionnement passé (vue positioning_test de l'API). */
 export function exportPositioningTestPdf(test, subject) {
   const w = new PdfWriter('TEST DE POSITIONNEMENT', subject.formationTitle);
