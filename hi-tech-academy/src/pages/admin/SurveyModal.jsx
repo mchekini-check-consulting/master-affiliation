@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, Download, X } from 'lucide-react';
 import { bodyFont, formatDate, headingFont } from './common';
 
 // Affichage « grand format » des réponses à un questionnaire : une carte par
@@ -120,9 +120,10 @@ export function SurveySection({ title, children }) {
 
 /**
  * Modal plein écran d'affichage des réponses.
- * props : title, subtitle, submittedAt, badge (nœud optionnel, ex : note), children (sections)
+ * props : title, subtitle, submittedAt, badge (nœud optionnel, ex : note),
+ * onExportPdf (optionnel : bouton « Exporter en PDF »), children (sections)
  */
-export default function SurveyModal({ title, subtitle, submittedAt, badge, onClose, children }) {
+export default function SurveyModal({ title, subtitle, submittedAt, badge, onExportPdf, onClose, children }) {
   // Fermeture avec Échap ; bloque le scroll de la page derrière
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -154,14 +155,26 @@ export default function SurveyModal({ title, subtitle, submittedAt, badge, onClo
             </p>
             {badge && <div className="mt-3">{badge}</div>}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Fermer"
-            className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.1)' }}>
-            <X className="w-5 h-5" style={{ color: 'white' }} />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {onExportPdf && (
+              <button
+                type="button"
+                onClick={onExportPdf}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold"
+                style={{ background: '#005064', color: 'white', ...headingFont }}>
+                <Download className="w-4 h-4" />
+                Exporter en PDF
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Fermer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'rgba(255,255,255,0.1)' }}>
+              <X className="w-5 h-5" style={{ color: 'white' }} />
+            </button>
+          </div>
         </div>
 
         {/* Réponses */}

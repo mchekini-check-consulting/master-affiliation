@@ -5,6 +5,7 @@ import {
   adminSendTraineeFinalEvaluation, adminUpdateStatus,
 } from '@/api/backend';
 import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
+import { exportNeedsAnalysisPdf, exportPositioningTestPdf } from '@/lib/surveyPdf';
 import PdfViewer from './PdfViewer';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import {
@@ -20,6 +21,11 @@ function NeedsAnalysisModal({ detail, onClose }) {
       title="Analyse du besoin"
       subtitle={`${detail.first_name} ${detail.last_name} — ${detail.formation_title}`}
       submittedAt={na.submitted_at}
+      onExportPdf={() => exportNeedsAnalysisPdf(na, {
+        name: `${detail.first_name} ${detail.last_name}`,
+        context: detail.company_name,
+        formationTitle: detail.formation_title,
+      })}
       badge={
         <span
           className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
@@ -114,6 +120,11 @@ function TraineeModal({ detail, trainee, onClose }) {
       title={`Analyse du besoin — ${trainee.first_name} ${trainee.last_name}`}
       subtitle={`Salarié de ${detail.company_name} — ${detail.formation_title}`}
       submittedAt={trainee.submitted_at}
+      onExportPdf={() => exportNeedsAnalysisPdf(trainee, {
+        name: `${trainee.first_name} ${trainee.last_name}`,
+        context: `Salarié de ${detail.company_name}`,
+        formationTitle: detail.formation_title,
+      })}
       badge={
         <span
           className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
@@ -662,6 +673,7 @@ function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
       title={`Test de positionnement — ${subjectName}`}
       subtitle={formationTitle}
       submittedAt={test.submitted_at}
+      onExportPdf={() => exportPositioningTestPdf(test, { name: subjectName, formationTitle })}
       badge={
         <span
           className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
