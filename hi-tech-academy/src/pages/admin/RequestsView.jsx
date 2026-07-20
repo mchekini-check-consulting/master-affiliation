@@ -4,7 +4,8 @@ import {
   adminGetRegistration, adminListRegistrations, adminSendFinalEvaluation,
   adminSendTraineeFinalEvaluation, adminUpdateStatus,
 } from '@/api/backend';
-import { downloadCertificatePdf, viewCertificatePdf } from '@/lib/certificatePdf';
+import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
+import PdfViewer from './PdfViewer';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import {
   APPLICANT_LABELS, Badge, Card, EmptyState, Field, StatusBadge, ViewHeader,
@@ -174,6 +175,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
   const [openTraineeTest, setOpenTraineeTest] = useState(null); // test d'un salarié
   const [openTraineeFinalEval, setOpenTraineeFinalEval] = useState(null); // évaluation finale d'un salarié
   const [sendingEval, setSendingEval] = useState(null); // 'self' | traineeId | null
+  const [certViewerOpen, setCertViewerOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
   // Envoi (ou renvoi) du QCM d'évaluation finale par email
@@ -574,7 +576,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => viewCertificatePdf(certificate)}
+                  onClick={() => setCertViewerOpen(true)}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold"
                   style={{ background: '#005064', color: 'white', ...headingFont }}>
                   <Eye className="w-4 h-4" />
@@ -636,6 +638,13 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           subjectName={`${openTraineeFinalEval.first_name} ${openTraineeFinalEval.last_name} (salarié de ${detail.company_name})`}
           formationTitle={detail.formation_title}
           onClose={() => setOpenTraineeFinalEval(null)} />
+      )}
+      {certViewerOpen && certificate && (
+        <PdfViewer
+          title={`Certificat de réalisation — ${certificate.first_name} ${certificate.last_name}`}
+          url={certificatePdfBlobUrl(certificate)}
+          onDownload={() => downloadCertificatePdf(certificate)}
+          onClose={() => setCertViewerOpen(false)} />
       )}
     </div>
   );

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Award, Download, Eye, RefreshCw, X } from 'lucide-react';
 import { adminIssueCertificate, adminListCertificates, adminListRegistrations } from '@/api/backend';
-import { downloadCertificatePdf, viewCertificatePdf } from '@/lib/certificatePdf';
+import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
+import PdfViewer from './PdfViewer';
 import {
   APPLICANT_LABELS, Badge, Card, EmptyState, ViewHeader,
   bodyFont, formatDate, formatDay, headingFont,
@@ -171,6 +172,7 @@ export default function CertificatesView({ auth }) {
   const [registrations, setRegistrations] = useState(null);
   const [error, setError] = useState(null);
   const [issueFor, setIssueFor] = useState(null);
+  const [viewerCert, setViewerCert] = useState(null); // certificat affiché dans la visionneuse
   const [reloadKey, setReloadKey] = useState(0);
 
   const load = useCallback(() => {
@@ -312,7 +314,7 @@ export default function CertificatesView({ auth }) {
                     <span className="inline-flex items-center gap-4">
                       <button
                         type="button"
-                        onClick={() => viewCertificatePdf(c)}
+                        onClick={() => setViewerCert(c)}
                         className="inline-flex items-center gap-1.5 text-sm font-semibold"
                         style={{ color: '#005064', ...headingFont }}>
                         <Eye className="w-4 h-4" />
@@ -344,6 +346,14 @@ export default function CertificatesView({ auth }) {
             setIssueFor(null);
             setReloadKey((k) => k + 1);
           }} />
+      )}
+
+      {viewerCert && (
+        <PdfViewer
+          title={`Certificat de réalisation — ${viewerCert.first_name} ${viewerCert.last_name}`}
+          url={certificatePdfBlobUrl(viewerCert)}
+          onDownload={() => downloadCertificatePdf(viewerCert)}
+          onClose={() => setViewerCert(null)} />
       )}
     </div>
   );

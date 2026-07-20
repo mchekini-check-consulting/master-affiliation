@@ -166,8 +166,7 @@ export function downloadCertificatePdf(certificate) {
   buildCertificatePdf(certificate).save(certificateFileName(certificate));
 }
 
-/** Ouvre le PDF du certificat dans un nouvel onglet du navigateur. */
-export function viewCertificatePdf(certificate) {
-  const url = buildCertificatePdf(certificate).output('bloburl');
-  window.open(url, '_blank', 'noopener');
+/** URL blob du certificat, à afficher dans la visionneuse intégrée. */
+export function certificatePdfBlobUrl(certificate) {
+  return buildCertificatePdf(certificate).output('bloburl');
 }
