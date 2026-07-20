@@ -44,6 +44,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Réclamation publique
+                        .requestMatchers(HttpMethod.POST, "/complaints").permitAll()
                         // Parcours public : dépôt d'une demande puis questionnaire d'analyse du besoin
                         .requestMatchers(HttpMethod.POST, "/registrations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/registrations/*/public").permitAll()

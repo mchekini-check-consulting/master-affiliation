@@ -84,6 +84,22 @@ export function adminSendTraineeFinalEvaluation(auth, id, traineeId) {
   return request(`/admin/registrations/${id}/trainees/${traineeId}/final-evaluation/send`, { method: 'POST', auth });
 }
 
+export function adminListComplaints(auth) {
+  return request('/admin/complaints', { auth });
+}
+
+export function adminGetComplaint(auth, id) {
+  return request(`/admin/complaints/${id}`, { auth });
+}
+
+export function adminUpdateComplaint(auth, id, payload) {
+  return request(`/admin/complaints/${id}`, { method: 'POST', body: payload, auth });
+}
+
+export function createComplaint(payload) {
+  return request('/complaints', { method: 'POST', body: payload });
+}
+
 // --- Espace admin (basic auth) ---------------------------------------
 const AUTH_STORAGE_KEY = 'hta-admin-auth';
 

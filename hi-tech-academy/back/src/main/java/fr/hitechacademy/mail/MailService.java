@@ -147,6 +147,48 @@ public class MailService {
                 body.formatted(firstName, lastName, formationTitle, baseUrl + evaluationPath));
     }
 
+    /** Nouvelle réclamation déposée sur le site : notifie l'organisme. */
+    @Async
+    public void notifyAdminNewComplaint(String formationTitle, String complainant, String email, String message) {
+        String body = """
+                Une nouvelle réclamation vient d'être déposée sur le site.
+
+                Formation concernée : %s
+                Réclamant : %s (%s)
+
+                Message :
+                %s
+
+                Traitez la réclamation depuis l'espace admin :
+                %s/admin
+
+                — Notification automatique Hi-Tech Academy""";
+        send(adminRecipient,
+                "Nouvelle réclamation — " + formationTitle,
+                body.formatted(formationTitle, complainant, email, message, baseUrl));
+    }
+
+    /** Accusé de réception envoyé au réclamant (procédure Qualiopi : sous 48 h ouvrées). */
+    @Async
+    public void acknowledgeComplaint(String to, String firstName, String lastName, String formationTitle) {
+        String body = """
+                Bonjour %s %s,
+
+                Nous accusons réception de votre réclamation concernant la formation
+                « %s ». Elle a bien été enregistrée et sera analysée par nos services.
+
+                Conformément à notre procédure, une réponse vous sera apportée sous
+                15 jours ouvrés. Nous restons à votre disposition pour tout complément :
+                contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Cordialement,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        send(to,
+                "Accusé de réception de votre réclamation — " + formationTitle,
+                body.formatted(firstName, lastName, formationTitle));
+    }
+
     private void send(String to, String subject, String body) {
         if (!enabled) {
             log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);

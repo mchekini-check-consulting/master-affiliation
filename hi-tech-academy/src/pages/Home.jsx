@@ -11,6 +11,7 @@ import TimelineSection from '@/components/TimelineSection';
 import BlogSection from '@/components/BlogSection';
 import FAQSection from '@/components/FAQSection';
 import CTASection from '@/components/CTASection';
+import ComplaintsSection from '@/components/ComplaintsSection';
 
 const HERO_IMAGES = [
 "/images/cbdcfde73_generated_f57bba76.png",
@@ -58,6 +59,7 @@ export default function Home() {
       <TimelineSection />
       <BlogSection />
       <FAQSection />
+      <ComplaintsSection />
       <CTASection />
       <Footer />
     </div>);

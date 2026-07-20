@@ -65,8 +65,11 @@ docker compose up -d --build hi-tech-academy-db hi-tech-academy-back hi-tech-aca
   salariés) ; fournit ensuite le lien apprenant à partager aux salariés
 - `/inscription/demande/:id/apprenant` — analyse du besoin individuelle de chaque
   salarié inscrit (identité + auto-évaluation, note /9 ; demandes entreprise uniquement)
+- `/` (section `#reclamations`) — formulaire public de dépôt d'une réclamation
+  (formation concernée, type de réclamant, identité, message)
 - `/admin` — espace admin (basic auth) : liste des demandes, détail d'un
-  apprenant avec réponses au questionnaire et note, validation / refus
+  apprenant avec réponses au questionnaire et note, validation / refus, et
+  onglet Réclamations (liste + traitement)
 - `/mentions-legales`, `/politique-confidentialite`, `/conditions-vente`
 
 ## Base de données — piège `ddl-auto=update`
@@ -105,3 +108,7 @@ ALTER TABLE registration_requests ADD CONSTRAINT registration_requests_status_ch
 | POST | `/admin/registrations/{id}/status` | basic auth | Valider (`VALIDATED`) / refuser (`REFUSED`) |
 | POST | `/admin/registrations/{id}/certificate` | basic auth | Émettre le certificat de réalisation : dates de session, durée, note QCM (reprise automatiquement de l'évaluation finale si passée), mise en pratique /10 → total /20 et objectifs atteints/non atteints (seuil 60 %) reportés sur le PDF |
 | GET | `/admin/certificates` | basic auth | Liste des certificats émis |
+| POST | `/complaints` | public | Dépôt d'une réclamation (notifie l'organisme + accusé de réception au réclamant) |
+| GET | `/admin/complaints` | basic auth | Liste des réclamations |
+| GET | `/admin/complaints/{id}` | basic auth | Détail d'une réclamation |
+| POST | `/admin/complaints/{id}` | basic auth | Mise à jour du statut et de la réponse |

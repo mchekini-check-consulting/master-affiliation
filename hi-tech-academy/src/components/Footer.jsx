@@ -16,6 +16,7 @@ const liens = [
   { label: 'Nos formations', href: '#programmes' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQ', href: '#faq' },
+  { label: 'Déposer une réclamation', href: '#reclamations' },
   { label: 'Mentions légales', href: '/mentions-legales' },
   { label: 'Politique de confidentialité', href: '/politique-confidentialite' },
   { label: 'Conditions générales de vente', href: '/conditions-vente' },
