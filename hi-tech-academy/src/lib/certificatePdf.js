@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import { SIGNATURE_PNG, SIGNATURE_RATIO } from './signatureImage.js';
 
 // Certificat de réalisation au format du modèle officiel de l'organisme
 // (documents_finaux/Certificat_de_réalisation.pdf) : attestation d'assiduité
@@ -349,10 +350,10 @@ function buildCertificatePdf(certificate) {
   w.doc.setFontSize(9).setTextColor(GREY);
   w.doc.text(ORG.representativeRole, boxX + boxW / 2, w.y, { align: 'center' });
   w.y += 6;
-  w.doc.setDrawColor(BORDER).setLineWidth(0.3);
-  w.doc.rect(boxX, w.y, boxW, 34);
-  w.doc.setFontSize(9).setTextColor(GREY);
-  w.doc.text('Signature', boxX + 3, w.y + 5.5);
+  // Signature / tampon de l'organisme
+  const sigW = 62;
+  const sigH = sigW * SIGNATURE_RATIO;
+  w.doc.addImage(SIGNATURE_PNG, 'PNG', boxX + (boxW - sigW) / 2, w.y, sigW, sigH);
 
   return w.finish();
 }
