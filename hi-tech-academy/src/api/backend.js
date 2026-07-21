@@ -85,14 +85,15 @@ export function adminSendTraineeFinalEvaluation(auth, id, traineeId) {
 }
 
 export function adminSendFinalEvaluationCorrection(auth, id, pdfBase64) {
+  // Le backend désérialise en snake_case (spring.jackson.property-naming-strategy)
   return request(`/admin/registrations/${id}/final-evaluation/send-correction`, {
-    method: 'POST', auth, body: { pdfBase64 },
+    method: 'POST', auth, body: { pdf_base64: pdfBase64 },
   });
 }
 
 export function adminSendTraineeFinalEvaluationCorrection(auth, id, traineeId, pdfBase64) {
   return request(`/admin/registrations/${id}/trainees/${traineeId}/final-evaluation/send-correction`, {
-    method: 'POST', auth, body: { pdfBase64 },
+    method: 'POST', auth, body: { pdf_base64: pdfBase64 },
   });
 }
 

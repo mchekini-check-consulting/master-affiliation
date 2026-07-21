@@ -449,7 +449,11 @@ public final class RegistrationDtos {
             String firstName,
             String lastName,
             String email,
-            String companyName) {
+            String companyName,
+            String addressLine,
+            String addressComplement,
+            String postalCode,
+            String city) {
 
         static CertificateView from(Certificate c) {
             RegistrationRequest r = c.getRegistration();
@@ -472,7 +476,11 @@ public final class RegistrationDtos {
                     r.getFirstName(),
                     r.getLastName(),
                     r.getEmail(),
-                    r.getCompanyName());
+                    r.getCompanyName(),
+                    r.getAddressLine(),
+                    r.getAddressComplement(),
+                    r.getPostalCode(),
+                    r.getCity());
         }
     }
 
