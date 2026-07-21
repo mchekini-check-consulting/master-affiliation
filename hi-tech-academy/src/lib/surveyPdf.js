@@ -116,6 +116,23 @@ class PdfWriter {
     this.y += lines.length * 4 + 2;
   }
 
+  /** Question de QCM avec seulement la bonne réponse (corrigé générique). */
+  qcmAnswerKey(item) {
+    const questionLines = this.doc.setFont('helvetica', 'bold').setFontSize(9.5)
+      .splitTextToSize(`${item.id}. ${item.question}`, this.contentWidth);
+    const answer = `Bonne réponse : ${item.options[item.correct_index]}`;
+    const answerLines = this.doc.setFont('helvetica', 'normal').setFontSize(10)
+      .splitTextToSize(answer, this.contentWidth - 4);
+    this.ensure(questionLines.length * 4.4 + answerLines.length * 4.8 + 6);
+
+    this.doc.setFont('helvetica', 'bold').setFontSize(9.5).setTextColor('#001a4a');
+    this.doc.text(questionLines, MARGIN, this.y);
+    this.y += questionLines.length * 4.4 + 1;
+    this.doc.setFont('helvetica', 'normal').setFontSize(10).setTextColor('#116632');
+    this.doc.text(answerLines, MARGIN + 4, this.y);
+    this.y += answerLines.length * 4.8 + 5.4;
+  }
+
   /** Question de QCM corrigée : réponse choisie + bonne réponse si ratée. */
   qcm(item) {
     const questionLines = this.doc.setFont('helvetica', 'bold').setFontSize(9.5)
@@ -142,8 +159,8 @@ class PdfWriter {
     this.y += 5.4;
   }
 
-  finish(fileName) {
-    // Pied de page organisme sur chaque page
+  // Pied de page organisme sur chaque page
+  stampFooters() {
     const pages = this.doc.getNumberOfPages();
     for (let i = 1; i <= pages; i++) {
       this.doc.setPage(i);
@@ -155,7 +172,17 @@ class PdfWriter {
       this.doc.text(`${ORG.nda} – ${ORG.contact}`, this.pageWidth / 2, footerY + 2.5, { align: 'center' });
       this.doc.text(`Page ${i}/${pages}`, this.pageWidth - MARGIN, footerY + 2.5, { align: 'right' });
     }
+  }
+
+  finish(fileName) {
+    this.stampFooters();
     this.doc.save(fileName);
+  }
+
+  /** Rend le document en base64 (sans le préfixe data:), pour un envoi serveur. */
+  toBase64() {
+    this.stampFooters();
+    return this.doc.output('datauristring').split(',')[1];
   }
 }
 
@@ -298,4 +325,26 @@ export function exportFinalEvaluationPdf(evaluation, subject) {
   );
 
   w.finish(safeFileName(['Evaluation_finale', subject.name]));
+}
+
+/**
+ * Construit le corrigé générique du QCM d'évaluation finale (questions +
+ * bonnes réponses attendues, sans les réponses individuelles). Renvoie le
+ * PDF en base64 pour un envoi serveur. `subject` : { formationTitle }.
+ */
+export function buildFinalEvaluationCorrectionPdf(evaluation, subject) {
+  const w = new PdfWriter('CORRIGÉ — ÉVALUATION FINALE', subject.formationTitle);
+  w.meta('Corrigé du QCM — bonnes réponses attendues');
+
+  w.section(`Partie A — QCM (${evaluation.questions.length} questions)`);
+  for (const q of evaluation.questions) {
+    w.qcmAnswerKey(q);
+  }
+
+  w.note(
+    "Partie B (mise en pratique sur AKS) évaluée par le formateur pendant la session ; le total "
+    + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
+  );
+
+  return w.toBase64();
 }

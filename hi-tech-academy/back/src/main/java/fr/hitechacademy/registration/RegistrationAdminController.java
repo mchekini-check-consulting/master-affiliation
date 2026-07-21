@@ -5,6 +5,7 @@ import fr.hitechacademy.registration.RegistrationDtos.AdminDetail;
 import fr.hitechacademy.registration.RegistrationDtos.AdminListItem;
 import fr.hitechacademy.registration.RegistrationDtos.CertificateView;
 import fr.hitechacademy.registration.RegistrationDtos.IssueCertificateRequest;
+import fr.hitechacademy.registration.RegistrationDtos.SendCorrectionRequest;
 import fr.hitechacademy.registration.RegistrationDtos.StatusUpdateRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -144,6 +145,58 @@ public class RegistrationAdminController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "L'évaluation finale ne peut être envoyée que pour une demande validée");
         }
+    }
+
+    // --- Corrigé du QCM : envoi en un clic à l'apprenant -------------
+
+    @PostMapping("/registrations/{id}/final-evaluation/send-correction")
+    @Transactional(readOnly = true)
+    public void sendFinalEvaluationCorrection(@PathVariable UUID id,
+                                              @Valid @RequestBody SendCorrectionRequest body) {
+        RegistrationRequest r = find(id);
+        requireSubmitted(r.getFinalEvaluation());
+        mailService.sendFinalEvaluationCorrection(
+                r.getEmail(), r.getFirstName(), r.getLastName(), r.getFormationTitle(),
+                decodePdf(body.pdfBase64()), "Corrige_evaluation_finale.pdf");
+    }
+
+    @PostMapping("/registrations/{id}/trainees/{traineeId}/final-evaluation/send-correction")
+    @Transactional(readOnly = true)
+    public void sendTraineeFinalEvaluationCorrection(@PathVariable UUID id, @PathVariable UUID traineeId,
+                                                     @Valid @RequestBody SendCorrectionRequest body) {
+        RegistrationRequest r = find(id);
+        Trainee t = r.getTrainees().stream()
+                .filter(x -> x.getId().equals(traineeId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Apprenant introuvable"));
+        requireSubmitted(t.getFinalEvaluation());
+        mailService.sendFinalEvaluationCorrection(
+                t.getEmail(), t.getFirstName(), t.getLastName(), r.getFormationTitle(),
+                decodePdf(body.pdfBase64()), "Corrige_evaluation_finale.pdf");
+    }
+
+    private static void requireSubmitted(FinalEvaluation fe) {
+        if (fe == null || !fe.isSubmitted()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le corrigé ne peut être envoyé qu'une fois l'évaluation passée");
+        }
+    }
+
+    /** Décode le PDF base64 du front en validant l'en-tête et la taille (max 5 Mo). */
+    private static byte[] decodePdf(String base64) {
+        byte[] pdf;
+        try {
+            pdf = java.util.Base64.getDecoder().decode(base64);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PDF invalide (base64)");
+        }
+        if (pdf.length < 5 || pdf[0] != '%' || pdf[1] != 'P' || pdf[2] != 'D' || pdf[3] != 'F') {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le fichier joint n'est pas un PDF");
+        }
+        if (pdf.length > 5 * 1024 * 1024) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PDF trop volumineux (max 5 Mo)");
+        }
+        return pdf;
     }
 
     // --- Certificats de réalisation ---------------------------------

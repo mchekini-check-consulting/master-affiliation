@@ -5,9 +5,12 @@ import fr.hitechacademy.registration.RegistrationRequest;
 import fr.hitechacademy.registration.RegistrationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -147,6 +150,32 @@ public class MailService {
                 body.formatted(firstName, lastName, formationTitle, baseUrl + evaluationPath));
     }
 
+    /**
+     * Envoie à l'apprenant le corrigé du QCM d'évaluation finale (bonnes
+     * réponses) en pièce jointe PDF. Déclenché en un clic depuis le dossier,
+     * une fois l'évaluation passée.
+     */
+    @Async
+    public void sendFinalEvaluationCorrection(String to, String firstName, String lastName,
+                                              String formationTitle, byte[] pdf, String filename) {
+        String body = """
+                Bonjour %s %s,
+
+                Suite à votre évaluation finale de la formation « %s », vous trouverez
+                en pièce jointe le corrigé du QCM (bonnes réponses attendues) afin de
+                revenir sur les notions clés.
+
+                Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Cordialement,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        sendWithAttachment(to,
+                "Corrigé de l'évaluation finale — " + formationTitle,
+                body.formatted(firstName, lastName, formationTitle),
+                pdf, filename);
+    }
+
     /** Nouvelle réclamation déposée sur le site : notifie l'organisme. */
     @Async
     public void notifyAdminNewComplaint(String formationTitle, String complainant, String email, String message) {
@@ -205,6 +234,26 @@ public class MailService {
         } catch (Exception e) {
             // L'échec d'un email ne doit jamais faire échouer le parcours
             log.error("Échec d'envoi d'email — à: {}, sujet: {}", to, subject, e);
+        }
+    }
+
+    private void sendWithAttachment(String to, String subject, String body, byte[] attachment, String filename) {
+        if (!enabled) {
+            log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);
+            return;
+        }
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body);
+            helper.addAttachment(filename, new ByteArrayResource(attachment), "application/pdf");
+            mailSender.send(message);
+            log.info("Email (avec PJ) envoyé — à: {}, sujet: {}", to, subject);
+        } catch (Exception e) {
+            log.error("Échec d'envoi d'email (avec PJ) — à: {}, sujet: {}", to, subject, e);
         }
     }
 

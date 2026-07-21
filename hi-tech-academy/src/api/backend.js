@@ -84,6 +84,18 @@ export function adminSendTraineeFinalEvaluation(auth, id, traineeId) {
   return request(`/admin/registrations/${id}/trainees/${traineeId}/final-evaluation/send`, { method: 'POST', auth });
 }
 
+export function adminSendFinalEvaluationCorrection(auth, id, pdfBase64) {
+  return request(`/admin/registrations/${id}/final-evaluation/send-correction`, {
+    method: 'POST', auth, body: { pdfBase64 },
+  });
+}
+
+export function adminSendTraineeFinalEvaluationCorrection(auth, id, traineeId, pdfBase64) {
+  return request(`/admin/registrations/${id}/trainees/${traineeId}/final-evaluation/send-correction`, {
+    method: 'POST', auth, body: { pdfBase64 },
+  });
+}
+
 export function adminListComplaints(auth) {
   return request('/admin/complaints', { auth });
 }

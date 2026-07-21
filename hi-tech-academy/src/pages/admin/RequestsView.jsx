@@ -2,11 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, CheckCircle2, Copy, Download, Eye, RefreshCw, Send, XCircle } from 'lucide-react';
 import {
   adminGetRegistration, adminListRegistrations, adminSendFinalEvaluation,
-  adminSendTraineeFinalEvaluation, adminUpdateStatus,
+  adminSendFinalEvaluationCorrection, adminSendTraineeFinalEvaluation,
+  adminSendTraineeFinalEvaluationCorrection, adminUpdateStatus,
 } from '@/api/backend';
 import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
 import {
-  exportFinalEvaluationPdf, exportNeedsAnalysisPdf, exportPositioningTestPdf, exportSponsorSurveyPdf,
+  buildFinalEvaluationCorrectionPdf, exportFinalEvaluationPdf, exportNeedsAnalysisPdf,
+  exportPositioningTestPdf, exportSponsorSurveyPdf,
 } from '@/lib/surveyPdf';
 import PdfViewer from './PdfViewer';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
@@ -192,6 +194,8 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
   const [openTraineeTest, setOpenTraineeTest] = useState(null); // test d'un salarié
   const [openTraineeFinalEval, setOpenTraineeFinalEval] = useState(null); // évaluation finale d'un salarié
   const [sendingEval, setSendingEval] = useState(null); // 'self' | traineeId | null
+  const [sendingCorrection, setSendingCorrection] = useState(null); // 'self' | traineeId | null
+  const [correctionSentFor, setCorrectionSentFor] = useState(null); // clé envoyée avec succès
   const [certViewerOpen, setCertViewerOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
@@ -208,6 +212,28 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
       setError(e.message);
     } finally {
       setSendingEval(null);
+    }
+  };
+
+  // Envoi en un clic du corrigé (PDF généré côté front) à l'apprenant
+  const sendCorrection = async (traineeId, evaluation) => {
+    const key = traineeId ?? 'self';
+    setSendingCorrection(key);
+    setError(null);
+    try {
+      const pdfBase64 = buildFinalEvaluationCorrectionPdf(evaluation, {
+        formationTitle: detail.formation_title,
+      });
+      if (traineeId) {
+        await adminSendTraineeFinalEvaluationCorrection(auth, id, traineeId, pdfBase64);
+      } else {
+        await adminSendFinalEvaluationCorrection(auth, id, pdfBase64);
+      }
+      setCorrectionSentFor(key);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSendingCorrection(null);
     }
   };
 
@@ -434,7 +460,10 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
                 canSend={detail.status === 'VALIDATED'}
                 sending={sendingEval === 'self'}
                 onSend={() => sendFinalEval(null)}
-                onView={() => setOpenSurvey('finalEval')} />
+                onView={() => setOpenSurvey('finalEval')}
+                onSendCorrection={() => sendCorrection(null, detail.final_evaluation)}
+                sendingCorrection={sendingCorrection === 'self'}
+                correctionSent={correctionSentFor === 'self'} />
               {detail.final_evaluation?.submitted_at && (
                 <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
                   Passée le {formatDate(detail.final_evaluation.submitted_at)} — la partie mise en
@@ -565,6 +594,9 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
                           sending={sendingEval === t.id}
                           onSend={() => sendFinalEval(t.id)}
                           onView={() => setOpenTraineeFinalEval(t)}
+                          onSendCorrection={() => sendCorrection(t.id, t.final_evaluation)}
+                          sendingCorrection={sendingCorrection === t.id}
+                          correctionSent={correctionSentFor === t.id}
                           compact />
                       </td>
                       <td className="px-3 py-3 text-xs whitespace-nowrap text-right" style={{ color: '#6b7a9b', ...bodyFont }}>
@@ -745,7 +777,10 @@ function FinalEvaluationModal({ evaluation, subjectName, formationTitle, onClose
 }
 
 // État + actions d'une évaluation finale (carte demandeur ou ligne salarié)
-function FinalEvaluationStatus({ evaluation, canSend, sending, onSend, onView, compact = false }) {
+function FinalEvaluationStatus({
+  evaluation, canSend, sending, onSend, onView, compact = false,
+  onSendCorrection, sendingCorrection, correctionSent,
+}) {
   if (evaluation?.submitted_at) {
     return (
       <span className="inline-flex items-center gap-2 flex-wrap">
@@ -758,6 +793,24 @@ function FinalEvaluationStatus({ evaluation, canSend, sending, onSend, onView, c
           <Eye className="w-4 h-4" />
           Voir
         </button>
+        {onSendCorrection && (correctionSent ? (
+          <span
+            className="inline-flex items-center gap-1 text-sm font-semibold"
+            style={{ color: '#116632', ...headingFont }}>
+            <CheckCircle2 className="w-4 h-4" />
+            Corrigé envoyé
+          </span>
+        ) : (
+          <button
+            type="button"
+            disabled={sendingCorrection}
+            onClick={onSendCorrection}
+            className="inline-flex items-center gap-1 text-sm font-semibold disabled:opacity-50"
+            style={{ color: '#005064', ...headingFont }}>
+            <Send className="w-4 h-4" />
+            {sendingCorrection ? 'Envoi…' : (compact ? 'Corrigé' : 'Envoyer le corrigé')}
+          </button>
+        ))}
       </span>
     );
   }
