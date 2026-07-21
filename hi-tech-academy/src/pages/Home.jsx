@@ -7,6 +7,7 @@ import MarqueeStrip from '@/components/MarqueeStrip';
 import AboutSection from '@/components/AboutSection';
 import FormationsSection from '@/components/FormationsSection';
 import WhyUsSection from '@/components/WhyUsSection';
+import ResultsSection from '@/components/ResultsSection';
 import TimelineSection from '@/components/TimelineSection';
 import BlogSection from '@/components/BlogSection';
 import FAQSection from '@/components/FAQSection';
@@ -56,6 +57,7 @@ export default function Home() {
       <AboutSection />
       <FormationsSection />
       <WhyUsSection />
+      <ResultsSection />
       <TimelineSection />
       <BlogSection />
       <FAQSection />
