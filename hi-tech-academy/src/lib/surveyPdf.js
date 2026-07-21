@@ -182,7 +182,15 @@ class PdfWriter {
   /** Rend le document en base64 (sans le préfixe data:), pour un envoi serveur. */
   toBase64() {
     this.stampFooters();
-    return this.doc.output('datauristring').split(',')[1];
+    // Conversion déterministe (identique en navigateur et en Node), plus fiable
+    // que le parsing de output('datauristring') qui diffère selon le build jsPDF.
+    const bytes = new Uint8Array(this.doc.output('arraybuffer'));
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
   }
 }
 
