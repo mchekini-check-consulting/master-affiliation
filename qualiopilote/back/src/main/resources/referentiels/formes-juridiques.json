@@ -1,0 +1,14 @@
+[
+  { "code": "EI", "libelle": "Entreprise individuelle" },
+  { "code": "EIRL", "libelle": "Entrepreneur individuel à responsabilité limitée" },
+  { "code": "EURL", "libelle": "EURL — Société à responsabilité limitée unipersonnelle" },
+  { "code": "SARL", "libelle": "SARL — Société à responsabilité limitée" },
+  { "code": "SAS", "libelle": "SAS — Société par actions simplifiée" },
+  { "code": "SASU", "libelle": "SASU — Société par actions simplifiée unipersonnelle" },
+  { "code": "SA", "libelle": "SA — Société anonyme" },
+  { "code": "SNC", "libelle": "SNC — Société en nom collectif" },
+  { "code": "SCOP", "libelle": "SCOP — Société coopérative et participative" },
+  { "code": "ASSO", "libelle": "Association loi 1901" },
+  { "code": "COLL", "libelle": "Collectivité territoriale / établissement public" },
+  { "code": "AUTRE", "libelle": "Autre" }
+]

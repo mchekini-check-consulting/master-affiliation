@@ -1,41 +1,73 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap, map, catchError, of } from 'rxjs';
 
-const STORAGE_KEY = 'qualiopilote-auth';
+/** Profil retourné par /api/auth/me (JSON snake_case). */
+export interface SessionUtilisateur {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+}
+
+export interface SessionOrganisme {
+  id: string;
+  nom: string;
+  slug: string;
+}
+
+/** { MODULE: [ACTIONS...] } — modules accessibles et actions autorisées. */
+export type Permissions = Record<string, string[]>;
+
+export interface Session {
+  user: SessionUtilisateur;
+  organization: SessionOrganisme;
+  permissions: Permissions;
+}
 
 /**
- * Authentification factice (temporaire) : identifiants en dur test / test,
- * état de session conservé en localStorage. Sera remplacé par la vraie
- * authentification multi-tenant (Better Auth / Spring Security) en phase 0.
+ * Authentification réelle par session (cookie) contre l'API Spring Security.
+ * withCredentials envoie/reçoit le cookie de session sur chaque appel.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly platformId = inject(PLATFORM_ID);
+  private readonly http = inject(HttpClient);
+  private static readonly API = '/api/auth';
+  private static readonly OPTS = { withCredentials: true } as const;
 
-  /** Identifiants de démonstration. */
-  private static readonly IDENTIFIANT = 'test';
-  private static readonly MOT_DE_PASSE = 'test';
+  private readonly _session = signal<Session | null>(null);
 
-  login(identifiant: string, motDePasse: string): boolean {
-    const ok =
-      identifiant.trim() === AuthService.IDENTIFIANT &&
-      motDePasse === AuthService.MOT_DE_PASSE;
-    if (ok && isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(STORAGE_KEY, '1');
-    }
-    return ok;
+  readonly session = this._session.asReadonly();
+  readonly estConnecte = computed(() => this._session() !== null);
+
+  login(email: string, motDePasse: string): Observable<Session> {
+    return this.http
+      .post<Session>(`${AuthService.API}/login`, { email, password: motDePasse }, AuthService.OPTS)
+      .pipe(tap((s) => this._session.set(s)));
   }
 
-  estConnecte(): boolean {
-    if (!isPlatformBrowser(this.platformId)) {
-      return false;
-    }
-    return localStorage.getItem(STORAGE_KEY) === '1';
+  /** Recharge la session depuis le cookie ; renvoie false si non authentifié. */
+  rafraichir(): Observable<boolean> {
+    return this.http.get<Session>(`${AuthService.API}/me`, AuthService.OPTS).pipe(
+      tap((s) => this._session.set(s)),
+      map(() => true),
+      catchError(() => {
+        this._session.set(null);
+        return of(false);
+      }),
+    );
   }
 
-  deconnexion(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+  deconnexion(): Observable<void> {
+    return this.http
+      .post<void>(`${AuthService.API}/logout`, {}, AuthService.OPTS)
+      .pipe(tap(() => this._session.set(null)));
+  }
+
+  /** Vrai si l'utilisateur courant peut réaliser `action` sur `module`. */
+  peut(module: string, action = 'VOIR'): boolean {
+    const perms = this._session()?.permissions;
+    return !!perms && (perms[module]?.includes(action) ?? false);
   }
 }

@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { NAV } from '../core/navigation';
+import { NAV, NavGroup } from '../core/navigation';
 import { AuthService } from '../core/auth.service';
 
 @Component({
@@ -14,15 +14,36 @@ export class BackOfficeLayoutComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  readonly nav = NAV;
+  readonly session = this.auth.session;
   readonly menuOuvert = signal(false); // sidebar mobile
+
+  /** Nav filtrée par les permissions RBAC : un module non autorisé disparaît. */
+  readonly nav = computed<NavGroup[]>(() => {
+    this.session(); // dépendance : recalcul quand la session change
+    return NAV
+      .map((groupe) => ({
+        ...groupe,
+        items: groupe.items.filter((item) => !item.module || this.auth.peut(item.module, 'VOIR')),
+      }))
+      .filter((groupe) => groupe.items.length > 0);
+  });
+
+  /** Nom affiché : « Prénom Nom » ou, à défaut, l'e-mail. */
+  readonly nomAffiche = computed(() => {
+    const u = this.session()?.user;
+    if (!u) return '';
+    const complet = `${u.first_name} ${u.last_name}`.trim();
+    return complet || u.email;
+  });
 
   basculerMenu(): void {
     this.menuOuvert.update((v) => !v);
   }
 
   deconnexion(): void {
-    this.auth.deconnexion();
-    this.router.navigate(['/connexion']);
+    this.auth.deconnexion().subscribe({
+      next: () => this.router.navigate(['/connexion']),
+      error: () => this.router.navigate(['/connexion']),
+    });
   }
 }

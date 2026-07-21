@@ -9,24 +9,24 @@
     <p class="subtitle">Accédez au back-office de votre organisme de formation.</p>
 
     <label>
-      <span class="lbl">Identifiant</span>
-      <input type="text" formControlName="identifiant" autocomplete="username" placeholder="test" />
+      <span class="lbl">Adresse e-mail</span>
+      <input type="email" formControlName="identifiant" autocomplete="username" placeholder="vous@organisme.fr" />
     </label>
 
     <label>
       <span class="lbl">Mot de passe</span>
-      <input type="password" formControlName="motDePasse" autocomplete="current-password" placeholder="••••" />
+      <input type="password" formControlName="motDePasse" autocomplete="current-password" placeholder="••••••••" />
     </label>
 
-    @if (erreur) {
-      <p class="error">Identifiant ou mot de passe incorrect.</p>
+    @if (erreur()) {
+      <p class="error">Adresse e-mail ou mot de passe incorrect.</p>
     }
 
-    <button type="submit" class="btn-primary">
+    <button type="submit" class="btn-primary" [disabled]="enCours()">
       <lucide-icon name="log-in" [size]="18" />
-      Se connecter
+      {{ enCours() ? 'Connexion…' : 'Se connecter' }}
     </button>
 
-    <p class="hint">Démonstration — identifiants : <strong>test</strong> / <strong>test</strong></p>
+    <p class="hint">Compte de démonstration : <strong>demo&#64;qualiopilote.fr</strong> / <strong>demo</strong></p>
   </form>
 </div>

@@ -1,0 +1,6 @@
+[
+  { "code": "20", "libelle": "Taux normal — 20 %", "taux": 20.0 },
+  { "code": "10", "libelle": "Taux intermédiaire — 10 %", "taux": 10.0 },
+  { "code": "5.5", "libelle": "Taux réduit — 5,5 %", "taux": 5.5 },
+  { "code": "0", "libelle": "Exonération (art. 261-4-4 CGI) — 0 %", "taux": 0.0 }
+]

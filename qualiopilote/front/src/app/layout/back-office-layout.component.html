@@ -10,7 +10,7 @@
     </a>
 
     <nav class="menu">
-      @for (groupe of nav; track groupe.titre) {
+      @for (groupe of nav(); track groupe.titre) {
         <div class="groupe">
           <p class="groupe-titre">{{ groupe.titre }}</p>
           @for (item of groupe.items; track item.path) {
@@ -29,7 +29,10 @@
     </nav>
 
     <div class="pied">
-      <p class="compte">of.demo&#64;qualiopilote.fr</p>
+      @if (session(); as s) {
+        <p class="orga">{{ s.organization.nom }}</p>
+        <p class="compte">{{ s.user.email }}</p>
+      }
       <button type="button" class="deconnexion" (click)="deconnexion()">
         <lucide-icon name="log-out" [size]="18" />
         Se déconnecter

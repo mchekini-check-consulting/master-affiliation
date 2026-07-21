@@ -1,0 +1,10 @@
+[
+  { "code": "EMPLOYEURS_PRIVES", "libelle": "Employeurs privés hors OF pour leurs salariés" },
+  { "code": "OPCO", "libelle": "Opérateurs de compétences (OPCO)" },
+  { "code": "POUVOIRS_PUBLICS_AGENTS", "libelle": "Pouvoirs publics pour la formation de leurs agents" },
+  { "code": "POUVOIRS_PUBLICS_DEMANDEURS", "libelle": "Pouvoirs publics pour des publics spécifiques (demandeurs d'emploi…)" },
+  { "code": "CPF", "libelle": "Caisse des dépôts (CPF)" },
+  { "code": "PARTICULIERS", "libelle": "Particuliers à leurs propres frais" },
+  { "code": "AUTRES_OF", "libelle": "Autres organismes de formation (sous-traitance)" },
+  { "code": "AUTRES", "libelle": "Autres ressources (contrats de professionnalisation, etc.)" }
+]

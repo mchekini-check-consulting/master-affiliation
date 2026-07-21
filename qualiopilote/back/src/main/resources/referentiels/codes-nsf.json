@@ -1,0 +1,18 @@
+[
+  { "code": "100", "libelle": "100 — Formations générales" },
+  { "code": "110", "libelle": "110 — Spécialités pluriscientifiques" },
+  { "code": "200", "libelle": "200 — Technologies industrielles fondamentales" },
+  { "code": "300", "libelle": "300 — Spécialités plurivalentes des services" },
+  { "code": "310", "libelle": "310 — Spécialités plurivalentes des échanges et de la gestion" },
+  { "code": "312", "libelle": "312 — Commerce, vente" },
+  { "code": "313", "libelle": "313 — Finances, banque, assurances" },
+  { "code": "314", "libelle": "314 — Comptabilité, gestion" },
+  { "code": "315", "libelle": "315 — Ressources humaines, gestion du personnel" },
+  { "code": "320", "libelle": "320 — Spécialités plurivalentes de la communication" },
+  { "code": "326", "libelle": "326 — Informatique, traitement de l'information, réseaux" },
+  { "code": "330", "libelle": "330 — Spécialités plurivalentes sanitaires et sociales" },
+  { "code": "333", "libelle": "333 — Enseignement, formation" },
+  { "code": "341", "libelle": "341 — Aménagement du territoire, développement, urbanisme" },
+  { "code": "413", "libelle": "413 — Développement des capacités mentales et apprentissages de base" },
+  { "code": "415", "libelle": "415 — Développement des capacités d'orientation, d'insertion" }
+]

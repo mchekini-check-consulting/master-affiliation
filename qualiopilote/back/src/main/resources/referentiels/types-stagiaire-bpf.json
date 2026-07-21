@@ -1,0 +1,8 @@
+[
+  { "code": "SALARIES_PRIVES", "libelle": "Salariés d'employeurs privés hors apprentis" },
+  { "code": "APPRENTIS", "libelle": "Apprentis" },
+  { "code": "AGENTS_PUBLICS", "libelle": "Agents publics" },
+  { "code": "DEMANDEURS_EMPLOI", "libelle": "Personnes en recherche d'emploi" },
+  { "code": "PARTICULIERS", "libelle": "Particuliers à leurs propres frais" },
+  { "code": "AUTRES", "libelle": "Autres stagiaires" }
+]

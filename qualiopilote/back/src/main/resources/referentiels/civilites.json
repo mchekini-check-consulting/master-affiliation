@@ -1,0 +1,5 @@
+[
+  { "code": "M", "libelle": "Monsieur" },
+  { "code": "MME", "libelle": "Madame" },
+  { "code": "NP", "libelle": "Non précisé" }
+]

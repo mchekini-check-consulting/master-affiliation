@@ -1,0 +1,20 @@
+[
+  { "code": "FR", "libelle": "France" },
+  { "code": "BE", "libelle": "Belgique" },
+  { "code": "CH", "libelle": "Suisse" },
+  { "code": "LU", "libelle": "Luxembourg" },
+  { "code": "DE", "libelle": "Allemagne" },
+  { "code": "ES", "libelle": "Espagne" },
+  { "code": "IT", "libelle": "Italie" },
+  { "code": "GB", "libelle": "Royaume-Uni" },
+  { "code": "PT", "libelle": "Portugal" },
+  { "code": "NL", "libelle": "Pays-Bas" },
+  { "code": "MA", "libelle": "Maroc" },
+  { "code": "DZ", "libelle": "Algérie" },
+  { "code": "TN", "libelle": "Tunisie" },
+  { "code": "SN", "libelle": "Sénégal" },
+  { "code": "CI", "libelle": "Côte d'Ivoire" },
+  { "code": "CA", "libelle": "Canada" },
+  { "code": "US", "libelle": "États-Unis" },
+  { "code": "AUTRE", "libelle": "Autre pays" }
+]

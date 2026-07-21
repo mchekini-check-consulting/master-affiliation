@@ -1,0 +1,10 @@
+[
+  { "code": "8", "libelle": "Niveau 8 — Doctorat" },
+  { "code": "7", "libelle": "Niveau 7 — Master, diplôme d'ingénieur, bac+5" },
+  { "code": "6", "libelle": "Niveau 6 — Licence, licence professionnelle, bac+3/4" },
+  { "code": "5", "libelle": "Niveau 5 — BTS, DUT, bac+2" },
+  { "code": "4", "libelle": "Niveau 4 — Baccalauréat" },
+  { "code": "3", "libelle": "Niveau 3 — CAP, BEP" },
+  { "code": "2", "libelle": "Niveau 2 — Sans qualification (niveau collège)" },
+  { "code": "SANS", "libelle": "Sans niveau spécifique" }
+]
