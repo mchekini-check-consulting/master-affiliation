@@ -105,6 +105,17 @@ class PdfWriter {
     this.y += answerLines.length * 4.8 + 4;
   }
 
+  /** Note libre (petit texte gris, multi-lignes) en bas de section. */
+  note(text) {
+    const lines = this.doc.setFont('helvetica', 'italic').setFontSize(8.5)
+      .splitTextToSize(text, this.contentWidth);
+    this.ensure(lines.length * 4 + 4);
+    this.y += 2;
+    this.doc.setFont('helvetica', 'italic').setFontSize(8.5).setTextColor('#6b7a9b');
+    this.doc.text(lines, MARGIN, this.y);
+    this.y += lines.length * 4 + 2;
+  }
+
   /** Question de QCM corrigée : réponse choisie + bonne réponse si ratée. */
   qcm(item) {
     const questionLines = this.doc.setFont('helvetica', 'bold').setFontSize(9.5)
@@ -264,4 +275,27 @@ export function exportPositioningTestPdf(test, subject) {
   w.qa("Cas d'usage ou objectif précis pour cette formation", test.expectations);
 
   w.finish(safeFileName(['Test_de_positionnement', subject.name]));
+}
+
+/**
+ * Exporte une évaluation finale passée (vue final_evaluation de l'API).
+ * `subject` : { name, formationTitle }.
+ */
+export function exportFinalEvaluationPdf(evaluation, subject) {
+  const w = new PdfWriter('ÉVALUATION FINALE', subject.formationTitle);
+  w.meta(`Apprenant : ${subject.name}`);
+  w.meta(`Passée le : ${formatDateFr(evaluation.submitted_at)}`);
+  w.score(`Note au QCM : ${evaluation.score} / ${evaluation.max_score}`);
+
+  w.section(`Partie A — QCM (${evaluation.questions.length} questions)`);
+  for (const q of evaluation.questions) {
+    w.qcm(q);
+  }
+
+  w.note(
+    "Partie B (mise en pratique sur AKS) évaluée par le formateur pendant la session ; le total "
+    + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
+  );
+
+  w.finish(safeFileName(['Evaluation_finale', subject.name]));
 }

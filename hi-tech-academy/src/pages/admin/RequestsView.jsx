@@ -5,7 +5,9 @@ import {
   adminSendTraineeFinalEvaluation, adminUpdateStatus,
 } from '@/api/backend';
 import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
-import { exportNeedsAnalysisPdf, exportPositioningTestPdf, exportSponsorSurveyPdf } from '@/lib/surveyPdf';
+import {
+  exportFinalEvaluationPdf, exportNeedsAnalysisPdf, exportPositioningTestPdf, exportSponsorSurveyPdf,
+} from '@/lib/surveyPdf';
 import PdfViewer from './PdfViewer';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import {
@@ -720,6 +722,7 @@ function FinalEvaluationModal({ evaluation, subjectName, formationTitle, onClose
       title={`Évaluation finale — ${subjectName}`}
       subtitle={formationTitle}
       submittedAt={evaluation.submitted_at}
+      onExportPdf={() => exportFinalEvaluationPdf(evaluation, { name: subjectName, formationTitle })}
       badge={
         <span
           className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
