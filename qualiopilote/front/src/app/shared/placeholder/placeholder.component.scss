@@ -1,0 +1,59 @@
+:host {
+  --brand: #005064;
+  --ink: #001a4a;
+  --muted: #6b7a9b;
+  --line: #e0e8f4;
+  display: block;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.entete {
+  margin-bottom: 24px;
+}
+
+.entete h1 {
+  font-size: 24px;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+
+.sous {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0;
+  max-width: 640px;
+}
+
+.carte-vide {
+  background: #fff;
+  border: 1px dashed var(--line);
+  border-radius: 20px;
+  padding: 56px 32px;
+  text-align: center;
+  max-width: 620px;
+}
+
+.icone {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #f0f3fa;
+  color: var(--brand);
+  margin: 0 auto 16px;
+}
+
+.carte-vide h2 {
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.carte-vide p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 420px;
+}

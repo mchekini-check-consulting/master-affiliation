@@ -1,0 +1,21 @@
+<header class="entete">
+  <span class="eyebrow">Tableau de bord</span>
+  <h1>Bienvenue sur Qualiopilote</h1>
+  <p class="sous">
+    Votre espace de pilotage. Les modules ci-dessous seront progressivement mis
+    en service — sélectionnez-en un pour en découvrir le périmètre.
+  </p>
+</header>
+
+<section class="grille">
+  @for (r of raccourcis; track r.path) {
+    <a class="tuile" [routerLink]="['/app', r.path]">
+      <div class="tuile-icon">
+        <lucide-icon [name]="r.icone" [size]="20" />
+      </div>
+      <h3>{{ r.libelle }}</h3>
+      <p>{{ r.description }}</p>
+      <span class="badge">Bientôt disponible</span>
+    </a>
+  }
+</section>

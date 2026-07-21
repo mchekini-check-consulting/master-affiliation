@@ -1,0 +1,32 @@
+<div class="page">
+  <form class="card" [formGroup]="form" (ngSubmit)="soumettre()">
+    <a routerLink="/" class="brand">
+      <span class="brand-mark">Q</span>
+      <span class="brand-name">Qualiopilote</span>
+    </a>
+
+    <h1>Connexion à votre espace</h1>
+    <p class="subtitle">Accédez au back-office de votre organisme de formation.</p>
+
+    <label>
+      <span class="lbl">Identifiant</span>
+      <input type="text" formControlName="identifiant" autocomplete="username" placeholder="test" />
+    </label>
+
+    <label>
+      <span class="lbl">Mot de passe</span>
+      <input type="password" formControlName="motDePasse" autocomplete="current-password" placeholder="••••" />
+    </label>
+
+    @if (erreur) {
+      <p class="error">Identifiant ou mot de passe incorrect.</p>
+    }
+
+    <button type="submit" class="btn-primary">
+      <lucide-icon name="log-in" [size]="18" />
+      Se connecter
+    </button>
+
+    <p class="hint">Démonstration — identifiants : <strong>test</strong> / <strong>test</strong></p>
+  </form>
+</div>

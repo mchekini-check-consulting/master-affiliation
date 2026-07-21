@@ -1,0 +1,48 @@
+<div class="page">
+  <!-- En-tête -->
+  <header class="topbar">
+    <a routerLink="/" class="brand">
+      <span class="brand-mark">Q</span>
+      <span class="brand-name">Qualiopilote</span>
+    </a>
+    <a routerLink="/connexion" class="btn btn-primary btn-sm">
+      <lucide-icon name="log-in" [size]="16" />
+      Se connecter
+    </a>
+  </header>
+
+  <!-- Hero -->
+  <main>
+    <section class="hero">
+      <span class="eyebrow">Logiciel de gestion pour organismes de formation</span>
+      <h1>Pilotez votre organisme de formation, sereinement.</h1>
+      <p class="lead">
+        Qualiopilote réunit vos clients, apprenants, formateurs, formations et sessions,
+        et automatise la production des documents attendus dans un contexte Qualiopi.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/connexion" class="btn btn-primary">
+          Se connecter
+          <lucide-icon name="arrow-right" [size]="18" />
+        </a>
+      </div>
+    </section>
+
+    <!-- Atouts -->
+    <section class="atouts">
+      @for (a of atouts; track a.titre) {
+        <article class="atout">
+          <div class="atout-icon">
+            <lucide-icon [name]="a.icone" [size]="22" />
+          </div>
+          <h3>{{ a.titre }}</h3>
+          <p>{{ a.texte }}</p>
+        </article>
+      }
+    </section>
+  </main>
+
+  <footer class="footer">
+    © {{ annee }} Qualiopilote — Plateforme de gestion pour organismes de formation.
+  </footer>
+</div>

@@ -1,0 +1,55 @@
+<div class="shell" [class.menu-ouvert]="menuOuvert()">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <a routerLink="/app" class="brand">
+      <span class="brand-mark">Q</span>
+      <div class="brand-txt">
+        <span class="brand-name">Qualiopilote</span>
+        <span class="brand-sub">Back-office</span>
+      </div>
+    </a>
+
+    <nav class="menu">
+      @for (groupe of nav; track groupe.titre) {
+        <div class="groupe">
+          <p class="groupe-titre">{{ groupe.titre }}</p>
+          @for (item of groupe.items; track item.path) {
+            <a
+              class="lien"
+              [routerLink]="['/app', item.path]"
+              routerLinkActive="actif"
+              [routerLinkActiveOptions]="{ exact: item.path === '' }"
+              (click)="menuOuvert.set(false)">
+              <lucide-icon [name]="item.icone" [size]="18" />
+              <span>{{ item.libelle }}</span>
+            </a>
+          }
+        </div>
+      }
+    </nav>
+
+    <div class="pied">
+      <p class="compte">of.demo&#64;qualiopilote.fr</p>
+      <button type="button" class="deconnexion" (click)="deconnexion()">
+        <lucide-icon name="log-out" [size]="18" />
+        Se déconnecter
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenu -->
+  <div class="contenu">
+    <header class="mobilebar">
+      <button type="button" class="burger" (click)="basculerMenu()" aria-label="Menu">
+        <lucide-icon name="menu" [size]="20" />
+      </button>
+      <span class="brand-name">Qualiopilote</span>
+    </header>
+    <main class="zone">
+      <router-outlet />
+    </main>
+  </div>
+
+  <!-- Voile mobile -->
+  <div class="voile" (click)="menuOuvert.set(false)"></div>
+</div>

@@ -1,10 +1,31 @@
 # qualiopilote
 
-Application fullstack **Qualiopilote** (Java Spring Boot + Angular + PostgreSQL),
-sur le modèle de `my-way`. Le front Angular est **prérendu (SSG, `outputMode: static`)
-pour le SEO** : les pages publiques sont générées en HTML statique au build et
-servies par nginx (indexables directement), avec repli client-side rendering pour
-les routes de l'espace connecté.
+Plateforme SaaS multi-tenant pour organismes de formation **Qualiopilote**
+(Java Spring Boot + Angular + PostgreSQL), sur le modèle de `my-way`. Le front
+Angular est **prérendu (SSG, `outputMode: static`) pour le SEO** : les pages
+publiques sont générées en HTML statique au build et servies par nginx
+(indexables directement), avec repli client-side rendering pour l'espace connecté.
+
+Le produit complet et sa feuille de route par phases sont décrits dans
+[`PLAN.md`](./PLAN.md). **État actuel** : coquille (landing, connexion de
+démonstration, shell back-office) — voir « Front » ci-dessous.
+
+## Front (état actuel)
+
+Routes (`front/src/app/app.routes.ts`) :
+
+- `/` — landing publique (prérendue, SEO) : `pages/landing/`
+- `/connexion` — connexion de démonstration, identifiants **test / test**
+  (auth factice, `core/auth.service.ts` ; à remplacer par la vraie auth
+  multi-tenant en phase 0) : `pages/login/`
+- `/app` — back-office protégé par `core/auth.guard.ts` :
+  `layout/back-office-layout.component` (sidebar + rubriques du cahier des
+  charges, source unique `core/navigation.ts`), tableau de bord
+  `pages/dashboard/`, et une page « Bientôt disponible »
+  (`shared/placeholder/`) par module.
+
+Stratégie de rendu : `front/src/app/app.routes.server.ts` (landing + connexion
+prérendues ; `/app/**` en CSR).
 
 - **Domaine** : https://qualiopilote.fr
 - **Services Docker** (compose racine) : `qualiopilote-front` (nginx, port interne 80,
