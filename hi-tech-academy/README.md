@@ -112,3 +112,4 @@ ALTER TABLE registration_requests ADD CONSTRAINT registration_requests_status_ch
 | GET | `/admin/complaints` | basic auth | Liste des réclamations |
 | GET | `/admin/complaints/{id}` | basic auth | Détail d'une réclamation |
 | POST | `/admin/complaints/{id}` | basic auth | Mise à jour du statut et de la réponse |
+
