@@ -8,6 +8,7 @@ import LearnersView from '@/pages/admin/LearnersView';
 import CertificatesView from '@/pages/admin/CertificatesView';
 import DocumentsView from '@/pages/admin/DocumentsView';
 import ComplaintsView from '@/pages/admin/ComplaintsView';
+import AuditQualiopiView from '@/pages/admin/AuditQualiopiView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
 function LoginScreen({ onLoggedIn }) {
@@ -97,6 +98,7 @@ const NAV_ITEMS = [
   { key: 'certificates', label: 'Certificats de réalisation', icon: Award },
   { key: 'complaints', label: 'Réclamations', icon: MessageSquareWarning },
   { key: 'documents', label: 'Documents Qualiopi', icon: FolderOpen },
+  { key: 'audit', label: 'Audit Qualiopi', icon: ShieldCheck },
 ];
 
 // --- Page /admin ------------------------------------------------------
@@ -217,6 +219,9 @@ export default function Admin() {
           )}
           {view === 'documents' && (
             <DocumentsView />
+          )}
+          {view === 'audit' && (
+            <AuditQualiopiView />
           )}
         </div>
       </main>
