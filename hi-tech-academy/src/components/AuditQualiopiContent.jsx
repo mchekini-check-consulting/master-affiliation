@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  CheckCircle2, ChevronDown, Database, Download, ExternalLink, FileText, MinusCircle,
+  CheckCircle2, ChevronDown, Database, Download, ExternalLink, FileText, FolderOpen, MinusCircle,
 } from 'lucide-react';
 import PdfViewer from '@/pages/admin/PdfViewer';
-import { AUDIT_CRITERIA, auditDocUrl, isViewable } from '@/data/auditQualiopi';
+import { AUDIT_CRITERIA, OTHER_DOCUMENTS, auditDocUrl, isViewable } from '@/data/auditQualiopi';
 
 const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
@@ -198,6 +198,32 @@ export default function AuditQualiopiContent() {
             onToggle={() => setOpenCriterion(openCriterion === criterion.number ? null : criterion.number)}
             onView={setViewedDoc} />
         ))}
+
+        {/* Documents transverses, non rattachés à un critère */}
+        <div
+          className="rounded-3xl px-5 sm:px-7 py-5"
+          style={{ background: 'white', border: '1.5px solid #e0e8f4' }}>
+          <div className="flex items-center gap-4">
+            <span
+              className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center"
+              style={{ background: '#f0f3fa' }}>
+              <FolderOpen className="w-6 h-6" style={{ color: '#005064' }} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-base sm:text-lg font-bold" style={{ color: '#001a4a', ...headingFont }}>
+                {OTHER_DOCUMENTS.title}
+              </span>
+              <span className="block text-xs mt-0.5 leading-relaxed" style={{ color: '#6b7a9b', ...bodyFont }}>
+                {OTHER_DOCUMENTS.description}
+              </span>
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-4 sm:pl-16">
+            {OTHER_DOCUMENTS.documents.map((doc) => (
+              <DocumentChip key={doc.label} doc={doc} onView={setViewedDoc} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {viewedDoc && (

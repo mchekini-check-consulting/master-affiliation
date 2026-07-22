@@ -52,6 +52,8 @@ const D = {
   questionnaireFinanceur: { label: 'Questionnaire de satisfaction financeur', file: 'Questionnaire_satisfaction_financeur_V1_0.pdf' },
   processReclamations: { label: 'Processus de suivi des réclamations', file: 'Processus_suivi_reclamations_V1_0.pdf' },
   processAmelioration: { label: "Processus d'amélioration continue", file: 'Processus_amelioration_continue_V1_0.pdf' },
+  processAdministratif: { label: "Processus de gestion administrative d'un parcours de formation", file: 'Processus_gestion_administrative_parcours_V1_0.pdf' },
+  planDev: { label: 'Plan de développement des compétences 2026-2028', file: 'Plan_developpement_competences_V1_0.pdf' },
 };
 
 export function auditDocUrl(doc) {
@@ -236,8 +238,8 @@ export const AUDIT_CRITERIA = [
         title:
           'Mettre à disposition des moyens humains et techniques adaptés aux prestations',
         proofs:
-          "CVthèque (CV des formateurs et collaborateurs de l'organigramme) ; factures Google Meet (dispositif de classe virtuelle).",
-        documents: [D.organigramme, D.cv, D.diplome, D.certifs],
+          "CVthèque (CV des formateurs et collaborateurs de l'organigramme) ; factures Google Meet (dispositif de classe virtuelle) ; plan de développement des compétences du formateur.",
+        documents: [D.organigramme, D.cv, D.diplome, D.certifs, D.planDev],
       },
       {
         number: 18,
@@ -286,8 +288,8 @@ export const AUDIT_CRITERIA = [
         title:
           'Entretenir et développer les compétences de ses salariés, adaptées aux prestations',
         proofs:
-          "Plan de développement des compétences du formateur ; preuves des formations suivies (certifications Kubernetes) et des formations envisagées ; participation à des communautés de pairs.",
-        documents: [D.certifs, D.cv, D.veille],
+          "Plan de développement des compétences 2026-2028 (mise à jour Kubernetes en cours sur Dyma, IA, DevOps / cloud, pédagogie et accessibilité handicap) ; preuves des formations suivies (certifications Kubernetes) ; participation à des communautés de pairs.",
+        documents: [D.planDev, D.certifs, D.cv],
       },
     ],
   },
@@ -393,9 +395,20 @@ export const AUDIT_CRITERIA = [
   },
 ];
 
+// Documents transverses, non rattachés à un critère spécifique
+export const OTHER_DOCUMENTS = {
+  title: 'Autres documents',
+  description:
+    "Documents transverses de l'organisme, non rattachés à un critère spécifique du référentiel.",
+  documents: [D.processAdministratif],
+};
+
 export const AUDIT_STATS = (() => {
   const all = AUDIT_CRITERIA.flatMap((c) => c.indicators);
   const applicable = all.filter((i) => i.applicable);
-  const docs = new Set(applicable.flatMap((i) => (i.documents ?? []).filter((d) => d.file).map((d) => d.file)));
+  const docs = new Set([
+    ...applicable.flatMap((i) => (i.documents ?? []).filter((d) => d.file).map((d) => d.file)),
+    ...OTHER_DOCUMENTS.documents.map((d) => d.file),
+  ]);
   return { indicators: all.length, applicable: applicable.length, documents: docs.size };
 })();
