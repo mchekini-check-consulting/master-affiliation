@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, FolderOpen, GraduationCap, Inbox, LogOut, MessageSquareWarning, ShieldCheck, UsersRound } from 'lucide-react';
+import { Award, FolderOpen, GraduationCap, Inbox, LogOut, MessageSquareWarning, Rss, ShieldCheck, UsersRound } from 'lucide-react';
 import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
 import { bodyFont, headingFont } from '@/pages/admin/common';
 import RequestsView from '@/pages/admin/RequestsView';
@@ -9,6 +9,7 @@ import CertificatesView from '@/pages/admin/CertificatesView';
 import DocumentsView from '@/pages/admin/DocumentsView';
 import ComplaintsView from '@/pages/admin/ComplaintsView';
 import AuditQualiopiView from '@/pages/admin/AuditQualiopiView';
+import VeilleView from '@/pages/admin/VeilleView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
 function LoginScreen({ onLoggedIn }) {
@@ -97,6 +98,7 @@ const NAV_ITEMS = [
   { key: 'learners', label: 'Dossiers apprenants', icon: UsersRound },
   { key: 'certificates', label: 'Certificats de réalisation', icon: Award },
   { key: 'complaints', label: 'Réclamations', icon: MessageSquareWarning },
+  { key: 'veille', label: 'Veille', icon: Rss },
   { key: 'documents', label: 'Documents Qualiopi', icon: FolderOpen },
   { key: 'audit', label: 'Audit Qualiopi', icon: ShieldCheck },
 ];
@@ -219,6 +221,9 @@ export default function Admin() {
           )}
           {view === 'documents' && (
             <DocumentsView />
+          )}
+          {view === 'veille' && (
+            <VeilleView auth={auth} />
           )}
           {view === 'audit' && (
             <AuditQualiopiView />

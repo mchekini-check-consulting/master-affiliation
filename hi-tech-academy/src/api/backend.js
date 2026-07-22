@@ -103,6 +103,25 @@ export function adminSendCertificate(auth, certificateId, pdfBase64) {
   });
 }
 
+// --- Kanban de veille -------------------------------------------------
+export function adminListVeille(auth) {
+  return request('/admin/veille', { auth });
+}
+
+export function adminCreateVeille(auth, { axis, content, entryDate }) {
+  return request('/admin/veille', {
+    method: 'POST', auth, body: { axis, content, entry_date: entryDate || undefined },
+  });
+}
+
+export function adminMoveVeille(auth, id, axis) {
+  return request(`/admin/veille/${id}`, { method: 'PATCH', auth, body: { axis } });
+}
+
+export function adminDeleteVeille(auth, id) {
+  return request(`/admin/veille/${id}`, { method: 'DELETE', auth });
+}
+
 export function adminListComplaints(auth) {
   return request('/admin/complaints', { auth });
 }

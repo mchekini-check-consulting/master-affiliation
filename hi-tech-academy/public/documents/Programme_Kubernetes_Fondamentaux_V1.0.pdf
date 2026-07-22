@@ -1,118 +1,1479 @@
-%PDF-1.4
-%“Œ‹ž ReportLab Generated PDF document (opensource)
-1 0 obj
-<<
-/F1 2 0 R /F2 3 0 R /F3 4 0 R
->>
-endobj
-2 0 obj
-<<
-/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
->>
-endobj
+%PDF-1.3
+%ºß¬à
 3 0 obj
-<<
-/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
 >>
 endobj
 4 0 obj
 <<
-/BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+/Length 8291
 >>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0. 0.102 0.29 rg
+56.6929133858267775 785.1970866141732586 Td
+(HI-TECH ACADEMY) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.42 0.478 0.608 rg
+168.0468503937007938 785.1970866141732586 Td
+(|   Organisme de formation) Tj
+ET
+0. 0.31 0.39 RG
+1.1338582677165356 w
+56.6929133858267775 776.69314960629913 m
+538.5870866141731312 776.69314960629913 l
+S
+BT
+/F2 17 Tf
+19.5499999999999972 TL
+0. 0.102 0.29 rg
+172.7749999999999773 745.5120472440944468 Td
+(PROGRAMME DE FORMATION) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.314 0.392 rg
+215.67999999999995 724.2522047244094665 Td
+(Kubernetes – Fondamentaux) Tj
+ET
+BT
+/F3 9 Tf
+10.3499999999999996 TL
+0.42 0.478 0.608 rg
+201.7449999999998909 707.2443307086614368 Td
+(Action de formation – Version 1.0 du 21/06/2026) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 676.0632283464566399 Td
+(1. Identification de l'action) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 670.3939370078740012 m
+538.5870866141731312 670.3939370078740012 l
+S
+0. 0.31 0.39 rg
+56.6929133858267775 653.3860629921259715 96.3779527559055254 -26.0787401574803148 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 653.3860629921259715 481.8941732283464034 -26.0787401574803148 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 636.3781889763779418 Td
+(Intitulé) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 636.3781889763779418 Td
+(Kubernetes – Fondamentaux) Tj
+ET
+0. 0.31 0.39 rg
+56.6929133858267775 627.3073228346456744 96.3779527559055254 -39.118110236220474 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 627.3073228346456744 481.8941732283464034 -39.118110236220474 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 610.2994488188976447 Td
+(Catégorie) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 610.2994488188976447 Td
+(Action de formation concourant au développement des compétences \(art. L.6313-1 du) Tj
+T* (Code du travail\)) Tj
+ET
+0. 0.31 0.39 rg
+56.6929133858267775 588.1892125984251152 96.3779527559055254 -26.0787401574803148 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 588.1892125984251152 481.8941732283464034 -26.0787401574803148 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 571.1813385826771992 Td
+(Modalité) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 571.1813385826771992 Td
+(Formation 100 % à distance – classe virtuelle synchrone \(Google Meet\)) Tj
+ET
+0. 0.31 0.39 rg
+56.6929133858267775 562.1104724409448181 96.3779527559055254 -26.0787401574803148 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 562.1104724409448181 481.8941732283464034 -26.0787401574803148 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 545.1025984251967884 Td
+(Durée) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 545.1025984251967884 Td
+(7 heures – 1 journée) Tj
+ET
+0. 0.31 0.39 rg
+56.6929133858267775 536.0317322834645211 96.3779527559055254 -26.0787401574803148 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 536.0317322834645211 481.8941732283464034 -26.0787401574803148 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 519.0238582677164914 Td
+(Horaires) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 519.0238582677164914 Td
+(9 h 00–12 h 30 / 13 h 30–17 h 00 \(3 h 30 le matin, 3 h 30 l'après-midi\)) Tj
+ET
+0. 0.31 0.39 rg
+56.6929133858267775 509.9529921259841103 96.3779527559055254 -26.0787401574803148 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 509.9529921259841103 481.8941732283464034 -26.0787401574803148 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 492.9451181102361375 Td
+(Effectif) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 492.9451181102361375 Td
+(À partir de 1 participant) Tj
+ET
+0. 0.31 0.39 rg
+56.6929133858267775 483.8742519685038701 96.3779527559055254 -26.0787401574803148 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 483.8742519685038701 481.8941732283464034 -26.0787401574803148 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 466.8663779527558404 Td
+(Tarif) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 466.8663779527558404 Td
+(1 000 € HT \(1 200 € TTC\) / stagiaire \(forfait 7 h\)) Tj
+ET
+0. 0.31 0.39 rg
+56.6929133858267775 457.795511811023573 96.3779527559055254 -26.0787401574803148 re
+f
+0.84 0.87 0.93 RG
+0.7086614173228347 w
+56.6929133858267775 457.795511811023573 481.8941732283464034 -26.0787401574803148 re
+S
+BT
+/F2 9.5 Tf
+10.9249999999999989 TL
+1. g
+65.1968503937007995 440.7876377952755433 Td
+(Sanction) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.102 0.102 0.18 rg
+161.5748031496063106 440.7876377952755433 Td
+(Attestation de fin de formation \(art. L.6353-1 du Code du travail\)) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 411.8742519685039269 Td
+(2. Public visé et prérequis) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 406.2049606299212314 m
+538.5870866141731312 406.2049606299212314 l
+S
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 389.1970866141732017 Td
+(Public concerné) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 373.6065354330708601 Td
+(Développeurs, administrateurs systèmes et réseaux, ingénieurs DevOps / Cloud, techniciens et architectes) Tj
+T* (IT souhaitant déployer des applications conteneurisées avec Kubernetes.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 325.5309448818896954 Td
+(Prérequis) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 309.9403937007873537 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 309.9403937007873537 Td
+(Maîtrise des bases de la ligne de commande Linux \(navigation, édition de fichiers, droits\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 287.1498425196849666 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 287.1498425196849666 Td
+(Connaissance des fondamentaux des conteneurs et de Docker \(images, conteneurs, registre\).) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 264.3592913385826932 Td
+(Les prérequis sont vérifiés à l'entrée via un test de positionnement \(voir § 6\).) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 228.9829133858268051 Td
+(3. Objectifs opérationnels et évaluables) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 223.3136220472440812 m
+538.5870866141731312 223.3136220472440812 l
+S
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 206.305748031496023 Td
+(À l'issue de la formation, le participant sera capable de :) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 182.2679527559055259 Td
+(1.) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+79.3700787401574814 182.2679527559055259 Td
+(Expliquer le rôle de Kubernetes dans le cycle de vie d'une application conteneurisée et décrire) Tj
+T* (l'architecture d'un cluster \(control plane, nœuds\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 141.7892125984252516 Td
+(2.) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+79.3700787401574814 141.7892125984252516 Td
+(Déployer une application conteneurisée avec des Pods et des Deployments, via manifestes YAML et) Tj
+T* (kubectl.) Tj
+ET
+0.75 0.83 0.85 RG
+0.5669291338582678 w
+56.6929133858267775 63.7795275590551256 m
+538.5870866141731312 63.7795275590551256 l
+S
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+160.7649999999999864 52.4409448818897772 Td
+(HI-TECH ACADEMY – 73 rue de Reuilly, 75012 Paris – SIRET 922 695 648 00027) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+100.8775000000001114 42.5196850393700743 Td
+(Déclaration d'activité n° 11756755575 \(préfet de région d'Île-de-France\) – 07 51 47 41 35 – contact@hi-techacademy.fr) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+180.0774999999998442 32.5984251968503713 Td
+(Programme de formation – Kubernetes – V1.0 – 21/06/2026 – page 1/4) Tj
+ET
+endstream
 endobj
 5 0 obj
-<<
-/Contents 11 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 10 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 6 0 R
 >>
 endobj
 6 0 obj
 <<
-/Contents 12 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 10 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
+/Length 7102
 >>
+stream
+0.8503937007874016 w
+0.75 0.83 0.85 RG
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0. 0.102 0.29 rg
+56.6929133858267775 785.1970866141732586 Td
+(HI-TECH ACADEMY) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.42 0.478 0.608 rg
+168.0468503937007938 785.1970866141732586 Td
+(|   Organisme de formation) Tj
+ET
+0. 0.31 0.39 RG
+1.1338582677165356 w
+56.6929133858267775 776.69314960629913 m
+538.5870866141731312 776.69314960629913 l
+S
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0. 0.314 0.392 rg
+59.5275590551181182 745.5120472440944468 Td
+(3.) Tj
+ET
+BT
+/F1 8.5 Tf
+11.0500000000000007 TL
+0.102 0.102 0.18 rg
+79.3700787401574814 745.5120472440944468 Td
+(Exposer une application avec un Service et identifier les cas d'usage du routage HTTP avec Ingress.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 722.7214960629920597 Td
+(4.) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+79.3700787401574814 722.7214960629920597 Td
+(Externaliser la configuration et les données sensibles d'une application via ConfigMap et Secrets.) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 694.2616535433070339 Td
+(4. Contenu et déroulé pédagogique \(1 journée de 7 h\)) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 688.5923622047243953 m
+538.5870866141731312 688.5923622047243953 l
+S
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 671.5844881889763656 Td
+(MATIN \(3 h 30\) – Découvrir Kubernetes et déployer ses premiers pods) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 655.9939370078740239 Td
+(À quoi sert Kubernetes ?) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 633.3734645669291012 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 633.3734645669291012 Td
+(Orchestration de conteneurs : problèmes résolus, écosystème CNCF et cas d'usage.) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 610.5829133858267141 Td
+(Architecture et composants) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 587.9624409448817914 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 587.9624409448817914 Td
+(Control plane : API server, etcd, scheduler, controller manager.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 565.1718897637794043 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 565.1718897637794043 Td
+(Nœuds : kubelet, kube-proxy, container runtime. Boucle de réconciliation.) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 542.3813385826770173 Td
+(Pods et kubectl) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 519.7608661417320945 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 519.7608661417320945 Td
+(Pod : plus petite unité déployable ; manifestes YAML.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 496.9703149606297643 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 496.9703149606297643 Td
+(kubectl : commandes essentielles \(get, describe, apply, logs, exec\).) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 474.1797637795274341 Td
+(TP 1) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 451.5592913385825682 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 451.5592913385825682 Td
+(Prise en main du cluster AKS fourni ; premier Pod et inspection des ressources.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 428.7687401574802379 Td
+(APRÈS-MIDI \(3 h 30\) – Déployer, exposer et configurer une application) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 413.1781889763778963 Td
+(Des Pods aux Deployments) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 390.5577165354330305 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 390.5577165354330305 Td
+(Pod, ReplicaSet, Deployment ; réplication, rolling update et rollback.) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 367.7671653543306434 Td
+(Exposer les applications) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 345.1466929133858343 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 345.1466929133858343 Td
+(Services : ClusterIP, NodePort, LoadBalancer ; aperçu du routage HTTP avec Ingress.) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 322.3561417322835041 Td
+(Configuration) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 299.7356692913385814 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 299.7356692913385814 Td
+(ConfigMap : externaliser la configuration ; Secrets : données sensibles.) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 276.945118110236308 Td
+(TP 2 fil rouge + évaluation) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 254.3246456692913853 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 254.3246456692913853 Td
+(Déployer, exposer et configurer une application complète \(Deployment, Service, ConfigMap, Secret\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 231.5340944881891119 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 231.5340944881891119 Td
+(Évaluation finale \(QCM + mise en pratique\), bilan et correction commentée.) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 203.0742519685040861 Td
+(5. Méthodes et moyens mobilisés) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 197.4049606299213622 m
+538.5870866141731312 197.4049606299213622 l
+S
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 180.397086614173304 Td
+(Méthodes pédagogiques) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 164.8065354330709624 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 164.8065354330709624 Td
+(Alternance d'apports théoriques et de mises en pratique \(expositive, démonstrative, applicative\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 142.015984251968689 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 142.015984251968689 Td
+(Démonstrations en direct et travaux pratiques guidés sur cluster réel.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 119.2254330708663019 Td
+(Moyens techniques) Tj
+ET
+0.75 0.83 0.85 RG
+0.5669291338582678 w
+56.6929133858267775 63.7795275590551256 m
+538.5870866141731312 63.7795275590551256 l
+S
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+160.7649999999999864 52.4409448818897772 Td
+(HI-TECH ACADEMY – 73 rue de Reuilly, 75012 Paris – SIRET 922 695 648 00027) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+100.8775000000001114 42.5196850393700743 Td
+(Déclaration d'activité n° 11756755575 \(préfet de région d'Île-de-France\) – 07 51 47 41 35 – contact@hi-techacademy.fr) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+180.0774999999998442 32.5984251968503713 Td
+(Programme de formation – Kubernetes – V1.0 – 21/06/2026 – page 2/4) Tj
+ET
+endstream
 endobj
 7 0 obj
-<<
-/Contents 13 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 10 0 R /Resources <<
-/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
->> /Rotate 0 /Trans <<
-
->> 
-  /Type /Page
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 8 0 R
 >>
 endobj
 8 0 obj
 <<
-/PageMode /UseNone /Pages 10 0 R /Type /Catalog
+/Length 7249
 >>
+stream
+0.8503937007874016 w
+0.75 0.83 0.85 RG
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0. 0.102 0.29 rg
+56.6929133858267775 785.1970866141732586 Td
+(HI-TECH ACADEMY) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.42 0.478 0.608 rg
+168.0468503937007938 785.1970866141732586 Td
+(|   Organisme de formation) Tj
+ET
+0. 0.31 0.39 RG
+1.1338582677165356 w
+56.6929133858267775 776.69314960629913 m
+538.5870866141731312 776.69314960629913 l
+S
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0. 0.314 0.392 rg
+59.5275590551181182 745.5120472440944468 Td
+(•) Tj
+ET
+BT
+/F1 8.5 Tf
+11.0500000000000007 TL
+0.102 0.102 0.18 rg
+73.7007874015748143 745.5120472440944468 Td
+(Classe virtuelle synchrone Google Meet \(caméra, partage d'écran, suivi de connexion\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 722.7214960629920597 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 722.7214960629920597 Td
+(Cluster Kubernetes managé Microsoft Azure \(AKS\), avec un espace de noms dédié par stagiaire.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 699.9309448818896726 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 699.9309448818896726 Td
+(Outil kubectl et manifestes YAML de travaux pratiques.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 677.1403937007873992 Td
+(Ressources pédagogiques) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 661.5498425196849439 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 661.5498425196849439 Td
+(Support de cours, fiches de commandes, énoncés et corrigés des TP.) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 633.0899999999999181 Td
+(6. Modalités d'évaluation et de suivi) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 627.4207086614172795 m
+538.5870866141731312 627.4207086614172795 l
+S
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 610.4128346456692498 Td
+(Avant) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 594.8222834645669082 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 594.8222834645669082 Td
+(Questionnaire d'analyse du besoin et des attentes ; test de positionnement \(prérequis\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 572.0317322834645211 Td
+(Pendant) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 556.4411811023621794 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 556.4411811023621794 Td
+(Travaux pratiques corrigés ; émargement par demi-journée et rapport de connexion Google Meet.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 533.6506299212597924 Td
+(En fin de formation) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 518.0600787401574507 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 518.0600787401574507 Td
+(Évaluation finale des acquis \(QCM + mise en pratique\) : questionnaire unique en fin de journée.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 495.2695275590550068 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 495.2695275590550068 Td
+(Questionnaire de satisfaction à chaud, puis à froid.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 472.4789763779526197 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 472.4789763779526197 Td
+(Attestation de fin de formation \(objectifs, nature, durée, résultats de l'évaluation des acquis\).) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 444.0191338582676508 Td
+(7. Modalités et délais d'accès) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 438.3498425196849553 m
+538.5870866141731312 438.3498425196849553 l
+S
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 421.3419685039369256 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 421.3419685039369256 Td
+(Inscription par e-mail, téléphone ou formulaire de contact sur https://hi-tech-academy.fr/) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 398.5514173228345953 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 398.5514173228345953 Td
+(Délai d'accès : 1 jour minimum entre la demande et le début \(hors prise en charge financeur\).) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 375.7608661417322082 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 375.7608661417322082 Td
+(Ouverture de la session à partir de 1 participant.) Tj
+ET
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 352.970314960629878 Td
+(Information complète et accessible au public sur https://hi-tech-academy.fr/) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 317.5939370078740467 Td
+(8. Accessibilité aux personnes en situation de handicap) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 311.9246456692912943 m
+538.5870866141731312 311.9246456692912943 l
+S
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 294.9167716535432646 Td
+(Nos formations à distance peuvent être adaptées aux personnes en situation de handicap. Lors de) Tj
+T* (l'inscription, le référent handicap étudie avec le candidat les aménagements nécessaires et mobilise si besoin) Tj
+T* (son réseau de partenaires.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 228.4726771653542983 Td
+(Référent handicap : ) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.102 0.102 0.18 rg
+158.0622047244094688 228.4726771653542983 Td
+(Mahdi CHEKINI – contact@hi-techacademy.fr – 07 51 47 41 35) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 205.7955118110236299 Td
+(9. Indicateurs de résultats) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 200.126220472440906 m
+538.5870866141731312 200.126220472440906 l
+S
+BT
+/F1 10 Tf
+13.5 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 183.1183464566928478 Td
+(Indicateurs issus des questionnaires de satisfaction à chaud renseignés par les bénéficiaires en fin de) Tj
+T* (formation :) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 140.7120472440944923 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 140.7120472440944923 Td
+(Taux de satisfaction : 95 %.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.314 0.392 rg
+59.5275590551181182 117.9214960629921052 Td
+(•) Tj
+ET
+BT
+/F1 10 Tf
+13. TL
+0.102 0.102 0.18 rg
+73.7007874015748143 117.9214960629921052 Td
+(Taux de recommandation : 100 %.) Tj
+ET
+0.75 0.83 0.85 RG
+0.5669291338582678 w
+56.6929133858267775 63.7795275590551256 m
+538.5870866141731312 63.7795275590551256 l
+S
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+160.7649999999999864 52.4409448818897772 Td
+(HI-TECH ACADEMY – 73 rue de Reuilly, 75012 Paris – SIRET 922 695 648 00027) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+100.8775000000001114 42.5196850393700743 Td
+(Déclaration d'activité n° 11756755575 \(préfet de région d'Île-de-France\) – 07 51 47 41 35 – contact@hi-techacademy.fr) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+180.0774999999998442 32.5984251968503713 Td
+(Programme de formation – Kubernetes – V1.0 – 21/06/2026 – page 3/4) Tj
+ET
+endstream
 endobj
 9 0 obj
-<<
-/Author (HI-TECH ACADEMY) /CreationDate (D:20260715151113+02'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20260715151113+02'00') /Producer (ReportLab PDF Library - \(opensource\)) 
-  /Subject (\(unspecified\)) /Title (Programme de formation \205 Kubernetes \205 Fondamentaux) /Trapped /False
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 10 0 R
 >>
 endobj
 10 0 obj
 <<
-/Count 3 /Kids [ 5 0 R 6 0 R 7 0 R ] /Type /Pages
+/Length 2184
+>>
+stream
+0.8503937007874016 w
+0.75 0.83 0.85 RG
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0. 0.102 0.29 rg
+56.6929133858267775 785.1970866141732586 Td
+(HI-TECH ACADEMY) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.42 0.478 0.608 rg
+168.0468503937007938 785.1970866141732586 Td
+(|   Organisme de formation) Tj
+ET
+0. 0.31 0.39 RG
+1.1338582677165356 w
+56.6929133858267775 776.69314960629913 m
+538.5870866141731312 776.69314960629913 l
+S
+BT
+/F1 8.5 Tf
+11.4750000000000014 TL
+0.102 0.102 0.18 rg
+56.6929133858267775 745.5120472440944468 Td
+(Indicateurs mis à jour après chaque session et publiés sur https://hi-tech-academy.fr/) Tj
+ET
+BT
+/F2 12 Tf
+13.7999999999999989 TL
+0. 0.176 0.455 rg
+56.6929133858267775 710.1356692913385587 Td
+(10. Contact) Tj
+ET
+0.75 0.83 0.85 RG
+0.8503937007874016 w
+56.6929133858267775 704.4663779527558063 m
+538.5870866141731312 704.4663779527558063 l
+S
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 687.4585039370078903 Td
+(Formateur référent : ) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.102 0.102 0.18 rg
+160.3622047244094233 687.4585039370078903 Td
+(Mahdi CHEKINI) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 670.4506299212598606 Td
+(E-mail : ) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.102 0.102 0.18 rg
+101.1622047244094773 670.4506299212598606 Td
+(contact@hi-techacademy.fr) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0. 0.102 0.29 rg
+56.6929133858267775 653.4427559055118309 Td
+(Téléphone : ) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.102 0.102 0.18 rg
+121.0622047244094546 653.4427559055118309 Td
+(07 51 47 41 35) Tj
+ET
+0.75 0.83 0.85 RG
+0.5669291338582678 w
+56.6929133858267775 63.7795275590551256 m
+538.5870866141731312 63.7795275590551256 l
+S
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+160.7649999999999864 52.4409448818897772 Td
+(HI-TECH ACADEMY – 73 rue de Reuilly, 75012 Paris – SIRET 922 695 648 00027) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+100.8775000000001114 42.5196850393700743 Td
+(Déclaration d'activité n° 11756755575 \(préfet de région d'Île-de-France\) – 07 51 47 41 35 – contact@hi-techacademy.fr) Tj
+ET
+BT
+/F1 7.5 Tf
+8.625 TL
+0.42 0.478 0.608 rg
+180.0774999999998442 32.5984251968503713 Td
+(Programme de formation – Kubernetes – V1.0 – 21/06/2026 – page 4/4) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R 5 0 R 7 0 R 9 0 R ]
+/Count 4
 >>
 endobj
 11 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 2451
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
 >>
-stream
-Gau`U>>sk/&UrnEoLfOtAV<Nsk:))-JHQ#^Y-$D-^C9\cbZS*>dD\+Fji?QMO^r",7C[01>[YhKB_pTWoiR<8O"gUo"ju5JFEB-+3&I4hn19X?=*-@WqlqN;PsI[/(g0]mMXUfUQ>hL!N6$%X.'Or%g^tl"b3+-(9ro4?Ws(D*8;+Xd,C"!4#F9;g/XsaY)Vj3*I(MJS^-8=@1HN:]]079ChYc\i`ntM.$QX,fL024MZRM@1DMT(]OG5=4O!;Uh.hlmbpod),f:n+*D^1\m=MhQ'7^RYG%k:@TW=#(R:-duF3gC)<QEpA_/E"N0gB7qZYUcC4NGQ\Fn[1_FQUXG(`sCl)Q5tf_\Dt*K=\;U]ZRfHS1GD`+VXf<D_QmlZ_<=C4E9,YHn1=.M:0U-sljqauZ2D"0bqhc^=nI9Lk].$Jl'[QC.sJ9PN=N'q7Z^ogm_8'kThk^F9>Ti=V$2-qCH8(1n0k"-9be4dIah@@nngL!-GV]RNI5C"$.aY$';H+Il,,9$aC3J'p2%'6XeA;sqq2W%aUo]+8+0*/Y+=q!:9LkN,tq9=ai*kkL/kgr$*7F=m#&?-JU#;pIgP@@*20)c_DYbsjG>Ej_0M>^eZYh4p1YuRSSE%8N]9\lXNG*XP,r?>,-4b,/XM@fa4^Sf(/(5P<>r2t"u7j6<lDh>'tD+D'V&/N)>;'oRELlFalK,@G`M`&VRt-N1=>4<n^4XiDg\(Ybp@1qr^%:M6P\!;.:J?"AE#umKqajXb=X(;U>dV]+7h#eIIJi3k*W_\WpI,"o'D9.Ea%R@NrDRaftGuW+[)hTDj*W:G6CarcRts=q^UDSZ<V.Kn("OOpKlZFoLQF8MP7%5P&&MYPPE6nL5$21eoLu'EbM79C+&`:P&5+RLC68q^&I`E=4uYN2H.]b=g(P'G42i\`.c3(AA-:!G_l2Vek8u%*poJAihG8_NFi*DC+ZX`WWjr"e%reW0t]!WBuf9(alEHY8!_IY#9:g`Rkq$:659&Rp8^$b7tl5B#%%,uA%EbK3:P'Jn<iI,\B,G2iWAS`UVQm3J)Be:+5dg[TG%MAJ1%$t_\4(H5"Ua,*J1sZD0Hb=QL*6p+R?Wb%+ca`g)sh6-39-L8Jnl]5ctS#UQtnXFpJqm">AsO0PUoSgEegs6XYG`qXA^0b-/"BVrrpjKq=;n\(*j?A"6X)QYo\IRCX\boqTsST)h0ML9Nnh0^VVr7L',PW]l#X-478p@CKOs!M@4\q;Tq;C'P_YGqgR)?0DtN+I=BMi5dPgK\-YPNA.98Ata_uLSWBZO&Bg1SuU>cZ9W7e8[<(lUf,0m.13(Iq8G4uP'Qu(6"=/G3Mn"$*`7;%WYq>89X6%2)i,i-bG=AG(pBcdC1("fQH:Wldkf(QHB#;b+ai-8]7T;o?`tF-S]rC"].SAH3*HRHJ.c:(p;Y,,gaZXsZ/O8L#m#Ykel'MR&$j!#m_g@sHCj[YA)N&7nSk>Rl6f26.T^q6$pGq;E2oPr.(lE:5,NV&b@5M=Df<\ns6+loV5_s5@5'5_53m;R%Ie9;ab2HL43cbL&93nb?HB[/L<hB)kRcpI$gK<lmI8@Ggb&.5`9NX;,R)V)AL>bnRuFE,H*RrTC(Q=B-`K^pO#pBPR2*_GC#.fC#-/0RB&\%Y"`Hs#6sk9Ei*(6onD-@=Jhkeejg(1(0ig4j7jaLK8CX82P_!R6i=Q/%PC3R3V4+Jg6\lo'iso1e6KOA>\R]Q%nR$W[m>SJd7e!-EDbCOJod,@QoG.5/T;\VO.RZ=n6jNs&/T'[>?n,#e0cN?r2/T2[[9oV2FDC?H;Jbo[TAgi@Ea@nV1UNu"I?iIj%:rP(-J<X-4A0@UaA`TtSN*cR:#Ds$@MF7GHHmn>GM5'HhR&%uRCLi'B%*X"nF=T'F)I_RE:0Iml5>cZ3<KK#+(&CFqENo%\4l`n&VM5bL&8DGb).c_0NuB7pF9P7fL1F2/cnboU%HKZ_k98_A\=RH<QU:<j706sHYnP]FH0D3s%!rDn8\E?:[*oG:1^0Q#Ug+#s%Lb>]#(`'XQgM=Y/)Oj!0DX`PHRl@j5@kgIk@!mP]X+g>a;KDd#VFHTX&Q_fsQ`4@FPu5BK!B14<0ua>gW#_n`ea"mi>.dpXX/ALcLEqi&(lSnGW83S,X&I9g2(O(CRXuMfh%o?1s9Q9heuVml!>LHEQZuYUXV'oUp)?hGD>lAeD.p&(scnAD+\Pmap-([JI<[F=FC(ME=i&,^C;+khC'n/UI?W7d9pCmVIi"b<]Y";h,n9UcW#*#[OSm;*uG[HKOCA])9L'Ck?J<Y1$JFm3($+J/^\N)u@8ZHVF]%S=%h4a#q]6(FQ?k&p606LZ^[MUrbnSSfRAr$G_6@J<l\j586"0qV.c/A2#ZH3E:tbCR4E#3XQIkn@r08I@Fm@>V9?-^#&VIjn*Kh'8CdYrXknH0=aK,,IbRSpAPHiiJ>J~>endstream
 endobj
 12 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 2214
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
 >>
-stream
-Gb!;egMYb8&:O:SbZjF5B"5LSH"[rG8W6&o@LE>@k[dJkj@so^Q_\(,rV2si;@4-dFG_OZ$3MK_U3:1pS@P)NNB_#=j,E3@N1R^n`#P3tLj>:VZaY$?41[Ram@-C,U#T?S1lUo3Hss;$G)$Q1Sf^C]7om]9]Kp:XK\b;S!6=YEQ=5+FgZs2+i9Tck4c@<K?AZ<A;,K)mIAVl_eQ5r=c\*s0V7`o6c&W`j.Vb77AO20GODa2.-T(]gZ_q!T&)S,co$rj;qXjS3LGYn]A`O#tjb/)UT2N8;D``:!'F_m^SrmsO*\.8?6e9V.L*"fYlMV]h][1S@_h/T/G^<nibo.i9Y-q3^H%9WtrWZ)Pq8&.DLCF>)a$CC$LV7BT/Xih.F#'1i]E:t_h2lEu:MB/U!M*r?ihBa0WT[')/Q=>P;/QDAV8^,E<+9R<6mdW)9p(Z%aD-)d[+>d0JhYj9_gg3Emb0STeqJc:Wp34RgB2H,@edj$(nIuWE]7XuRUBVH*6H(Em#@":7b_aq^=o?If=8lkHPPFoZ;S>u7BSWg)`ETm)#ak%MegRK4+dT,@pKja>n3g<89nQCc*oNY2h%_8'(_9L-[!Ot_Wk.RNV88,#^XQa`)R9?C,q/f<KoVL*jVFhKu4B&]8dc/884@[>QF!8oKj4'/^sdKa2rj(fHmLq]b!+Uj.8#t"'O.bXmI,uWHWF(p$+pYk>1S2("L+TS:X4SpPg5!k"nFqGpP7Td>O`Z;\KO=6`E26WAJ/Pe^9H5^!^PNE1q!@`Jpq*pZN_Z%(q[!]-R<8<h]ZKWQo'd1<h]cnnXoo>gl(ni7@DOO/'hOIOMl3Kq9&qkQGOP`/+ugALTkR!OA'5"%u?3XN*q>MZN@u.Ktm]@YkXAmR00%kuZ-_DigA]M=mI\%MV[88sTa03=IPQ`G:@IOp[4-H?2L_?#rQ@U.pZDM$1!)]Ni8Q:#&6`#PNBu(1e#R2L1Gb5:e?Te'#;Fm&SUW`S&5>$]Ls?d(D^)!(nSpj9rLd7T"+^@H](K':aNI[."-8YO"?'O\D;)oc9S0/T2sW8T:7;*\:D&kY`85Y-]!p&K"2@%H&h*"4Gjsk"D^U$*R&%ego?7rj14k4_MOKgNdR\*IKofmRPnn;#%[i\KKk5LnE_IgFoE+H<2A$=ssCM[c#78NqsrS7aIch!:!lmlgTE?V*Z1gY@e,THnAg=aHnpfoYTubq[KI`f"Jfb;;HlB_j+qtE5GZV=kj&;S>XdhKPuK1;`R(?.hO:/BlbOghXl%=C:_'BaN9JCleD<^;[tBiWpL3Fs'j.D2,EPYO_3K^1CNpWp$O.g=TA7@Cl3VhSlE;5rXrWDe2kX#[MBj!e37aYogn?*g<O+TLG\\C<%oL5Vj7-5T"p@hS*!e@FgncGT+'pe_T*UgP\Tg#/uX;Q+^qRC8BlK%L\MWZoVpA8OYe))#(u%a/s'"tVM4pc'+_&$ml0'Gp"5hro]?7r4\WjY[4UN$rfGOo1[:O\"=qE>FQ7<XA;$,G)m)T'N"0HG+q16h/u??@j*\.qC\WtT/2H9O1Eor17C[?Q[HRCIXcNE-*fbXc7loCe**97R,.3>Bh6FQBL"&T\P*WL4g*1:`C0Nun;FRCp?GqT9rDKihR7bCVq4iUQd=ELl39BATBJ!4al\:DAq`MSi"bQBIU0(l5+oq9539HWsMt-nN\2&b.o#.p4MPKqsCUobukU@<l0\%DQRJG_l#C^iZC+HFS>gJ@>9G]mTYq!n*;:4S\4bfCIU]&Uag/M03JonQ_Z'fdr792=\Q,mQ<bgeU;Q%2DG0XVu+pHW5[pN;2<@ai$V&AL;Dd/#opY-1jiGETrnG1sfnFQc'/W:`-+Gl7EtFETis9r%7Bm!SB/F->X26Q<RIkOPJ@N:[ED.sQ:A$hSg\pR&^Pke1.dfeP?Q>SJ[b\t]%PFCrI0)4ZiX[LMeN:$4G+<oA)7a-6Mb&X>\b;RHD[a,WbZbP"(Ue]tX#CHCDc9mUZ@]+hYHos?%;D&?^(Pq8DKXtD?QB/F]M$AL_Jf[7-E-gZB14V\,ek[RiC25`@=r02+(c;-DLQ?>:/b3'8aAdmsZ^@)0-q=2T1i'ij3bl+jC+UY%g'rQmJIAq=_gGJMF8D)&ma^Za#Rl*!IN2tiSjJ`Wh4Q_LAm]D3>NmLW/I_u)%,P4qM9?"6@XPRdLM$2u:%qaM>S\q&P_)'-OXa+7;^umh$4(m!h5Fs3ciW~>endstream
 endobj
 13 0 obj
 <<
-/Filter [ /ASCII85Decode /FlateDecode ] /Length 1994
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
 >>
-stream
-Gb!#\gMYb8&:O:SbaXkuU:IomH)^*XNKH2?*2,Uu]r]>@ZiP)OP"GfJj#aTC,YF@N[ufQ8JAdq#DJ.7b,m+fF9RfP]_!_rHGfP>;0UVr_$jS+$@6?Ps3+M?>Sd3!k)aP#>p^b#G0T3JJ#_p;bcO@Un6bM?0R\/PRCi-sC>aV=s]EQNT@l.TBnq0#$Q?fSV;*m"F>o*$W5*lef-ssgO)bb](&&-t7b6ouq3aQo%"i1&$/I]VJQ7T=PlAqCO@*3k(09.QdY'/E)]8O$+l[0,TejY_%$=X#J3aN;)-DLaUY:l\#cXMGA.@)O2,5NlW<-V1f3H%[_$(0KXTq^"h^7kd4F2@;Y]MmBr(&K+6(M1E-6)u@QB":NZ-1f@Ec&NTXeL3,V/7:GT&6KDZ5-o[\mB)N$L@"2e4TfTmQm]1Sh*7gp,u8:C$Uoj=Q*jl>/[l3m^AHs7n6Pg<QD)uo%4O9.D-4O<d9-NX*sL^.-O&>fP%Rd5#&SMh?hOfaAKO=l(Bcq`1uhJBdEd*XPFj-BeSm1a>dha,JQJ,X.QhqXpoOp#jJCB+'e/!kl(CjP-RBgK=\`>s6O*KKAVP+l(*CZ'l\@.D_\:"U]`%qc63%\NCj"n[h7P0oUeYI:'rEpTUMnfR);Ps*"iWPkJ4]c,XmeiPcP*R$h]!`=hRpJgBotR(OH)*eBh]>Uk+*=*q:'!s!^W/u+rX]VKN86EQ`D)#'iKnH(YQAtdoZ#W*k%N5cKGHqe4./$;h+'akC:n>aIF)O3TH7I`RK'M*%uOW&#%@LTF3Q@bIBbVdsmd)/h8-=VN?JC*Va%loD<G-K:Ch%b]m,<0gn4Sgk82o\#^6J6-mngB=MbCEJ23!^c^l2o67&Q&[.eX>g`o=&^>L*I%H2XGV@R6f3&t?=m4?KnVL,cA^Zhn`?NV2jL$U[SZG)8**=A;8\Mo+N[bVm7Qf[$S3N"$lE?`L6Cmn[X_4Q%82!Xm#Z=GFdlKp,WK\0*(^c*]!WnK!rV+%'3P3?IW`R_K<?pT^Ve(uUS0*<aog4*(\R#V3h:QJc&s`6\J?\[2Up5]Uki52L37%IHg!UH/r%U.ufT1TmTa]Gu"_#ZWFLJG4j;Wtdi&-\WI3PF=cCP:t40VLQ&:jkKX_4qN$.,\=W0.9L8SC@\[O*b3+F[k>Ms'%-g\-ZjT,kkfVnCfhFuskVM9Lu.`g@;h,V!Z_U3>HL06G.Nc;0>NJ</2,nQHol9Z-LN#Eq(A:)b4a@@eW"QlZ[B7_th\eN-m(<HTk?M5?$labXiRSD"Uh8bLYm2r^qBXTYRp6r]Voe"#]'XrT7)"/T6OC^d,18cms@_AX@Yk\4>r",mE\>Bu5*-IlDX[V=m9"7a+V-G'F#^^XYh'!C)P5?r]LL8ea0/,oM7;,9$X9cl(<NfRHQ[bDUP'sa%38SGoI%])KIe0D[hnt2fpX=[Sg^D2(g#OeidPO[1M\@fD#421LuBS2T3fE$i##+RRT1a4,pg'8PTLA45_a\JY\6!)\Jop/>3SrG#?HABkp7N@gAXrAQNSVo2'8H3H#S*5%rc%JEd/em_DkR:[8`S62b9oY-9q=jMpfr(r6jqOs::d.g?dGTLm[s+;+YY_r"F0sj$P/tKB;W^P7NO@EmlbUF2me+Ran=&]8hFr)<h`eMqBr-;@gDJbf)Z3OS6dGm"BO;=DT=Z].Z"2K^BHitTIT@dd7\PO_n/e',*pJ5m1OfMBB/Sk?/5pP%)uTmBC\QS49#7pk#0?+G"D@[tB6E\');R:cP#!5)lh@_i+bb[83WX,9pLUHE"hkGGf"p1!=shA;+o&3s7C_H:p7(]ufB^'="@C9506HIW)jmL:q4/dQX^WOO/hZJBg8^Ih;8Q<`!mZW'Q`WTsVA=p2(l%@gY)E*Z]r7AWmh,6_]_UU;AmQZNYo(/QUdL4ZpIqn<"7UiiJWKTEqV."Y[jn"#T'fRk=o(L602s:^FdkSpP8RtRA?cNk]<FskeE7##%^7VQN_MM1#GtthU]~>endstream
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+19 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+20 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+21 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+22 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+23 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+24 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 11 0 R
+/F2 12 0 R
+/F3 13 0 R
+/F4 14 0 R
+/F5 15 0 R
+/F6 16 0 R
+/F7 17 0 R
+/F8 18 0 R
+/F9 19 0 R
+/F10 20 0 R
+/F11 21 0 R
+/F12 22 0 R
+/F13 23 0 R
+/F14 24 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+25 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260723002523+02'00')
+>>
+endobj
+26 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
 endobj
 xref
-0 14
+0 27
 0000000000 65535 f 
-0000000061 00000 n 
-0000000112 00000 n 
-0000000219 00000 n 
-0000000331 00000 n 
-0000000446 00000 n 
-0000000651 00000 n 
-0000000856 00000 n 
-0000001061 00000 n 
-0000001130 00000 n 
-0000001455 00000 n 
-0000001527 00000 n 
-0000004070 00000 n 
-0000006376 00000 n 
+0000025599 00000 n 
+0000027439 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000008495 00000 n 
+0000008632 00000 n 
+0000015786 00000 n 
+0000015923 00000 n 
+0000023224 00000 n 
+0000023362 00000 n 
+0000025674 00000 n 
+0000025800 00000 n 
+0000025931 00000 n 
+0000026065 00000 n 
+0000026203 00000 n 
+0000026327 00000 n 
+0000026456 00000 n 
+0000026588 00000 n 
+0000026724 00000 n 
+0000026852 00000 n 
+0000026979 00000 n 
+0000027108 00000 n 
+0000027241 00000 n 
+0000027343 00000 n 
+0000027692 00000 n 
+0000027778 00000 n 
 trailer
 <<
-/ID 
-[<4ab25847306a5c89c9e30ce43efa3216><4ab25847306a5c89c9e30ce43efa3216>]
-% ReportLab generated PDF document -- digest (opensource)
-
-/Info 9 0 R
-/Root 8 0 R
-/Size 14
+/Size 27
+/Root 26 0 R
+/Info 25 0 R
+/ID [ <0387E5271F3E824691EA7384D7286B3C> <0387E5271F3E824691EA7384D7286B3C> ]
 >>
 startxref
-8462
+27882
 %%EOF

@@ -18,7 +18,8 @@ const D = {
   convention: { label: 'Convention de formation', file: 'Convention_de_formation.pdf' },
   processAccueil: { label: 'Processus d\'accueil des apprenants', file: 'Processus_accueil_apprenants_V1_0.pdf' },
   cgv: { label: 'Conditions générales de vente', file: 'Conditions_Generales_de_Vente.pdf' },
-  satisfactionChaud: { label: 'Évaluation satisfaction à chaud — complétée', file: 'Evaluation_de_la_satisfaction_du_client_suite_a_la_formation.pdf' },
+  satisfactionChaud: { label: "Questionnaire satisfaction à chaud de l'apprenant", file: 'Evaluation_satisfaction_chaud_apprenant.pdf' },
+  satisfactionCommanditaire: { label: 'Questionnaire satisfaction commanditaire — complété', file: 'Evaluation_de_la_satisfaction_du_client_suite_a_la_formation.pdf' },
   satisfactionFroid: { label: 'Évaluation satisfaction à froid — complétée', file: 'Evaluation_de_la_satisfaction_a_froid_de_l_apprenant.pdf' },
   questionnaireCommanditaire: { label: 'Questionnaire analyse du besoin — commanditaire', file: 'Questionnaire_analyse_du_besoin_commanditaire_V1_0.pdf' },
   analyseBesoinComplete: { label: 'Analyse du besoin complétée (H. Goumeziane)', file: 'Analyse_du_besoin_Hocine_GOUMEZIANE.pdf' },
@@ -54,6 +55,8 @@ const D = {
   processAmelioration: { label: "Processus d'amélioration continue", file: 'Processus_amelioration_continue_V1_0.pdf' },
   processAdministratif: { label: "Processus de gestion administrative d'un parcours de formation", file: 'Processus_gestion_administrative_parcours_V1_0.pdf' },
   planDev: { label: 'Plan de développement des compétences 2026-2028', file: 'Plan_developpement_competences_V1_0.pdf' },
+  certifUrbilog: { label: "Certificat de réalisation — formation « Intégrer l'accessibilité pour les développeurs web » (Urbilog)", file: 'Certificat_realisation_Mahdi_CHEKINI.pdf' },
+  factureUrbilog: { label: 'Facture de la formation accessibilité (FACT-2025-1467)', file: 'FACT_2025_1467.pdf' },
 };
 
 export function auditDocUrl(doc) {
@@ -68,9 +71,9 @@ export function isViewable(doc) {
 const SITE_RESULTATS = { label: 'Indicateurs de résultats publiés sur le site', href: '/#resultats' };
 const SITE_HOME = { label: 'Site internet hi-tech-academy.fr', href: '/' };
 
-// Preuves consultables dans l'outil qualité Qualiobee (pastille dédiée)
-const QB_VEILLE = { label: 'Espace « Veille »', qualiobee: true };
-const QB_AMELIORATION = { label: "Tableau d'amélioration continue", qualiobee: true };
+// Preuves consultables dans l'interface d'administration du site (pastille dédiée)
+const QB_VEILLE = { label: 'Onglet « Veille » (kanban par axe)', adminTool: true };
+const QB_AMELIORATION = { label: 'Registre des réclamations et suivi', adminTool: true };
 
 export const AUDIT_CRITERIA = [
   {
@@ -288,8 +291,8 @@ export const AUDIT_CRITERIA = [
         title:
           'Entretenir et développer les compétences de ses salariés, adaptées aux prestations',
         proofs:
-          "Plan de développement des compétences 2026-2028 (mise à jour Kubernetes en cours sur Dyma, IA, DevOps / cloud, pédagogie et accessibilité handicap) ; preuves des formations suivies (certifications Kubernetes) ; participation à des communautés de pairs.",
-        documents: [D.planDev, D.certifs, D.cv],
+          "Plan de développement des compétences 2026-2028 (mise à jour Kubernetes en cours sur Dyma, IA, DevOps / cloud, pédagogie et accessibilité handicap) ; preuves des formations suivies : certifications Kubernetes, formation « Intégrer l'accessibilité pour les développeurs web » (Urbilog, 2025) avec certificat et facture ; participation à des communautés de pairs.",
+        documents: [D.planDev, D.certifUrbilog, D.factureUrbilog, D.certifs, D.cv],
       },
     ],
   },
@@ -304,7 +307,7 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Réaliser une veille légale et réglementaire sur le champ de la formation professionnelle',
-        proofs: 'Plan de veille ; espace « Veille » alimenté dans Qualiobee.',
+        proofs: "Plan de veille ; espace « Veille » alimenté dans l'interface d'administration du site (kanban par axe).",
         documents: [D.veille, QB_VEILLE],
       },
       {
@@ -313,7 +316,7 @@ export const AUDIT_CRITERIA = [
         title:
           'Réaliser une veille sur les évolutions des compétences, des métiers et des emplois',
         proofs:
-          'Plan de veille ; espace « Veille » alimenté dans Qualiobee ; emails de veille conservés et transmis aux collaborateurs.',
+          "Plan de veille ; espace « Veille » alimenté dans l'interface d'administration du site ; emails de veille conservés et transmis aux collaborateurs.",
         documents: [D.veille, QB_VEILLE],
       },
       {
@@ -321,7 +324,7 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Réaliser une veille sur les innovations pédagogiques et technologiques',
-        proofs: 'Plan de veille ; espace « Veille » alimenté dans Qualiobee.',
+        proofs: "Plan de veille ; espace « Veille » alimenté dans l'interface d'administration du site (kanban par axe).",
         documents: [D.veille, QB_VEILLE],
       },
       {
@@ -330,7 +333,7 @@ export const AUDIT_CRITERIA = [
         title:
           'Mobiliser les expertises, outils et réseaux nécessaires pour accueillir, accompagner, former ou orienter les publics en situation de handicap',
         proofs:
-          "Politique d'accessibilité ; procédure d'orientation avec liste des structures partenaires PSH ; preuve de prise de contact avec les partenaires (email) ; espace « Veille » dans Qualiobee.",
+          "Politique d'accessibilité ; procédure d'orientation avec liste des structures partenaires PSH ; preuve de prise de contact avec les partenaires (email) ; espace « Veille » de l'interface d'administration du site.",
         documents: [D.accessibilite, D.procedurePsh, D.mailPartenaires, D.fpHandicap, QB_VEILLE],
       },
       {
@@ -370,8 +373,8 @@ export const AUDIT_CRITERIA = [
         title:
           'Recueillir les appréciations des parties prenantes : bénéficiaires, financeurs, équipes pédagogiques et entreprises',
         proofs:
-          'Auto-évaluation formateur ; questionnaires à chaud et à froid apprenant ; questionnaire commanditaire ; questionnaire financeur ; questionnaires complétés sur la formation témoin.',
-        documents: [D.satisfactionChaud, D.satisfactionFroid, D.questionnaireFinanceur, D.questionnaireCommanditaire],
+          'Auto-évaluation formateur ; questionnaires à chaud et à froid apprenant ; questionnaire de satisfaction commanditaire (complété sur la formation témoin) ; questionnaire financeur.',
+        documents: [D.satisfactionChaud, D.satisfactionFroid, D.satisfactionCommanditaire, D.questionnaireFinanceur],
       },
       {
         number: 31,
@@ -379,7 +382,7 @@ export const AUDIT_CRITERIA = [
         title:
           'Mettre en œuvre des modalités de traitement des difficultés rencontrées et des réclamations exprimées par les parties prenantes',
         proofs:
-          "Tableau d'amélioration continue dans Qualiobee ; processus de suivi des réclamations ; formulaire de réclamation public sur le site et registre dans l'espace admin.",
+          "Processus de suivi des réclamations ; formulaire de réclamation public sur le site ; registre et suivi des réclamations dans l'interface d'administration.",
         documents: [D.processReclamations, QB_AMELIORATION],
       },
       {
@@ -388,7 +391,7 @@ export const AUDIT_CRITERIA = [
         title:
           "Mettre en œuvre des mesures d'amélioration à partir de l'analyse des appréciations et des réclamations",
         proofs:
-          "Tableau d'amélioration continue dans Qualiobee ; processus formalisé de gestion de l'amélioration continue.",
+          "Processus formalisé de gestion de l'amélioration continue ; suivi dans l'interface d'administration du site.",
         documents: [D.processAmelioration, QB_AMELIORATION],
       },
     ],

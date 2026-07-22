@@ -13,18 +13,18 @@ const bodyFont = { fontFamily: "'Inter', sans-serif" };
 // partagé entre la page publique /audit-qualiopi et l'onglet admin.
 
 // Pastille document : PDF → visionneuse intégrée ; xlsx → téléchargement ;
-// lien site → nouvel onglet ; preuve Qualiobee → pastille informative.
+// lien site → nouvel onglet ; preuve interface admin → pastille informative.
 function DocumentChip({ doc, onView }) {
   const base =
     'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors';
-  if (doc.qualiobee) {
+  if (doc.adminTool) {
     return (
       <span
         className={base}
-        title="Preuve consultable dans Qualiobee"
+        title="Preuve consultable dans l'interface d'administration du site"
         style={{ background: '#f3effc', color: '#5b3fa8', border: '1px solid #ddd2f3', ...headingFont }}>
         <Database className="w-3.5 h-3.5 shrink-0" />
-        Qualiobee — {doc.label}
+        Interface admin — {doc.label}
       </span>
     );
   }
@@ -185,8 +185,8 @@ export default function AuditQualiopiContent() {
         <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: '#116632' }} />
         Cliquez sur un critère pour consulter ses indicateurs et les documents de preuve associés
         (visionneuse intégrée). Les indicateurs propres aux autres catégories de prestations
-        (certifiantes, CFA, alternance) sont grisés. Les preuves marquées « Qualiobee » sont
-        consultables dans l'outil qualité Qualiobee (démonstration en séance d'audit).
+        (certifiantes, CFA, alternance) sont grisés. Les preuves marquées « Interface admin » sont
+        consultables dans l'interface d'administration du site (démonstration en séance d'audit).
       </div>
 
       <div className="space-y-4">
