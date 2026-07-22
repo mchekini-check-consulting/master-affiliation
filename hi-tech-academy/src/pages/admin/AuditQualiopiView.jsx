@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  CheckCircle2, ChevronDown, Download, ExternalLink, FileText, MinusCircle,
+  CheckCircle2, ChevronDown, Database, Download, ExternalLink, FileText, MinusCircle,
 } from 'lucide-react';
 import PdfViewer from './PdfViewer';
 import { ViewHeader, bodyFont, headingFont } from './common';
@@ -15,6 +15,18 @@ import { AUDIT_CRITERIA, AUDIT_STATS, auditDocUrl, isViewable } from '@/data/aud
 function DocumentChip({ doc, onView }) {
   const base =
     'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors';
+  if (doc.qualiobee) {
+    // Preuve consultable dans l'outil qualité Qualiobee (démonstration en séance)
+    return (
+      <span
+        className={base}
+        title="Preuve consultable dans Qualiobee"
+        style={{ background: '#f3effc', color: '#5b3fa8', border: '1px solid #ddd2f3', ...headingFont }}>
+        <Database className="w-3.5 h-3.5 shrink-0" />
+        Qualiobee — {doc.label}
+      </span>
+    );
+  }
   if (doc.href) {
     return (
       <Link
@@ -96,6 +108,12 @@ function IndicatorRow({ indicator, onView }) {
           <p className="text-xs mt-1 leading-relaxed" style={{ color: '#44506b', ...bodyFont }}>
             {indicator.title}
           </p>
+          {indicator.proofs && (
+            <p className="text-xs mt-2 leading-relaxed rounded-xl px-3 py-2" style={{ background: '#f7f9fd', color: '#44506b', ...bodyFont }}>
+              <span className="font-bold" style={{ color: '#005064', ...headingFont }}>Preuves disponibles : </span>
+              {indicator.proofs}
+            </p>
+          )}
           {indicator.documents?.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
               {indicator.documents.map((doc) => (
@@ -170,7 +188,8 @@ export default function AuditQualiopiView() {
         <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: '#116632' }} />
         Cliquez sur un critère pour consulter ses indicateurs et les documents de preuve associés
         (visionneuse intégrée). Les indicateurs propres aux autres catégories de prestations
-        (certifiantes, CFA, alternance) sont grisés.
+        (certifiantes, CFA, alternance) sont grisés. Les preuves marquées « Qualiobee » sont
+        consultables dans l'outil qualité Qualiobee (démonstration en séance d'audit).
       </div>
 
       <div className="space-y-4">

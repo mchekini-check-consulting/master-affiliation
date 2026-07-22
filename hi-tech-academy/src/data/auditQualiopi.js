@@ -66,6 +66,10 @@ export function isViewable(doc) {
 const SITE_RESULTATS = { label: 'Indicateurs de résultats publiés sur le site', href: '/#resultats' };
 const SITE_HOME = { label: 'Site internet hi-tech-academy.fr', href: '/' };
 
+// Preuves consultables dans l'outil qualité Qualiobee (pastille dédiée)
+const QB_VEILLE = { label: 'Espace « Veille »', qualiobee: true };
+const QB_AMELIORATION = { label: "Tableau d'amélioration continue", qualiobee: true };
+
 export const AUDIT_CRITERIA = [
   {
     number: 1,
@@ -78,6 +82,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           "Diffuser une information accessible, exhaustive et vérifiable : prérequis, objectifs, durée, modalités et délais d'accès, tarifs, contacts, méthodes mobilisées, modalités d'évaluation, accessibilité aux personnes en situation de handicap",
+        proofs:
+          "Site internet hi-tech-academy.fr ; règlement intérieur, convention, programme, livret d'accueil et politique d'accessibilité PSH publiés sur le site ; processus formalisé d'accueil des nouveaux apprenants.",
         documents: [SITE_HOME, D.plaquette, D.programme, D.reglement, D.livret, D.accessibilite, D.convention, D.cgv, D.processAccueil],
       },
       {
@@ -85,6 +91,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Diffuser des indicateurs de résultats adaptés à la nature des prestations mises en œuvre et des publics accueillis',
+        proofs:
+          "Indicateurs de résultats publiés sur le site, le programme et la convention (taux issus des questionnaires de satisfaction à chaud des bénéficiaires) ; questionnaires complétés sur la formation témoin.",
         documents: [SITE_RESULTATS, D.satisfactionChaud, D.satisfactionFroid],
       },
       {
@@ -107,12 +115,16 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           "Analyser le besoin du bénéficiaire en lien avec l'entreprise et/ou le financeur concerné",
+        proofs:
+          "Questionnaire des attentes / positionnement du bénéficiaire et du commanditaire (avec question sur les besoins d'aménagement handicap) ; compte rendu d'entretien formalisé avec le client.",
         documents: [D.questionnaireCommanditaire, D.analyseBesoinComplete, D.compteRendu],
       },
       {
         number: 5,
         applicable: true,
         title: 'Définir les objectifs opérationnels et évaluables de la prestation',
+        proofs:
+          "Convention et programme ; déroulé pédagogique (leçons / évaluations) et grilles permettant de vérifier l'atteinte des objectifs pédagogiques.",
         documents: [D.convention, D.programme, D.deroule, D.tableauCroise],
       },
       {
@@ -120,6 +132,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           "Établir les contenus et les modalités de mise en œuvre de la prestation, adaptés aux objectifs définis et aux publics bénéficiaires",
+        proofs:
+          "Convention et programme — accessibilité et adaptations PSH notées sur le programme ; déroulé pédagogique et tableau croisé objectifs / contenus / évaluations.",
         documents: [D.programme, D.deroule, D.tableauCroise, D.support],
       },
       {
@@ -134,6 +148,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           "Déterminer les procédures de positionnement et d'évaluation des acquis à l'entrée de la prestation",
+        proofs:
+          "Auto-positionnement dans le questionnaire des attentes ; test de positionnement / niveau complété sur la formation témoin.",
         documents: [D.testPositionnement, D.analyseBesoinComplete, D.processEvaluation],
       },
     ],
@@ -149,6 +165,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Informer les publics bénéficiaires des conditions de déroulement de la prestation',
+        proofs:
+          "Règlement intérieur, convention, programme, convocation (envoyée par email), CGV ; organigramme accessible aux apprenants via le livret d'accueil.",
         documents: [D.convocation, D.convention, D.programme, D.reglement, D.livret, D.cgv, D.organigramme],
       },
       {
@@ -156,6 +174,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           "Mettre en œuvre et adapter la prestation, l'accompagnement et le suivi aux publics bénéficiaires",
+        proofs:
+          "Adaptations de parcours selon le niveau, les attentes ou le handicap de l'apprenant ; support de formation ; liste des structures partenaires PSH et procédure d'orientation.",
         documents: [D.support, D.deroule, D.procedurePsh],
       },
       {
@@ -163,6 +183,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           "Évaluer l'atteinte par les publics bénéficiaires des objectifs de la prestation",
+        proofs:
+          "Certificat de réalisation (avec atteinte des objectifs) ; évaluation finale QCM complétée par l'apprenant, avec version corrigée ; processus d'évaluation des apprenants.",
         documents: [D.evaluationFinale, D.certificat, D.processEvaluation, D.tableauCroise],
       },
       {
@@ -170,6 +192,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           "Décrire et mettre en œuvre les mesures pour favoriser l'engagement des bénéficiaires et prévenir les ruptures de parcours",
+        proofs:
+          "Formations en visio favorisant la motivation et les échanges ; formations / rendez-vous individuels possibles ; adaptations PSH selon le handicap ; émargement et rapports de participation ; processus de gestion des absences et abandons.",
         documents: [D.processAbsences, D.emargement, D.participationMatin, D.participationAprem],
       },
       {
@@ -211,6 +235,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Mettre à disposition des moyens humains et techniques adaptés aux prestations',
+        proofs:
+          "CVthèque (CV des formateurs et collaborateurs de l'organigramme) ; factures Google Meet (dispositif de classe virtuelle).",
         documents: [D.organigramme, D.cv, D.diplome, D.certifs],
       },
       {
@@ -218,6 +244,7 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Mobiliser et coordonner les différents intervenants internes et/ou externes',
+        proofs: 'Organigramme de l\'organisme et fiches de poste de chaque fonction.',
         documents: [D.organigramme, D.fpFormateur, D.fpDirection, D.fpAdmin, D.fpHandicap, D.fpQualite],
       },
       {
@@ -225,6 +252,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Mettre à disposition des bénéficiaires des ressources pédagogiques et permettre leur appropriation',
+        proofs:
+          "Support de formation (versionné et daté) ; aide à la connexion aux outils logiciels indiquée sur la convocation.",
         documents: [D.support, D.convocation],
       },
       {
@@ -247,6 +276,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Déterminer, mobiliser et évaluer les compétences des différents intervenants internes et/ou externes, adaptées aux prestations',
+        proofs:
+          "CV formateur ; questionnaire de satisfaction à chaud bénéficiaire (qualité du formateur) ; auto-évaluation formateur ; processus de recrutement, charte d'engagement qualité et fiches de poste.",
         documents: [D.processRecrutement, D.charte, D.cv, D.diplome, D.fpFormateur],
       },
       {
@@ -254,6 +285,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Entretenir et développer les compétences de ses salariés, adaptées aux prestations',
+        proofs:
+          "Plan de développement des compétences du formateur ; preuves des formations suivies (certifications Kubernetes) et des formations envisagées ; participation à des communautés de pairs.",
         documents: [D.certifs, D.cv, D.veille],
       },
     ],
@@ -269,34 +302,42 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Réaliser une veille légale et réglementaire sur le champ de la formation professionnelle',
-        documents: [D.veille],
+        proofs: 'Plan de veille ; espace « Veille » alimenté dans Qualiobee.',
+        documents: [D.veille, QB_VEILLE],
       },
       {
         number: 24,
         applicable: true,
         title:
           'Réaliser une veille sur les évolutions des compétences, des métiers et des emplois',
-        documents: [D.veille],
+        proofs:
+          'Plan de veille ; espace « Veille » alimenté dans Qualiobee ; emails de veille conservés et transmis aux collaborateurs.',
+        documents: [D.veille, QB_VEILLE],
       },
       {
         number: 25,
         applicable: true,
         title:
           'Réaliser une veille sur les innovations pédagogiques et technologiques',
-        documents: [D.veille],
+        proofs: 'Plan de veille ; espace « Veille » alimenté dans Qualiobee.',
+        documents: [D.veille, QB_VEILLE],
       },
       {
         number: 26,
         applicable: true,
         title:
           'Mobiliser les expertises, outils et réseaux nécessaires pour accueillir, accompagner, former ou orienter les publics en situation de handicap',
-        documents: [D.accessibilite, D.procedurePsh, D.mailPartenaires, D.fpHandicap],
+        proofs:
+          "Politique d'accessibilité ; procédure d'orientation avec liste des structures partenaires PSH ; preuve de prise de contact avec les partenaires (email) ; espace « Veille » dans Qualiobee.",
+        documents: [D.accessibilite, D.procedurePsh, D.mailPartenaires, D.fpHandicap, QB_VEILLE],
       },
       {
         number: 27,
         applicable: true,
         title:
           'Faire respecter le référentiel par les sous-traitants et prestataires de portage salarial',
+        proofs:
+          "Charte d'engagement qualité signée par le formateur, avec mention du respect du référentiel.",
         documents: [D.charte],
       },
       {
@@ -326,6 +367,8 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Recueillir les appréciations des parties prenantes : bénéficiaires, financeurs, équipes pédagogiques et entreprises',
+        proofs:
+          'Auto-évaluation formateur ; questionnaires à chaud et à froid apprenant ; questionnaire commanditaire ; questionnaire financeur ; questionnaires complétés sur la formation témoin.',
         documents: [D.satisfactionChaud, D.satisfactionFroid, D.questionnaireFinanceur, D.questionnaireCommanditaire],
       },
       {
@@ -333,14 +376,18 @@ export const AUDIT_CRITERIA = [
         applicable: true,
         title:
           'Mettre en œuvre des modalités de traitement des difficultés rencontrées et des réclamations exprimées par les parties prenantes',
-        documents: [D.processReclamations],
+        proofs:
+          "Tableau d'amélioration continue dans Qualiobee ; processus de suivi des réclamations ; formulaire de réclamation public sur le site et registre dans l'espace admin.",
+        documents: [D.processReclamations, QB_AMELIORATION],
       },
       {
         number: 32,
         applicable: true,
         title:
           "Mettre en œuvre des mesures d'amélioration à partir de l'analyse des appréciations et des réclamations",
-        documents: [D.processAmelioration],
+        proofs:
+          "Tableau d'amélioration continue dans Qualiobee ; processus formalisé de gestion de l'amélioration continue.",
+        documents: [D.processAmelioration, QB_AMELIORATION],
       },
     ],
   },
