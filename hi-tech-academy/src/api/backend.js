@@ -97,6 +97,12 @@ export function adminSendTraineeFinalEvaluationCorrection(auth, id, traineeId, p
   });
 }
 
+export function adminSendCertificate(auth, certificateId, pdfBase64) {
+  return request(`/admin/certificates/${certificateId}/send`, {
+    method: 'POST', auth, body: { pdf_base64: pdfBase64 },
+  });
+}
+
 export function adminListComplaints(auth) {
   return request('/admin/complaints', { auth });
 }

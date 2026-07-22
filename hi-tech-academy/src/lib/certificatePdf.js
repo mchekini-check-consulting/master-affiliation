@@ -372,3 +372,14 @@ export function downloadCertificatePdf(certificate) {
 export function certificatePdfBlobUrl(certificate) {
   return buildCertificatePdf(certificate).output('bloburl');
 }
+
+/** Certificat en base64 (sans préfixe data:), pour un envoi par le serveur. */
+export function certificatePdfBase64(certificate) {
+  const bytes = new Uint8Array(buildCertificatePdf(certificate).output('arraybuffer'));
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}

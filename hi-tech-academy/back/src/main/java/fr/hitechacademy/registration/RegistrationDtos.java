@@ -203,8 +203,8 @@ public final class RegistrationDtos {
     public record FinalEvaluationRequest(@NotNull List<Integer> answers) {
     }
 
-    /** Envoi du corrigé (PDF généré côté front, encodé en base64) à l'apprenant. */
-    public record SendCorrectionRequest(@NotBlank String pdfBase64) {
+    /** Envoi d'un document PDF (généré côté front, encodé en base64) par email. */
+    public record SendPdfRequest(@NotBlank String pdfBase64) {
     }
 
     public record FinalEvaluationView(

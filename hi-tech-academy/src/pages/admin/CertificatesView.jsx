@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Award, Download, Eye, RefreshCw, X } from 'lucide-react';
-import { adminIssueCertificate, adminListCertificates, adminListRegistrations } from '@/api/backend';
-import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
+import { Award, CheckCircle2, Download, Eye, RefreshCw, Send, X } from 'lucide-react';
+import {
+  adminIssueCertificate, adminListCertificates, adminListRegistrations, adminSendCertificate,
+} from '@/api/backend';
+import { certificatePdfBase64, certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
 import PdfViewer from './PdfViewer';
 import {
   APPLICANT_LABELS, Badge, Card, EmptyState, ViewHeader,
@@ -174,6 +176,22 @@ export default function CertificatesView({ auth }) {
   const [issueFor, setIssueFor] = useState(null);
   const [viewerCert, setViewerCert] = useState(null); // certificat affiché dans la visionneuse
   const [reloadKey, setReloadKey] = useState(0);
+  const [sendingCertId, setSendingCertId] = useState(null); // envoi email en cours
+  const [sentCertIds, setSentCertIds] = useState(() => new Set()); // envoyés avec succès
+
+  // Envoi du certificat (PDF généré ici) à l'apprenant par email
+  const sendCert = async (c) => {
+    setSendingCertId(c.id);
+    setError(null);
+    try {
+      await adminSendCertificate(auth, c.id, certificatePdfBase64(c));
+      setSentCertIds((prev) => new Set(prev).add(c.id));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSendingCertId(null);
+    }
+  };
 
   const load = useCallback(() => {
     setError(null);
@@ -328,6 +346,24 @@ export default function CertificatesView({ auth }) {
                         <Download className="w-4 h-4" />
                         Télécharger
                       </button>
+                      {sentCertIds.has(c.id) ? (
+                        <span
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                          style={{ color: '#116632', ...headingFont }}>
+                          <CheckCircle2 className="w-4 h-4" />
+                          Envoyé
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={sendingCertId === c.id}
+                          onClick={() => sendCert(c)}
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold disabled:opacity-50"
+                          style={{ color: '#005064', ...headingFont }}>
+                          <Send className="w-4 h-4" />
+                          {sendingCertId === c.id ? 'Envoi…' : "Envoyer à l'apprenant"}
+                        </button>
+                      )}
                     </span>
                   </td>
                 </tr>

@@ -176,6 +176,32 @@ public class MailService {
                 pdf, filename);
     }
 
+    /**
+     * Envoie à l'apprenant son certificat de réalisation en pièce jointe PDF.
+     * Déclenché en un clic depuis l'espace admin, une fois le certificat émis.
+     */
+    @Async
+    public void sendCertificate(String to, String firstName, String lastName,
+                                String formationTitle, byte[] pdf, String filename) {
+        String body = """
+                Bonjour %s %s,
+
+                Vous trouverez en pièce jointe votre certificat de réalisation de la
+                formation « %s » (attestation d'assiduité et de présence).
+
+                Ce document est à conserver ; il peut être demandé par votre employeur
+                ou votre financeur. Pour toute question :
+                contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Nous vous remercions de votre confiance,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        sendWithAttachment(to,
+                "Votre certificat de réalisation — " + formationTitle,
+                body.formatted(firstName, lastName, formationTitle),
+                pdf, filename);
+    }
+
     /** Nouvelle réclamation déposée sur le site : notifie l'organisme. */
     @Async
     public void notifyAdminNewComplaint(String formationTitle, String complainant, String email, String message) {

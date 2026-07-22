@@ -5,7 +5,7 @@ import fr.hitechacademy.registration.RegistrationDtos.AdminDetail;
 import fr.hitechacademy.registration.RegistrationDtos.AdminListItem;
 import fr.hitechacademy.registration.RegistrationDtos.CertificateView;
 import fr.hitechacademy.registration.RegistrationDtos.IssueCertificateRequest;
-import fr.hitechacademy.registration.RegistrationDtos.SendCorrectionRequest;
+import fr.hitechacademy.registration.RegistrationDtos.SendPdfRequest;
 import fr.hitechacademy.registration.RegistrationDtos.StatusUpdateRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -152,7 +152,7 @@ public class RegistrationAdminController {
     @PostMapping("/registrations/{id}/final-evaluation/send-correction")
     @Transactional(readOnly = true)
     public void sendFinalEvaluationCorrection(@PathVariable UUID id,
-                                              @Valid @RequestBody SendCorrectionRequest body) {
+                                              @Valid @RequestBody SendPdfRequest body) {
         RegistrationRequest r = find(id);
         requireSubmitted(r.getFinalEvaluation());
         mailService.sendFinalEvaluationCorrection(
@@ -163,7 +163,7 @@ public class RegistrationAdminController {
     @PostMapping("/registrations/{id}/trainees/{traineeId}/final-evaluation/send-correction")
     @Transactional(readOnly = true)
     public void sendTraineeFinalEvaluationCorrection(@PathVariable UUID id, @PathVariable UUID traineeId,
-                                                     @Valid @RequestBody SendCorrectionRequest body) {
+                                                     @Valid @RequestBody SendPdfRequest body) {
         RegistrationRequest r = find(id);
         Trainee t = r.getTrainees().stream()
                 .filter(x -> x.getId().equals(traineeId))
@@ -258,6 +258,18 @@ public class RegistrationAdminController {
         r.setCertificate(c);
         repository.save(r);
         return CertificateView.from(r.getCertificate());
+    }
+
+    // Envoi du certificat (PDF généré côté front) à l'apprenant par email
+    @PostMapping("/certificates/{certificateId}/send")
+    @Transactional(readOnly = true)
+    public void sendCertificate(@PathVariable UUID certificateId, @Valid @RequestBody SendPdfRequest body) {
+        Certificate c = certificateRepository.findById(certificateId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificat introuvable"));
+        RegistrationRequest r = c.getRegistration();
+        mailService.sendCertificate(
+                r.getEmail(), r.getFirstName(), r.getLastName(), r.getFormationTitle(),
+                decodePdf(body.pdfBase64()), "Certificat_de_realisation.pdf");
     }
 
     private RegistrationRequest find(UUID id) {

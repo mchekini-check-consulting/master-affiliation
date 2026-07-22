@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, CheckCircle2, Copy, Download, Eye, RefreshCw, Send, XCircle } from 'lucide-react';
 import {
-  adminGetRegistration, adminListRegistrations, adminSendFinalEvaluation,
-  adminSendFinalEvaluationCorrection, adminSendTraineeFinalEvaluation,
-  adminSendTraineeFinalEvaluationCorrection, adminUpdateStatus,
+  adminGetRegistration, adminListRegistrations, adminSendCertificate,
+  adminSendFinalEvaluation, adminSendFinalEvaluationCorrection,
+  adminSendTraineeFinalEvaluation, adminSendTraineeFinalEvaluationCorrection,
+  adminUpdateStatus,
 } from '@/api/backend';
-import { certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
+import { certificatePdfBase64, certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
 import {
   buildFinalEvaluationCorrectionPdf, exportFinalEvaluationPdf, exportNeedsAnalysisPdf,
   exportPositioningTestPdf, exportSponsorSurveyPdf,
@@ -197,6 +198,8 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
   const [sendingCorrection, setSendingCorrection] = useState(null); // 'self' | traineeId | null
   const [correctionSentFor, setCorrectionSentFor] = useState(null); // clé envoyée avec succès
   const [certViewerOpen, setCertViewerOpen] = useState(false);
+  const [sendingCert, setSendingCert] = useState(false);
+  const [certSent, setCertSent] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
   // Envoi (ou renvoi) du QCM d'évaluation finale par email
@@ -212,6 +215,20 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
       setError(e.message);
     } finally {
       setSendingEval(null);
+    }
+  };
+
+  // Envoi en un clic du certificat de réalisation (PDF généré ici) à l'apprenant
+  const sendCertificate = async (certificate) => {
+    setSendingCert(true);
+    setError(null);
+    try {
+      await adminSendCertificate(auth, certificate.id, certificatePdfBase64(certificate));
+      setCertSent(true);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSendingCert(false);
     }
   };
 
@@ -639,6 +656,24 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
                   <Download className="w-4 h-4" />
                   Télécharger le PDF
                 </button>
+                {certSent ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 text-sm font-bold"
+                    style={{ color: '#116632', ...headingFont }}>
+                    <CheckCircle2 className="w-4 h-4" />
+                    Envoyé à l'apprenant
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={sendingCert}
+                    onClick={() => sendCertificate(certificate)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-50"
+                    style={{ background: '#f0f3fa', color: '#005064', border: '1.5px solid #005064', ...headingFont }}>
+                    <Send className="w-4 h-4" />
+                    {sendingCert ? 'Envoi…' : "Envoyer à l'apprenant"}
+                  </button>
+                )}
               </div>
             </div>
           ) : (
