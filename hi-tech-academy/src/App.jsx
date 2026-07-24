@@ -19,7 +19,6 @@ import ApprenantQuestionnaire from './pages/ApprenantQuestionnaire';
 import TestPositionnement from './pages/TestPositionnement';
 import EvaluationFinale from './pages/EvaluationFinale';
 import Admin from './pages/Admin';
-import AuditQualiopi from './pages/AuditQualiopi';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -58,7 +57,6 @@ const AuthenticatedApp = () => {
       <Route path="/inscription/demande/:requestId/test-positionnement" element={<TestPositionnement />} />
       <Route path="/inscription/demande/:requestId/evaluation-finale" element={<EvaluationFinale />} />
       <Route path="/admin" element={<Admin />} />
-      <Route path="/audit-qualiopi" element={<AuditQualiopi />} />
       <Route path="/mentions-legales" element={<LegalNotices />} />
       <Route path="/politique-confidentialite" element={<PrivacyPolicy />} />
       <Route path="/conditions-vente" element={<TermsAndConditions />} />

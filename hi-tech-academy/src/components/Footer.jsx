@@ -20,7 +20,6 @@ const liens = [
   { label: 'Mentions légales', href: '/mentions-legales' },
   { label: 'Politique de confidentialité', href: '/politique-confidentialite' },
   { label: 'Conditions générales de vente', href: '/conditions-vente' },
-  { label: 'Audit Qualiopi', href: '/audit-qualiopi' },
 ];
 
 // Documents Qualiopi publics (PDF servis depuis public/documents/qualiopi/)

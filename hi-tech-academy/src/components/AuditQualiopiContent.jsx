@@ -10,7 +10,7 @@ const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 // Contenu du dossier d'audit Qualiopi (critères → indicateurs → preuves),
-// partagé entre la page publique /audit-qualiopi et l'onglet admin.
+// affiché dans l'onglet « Audit Qualiopi » de l'espace admin.
 
 // Pastille document : PDF → visionneuse intégrée ; xlsx → téléchargement ;
 // lien site → nouvel onglet ; preuve interface admin → pastille informative.
