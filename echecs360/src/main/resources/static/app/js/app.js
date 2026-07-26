@@ -334,6 +334,11 @@
   // ---------------------------------------------------------------- statut --
 
   function renderStatus() {
+    if (mode === 'config') {
+      statusMain.textContent = 'Configuration';
+      statusSub.textContent = 'Pseudo chess.com et chargement des parties.';
+      return;
+    }
     if (mode === 'trainer') {
       statusMain.textContent = 'Blunder Trainer';
       if (trainer && (trainer.state === 'guess' || trainer.state === 'feedback')) {
@@ -921,6 +926,9 @@
     renderMoves(replay.sans, replayPly, replay.cls);
     renderStatus();
     drawEvalGraph();
+    updateMoveExplain();
+    hideSignalsPanel();
+    updateSignalsButton();
   }
 
   document.getElementById('nav-first').addEventListener('click', () => gotoPly(0));
@@ -1030,6 +1038,169 @@
     const rect = graphCanvas.getBoundingClientRect();
     const ratio = (event.clientX - rect.left) / rect.width;
     gotoPly(Math.round(ratio * (replay.evals.length - 1)));
+  });
+
+  // --------------------------------------------------------- configuration --
+  // Pseudo chess.com + chargement des parties une seule fois pour la session :
+  // « Mes parties », l'analyse et le Blunder Trainer réutilisent gamesList.
+
+  const configPanel = document.getElementById('config-panel');
+  let configBusy = false;
+
+  function renderConfigPanel(status, kind) {
+    const loaded = gamesList.length > 0;
+    configPanel.innerHTML =
+      '<div class="tr-card"><h3>⚙️ Configuration</h3>'
+      + '<p>Indiquez votre pseudo chess.com puis chargez vos 100 dernières parties. '
+      + 'Elles restent en mémoire : « Mes parties » et le Blunder Trainer les réutilisent sans recharger.</p>'
+      + '<label style="font-size:12px;font-weight:700">Pseudo chess.com</label>'
+      + '<input type="text" id="cfg-user" value="' + escapeHtml(chesscomUsername) + '" placeholder="ex. hikaru" autocomplete="off">'
+      + '<button type="button" class="btn btn-primary" id="cfg-load"' + (configBusy ? ' disabled' : '') + '>'
+      + (configBusy ? 'Chargement en cours…' : (loaded ? 'Recharger les parties' : 'Charger mes parties')) + '</button>'
+      + (status ? '<p class="cfg-status ' + kind + '">' + status + '</p>'
+          : (loaded ? '<p class="cfg-status ok">✓ ' + gamesList.length + ' parties chargées pour « '
+             + escapeHtml(chesscomUsername) + ' ».</p>'
+             : '<p class="cfg-status busy">Aucune partie chargée pour l\'instant.</p>'))
+      + '</div>';
+    const input = configPanel.querySelector('#cfg-user');
+    configPanel.querySelector('#cfg-load').addEventListener('click', () => loadGamesFromConfig(input.value.trim()));
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadGamesFromConfig(input.value.trim()); });
+  }
+
+  async function loadGamesFromConfig(username) {
+    if (configBusy) return;
+    if (!username) {
+      renderConfigPanel('Saisissez votre pseudo chess.com.', 'err');
+      return;
+    }
+    configBusy = true;
+    renderConfigPanel('Récupération des parties de « ' + escapeHtml(username) + ' »…', 'busy');
+    try {
+      const games = await fetchChesscomGames(username);
+      gamesList = games;
+      chesscomUsername = username;
+      saveChesscomUsername(username);
+      replay = null; // les parties affichées ne correspondent plus à l'ancien pseudo
+      configBusy = false;
+      renderConfigPanel(null, null);
+    } catch (err) {
+      configBusy = false;
+      renderConfigPanel(escapeHtml(err.message), 'err');
+    }
+  }
+
+  // ------------------------------------- explications et signaux faibles --
+
+  const moveExplainEl = document.getElementById('move-explain');
+  const btnSignals = document.getElementById('btn-signals');
+  const signalsPanel = document.getElementById('signals-panel');
+  let signalsActive = null; // index du signal surligné
+
+  /** État moteur complet de la position affichée (relecture ou trainer). */
+  function currentDisplayedState() {
+    if (mode === 'games' && replay) {
+      const s = Chess.newGame();
+      for (let i = 0; i < replayPly; i++) {
+        const move = Pgn.sanToMove(Chess, s, replay.sans[i]);
+        if (!move) break;
+        Chess.play(s, move);
+      }
+      return s;
+    }
+    if (mode === 'trainer' && trainer && (trainer.state === 'guess' || trainer.state === 'feedback')) {
+      return game;
+    }
+    return null;
+  }
+
+  /** Explication du coup courant pendant la relecture d'une partie. */
+  function updateMoveExplain() {
+    if (mode !== 'games' || !replay || replayPly === 0) {
+      moveExplainEl.style.display = 'none';
+      return;
+    }
+    const s = Chess.newGame();
+    for (let i = 0; i < replayPly - 1; i++) {
+      const move = Pgn.sanToMove(Chess, s, replay.sans[i]);
+      if (!move) { moveExplainEl.style.display = 'none'; return; }
+      Chess.play(s, move);
+    }
+    const san = replay.sans[replayPly - 1];
+    const move = Pgn.sanToMove(Chess, s, san);
+    if (!move) { moveExplainEl.style.display = 'none'; return; }
+    const reasons = Signals.explainMove(Chess, s, move);
+    if (reasons.length === 0) {
+      moveExplainEl.style.display = 'none';
+      return;
+    }
+    moveExplainEl.innerHTML = '<b>' + escapeHtml(san) + '</b> — ' + reasons.join(' · ') + '.';
+    moveExplainEl.style.display = 'block';
+  }
+
+  function clearSignalOverlays() {
+    for (const el of squares) el.querySelectorAll('.ov-signal').forEach(n => n.remove());
+    signalsActive = null;
+  }
+
+  function hideSignalsPanel() {
+    signalsPanel.style.display = 'none';
+    clearSignalOverlays();
+  }
+
+  function updateSignalsButton() {
+    const available = (mode === 'games' && replay)
+        || (mode === 'trainer' && trainer && (trainer.state === 'guess' || trainer.state === 'feedback'));
+    btnSignals.style.display = available ? '' : 'none';
+    if (!available) hideSignalsPanel();
+  }
+
+  function showSignalsPanel() {
+    const state = currentDisplayedState();
+    if (!state) return;
+    const result = Signals.detectSignals(Chess, state);
+    let html = '<div class="sig-head"><span>🔍 Signaux de la position</span>'
+      + '<button type="button" class="sig-close" id="sig-close">✕ fermer</button></div>';
+    const section = (titre, items) => {
+      let out = '<h4>' + titre + '</h4>';
+      if (items.length === 0) return out + '<p class="sig-empty">Rien de notable.</p>';
+      items.forEach((item) => {
+        const campLabel = item.camp ? '<span class="sig-camp ' + item.camp + '">'
+          + (item.camp === 'w' ? 'Blancs' : 'Noirs') + '</span> · ' : '';
+        out += '<button type="button" class="sig-item" data-sig="' + signalsFlat.length + '">'
+          + campLabel + escapeHtml(item.titre)
+          + '<span class="sig-detail">' + escapeHtml(item.detail) + '</span></button>';
+        signalsFlat.push(item);
+      });
+      return out;
+    };
+    const signalsFlat = [];
+    html += section('Signaux tactiques', result.tactiques);
+    html += section('Signaux positionnels', result.positionnels);
+    signalsPanel.innerHTML = html;
+    signalsPanel.style.display = 'flex';
+    clearSignalOverlays();
+    signalsPanel.querySelector('#sig-close').addEventListener('click', hideSignalsPanel);
+    for (const btn of signalsPanel.querySelectorAll('.sig-item')) {
+      btn.addEventListener('click', () => {
+        const index = +btn.dataset.sig;
+        const wasActive = signalsActive === index;
+        clearSignalOverlays();
+        for (const el of signalsPanel.querySelectorAll('.sig-item')) el.classList.remove('active');
+        if (wasActive) return;
+        signalsActive = index;
+        btn.classList.add('active');
+        for (const sq of signalsFlat[index].cases) {
+          const ov = document.createElement('div');
+          ov.className = 'ov ov-signal';
+          squares[sq].appendChild(ov);
+        }
+      });
+    }
+  }
+
+  btnSignals.addEventListener('click', () => {
+    if (signalsPanel.style.display === 'flex') hideSignalsPanel();
+    else showSignalsPanel();
   });
 
   // ------------------------------------------------------- blunder trainer --
@@ -1153,17 +1324,7 @@
   /** Affiche la position du puzzle courant (juste avant la gaffe). */
   function trainerShowPuzzle() {
     const p = trainer.puzzles[trainer.index];
-    game = Chess.newGame();
-    sanHistory = [];
-    lastMove = null;
-    let prev = null;
-    for (let i = 0; i < p.ply; i++) {
-      const move = Pgn.sanToMove(Chess, game, p.sans[i]);
-      Chess.play(game, move);
-      sanHistory.push(p.sans[i]);
-      prev = move;
-    }
-    if (prev) lastMove = { from: prev.from, to: prev.to };
+    trainerReplayPrefix(p);
     selected = -1;
     legalTargets = [];
     gameOver = false;
@@ -1172,10 +1333,26 @@
     for (const el of pieceEls.values()) el.remove();
     pieceEls.clear();
     for (const el of squares) el.classList.remove('hint-move');
+    const arrow = document.getElementById('trainer-arrow');
+    if (arrow) arrow.remove();
     trainer.state = 'guess';
     trainer.lastResult = null;
     renderGame({});
     renderTrainerPanel();
+    updateSignalsButton();
+  }
+
+  /** Position du puzzle rejouée dans `game` (préfixe de la partie). */
+  function trainerReplayPrefix(p) {
+    game = Chess.newGame();
+    sanHistory = [];
+    lastMove = null;
+    for (let i = 0; i < p.ply; i++) {
+      const move = Pgn.sanToMove(Chess, game, p.sans[i]);
+      Chess.play(game, move);
+      sanHistory.push(p.sans[i]);
+      lastMove = { from: move.from, to: move.to };
+    }
   }
 
   /** Réponse du joueur : point si le coup est (quasi) le meilleur. */
@@ -1186,6 +1363,11 @@
     const ok = p.acceptable.some(a =>
         a.from === move.from && a.to === move.to && (a.promo || null) === (move.promo || null));
     const userSan = Chess.sanOf(game, move);
+    // Explication « humaine » du meilleur coup, calculée sur la position du puzzle
+    const best = p.acceptable[0];
+    const bestMove = Chess.legalMoves(game).find(m =>
+        m.from === best.from && m.to === best.to && (m.promo || null) === (best.promo || null));
+    const why = bestMove ? Signals.explainMove(Chess, game, bestMove) : [];
     Chess.play(game, move);
     sanHistory.push(userSan);
     lastMove = { from: move.from, to: move.to };
@@ -1193,16 +1375,44 @@
     legalTargets = [];
     if (ok) trainer.score++;
     trainer.state = 'feedback';
-    trainer.lastResult = { ok, userSan };
+    trainer.lastResult = { ok, userSan, why };
     trainerSaveAttempt(ok);
     if (move.capture) soundCapture(); else soundMove();
     renderGame({ animate: true });
-    // Surligne le meilleur coup sur l'échiquier
-    const best = p.acceptable[0];
     squares[best.from].classList.add('hint-move');
     squares[best.to].classList.add('hint-move');
+    if (!ok) {
+      // Réponse visuelle : on revient à la position et on JOUE le meilleur coup
+      setTimeout(() => {
+        if (!trainer || trainer.state !== 'feedback' || mode !== 'trainer') return;
+        trainerReplayPrefix(p);
+        for (const el of pieceEls.values()) el.remove();
+        pieceEls.clear();
+        syncPieces(game.board);
+        const replayBest = Chess.legalMoves(game).find(m =>
+            m.from === best.from && m.to === best.to && (m.promo || null) === (best.promo || null));
+        if (!replayBest) return;
+        Chess.play(game, replayBest);
+        sanHistory.push(best.san);
+        lastMove = { from: best.from, to: best.to };
+        soundMove();
+        renderGame({ animate: true });
+        squares[best.from].classList.add('hint-move');
+        squares[best.to].classList.add('hint-move');
+        drawArrow(best.from, best.to, 'rgba(46, 125, 91, .85)', 'trainer-arrow');
+      }, 1100);
+    }
     renderTrainerPanel();
+    updateSignalsButton();
     return true;
+  }
+
+  /** Suggestion : surligne la pièce à jouer (sans révéler la case d'arrivée). */
+  function trainerHint() {
+    if (!trainer || trainer.state !== 'guess') return;
+    const best = trainer.puzzles[trainer.index].acceptable[0];
+    squares[best.from].classList.add('hint-move');
+    setTimeout(() => squares[best.from].classList.remove('hint-move'), 2200);
   }
 
   function trainerNext() {
@@ -1212,6 +1422,7 @@
       trainer.state = 'done';
       renderTrainerPanel();
       renderStatus();
+      updateSignalsButton();
     } else {
       trainerShowPuzzle();
     }
@@ -1268,12 +1479,15 @@
       let feedback = '';
       if (trainer.state === 'feedback') {
         const r = trainer.lastResult;
+        const why = r.why && r.why.length > 0
+          ? '<small>Pourquoi ' + escapeHtml(p.bestSan) + ' ? Ce coup ' + r.why.join(', ') + '.</small>'
+          : '';
         feedback = r.ok
           ? '<div class="tr-feedback ok">✓ Exact ! ' + escapeHtml(r.userSan) + ' était le meilleur coup ('
-            + trainerEvalLabel(p.evalBest) + ').'
+            + trainerEvalLabel(p.evalBest) + ').' + why
             + '<small>En partie, vous aviez joué ' + escapeHtml(p.played) + ' — ' + kind + '.</small></div>'
-          : '<div class="tr-feedback ko">✗ ' + escapeHtml(r.userSan) + '… Le meilleur coup était '
-            + escapeHtml(p.bestSan) + ' (' + trainerEvalLabel(p.evalBest) + '), surligné en vert.'
+          : '<div class="tr-feedback ko">✗ ' + escapeHtml(r.userSan) + '… Regardez : le meilleur coup ('
+            + escapeHtml(p.bestSan) + ', ' + trainerEvalLabel(p.evalBest) + ') est joué en vert sur l\'échiquier.' + why
             + '<small>En partie, vous aviez joué ' + escapeHtml(p.played) + ' — ' + kind + '.</small></div>';
         feedback += '<button type="button" class="btn btn-primary" data-tr="next">'
           + (trainer.index + 1 >= trainer.puzzles.length ? 'Voir le résultat' : 'Position suivante') + '</button>';
@@ -1287,7 +1501,9 @@
         + '<p class="tr-meta">Contre ' + escapeHtml(p.opponent) + ' · coup n°' + moveNumber
         + ' · trait aux ' + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.</p>'
         + (trainer.state === 'guess'
-            ? '<p>Vous avez commis ' + kind + ' ici. Trouvez le meilleur coup !</p>' : '')
+            ? '<p>Vous avez commis ' + kind + ' ici. Trouvez le meilleur coup !</p>'
+              + '<button type="button" class="btn btn-secondary" data-tr="hint">💡 Suggestion : quelle pièce jouer ?</button>'
+            : '')
         + feedback
         + '</div>';
     } else if (trainer.state === 'done') {
@@ -1323,6 +1539,7 @@
     const action = btn.dataset.tr;
     if (action === 'start') trainerStart();
     else if (action === 'next') trainerNext();
+    else if (action === 'hint') trainerHint();
     else if (action === 'setuser') {
       const input = trainerPanel.querySelector('#tr-user');
       const value = (input && input.value.trim()) || '';
@@ -1740,10 +1957,13 @@
     }
   }
 
-  function drawStepsArrow(from, to) {
+  /** Flèche superposée à l'échiquier (étapes : orange, meilleur coup : vert). */
+  function drawArrow(from, to, color, id) {
+    const existing = document.getElementById(id);
+    if (existing) existing.remove();
     const NS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(NS, 'svg');
-    svg.id = 'steps-arrow';
+    svg.id = id;
     svg.setAttribute('class', 'steps-arrow');
     svg.setAttribute('viewBox', '0 0 8 8');
     const x1 = viewCol(from) + 0.5, y1 = viewRow(from) + 0.5;
@@ -1757,7 +1977,7 @@
     line.setAttribute('y1', y1 + uy * 0.28);
     line.setAttribute('x2', hx);
     line.setAttribute('y2', hy);
-    line.setAttribute('stroke', 'rgba(240, 154, 32, .9)');
+    line.setAttribute('stroke', color);
     line.setAttribute('stroke-width', '0.2');
     line.setAttribute('stroke-linecap', 'round');
     svg.appendChild(line);
@@ -1767,9 +1987,13 @@
       (x2 - ux * 0.06) + ',' + (y2 - uy * 0.06) + ' '
       + (hx + px * 0.2) + ',' + (hy + py * 0.2) + ' '
       + (hx - px * 0.2) + ',' + (hy - py * 0.2));
-    head.setAttribute('fill', 'rgba(240, 154, 32, .9)');
+    head.setAttribute('fill', color);
     svg.appendChild(head);
     boardEl.appendChild(svg);
+  }
+
+  function drawStepsArrow(from, to) {
+    drawArrow(from, to, 'rgba(240, 154, 32, .9)', 'steps-arrow');
   }
 
   function renderStepsPanel() {
@@ -1889,6 +2113,7 @@
     const inGames = next === 'games';
     const inExercises = next === 'exercises';
     const inTrainer = next === 'trainer';
+    const inConfig = next === 'config';
     // Quitter le trainer pendant la préparation annule la recherche en cours
     if (!inTrainer && trainer && trainer.state === 'prep') {
       trainer = null;
@@ -1896,24 +2121,31 @@
       renderTrainerPanel();
     }
     gamesPanel.style.display = inGames && !replay ? 'block' : 'none';
-    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer ? 'none' : '';
+    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inConfig ? 'none' : '';
     replayNav.style.display = inGames && replay ? 'flex' : 'none';
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
     graphWrap.style.display = inGames && replay && replay.evals ? 'block' : 'none';
     analysisSummary.textContent = inGames && replay && replay.evals ? analysisSummary.textContent : '';
     btnNew.textContent = inGames ? 'Importer' : 'Nouvelle partie';
-    // Panneaux des exercices et du trainer
+    // Panneaux des exercices, du trainer et de la configuration
     document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
     document.getElementById('ex-toolbar').style.display = inExercises && exCurrent ? 'flex' : 'none';
     document.getElementById('ex-explanation').style.display = 'none';
-    document.getElementById('controls').style.display = inExercises || inTrainer ? 'none' : 'flex';
+    document.getElementById('controls').style.display = inExercises || inTrainer || inConfig ? 'none' : 'flex';
     trainerPanel.style.display = inTrainer ? 'flex' : 'none';
+    configPanel.style.display = inConfig ? 'flex' : 'none';
+    moveExplainEl.style.display = 'none';
+    hideSignalsPanel();
 
     if (next === 'two') {
       startGame('w');
     } else if (next === 'bot') {
       showBotConfigModal();
+    } else if (next === 'config') {
+      startGame('w');
+      renderConfigPanel(null, null);
+      renderStatus();
     } else if (next === 'trainer') {
       if (trainer && trainer.state === 'guess') {
         trainerShowPuzzle();
@@ -1944,6 +2176,7 @@
         else showImportModal();
       }
     }
+    updateSignalsButton();
   }
 
   for (const btn of document.querySelectorAll('.rail-item')) {

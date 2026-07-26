@@ -37,6 +37,10 @@
     <button type="button" class="rail-item" id="nav-trainer" data-mode="trainer">
       <span class="rail-ico">🧩</span><span class="rail-label">Blunder Trainer</span>
     </button>
+    <div class="rail-group">Compte</div>
+    <button type="button" class="rail-item" id="nav-config" data-mode="config">
+      <span class="rail-ico">⚙️</span><span class="rail-label">Configuration</span>
+    </button>
     <div class="spacer"></div>
     <div class="progress-card">
       <div class="progress-head"><span>Progression exercices</span><span id="progress-count">0/0</span></div>
@@ -94,6 +98,13 @@
     <div class="analysis-progress" id="analysis-progress" style="display:none"></div>
     <div class="analysis-summary" id="analysis-summary"></div>
 
+    <!-- Explication « humaine » du coup courant (relecture de partie) -->
+    <div class="move-explain" id="move-explain" style="display:none"></div>
+
+    <!-- Signaux faibles de la position (relecture + Blunder Trainer) -->
+    <button type="button" class="btn btn-secondary btn-signals" id="btn-signals" style="display:none">🔍 Signaux de la position</button>
+    <div class="signals-panel" id="signals-panel" style="display:none"></div>
+
     <div class="ex-toolbar" id="ex-toolbar" style="display:none">
       <button type="button" class="btn btn-secondary" id="ex-back" title="Retour à la liste">⬅ Liste</button>
       <button type="button" class="btn btn-secondary" id="ex-prev" title="Exercice précédent">◀</button>
@@ -142,6 +153,9 @@
     <!-- Blunder Trainer : quiz sur les gaffes de vos parties chess.com -->
     <div class="trainer-panel" id="trainer-panel" style="display:none"></div>
 
+    <!-- Configuration : pseudo chess.com et chargement des parties -->
+    <div class="config-panel" id="config-panel" style="display:none"></div>
+
     <div class="controls" id="controls">
       <button type="button" class="btn btn-primary" id="btn-new">Nouvelle partie</button>
       <button type="button" class="btn btn-secondary" id="btn-undo">Annuler</button>
@@ -155,6 +169,7 @@
 <script src="/app/js/pieces.js"></script>
 <script src="/app/js/engine.js"></script>
 <script src="/app/js/pgn.js"></script>
+<script src="/app/js/signals.js"></script>
 <script src="/app/js/exercises-data.js"></script>
 <script src="/app/js/app.js"></script>
 </body>
