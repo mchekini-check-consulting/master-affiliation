@@ -9,6 +9,7 @@ data/
 *.iml
 .DS_Store
 
-# Maquette source de la landing (intégrée dans templates/index.html)
+# Maquettes sources (intégrées dans les templates)
 /Echecs360 Landing (standalone).html
+/Echecs360 App (standalone).html
 /echecs360-hero.mp4

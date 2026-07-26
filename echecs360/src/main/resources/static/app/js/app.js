@@ -954,18 +954,18 @@
     const y = (cp) => H / 2 - (Math.max(-BOUND, Math.min(BOUND, cp)) / BOUND) * (H / 2 - 4);
 
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#3d3a36';
+    ctx.fillStyle = '#22302a';
     ctx.fillRect(0, 0, W, H);
-    // Aire blanche (au-dessus de la courbe = avantage Blancs)
+    // Aire claire (au-dessus de la courbe = avantage Blancs)
     ctx.beginPath();
     ctx.moveTo(0, H);
     for (let i = 0; i < evals.length; i++) ctx.lineTo(x(i), y(evals[i]));
     ctx.lineTo(W, H);
     ctx.closePath();
-    ctx.fillStyle = '#e8e6e3';
+    ctx.fillStyle = '#f0e9d8';
     ctx.fill();
     // Ligne médiane (égalité)
-    ctx.strokeStyle = 'rgba(129,182,76,.6)';
+    ctx.strokeStyle = 'rgba(143,208,174,.6)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(0, H / 2);
@@ -983,7 +983,7 @@
       }
     }
     // Curseur du coup courant
-    ctx.strokeStyle = '#81b64c';
+    ctx.strokeStyle = '#8fd0ae';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(x(replayPly), 0);
@@ -1011,6 +1011,20 @@
 
   function exSaveDone() {
     localStorage.setItem(EX_STORAGE_KEY, JSON.stringify([...exDone]));
+    updateExProgress();
+  }
+
+  /** Progression globale des exercices : badge du rail + carte « Progression ». */
+  function updateExProgress() {
+    const total = EXERCISES.MATS.length + EXERCISES.FINALES.length;
+    const done = exDone.size;
+    const label = done + '/' + total;
+    document.getElementById('ex-progress-badge').textContent = label;
+    document.getElementById('progress-count').textContent = label;
+    document.getElementById('progress-fill').style.width = Math.round((done / total) * 100) + '%';
+    document.getElementById('progress-caption').textContent = done >= total
+      ? 'Tous les exercices sont validés, bravo !'
+      : 'Encore ' + (total - done) + ' exercice' + (total - done > 1 ? 's' : '') + ' à valider.';
   }
 
   /** Grille des exercices : titre, difficulté, progression (fait / non fait). */
@@ -1393,6 +1407,8 @@
 
   // ---------------------------------------------------------------- départ --
 
+  document.getElementById('user-avatar').textContent = (PSEUDO[0] || '?');
+  updateExProgress();
   buildBoard();
   fitBoard();
   startGame('w');

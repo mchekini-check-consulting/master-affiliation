@@ -18,28 +18,35 @@
 
   <!-- Rail de navigation (3 modes) -->
   <nav class="rail" aria-label="Modes de jeu">
-    <a class="brand" href="/"><span class="logo"></span>Échecs<em>360</em></a>
+    <a class="brand" href="/"><span class="logo">♞</span><span class="brand-name">echecs<em>360</em></span></a>
+    <div class="rail-group">Jouer</div>
     <button type="button" class="rail-item active" id="nav-two" data-mode="two">
-      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      Deux joueurs
+      <span class="rail-ico">♟</span><span class="rail-label">Deux joueurs</span>
     </button>
     <button type="button" class="rail-item" id="nav-bot" data-mode="bot">
-      <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2zM7.5 13a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm9 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
-      Contre le bot
+      <span class="rail-ico">🤖</span><span class="rail-label">Contre le bot</span>
     </button>
+    <div class="rail-group">Progresser</div>
     <button type="button" class="rail-item" id="nav-games" data-mode="games">
-      <svg viewBox="0 0 24 24"><path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5l-7.09 8.09-4-4L2 17l1.5 1.5z"/></svg>
-      Mes parties
+      <span class="rail-ico">📈</span><span class="rail-label">Mes parties</span>
     </button>
     <button type="button" class="rail-item" id="nav-exercises" data-mode="exercises">
-      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 2.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/></svg>
-      Exercices intensifs
+      <span class="rail-ico">🎯</span><span class="rail-label">Exercices intensifs</span>
+      <span class="rail-badge" id="ex-progress-badge">0/0</span>
     </button>
     <div class="spacer"></div>
-    <div class="user" th:text="${pseudo}">pseudo</div>
-    <form th:action="@{/logout}" method="post">
-      <button type="submit" class="logout">Se déconnecter</button>
-    </form>
+    <div class="progress-card">
+      <div class="progress-head"><span>Progression exercices</span><span id="progress-count">0/0</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <span class="progress-caption" id="progress-caption"></span>
+    </div>
+    <div class="user-card">
+      <span class="user-avatar" id="user-avatar">?</span>
+      <span class="user-infos"><span class="user-name" th:text="${pseudo}">pseudo</span><span class="user-sub">Membre</span></span>
+      <form th:action="@{/logout}" method="post">
+        <button type="submit" class="logout" title="Se déconnecter">⏻</button>
+      </form>
+    </div>
   </nav>
 
   <!-- Zone centrale : barres joueurs + échiquier -->
