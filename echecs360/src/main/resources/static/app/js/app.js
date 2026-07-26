@@ -334,6 +334,16 @@
   // ---------------------------------------------------------------- statut --
 
   function renderStatus() {
+    if (mode === 'openings') {
+      if (opState.ligne) {
+        statusMain.textContent = opState.opening.nom;
+        statusSub.textContent = opState.ligne.titre + ' — suivez la flèche, coup par coup.';
+      } else {
+        statusMain.textContent = 'Ouvertures';
+        statusSub.textContent = 'Choisissez votre camp puis une ouverture à étudier.';
+      }
+      return;
+    }
     if (mode === 'config') {
       statusMain.textContent = 'Configuration';
       statusSub.textContent = 'Pseudo chess.com et chargement des parties.';
@@ -515,6 +525,7 @@
       return exCurrent !== null && !exBusy && !botThinking && game.turn === exPlayerColor;
     }
     if (mode === 'trainer') return trainer !== null && trainer.state === 'guess';
+    if (mode === 'openings') return false;
     return true;
   }
 
@@ -1038,6 +1049,154 @@
     const rect = graphCanvas.getBoundingClientRect();
     const ratio = (event.clientX - rect.left) / rect.width;
     gotoPly(Math.round(ratio * (replay.evals.length - 1)));
+  });
+
+  // ------------------------------------------------------------ ouvertures --
+  // Répertoire d'ouvertures Blancs / Noirs : chaque ligne se rejoue coup par
+  // coup sur l'échiquier avec un commentaire pédagogique et la flèche du
+  // prochain coup (données : openings-data.js).
+
+  const openingsPanel = document.getElementById('openings-panel');
+  let opState = { couleur: 'w', opening: null, ligne: null, ply: 0 };
+
+  function renderOpeningsPanel() {
+    if (opState.ligne) { renderOpeningViewer(); return; }
+    let html = '<div class="op-tabs">'
+      + '<button type="button" class="op-tab' + (opState.couleur === 'w' ? ' active' : '') + '" data-op-couleur="w">Blancs</button>'
+      + '<button type="button" class="op-tab' + (opState.couleur === 'b' ? ' active' : '') + '" data-op-couleur="b">Noirs</button>'
+      + '</div>';
+
+    if (opState.opening) {
+      const opening = opState.opening;
+      html += '<button type="button" class="op-back" data-op-back="1">⬅ Toutes les ouvertures</button>'
+        + '<div class="tr-card"><h3>' + escapeHtml(opening.nom) + '</h3>'
+        + '<p>' + escapeHtml(opening.description) + '</p></div>';
+      for (const ligne of opening.lignes) {
+        html += '<button type="button" class="op-card" data-op-ligne="' + ligne.id + '">'
+          + '<span class="op-titre"><span class="op-badge ' + ligne.type + '">'
+          + (ligne.type === 'piege' ? 'Piège' : 'Ligne') + '</span>' + escapeHtml(ligne.titre) + '</span>'
+          + '<span class="op-resume">' + escapeHtml(ligne.resume) + '</span>'
+          + '</button>';
+      }
+    } else {
+      const list = OPENINGS.filter(o => o.couleur === opState.couleur);
+      if (list.length === 0) {
+        html += '<div class="op-empty">Les ouvertures avec les '
+          + (opState.couleur === 'w' ? 'Blancs' : 'Noirs')
+          + ' arrivent bientôt : défense scandinave, Caro-Kann, défense française…</div>';
+      }
+      for (const opening of list) {
+        html += '<button type="button" class="op-card" data-op-id="' + opening.id + '">'
+          + '<span class="op-titre">' + escapeHtml(opening.nom) + '</span>'
+          + '<span class="op-resume">' + escapeHtml(opening.apercu) + '</span>'
+          + '</button>';
+      }
+    }
+    openingsPanel.innerHTML = html;
+  }
+
+  function renderOpeningViewer() {
+    const ligne = opState.ligne;
+    const total = ligne.coups.length;
+    const i = opState.ply;
+    let caption;
+    if (i === 0) {
+      caption = escapeHtml(ligne.resume) + ' Avancez avec « Suivant » — la flèche montre chaque coup.';
+    } else {
+      const [san, commentaire] = ligne.coups[i - 1];
+      const mover = (i - 1) % 2 === 0 ? 'Les Blancs jouent' : 'Les Noirs jouent';
+      caption = '<b>' + escapeHtml(san) + '</b> — '
+        + (commentaire ? escapeHtml(commentaire) : mover.replace(' jouent', '') + ' développent leur plan.');
+    }
+    openingsPanel.innerHTML =
+      '<button type="button" class="op-back" data-op-quit="1">⬅ ' + escapeHtml(opState.opening.nom) + '</button>'
+      + '<div class="op-viewer tr-card">'
+      + '<span class="op-count"><span class="op-badge ' + ligne.type + '">'
+      + (ligne.type === 'piege' ? 'Piège' : 'Ligne') + '</span> ' + escapeHtml(ligne.titre)
+      + ' · coup ' + i + ' / ' + total + '</span>'
+      + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + Math.round((i / total) * 100) + '%"></div></div>'
+      + '<div class="op-caption">' + caption + '</div>'
+      + '<div class="op-nav">'
+      + '<button type="button" class="btn btn-secondary" data-op-prev="1"' + (i === 0 ? ' disabled' : '') + '>◀ Précédent</button>'
+      + '<button type="button" class="btn btn-primary" data-op-next="1"' + (i === total ? ' disabled' : '') + '>Suivant ▶</button>'
+      + '</div>'
+      + '</div>';
+  }
+
+  function opGoto(ply) {
+    const ligne = opState.ligne;
+    opState.ply = Math.max(0, Math.min(ply, ligne.coups.length));
+    game = Chess.newGame();
+    sanHistory = [];
+    lastMove = null;
+    for (let i = 0; i < opState.ply; i++) {
+      const move = Pgn.sanToMove(Chess, game, ligne.coups[i][0]);
+      Chess.play(game, move);
+      sanHistory.push(ligne.coups[i][0]);
+      lastMove = { from: move.from, to: move.to };
+    }
+    selected = -1;
+    legalTargets = [];
+    renderGame({});
+    // Flèche du prochain coup
+    const arrow = document.getElementById('op-arrow');
+    if (arrow) arrow.remove();
+    if (opState.ply < ligne.coups.length) {
+      const next = Pgn.sanToMove(Chess, game, ligne.coups[opState.ply][0]);
+      if (next) drawArrow(next.from, next.to, 'rgba(240, 154, 32, .9)', 'op-arrow');
+    }
+    renderOpeningsPanel();
+  }
+
+  function opOpenLigne(ligne) {
+    opState.ligne = ligne;
+    orientation = opState.opening.couleur;
+    placeSquares();
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    opGoto(0);
+    renderStatus();
+  }
+
+  function opQuitViewer() {
+    opState.ligne = null;
+    const arrow = document.getElementById('op-arrow');
+    if (arrow) arrow.remove();
+    startGame(opState.couleur);
+    renderOpeningsPanel();
+    renderStatus();
+  }
+
+  openingsPanel.addEventListener('click', (event) => {
+    const target = event.target.closest('[data-op-couleur],[data-op-id],[data-op-ligne],[data-op-back],[data-op-quit],[data-op-prev],[data-op-next]');
+    if (!target) return;
+    if (target.dataset.opCouleur) {
+      opState.couleur = target.dataset.opCouleur;
+      opState.opening = null;
+      renderOpeningsPanel();
+    } else if (target.dataset.opId) {
+      opState.opening = OPENINGS.find(o => o.id === target.dataset.opId);
+      renderOpeningsPanel();
+    } else if (target.dataset.opLigne) {
+      opOpenLigne(opState.opening.lignes.find(l => l.id === target.dataset.opLigne));
+    } else if (target.dataset.opBack) {
+      opState.opening = null;
+      renderOpeningsPanel();
+    } else if (target.dataset.opQuit) {
+      opQuitViewer();
+    } else if (target.dataset.opPrev) {
+      opGoto(opState.ply - 1);
+    } else if (target.dataset.opNext) {
+      opGoto(opState.ply + 1);
+    }
+  });
+
+  // Navigation clavier dans la visionneuse d'ouvertures
+  document.addEventListener('keydown', (event) => {
+    if (mode !== 'openings' || !opState.ligne) return;
+    if (event.key === 'ArrowRight') { opGoto(opState.ply + 1); event.preventDefault(); }
+    else if (event.key === 'ArrowLeft') { opGoto(opState.ply - 1); event.preventDefault(); }
+    else if (event.key === 'Escape') { opQuitViewer(); }
   });
 
   // --------------------------------------------------------- configuration --
@@ -2114,6 +2273,11 @@
     const inExercises = next === 'exercises';
     const inTrainer = next === 'trainer';
     const inConfig = next === 'config';
+    const inOpenings = next === 'openings';
+    if (!inOpenings) {
+      const opArrow = document.getElementById('op-arrow');
+      if (opArrow) opArrow.remove();
+    }
     // Quitter le trainer pendant la préparation annule la recherche en cours
     if (!inTrainer && trainer && trainer.state === 'prep') {
       trainer = null;
@@ -2121,7 +2285,7 @@
       renderTrainerPanel();
     }
     gamesPanel.style.display = inGames && !replay ? 'block' : 'none';
-    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inConfig ? 'none' : '';
+    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inConfig || inOpenings ? 'none' : '';
     replayNav.style.display = inGames && replay ? 'flex' : 'none';
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
@@ -2132,9 +2296,10 @@
     document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
     document.getElementById('ex-toolbar').style.display = inExercises && exCurrent ? 'flex' : 'none';
     document.getElementById('ex-explanation').style.display = 'none';
-    document.getElementById('controls').style.display = inExercises || inTrainer || inConfig ? 'none' : 'flex';
+    document.getElementById('controls').style.display = inExercises || inTrainer || inConfig || inOpenings ? 'none' : 'flex';
     trainerPanel.style.display = inTrainer ? 'flex' : 'none';
     configPanel.style.display = inConfig ? 'flex' : 'none';
+    openingsPanel.style.display = inOpenings ? 'flex' : 'none';
     moveExplainEl.style.display = 'none';
     hideSignalsPanel();
 
@@ -2145,6 +2310,18 @@
     } else if (next === 'config') {
       startGame('w');
       renderConfigPanel(null, null);
+      renderStatus();
+    } else if (next === 'openings') {
+      if (opState.ligne) {
+        orientation = opState.opening.couleur;
+        placeSquares();
+        for (const el of pieceEls.values()) el.remove();
+        pieceEls.clear();
+        opGoto(opState.ply);
+      } else {
+        startGame(opState.couleur);
+        renderOpeningsPanel();
+      }
       renderStatus();
     } else if (next === 'trainer') {
       if (trainer && trainer.state === 'guess') {

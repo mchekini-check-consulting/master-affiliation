@@ -37,6 +37,9 @@
     <button type="button" class="rail-item" id="nav-trainer" data-mode="trainer">
       <span class="rail-ico">🧩</span><span class="rail-label">Blunder Trainer</span>
     </button>
+    <button type="button" class="rail-item" id="nav-openings" data-mode="openings">
+      <span class="rail-ico">📖</span><span class="rail-label">Ouvertures</span>
+    </button>
     <div class="rail-group">Compte</div>
     <button type="button" class="rail-item" id="nav-config" data-mode="config">
       <span class="rail-ico">⚙️</span><span class="rail-label">Configuration</span>
@@ -156,6 +159,9 @@
     <!-- Configuration : pseudo chess.com et chargement des parties -->
     <div class="config-panel" id="config-panel" style="display:none"></div>
 
+    <!-- Ouvertures : répertoire Blancs / Noirs, lignes commentées -->
+    <div class="openings-panel" id="openings-panel" style="display:none"></div>
+
     <div class="controls" id="controls">
       <button type="button" class="btn btn-primary" id="btn-new">Nouvelle partie</button>
       <button type="button" class="btn btn-secondary" id="btn-undo">Annuler</button>
@@ -171,6 +177,7 @@
 <script src="/app/js/pgn.js"></script>
 <script src="/app/js/signals.js"></script>
 <script src="/app/js/exercises-data.js"></script>
+<script src="/app/js/openings-data.js"></script>
 <script src="/app/js/app.js"></script>
 </body>
 </html>
