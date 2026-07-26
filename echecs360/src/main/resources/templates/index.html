@@ -24,7 +24,7 @@
   </div>
 
   
-  <div style="display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 44px; align-items: center; padding: 64px 56px 72px; max-width: 1280px; margin: 0px auto;">
+  <div style="display: grid; grid-template-columns: 0.72fr 1.28fr; gap: 40px; align-items: center; padding: 64px 40px 72px; max-width: 1440px; margin: 0px auto;">
     <div style="display: flex; flex-direction: column; gap: 22px;">
       <div style="align-self: flex-start; background: rgb(232, 242, 236); color: rgb(46, 125, 91); font-size: 13px; font-weight: 700; padding: 7px 16px; border-radius: 99px;">Pour les joueurs de 800 à 2000 Elo</div>
       <h1 style="font-size: 52px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.08; margin: 0px; text-wrap: pretty;">Ton coach d'échecs IA qui apprend de <span style="color: rgb(46, 125, 91);">TES</span> parties.</h1>
@@ -34,7 +34,7 @@
         <span style="font-size: 13px; color: rgb(122, 135, 127);">Essai Premium 7 jours offert · Sans carte bancaire</span>
       </div>
     </div>
-    <div style="position: relative;"><video id="hero-video" src="/videos/echecs360-hero.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Démonstration de l'application Échecs360 : analyse d'une partie" style="width: 100%; display: block; border-radius: 20px; border: 1.5px solid rgb(230, 226, 216); box-shadow: rgba(34, 48, 42, 0.12) 0px 24px 60px;"></video><button type="button" id="hero-sound" aria-label="Activer le son" style="position: absolute; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.95); color: rgb(46, 125, 91); border: 1.5px solid rgb(230, 226, 216); border-radius: 99px; padding: 9px 16px; font-family: Sora, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: rgba(34, 48, 42, 0.15) 0px 6px 18px;">🔇 Activer le son</button></div>
+    <div style="position: relative;"><video id="hero-video" src="/videos/echecs360-hero.mp4" autoplay muted playsinline preload="auto" aria-label="Démonstration de l'application Échecs360 : analyse d'une partie" style="width: 100%; display: block; border-radius: 20px; border: 1.5px solid rgb(230, 226, 216); box-shadow: rgba(34, 48, 42, 0.12) 0px 24px 60px;"></video><button type="button" id="hero-sound" aria-label="Activer le son" style="position: absolute; right: 14px; bottom: 14px; display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.95); color: rgb(46, 125, 91); border: 1.5px solid rgb(230, 226, 216); border-radius: 99px; padding: 9px 16px; font-family: Sora, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: rgba(34, 48, 42, 0.15) 0px 6px 18px;">🔇 Activer le son</button></div>
   </div>
 
   
@@ -261,6 +261,11 @@
   var video = document.getElementById('hero-video');
   var btn = document.getElementById('hero-sound');
   if (!video || !btn) return;
+  // Filet de sécurité : certains navigateurs n'enclenchent pas l'autoplay
+  // si la source n'est pas prête au moment du parsing.
+  var kick = function () { if (video.paused && !video.ended) { video.play().catch(function () {}); } };
+  video.addEventListener('canplay', kick, { once: true });
+  setTimeout(kick, 800);
   btn.addEventListener('click', function () {
     video.muted = !video.muted;
     if (!video.muted) { video.play(); }
