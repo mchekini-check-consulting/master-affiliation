@@ -48,11 +48,7 @@ a:hover { text-decoration: underline; }
   font-weight: 800; font-size: 1.25rem; color: var(--text);
 }
 .brand:hover { text-decoration: none; }
-.brand .logo {
-  width: 34px; height: 34px; border-radius: 7px; flex: none;
-  background: conic-gradient(var(--light-sq) 0 25%, var(--dark-sq) 0 50%,
-              var(--light-sq) 0 75%, var(--dark-sq) 0);
-}
+.brand-img { height: 30px; width: auto; display: block; }
 .brand em { color: var(--accent); font-style: normal; }
 .site-nav { display: flex; align-items: center; gap: 18px; }
 .site-nav a { color: var(--text); font-weight: 600; font-size: .95rem; }
