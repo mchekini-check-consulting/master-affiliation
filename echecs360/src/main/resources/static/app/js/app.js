@@ -61,6 +61,7 @@
   let exBusy = false;             // réponse scriptée / solution en cours
   let exAutoPlay = false;         // la solution a été déroulée automatiquement
   let exMessage = '';             // message affiché sous le titre
+  let exSteps = null;             // visionneuse d'étapes { line, ply, attacker, startTurn, finCaption }
   const EX_STORAGE_KEY = 'echecs360-exercices-faits';
   let exDone = new Set(JSON.parse(localStorage.getItem(EX_STORAGE_KEY) || '[]'));
 
@@ -479,7 +480,7 @@
   let dragging = null; // { el, from, moved, startX, startY }
 
   function humanCanMove() {
-    if (gameOver || mode === 'games') return false;
+    if (gameOver || mode === 'games' || exSteps) return false;
     if (mode === 'bot') return !botThinking && game.turn !== botColor;
     if (mode === 'exercises') {
       return exCurrent !== null && !exBusy && !botThinking && game.turn === exPlayerColor;
@@ -1051,6 +1052,10 @@
   function startExercise(data) {
     const type = exFilter === 'mats' ? 'mat' : 'finale';
     exCurrent = { type, data };
+    exSteps = null;
+    exStepsPanelEl.style.display = 'none';
+    clearStepsOverlays();
+    exStepsBtn.style.display = exStepsLineOf(data) ? '' : 'none';
     exStep = 0;
     exBusy = false;
     exAutoPlay = false;
@@ -1273,6 +1278,234 @@
       + '<h4>L\'erreur typique à éviter</h4><p>' + exp.erreur + '</p>');
   }
 
+  // ------------------------------------------- étapes de résolution (visuel) --
+  // Rejoue la ligne (solution du mat ou démo de finale) coup par coup en
+  // colorant l'échiquier : rouge = cases contrôlées par l'attaquant,
+  // bleu = cases où le roi défenseur peut encore aller, flèche = prochain coup.
+
+  const exStepsPanelEl = document.getElementById('ex-steps-panel');
+  const exStepsBtn = document.getElementById('ex-steps');
+
+  function exStepsLineOf(data) {
+    return data.solution || data.demo || null;
+  }
+
+  function enterExSteps() {
+    if (!exCurrent) return;
+    const line = exStepsLineOf(exCurrent.data);
+    if (!line) return;
+    searchToken++;
+    botThinking = false;
+    thinkingEl.classList.remove('on');
+    closePromotionPicker();
+    const start = Chess.fromFen(exCurrent.data.fen);
+    // Camp dont on visualise la couverture (rouge) : l'attaquant réel —
+    // le joueur pour les mats et les finales gagnantes, son adversaire pour
+    // les finales défensives — sauf indication contraire (demoCouleur).
+    let attacker = start.turn;
+    if (exCurrent.type === 'finale') {
+      attacker = exCurrent.data.objectif === 'mat'
+        ? exCurrent.data.joueur
+        : Chess.opposite(exCurrent.data.joueur);
+      if (exCurrent.data.demoCouleur) attacker = exCurrent.data.demoCouleur;
+    }
+    exSteps = {
+      line,
+      ply: 0,
+      startTurn: start.turn,
+      attacker,
+      showCovered: false,           // cases rouges masquées par défaut (option)
+      finCaption: exCurrent.data.demoFin || null
+    };
+    document.getElementById('ex-steps-covered').checked = false;
+    exToolbarEl.style.display = 'none';
+    exExplanationEl.style.display = 'none';
+    movesEl.style.display = 'none';
+    exStepsPanelEl.style.display = 'flex';
+    exMessage = 'Étapes de résolution — avancez avec « Suivante ».';
+    exStepsGoto(0);
+  }
+
+  function quitExSteps(restart) {
+    exSteps = null;
+    exStepsPanelEl.style.display = 'none';
+    clearStepsOverlays();
+    if (restart && exCurrent) startExercise(exCurrent.data);
+  }
+
+  function exStepsGoto(ply) {
+    exSteps.ply = Math.max(0, Math.min(ply, exSteps.line.length));
+    game = Chess.fromFen(exCurrent.data.fen);
+    sanHistory = [];
+    lastMove = null;
+    selected = -1;
+    legalTargets = [];
+    for (let i = 0; i < exSteps.ply; i++) {
+      const move = Pgn.sanToMove(Chess, game, exSteps.line[i]);
+      sanHistory.push(exSteps.line[i]);
+      lastMove = { from: move.from, to: move.to };
+      Chess.play(game, move);
+    }
+    renderGame({});
+    renderStepsOverlays();
+    renderStepsPanel();
+  }
+
+  function clearStepsOverlays() {
+    for (const el of squares) el.querySelectorAll('.ov').forEach(n => n.remove());
+    const arrow = document.getElementById('steps-arrow');
+    if (arrow) arrow.remove();
+  }
+
+  /** Cases où le roi défenseur peut aller : voisines, non occupées par son camp,
+      non contrôlées (roi retiré du plateau pour couvrir les cases « derrière » lui). */
+  function defenderKingFreeSquares(att) {
+    const def = Chess.opposite(att);
+    const dk = Chess.kingSquare(game, def);
+    const ghost = Chess.fromFen(Chess.toFen(game));
+    ghost.board[dk] = null;
+    const free = [];
+    const r = (dk / 8) | 0, f = dk % 8;
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let df = -1; df <= 1; df++) {
+        if (dr === 0 && df === 0) continue;
+        const nr = r + dr, nf = f + df;
+        if (nr < 0 || nr > 7 || nf < 0 || nf > 7) continue;
+        const n = nr * 8 + nf;
+        const piece = game.board[n];
+        if (piece !== null && Chess.colorOf(piece) === def) continue;
+        if (!Chess.attacked(ghost, n, att)) free.push(n);
+      }
+    }
+    return free;
+  }
+
+  function renderStepsOverlays() {
+    clearStepsOverlays();
+    const att = exSteps.attacker;
+    // Cases contrôlées par l'attaquant (la « barrière ») — sur option uniquement
+    if (exSteps.showCovered) {
+      for (let sq = 0; sq < 64; sq++) {
+        if (Chess.attacked(game, sq, att)) {
+          const ov = document.createElement('div');
+          ov.className = 'ov ov-covered';
+          squares[sq].appendChild(ov);
+        }
+      }
+    }
+    // Cases restantes du roi défenseur
+    for (const sq of defenderKingFreeSquares(att)) {
+      const ov = document.createElement('div');
+      ov.className = 'ov ov-free';
+      squares[sq].appendChild(ov);
+    }
+    // Flèche du prochain coup
+    if (exSteps.ply < exSteps.line.length) {
+      const next = Pgn.sanToMove(Chess, game, exSteps.line[exSteps.ply]);
+      if (next) drawStepsArrow(next.from, next.to);
+    }
+  }
+
+  function drawStepsArrow(from, to) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.id = 'steps-arrow';
+    svg.setAttribute('class', 'steps-arrow');
+    svg.setAttribute('viewBox', '0 0 8 8');
+    const x1 = viewCol(from) + 0.5, y1 = viewRow(from) + 0.5;
+    const x2 = viewCol(to) + 0.5, y2 = viewRow(to) + 0.5;
+    const dx = x2 - x1, dy = y2 - y1;
+    const len = Math.hypot(dx, dy);
+    const ux = dx / len, uy = dy / len;
+    const hx = x2 - ux * 0.42, hy = y2 - uy * 0.42; // base de la pointe
+    const line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', x1 + ux * 0.28);
+    line.setAttribute('y1', y1 + uy * 0.28);
+    line.setAttribute('x2', hx);
+    line.setAttribute('y2', hy);
+    line.setAttribute('stroke', 'rgba(240, 154, 32, .9)');
+    line.setAttribute('stroke-width', '0.2');
+    line.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(line);
+    const px = -uy, py = ux; // perpendiculaire
+    const head = document.createElementNS(NS, 'polygon');
+    head.setAttribute('points',
+      (x2 - ux * 0.06) + ',' + (y2 - uy * 0.06) + ' '
+      + (hx + px * 0.2) + ',' + (hy + py * 0.2) + ' '
+      + (hx - px * 0.2) + ',' + (hy - py * 0.2));
+    head.setAttribute('fill', 'rgba(240, 154, 32, .9)');
+    svg.appendChild(head);
+    boardEl.appendChild(svg);
+  }
+
+  function renderStepsPanel() {
+    const total = exSteps.line.length;
+    const i = exSteps.ply;
+    document.getElementById('ex-steps-count').textContent = 'Étape ' + i + ' / ' + total;
+    document.getElementById('ex-steps-prev').disabled = i === 0;
+    document.getElementById('ex-steps-next').disabled = i === total;
+    document.getElementById('ex-steps-caption').textContent = stepsCaption();
+  }
+
+  function stepsCaption() {
+    const att = exSteps.attacker;
+    const def = Chess.opposite(att);
+    const couleur = def === 'w' ? 'blanc' : 'noir';
+    const i = exSteps.ply;
+    const total = exSteps.line.length;
+    const freeCount = defenderKingFreeSquares(att).length;
+    const cases = freeCount + ' case' + (freeCount > 1 ? 's' : '');
+    if (i === 0) {
+      const joueur = exCurrent.type === 'finale' ? exCurrent.data.joueur : exSteps.startTurn;
+      const but = exCurrent.type === 'mat' || exCurrent.data.objectif === 'mat'
+        ? 'mater le roi adverse' : 'tenir la nulle';
+      return 'Position de départ — objectif des ' + (joueur === 'w' ? 'Blancs' : 'Noirs') + ' : ' + but + '. '
+        + 'Le roi ' + couleur + ' dispose de ' + cases
+        + ' (en bleu). Suivez la flèche orange.';
+    }
+    const mover = (i - 1) % 2 === 0 ? exSteps.startTurn : Chess.opposite(exSteps.startTurn);
+    const san = exSteps.line[i - 1];
+    const status = Chess.statusOf(game);
+    let txt = (mover === 'w' ? 'Les Blancs' : 'Les Noirs') + ' jouent ' + san + '.';
+    if (status.over) {
+      if (status.reason === 'échec et mat') {
+        txt += ' Échec et mat : toutes les cases du roi ' + couleur + ' sont couvertes, il n\'y a plus aucune case bleue !';
+      } else if (status.reason === 'pat') {
+        txt += ' Pat : le roi ' + couleur + ' n\'est pas en échec mais n\'a plus aucun coup légal — partie nulle.';
+      } else {
+        txt += ' ' + reasonLabel(status.reason) + '.';
+      }
+    } else if (status.check && game.turn === def) {
+      txt += ' Échec ! Le roi ' + couleur + ' doit fuir : il ne lui reste que ' + cases + ' (en bleu).';
+    } else if (mover === att) {
+      txt += freeCount === 0
+        ? ' Le roi ' + couleur + ' n\'a plus aucune case libre : attention au pat, il faut donner échec pour conclure.'
+        : ' La cage se referme : il ne reste que ' + cases + ' (en bleu) au roi ' + couleur + '.';
+    } else {
+      txt += ' La défense répond — le roi ' + couleur + ' dispose de ' + cases + ' (en bleu).';
+    }
+    if (i === total && exSteps.finCaption) txt += ' ' + exSteps.finCaption;
+    return txt;
+  }
+
+  exStepsBtn.addEventListener('click', enterExSteps);
+  document.getElementById('ex-steps-prev').addEventListener('click', () => exSteps && exStepsGoto(exSteps.ply - 1));
+  document.getElementById('ex-steps-next').addEventListener('click', () => exSteps && exStepsGoto(exSteps.ply + 1));
+  document.getElementById('ex-steps-quit').addEventListener('click', () => quitExSteps(true));
+  document.getElementById('ex-steps-covered').addEventListener('change', (event) => {
+    if (!exSteps) return;
+    exSteps.showCovered = event.target.checked;
+    renderStepsOverlays();
+  });
+
+  // Navigation au clavier dans la visionneuse
+  document.addEventListener('keydown', (event) => {
+    if (!exSteps) return;
+    if (event.key === 'ArrowRight') { exStepsGoto(exSteps.ply + 1); event.preventDefault(); }
+    else if (event.key === 'ArrowLeft') { exStepsGoto(exSteps.ply - 1); event.preventDefault(); }
+    else if (event.key === 'Escape') { quitExSteps(true); }
+  });
+
   // Écouteurs des sous-onglets et de la barre d'outils
   for (const tab of document.querySelectorAll('.ex-tab')) {
     tab.addEventListener('click', () => {
@@ -1299,6 +1532,7 @@
   // ------------------------------------------------------------ navigation --
 
   function switchMode(next) {
+    if (exSteps) quitExSteps(false);
     // Re-cliquer « Mes parties » depuis une relecture ramène à la liste
     if (next === 'games' && mode === 'games' && replay) {
       replay = null;

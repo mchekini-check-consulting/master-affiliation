@@ -10,7 +10,10 @@
  *
  * FINALES (type 'finale') — jouées contre le bot :
  *   { id, titre, difficulte, fen, joueur: 'w'|'b', objectif: 'mat'|'nulle',
- *     indice, plan, explication }
+ *     demo: [SAN...], demoFin?, indice, plan, explication }
+ *   `demo` est la ligne des « étapes de résolution » (visionneuse pédagogique) :
+ *   elle va jusqu'au mat pour les finales gagnantes, ou s'arrête sur la position
+ *   clé (pat, forteresse, échec perpétuel...) avec `demoFin` en légende finale.
  *
  * explication = { idee, mecanisme, reconnaitre, erreur } — en français.
  */
@@ -281,6 +284,7 @@
       difficulte: 'facile',
       fen: '8/8/3k4/8/8/4KQ2/8/8 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Kd4', 'Ke6', 'Qf8', 'Kd7', 'Kd5', 'Kc7', 'Qd6+', 'Kc8', 'Qe7', 'Kb8', 'Kc6', 'Ka8', 'Qb7#'],
       indice: "Placez la dame à distance de cavalier du roi adverse et rétrécissez sa « boîte » sans jamais donner d'échec.",
       plan: "1) La dame se place à une distance de cavalier du roi adverse et le suit, coup après coup : la boîte rétrécit. 2) Quand le roi adverse est confiné au bord, STOP : n'approchez plus la dame (danger de pat). 3) Amenez votre roi à une case du roi adverse. 4) Concluez par le baiser de la mort ou un échec perpendiculaire au bord.",
       explication: {
@@ -297,6 +301,7 @@
       difficulte: 'facile',
       fen: '8/8/4k3/8/8/8/4K3/6R1 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Ke3', 'Kd5', 'Rg4', 'Kd6', 'Rg5', 'Kc6', 'Ke4', 'Kc7', 'Kd5', 'Kc8', 'Kc6', 'Kd8', 'Re5', 'Kc8', 'Re8#'],
       indice: "La tour coupe une rangée ; votre roi prend l'opposition (face à face) et la tour donne échec pour faire reculer le roi adverse.",
       plan: "1) La tour coupe le roi adverse sur une rangée. 2) Votre roi avance face au roi adverse. 3) Quand les rois sont en OPPOSITION (face à face, une case d'écart), la tour donne échec : le roi adverse recule d'une rangée. 4) Répétez jusqu'à la dernière rangée : l'échec y est mat. Si le roi adverse attaque la tour, glissez-la à l'autre bout de la rangée.",
       explication: {
@@ -313,6 +318,7 @@
       difficulte: 'facile',
       fen: '8/8/4k3/8/8/8/8/R5RK w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Ra5', 'Ke7', 'Ra6', 'Ke8', 'Ra7', 'Kf8', 'Rb7', 'Ke8', 'Rg8#'],
       indice: "Une tour coupe, l'autre donne échec sur la rangée suivante : alternez sans jamais bouger votre roi.",
       plan: "1) Une tour donne échec sur une rangée : le roi recule. 2) L'autre tour donne échec sur la rangée suivante. 3) Alternez — l'escalier — jusqu'au bord. Votre roi ne sert à rien : laissez-le où il est. Si le roi adverse approche d'une tour, déplacez-la horizontalement à l'autre bord.",
       explication: {
@@ -328,6 +334,7 @@
       difficulte: 'moyen',
       fen: '8/8/3k4/8/8/2BB4/8/4K3 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Ke2', 'Kc6', 'Bb4', 'Kc7', 'Bb5', 'Kb6', 'Ba4', 'Kc7', 'Kd3', 'Kb7', 'Ba5', 'Ka6', 'Bd8', 'Kb7', 'Bd7', 'Ka7', 'Kd4', 'Kb7', 'Kd5', 'Ka7', 'Kc6', 'Ka8', 'Kb6', 'Kb8', 'Bc7+', 'Ka8', 'Bc6#'],
       indice: "Les fous côte à côte forment une double barrière diagonale ; le roi adverse doit être poussé dans un coin (n'importe lequel).",
       plan: "1) Placez les fous côte à côte (par exemple c3/d3) : ils dressent deux diagonales infranchissables. 2) Avancez votre roi pour soutenir la poussée. 3) Faites glisser la barrière pour repousser le roi adverse vers un coin. 4) Au bord, un fou coupe la fuite, l'autre donne le mat, le roi contrôlant les cases restantes.",
       explication: {
@@ -344,6 +351,7 @@
       difficulte: 'difficile',
       fen: '8/8/8/4k3/8/8/8/1B2K1N1 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Ke2', 'Kf6', 'Ke3', 'Kg7', 'Ke4', 'Kg8', 'Ke5', 'Kg7', 'Ke6', 'Kg8', 'Kf6', 'Kh8', 'Ba2', 'Kh7', 'Nf3', 'Kh8', 'Ne5', 'Kh7', 'Kf7', 'Kh8', 'Ng6+', 'Kh7', 'Kf6', 'Kh6', 'Bg8', 'Kh5', 'Ne5', 'Kh6', 'Ng4+', 'Kh5', 'Kf5', 'Kh4', 'Kf4', 'Kh5', 'Bf7+', 'Kh4', 'Be8', 'Kh3', 'Ne3', 'Kh4', 'Ng2+', 'Kh3', 'Kf3', 'Kh2', 'Bd7', 'Kg1', 'Ne3', 'Kh1', 'Kf2', 'Kh2', 'Nf1+', 'Kh1', 'Bc6#'],
       indice: "Le mat n'est possible que dans un coin DE LA COULEUR DU FOU. Le cavalier dessine un « W » pour barrer la fuite le long du bord.",
       plan: "1) Repoussez d'abord le roi vers n'importe quel bord (roi + pièces ensemble). 2) S'il file vers le mauvais coin (couleur opposée au fou), escortez-le le long du bord vers le bon coin : le cavalier suit le trajet en W (par exemple c7-e6-d8… côté dame) pour boucher les trous. 3) Dans le bon coin : fou et cavalier verrouillent, le roi mate.",
       explication: {
@@ -360,6 +368,7 @@
       difficulte: 'facile',
       fen: '3k4/8/3K4/4P3/8/8/8/8 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['e6', 'Ke8', 'e7', 'Kf7', 'Kd7', 'Kf6', 'e8=Q', 'Kf5', 'Qe3', 'Kg4', 'Ke6', 'Kh4', 'Kf5', 'Kh5', 'Qh3#'],
       indice: "Le roi passe DEVANT son pion. Gagnez l'opposition : quand les rois se font face et que l'adversaire doit jouer, il cède le passage.",
       plan: "1) Le roi avance DEVANT le pion (jamais l'inverse). 2) Prenez l'opposition : rois face à face, l'adversaire au trait doit s'écarter. 3) Le roi escorte alors le pion case après case ; le pion n'avance que quand sa route est sûre. 4) Promotion en dame, puis mat élémentaire. Attention au pat près du coin de promotion.",
       explication: {
@@ -375,6 +384,8 @@
       difficulte: 'facile',
       fen: '1k6/8/1K6/P7/8/8/8/8 b - - 0 1',
       joueur: 'b', objectif: 'nulle',
+      demo: ['Ka8', 'a6', 'Kb8', 'a7+', 'Ka8', 'Ka6'],
+      demoFin: "Le coin a8 est une forteresse : avec un pion tour, si le roi défenseur atteint le coin, l'attaquant ne peut plus gagner — le pat est inévitable.",
       indice: "Vous défendez : foncez dans le coin a8 et n'en sortez plus. Le camp fort ne pourra jamais vous en déloger.",
       plan: "1) Votre roi rejoint le coin de promotion (a8) ou les cases adjacentes. 2) Oscillez entre a8 et b8 (ou a7/b7 selon les coups adverses). 3) Deux issues, toutes deux nulles : le pion arrive en a7 avec votre roi en a8 → pat ; ou le roi blanc s'approche trop → pat également. Ne quittez JAMAIS la zone du coin.",
       explication: {
@@ -390,6 +401,7 @@
       difficulte: 'moyen',
       fen: '8/3k4/8/3PK3/8/8/8/8 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Kd4', 'Kd6', 'Ke4', 'Kd7', 'Ke5', 'Kd8', 'Kd6', 'Ke8', 'Kc7', 'Ke7', 'd6+', 'Ke8', 'd7+', 'Ke7', 'd8=Q+', 'Ke6', 'Qg5', 'Kf7', 'Kd7', 'Kf8', 'Ke6', 'Ke8', 'Qg8#'],
       indice: "Cette position vous est favorable… si c'était aux Noirs de jouer ! Votre roi décrit un triangle (e5-d4-e4-e5) pour « perdre » un temps.",
       plan: "1) Constatez le zugzwang réciproque : Noirs au trait, ils doivent céder du terrain. 2) Votre roi triangule : Rd4, puis Re4, puis retour Re5 — trois coups là où le roi noir n'en a que deux. 3) La même position revient, trait aux Noirs : leur roi s'écarte. 4) Votre roi passe devant le pion (d6/e6) et escorte la promotion, puis matez.",
       explication: {
@@ -406,6 +418,8 @@
       difficulte: 'moyen',
       fen: '6K1/4kP2/8/8/8/8/r7/2R5 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Rc4', 'Ra1', 'Kh7', 'Rh1+', 'Kg6', 'Rg1+', 'Kf5', 'Rf1+', 'Rf4', 'Ra1', 'f8=Q+'],
+      demoFin: "Le « pont » est construit : la tour en f4 bloque les échecs et la dame est faite. Dame + tour contre tour, le gain est désormais élémentaire.",
       indice: "Votre roi est enfermé devant son pion : construisez un « pont » — la tour va en c4 pour abriter le roi des échecs à la quatrième rangée.",
       plan: "1) Tc1-c4 ! : la tour prépare le pont sur la 4e rangée. 2) Le roi sort (Rg8-g7 n'est pas possible ici : sortez par e8/d7 selon les échecs)… en pratique : écartez le roi adverse (Tc1-e1+ d'abord si utile), sortez le roi des échecs de la tour noire. 3) Quand la tour noire donne échec sur la colonne g/h, interposez la tour EN C4 → plus d'échecs : le pion promeut. 4) Concluez avec la dame.",
       explication: {
@@ -422,6 +436,9 @@
       difficulte: 'moyen',
       fen: '4k3/R7/1r6/4K3/4P3/8/8/8 b - - 0 1',
       joueur: 'b', objectif: 'nulle',
+      demo: ['Rc6', 'Kf5', 'Rb6', 'e5', 'Rc6', 'e6', 'Rc1', 'Kf6', 'Rf1+', 'Ke5', 'Re1+', 'Kd6', 'Rd1+', 'Ke5', 'Re1+'],
+      demoCouleur: 'b',  // on visualise la couverture de la tour noire
+      demoFin: "Le roi blanc n'a aucun abri : les échecs par derrière ne s'arrêteront jamais. C'est l'idée de Philidor — tour sur la 6e rangée tant que le pion n'a pas avancé, puis échecs infinis par derrière. Nulle.",
       indice: "Vous défendez : gardez votre tour sur VOTRE 3e rangée (la 6e ici) tant que le pion n'a pas avancé. Dès qu'il pose le pied dessus, filez donner des échecs par derrière.",
       plan: "1) Tour sur la 6e rangée (b6-h6) : elle interdit l'avance du roi blanc. 2) Ne bougez la tour de cette rangée sous aucun prétexte (des coups d'attente : Tb6-c6-a6…). 3) Dès que le pion joue e5-e6, la rangée ne sert plus : Tb6-b1 ! et échecs perpétuels par derrière — le roi blanc n'a plus d'abri. 4) Roi collé à la case de promotion.",
       explication: {
@@ -438,6 +455,7 @@
       difficulte: 'moyen',
       fen: '8/6K1/8/8/2p5/2k5/8/7R w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Rd1', 'Kc2', 'Rd5', 'c3', 'Kf6', 'Kc1', 'Kf5', 'Kc2', 'Ke5', 'Kc1', 'Kd4', 'c2', 'Kc3', 'Kb1', 'Rb5+', 'Kc1', 'Rb2', 'Kd1', 'Rxc2', 'Ke1', 'Kd3', 'Kd1', 'Rc4', 'Ke1', 'Rf4', 'Kd1', 'Rf1#'],
       indice: "Coupez le pion par derrière (Th1-h4 ou h1-c1 ?) et ramenez votre roi au galop : c'est une course chronométrée.",
       plan: "1) La tour se place DERRIÈRE le pion (colonne c) ou le coupe sur sa rangée. 2) Le roi blanc accourt en diagonale (chaque coup compte). 3) Le duo roi noir + pion ne peut promouvoir que si votre roi reste hors jeu : ici il arrive à temps. 4) Pion capturé → finale tour contre roi : matez à l'escalier + opposition.",
       explication: {
@@ -454,6 +472,8 @@
       difficulte: 'moyen',
       fen: '3k4/8/3PK3/8/5B2/8/2b5/8 b - - 0 1',
       joueur: 'b', objectif: 'nulle',
+      demo: ['Bb3+', 'Kf6', 'Kd7', 'Ke5', 'Bc4', 'Bg5', 'Bb3', 'Bf4', 'Bc4'],
+      demoFin: "Forteresse : le roi noir bloque le pion depuis d7, une case claire que le fou blanc (cases foncées) ne contrôlera jamais, et le fou noir chasse le roi blanc dès qu'il approche. Nulle.",
       indice: "Vous défendez : votre roi bloque la case de promotion (case BLANCHE, celle de votre fou) et votre fou de cases blanches surveille les diagonales d'escorte (b1-h7 puis a2-g8). Le fou adverse ne pourra jamais vous chasser.",
       plan: "1) Roi vissé sur d8/e8 : il bloque le pion sur sa case claire — que le fou noir adverse ne contrôlera jamais. 2) Le fou c2 patrouille b1-h7 et bascule sur a2-g8 dès que le roi blanc tente le détour par f7 : échec ou prise du pion à chaque essai. 3) Oscillez sur les cases blanches : cinquante coups et c'est nul.",
       explication: {
@@ -469,6 +489,7 @@
       difficulte: 'moyen',
       fen: '8/8/1K6/7Q/8/8/4pk2/8 w - - 0 1',
       joueur: 'w', objectif: 'mat',
+      demo: ['Qc5+', 'Kf3', 'Qe5', 'Kf2', 'Qd4+', 'Kf3', 'Qd2', 'Ke4', 'Qxe2+', 'Kd4', 'Kb5', 'Kd5', 'Qg4', 'Kd6', 'Qg5', 'Kd7', 'Qe5', 'Kd8', 'Kc6', 'Kc8', 'Qe8#'],
       indice: "Pion central (e) : c'est GAGNÉ. Série d'échecs pour forcer le roi DEVANT son pion (e1), et chaque fois qu'il y est, votre roi avance d'une case.",
       plan: "1) Échecs en rafale (Dh4+, Df4+, De3…) pour zigzaguer vers le roi. 2) Dès que le roi noir est forcé de se placer DEVANT son pion (e1), il ne menace plus de promouvoir : votre roi gagne un temps et avance. 3) Répétez le cycle : échecs → roi noir en e1 → pas de roi blanc. 4) Le roi arrive : prise du pion et mat rapide. (Contre un pion a, c, f ou h, ce mécanisme échoue : pat ou coin — c'est nul.)",
       explication: {
@@ -485,6 +506,8 @@
       difficulte: 'difficile',
       fen: '7K/8/k1P5/7p/8/8/8/8 w - - 0 1',
       joueur: 'w', objectif: 'nulle',
+      demo: ['Kg7', 'h4', 'Kf6', 'Kb6', 'Ke5', 'h3', 'Kd6', 'h2', 'c7', 'Kb7', 'Kd7', 'h1=Q', 'c8=Q+'],
+      demoFin: "Le miracle de Réti : en marchant sur la diagonale, le roi blanc poursuit deux menaces à la fois — rattraper le pion h et soutenir c7. Les deux camps font dame : nulle.",
       indice: "Votre roi semble hors-jeu face au pion h… mais la diagonale h8-e5 poursuit DEUX objectifs à la fois : rattraper le pion h ET soutenir votre pion c.",
       plan: "1) Rg7 ! : le roi entre dans la diagonale magique. 2) Chaque coup menace double : se rapprocher du pion h ET du pion c6. 3) Si les Noirs poussent h4 : Rf6 → e5 et le roi rejoint le carré du pion h en soutenant c7 en chemin. 4) Si le roi noir prend en c6 : Rf6-g5 et le pion h tombe. Nulle dans toutes les variantes.",
       explication: {
@@ -500,6 +523,9 @@
       difficulte: 'difficile',
       fen: 'R7/6k1/P4r2/K7/8/8/8/8 b - - 0 1',
       joueur: 'b', objectif: 'nulle',
+      demo: ['Rf5+', 'Kb6', 'Rf6+', 'Kb7', 'Rf7+', 'Kb8', 'Rf6', 'a7', 'Rf8+', 'Kb7', 'Rf7+', 'Kb6', 'Rf6+'],
+      demoCouleur: 'b',  // on visualise la couverture de la tour noire
+      demoFin: "Position de Vancura : la tour blanche est enfermée devant son propre pion, et le roi blanc ne peut ni échapper aux échecs latéraux, ni trouver d'abri. Nulle.",
       indice: "Vous défendez contre le pion a : votre tour attaque le pion LATÉRALEMENT depuis la 6e rangée (f6 !) et y reste, prête à mitrailler le roi d'échecs de flanc.",
       plan: "1) La tour reste sur la 6e rangée en visant a6 (f6, g6, h6) : le pion est cloué sur place — s'il avance en a7, Ta6 ! le bloque définitivement... déjà fait ici : il est en a6. 2) Si le roi blanc vient le défendre (Rb5-b6), échecs latéraux : Tf6-f5+, f6+… il n'a aucun abri. 3) Votre roi reste collé à g7/h7, hors de portée. 4) La tour ne quitte la 6e que pour des échecs — et y revient.",
       explication: {

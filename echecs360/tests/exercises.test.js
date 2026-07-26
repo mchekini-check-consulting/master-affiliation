@@ -120,7 +120,53 @@ for (const exercise of FINALES) {
     fail(label, 'explication incomplète : ' + manquantes.join(', '));
     continue;
   }
-  ok(label + ' (objectif : ' + exercise.objectif + ', joueur : ' + exercise.joueur + ')');
+  // Démo des « étapes de résolution » : chaque coup légal (SAN canonique) ;
+  // fin en mat du joueur pour l'objectif mat, sinon nulle atteinte ou
+  // position ouverte accompagnée d'une légende finale (demoFin).
+  if (!Array.isArray(exercise.demo) || exercise.demo.length === 0) {
+    fail(label, 'demo manquante');
+    continue;
+  }
+  let demoValid = true;
+  const demoState = Chess.fromFen(exercise.fen);
+  for (let i = 0; i < exercise.demo.length; i++) {
+    const san = exercise.demo[i];
+    const move = Pgn.sanToMove(Chess, demoState, san);
+    if (!move) {
+      fail(label, 'demo coup ' + (i + 1) + ' (« ' + san + ' ») introuvable/illégal');
+      demoValid = false;
+      break;
+    }
+    const engineSan = Chess.sanOf(demoState, move);
+    if (engineSan !== san) {
+      fail(label, 'demo coup ' + (i + 1) + ' : SAN « ' + san + ' » ≠ moteur « ' + engineSan + ' »');
+      demoValid = false;
+      break;
+    }
+    Chess.play(demoState, move);
+  }
+  if (!demoValid) continue;
+  const demoStatus = Chess.statusOf(demoState);
+  if (exercise.objectif === 'mat') {
+    const expected = exercise.joueur === 'w' ? '1-0' : '0-1';
+    const mate = demoStatus.over && demoStatus.reason === 'échec et mat' && demoStatus.result === expected;
+    if (!mate && !exercise.demoFin) {
+      fail(label, 'la demo ne mate pas et n\'a pas de demoFin (' + JSON.stringify(demoStatus) + ')');
+      continue;
+    }
+  } else {
+    const draw = demoStatus.over && demoStatus.result === '1/2-1/2';
+    if (!draw && !exercise.demoFin) {
+      fail(label, 'la demo (nulle) doit finir nulle ou porter une demoFin');
+      continue;
+    }
+    if (demoStatus.over && demoStatus.result !== '1/2-1/2') {
+      fail(label, 'la demo (nulle) se termine par ' + demoStatus.result);
+      continue;
+    }
+  }
+  ok(label + ' (objectif : ' + exercise.objectif + ', demo : ' + exercise.demo.length + ' demi-coups, fin : '
+      + (demoStatus.over ? demoStatus.reason : 'position ouverte + légende') + ')');
 }
 
 // ------------------------------------------------------------- unicité --

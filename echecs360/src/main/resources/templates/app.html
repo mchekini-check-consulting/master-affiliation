@@ -99,8 +99,30 @@
       <button type="button" class="btn btn-secondary" id="ex-hint">Indice</button>
       <button type="button" class="btn btn-secondary" id="ex-solution">Solution</button>
       <button type="button" class="btn btn-primary" id="ex-explain">💡 Explication</button>
+      <button type="button" class="btn btn-primary wide" id="ex-steps" style="display:none">🎓 Voir les étapes de résolution</button>
     </div>
     <div class="ex-explanation" id="ex-explanation" style="display:none"></div>
+
+    <!-- Visionneuse pas à pas : cases couvertes / cases du roi / coup joué -->
+    <div class="ex-steps-panel" id="ex-steps-panel" style="display:none">
+      <div class="ex-steps-head">
+        <span id="ex-steps-count">Étape 0/0</span>
+        <button type="button" class="ex-steps-quit" id="ex-steps-quit">✕ Quitter</button>
+      </div>
+      <div class="ex-steps-caption" id="ex-steps-caption"></div>
+      <div class="ex-steps-legend">
+        <span class="lg"><i class="lg-swatch lg-free"></i>Cases où le roi peut encore aller</span>
+        <span class="lg"><i class="lg-swatch lg-move"></i>Coup joué · la flèche montre le prochain coup</span>
+        <label class="lg ex-steps-toggle">
+          <input type="checkbox" id="ex-steps-covered">
+          <i class="lg-swatch lg-covered"></i>Afficher les cases contrôlées (interdites au roi)
+        </label>
+      </div>
+      <div class="ex-steps-nav">
+        <button type="button" class="btn btn-secondary" id="ex-steps-prev">◀ Précédente</button>
+        <button type="button" class="btn btn-primary" id="ex-steps-next">Suivante ▶</button>
+      </div>
+    </div>
 
     <div class="moves" id="moves" aria-label="Liste des coups"></div>
 
