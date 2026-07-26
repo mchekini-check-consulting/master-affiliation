@@ -156,7 +156,10 @@ services:
     environment:
       DATA_DIR: /data
       APP_BASE_URL: https://echecs360.fr
-      REMEMBER_ME_KEY: ${ECHECS360_REMEMBER_ME_KEY:-changeme}
+    # Secrets locaux au serveur (REMEMBER_ME_KEY), non versionnés
+    env_file:
+      - path: ./.env.secrets
+        required: false
     volumes:
       - echecs360-data:/data
 
