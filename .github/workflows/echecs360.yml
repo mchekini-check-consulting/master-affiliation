@@ -1,0 +1,21 @@
+# Pipeline du projet echecs360 : ne se déclenche que si echecs360/ change sur main.
+name: echecs360
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "echecs360/**"
+      - ".github/workflows/echecs360.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-project.yml
+    with:
+      project: echecs360
+    secrets: inherit

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments :: metaHead(${metaTitle}, ${metaDescription}, ${canonical})}"></th:block>
+  <!-- Données structurées : article de blog -->
+  <script type="application/ld+json" th:utext="'{'
+      + '&quot;@context&quot;:&quot;https://schema.org&quot;,'
+      + '&quot;@type&quot;:&quot;BlogPosting&quot;,'
+      + '&quot;headline&quot;:&quot;' + ${#strings.replace(article.title, '&quot;', '\\&quot;')} + '&quot;,'
+      + '&quot;description&quot;:&quot;' + ${#strings.replace(article.description, '&quot;', '\\&quot;')} + '&quot;,'
+      + '&quot;datePublished&quot;:&quot;' + ${article.date} + '&quot;,'
+      + '&quot;inLanguage&quot;:&quot;fr-FR&quot;,'
+      + '&quot;author&quot;:{&quot;@type&quot;:&quot;Organization&quot;,&quot;name&quot;:&quot;Échecs360&quot;},'
+      + '&quot;publisher&quot;:{&quot;@type&quot;:&quot;Organization&quot;,&quot;name&quot;:&quot;Échecs360&quot;},'
+      + '&quot;mainEntityOfPage&quot;:&quot;' + ${canonical} + '&quot;'
+      + '}'"></script>
+</head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+
+<main>
+  <div class="container">
+    <div class="article-layout">
+      <article class="post">
+        <h1 th:text="${article.title}">Titre de l'article</h1>
+        <div class="post-meta">
+          <time th:datetime="${article.date}" th:text="${article.date.format(dateFr)}">10 juillet 2026</time>
+          <span th:text="${article.readingMinutes} + ' min de lecture'">3 min de lecture</span>
+          <span class="tag" th:each="t : ${article.tags}" th:text="${t}">tag</span>
+        </div>
+        <div class="post-body" th:utext="${article.html}">Contenu…</div>
+      </article>
+
+      <aside class="toc" th:if="${!article.toc.isEmpty()}" aria-label="Sommaire de l'article">
+        <h2>Sommaire</h2>
+        <ol>
+          <li th:each="entry : ${article.toc}">
+            <a th:href="'#' + ${entry.id}" th:text="${entry.label}">Section</a>
+          </li>
+        </ol>
+      </aside>
+    </div>
+
+    <section class="related" th:if="${!related.isEmpty()}">
+      <h2>À lire ensuite</h2>
+      <div class="cards">
+        <article class="card" th:each="a : ${related}">
+          <time th:datetime="${a.date}" th:text="${a.date.format(dateFr)}">10 juillet 2026</time>
+          <h3><a th:href="'/blog/' + ${a.slug}" th:text="${a.title}">Titre</a></h3>
+          <p th:text="${a.description}">Description</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

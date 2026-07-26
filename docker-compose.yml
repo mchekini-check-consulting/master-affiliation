@@ -40,6 +40,7 @@ services:
       - hi-tech-academy
       - parents-malins
       - prepa-technique
+      - echecs360
       - fidexil-front
       - my-way-front
       - qualiopilote-front
@@ -141,6 +142,23 @@ services:
     build: ./prepa-technique
     container_name: prepa-technique
     restart: unless-stopped
+
+  # ==========================================================
+  # Échecs360 — apprentissage des échecs (monolithe Spring Boot)
+  #   reverse-proxy -> echecs360:8095 (pages publiques SSR + app d'échecs)
+  #   Persistance : H2 en fichier sur le volume echecs360-data
+  # ==========================================================
+  echecs360:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/echecs360:${ECHECS360_TAG:-latest}
+    build: ./echecs360
+    container_name: echecs360
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /data
+      APP_BASE_URL: https://echecs360.fr
+      REMEMBER_ME_KEY: ${ECHECS360_REMEMBER_ME_KEY:-changeme}
+    volumes:
+      - echecs360-data:/data
 
   # ==========================================================
   # Application Fidexil
@@ -349,4 +367,6 @@ volumes:
   qualiopilote-db-data:
   # Fichiers de l'espace documentaire My Way
   my-way-documents:
+  # Base H2 d'Échecs360 (comptes utilisateurs)
+  echecs360-data:
 #   fidexil-db-data:                          # persistance : à activer plus tard

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments :: metaHead(${metaTitle}, ${metaDescription}, ${canonical})}"></th:block>
+  <!-- Pagination : rel prev/next pour les moteurs de recherche -->
+  <link rel="prev" th:if="${page > 1}"
+        th:href="${baseUrl} + '/blog' + (${page - 1} > 1 ? '?page=' + (${page} - 1) : '')">
+  <link rel="next" th:if="${page < pageCount}" th:href="${baseUrl} + '/blog?page=' + (${page} + 1)">
+</head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+
+<main>
+  <div class="page-title">
+    <div class="container">
+      <h1>Le blog d'Échecs360</h1>
+      <p>Conseils concrets, en français, pour apprendre les échecs et progresser.</p>
+    </div>
+  </div>
+
+  <section class="blog-list">
+    <div class="container">
+      <div class="cards">
+        <article class="card" th:each="a : ${articles}">
+          <time th:datetime="${a.date}" th:text="${a.date.format(dateFr)}">10 juillet 2026</time>
+          <h3><a th:href="'/blog/' + ${a.slug}" th:text="${a.title}">Titre</a></h3>
+          <p th:text="${a.description}">Description</p>
+          <div class="tags">
+            <span class="tag" th:each="t : ${a.tags}" th:text="${t}">tag</span>
+          </div>
+        </article>
+      </div>
+
+      <nav class="pagination" th:if="${pageCount > 1}" aria-label="Pagination du blog">
+        <a th:if="${page > 1}" th:href="'/blog' + (${page - 1} > 1 ? '?page=' + (${page} - 1) : '')">← Précédent</a>
+        <span class="current" th:text="${page} + ' / ' + ${pageCount}">1 / 1</span>
+        <a th:if="${page < pageCount}" th:href="'/blog?page=' + (${page} + 1)">Suivant →</a>
+      </nav>
+    </div>
+  </section>
+</main>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

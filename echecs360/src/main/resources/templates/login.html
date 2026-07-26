@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments :: metaHead(${metaTitle}, ${metaDescription}, ${canonical})}"></th:block>
+  <meta name="robots" content="noindex">
+</head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+
+<main class="auth-wrap">
+  <div class="auth-card">
+    <h1>Se connecter</h1>
+
+    <div class="alert alert-error" th:if="${param.error != null}">
+      Email ou mot de passe incorrect.
+    </div>
+    <div class="alert alert-success" th:if="${param.registered != null}">
+      Compte créé ! Connectez-vous pour commencer à jouer.
+    </div>
+    <div class="alert alert-success" th:if="${param.logout != null}">
+      Vous êtes déconnecté. À bientôt !
+    </div>
+
+    <form th:action="@{/login}" method="post">
+      <div class="field">
+        <label for="username">Adresse email</label>
+        <input type="email" id="username" name="username" required autocomplete="email" autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+      <label class="checkbox">
+        <input type="checkbox" name="remember-me"> Rester connecté
+      </label>
+      <button type="submit" class="btn btn-primary">Se connecter</button>
+    </form>
+
+    <p class="auth-alt">Pas encore de compte ? <a href="/register">Créer un compte</a></p>
+  </div>
+</main>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

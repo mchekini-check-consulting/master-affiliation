@@ -17,7 +17,8 @@ master-affiliation/
 │   ├── parents-malins.yml    # Pipeline parents-malins (déclenchée si parents-malins/** change)
 │   ├── prepa-technique.yml   # Pipeline prepa-technique (déclenchée si prepa-technique/** change)
 │   ├── my-way.yml            # Pipeline my-way (fullstack : images back + front)
-│   └── qualiopilote.yml      # Pipeline qualiopilote (fullstack : images back + front)
+│   ├── qualiopilote.yml      # Pipeline qualiopilote (fullstack : images back + front)
+│   └── echecs360.yml         # Pipeline echecs360 (monolithe : une image)
 ├── hi-tech-academy/          # Hi-Tech Academy (hi-tech-academy.fr) — React/Vite (SPA) + Spring Boot + PostgreSQL
 │   └── back/                 # API Spring Boot : demandes d'inscription, analyse du besoin, espace admin
 ├── parents-malins/           # Parents Malins (parents-malins.fr) — Astro statique → nginx
@@ -25,9 +26,10 @@ master-affiliation/
 ├── my-way/                   # My Way (freelance-now.fr) — Angular + Spring Boot + PostgreSQL
 │   ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
 │   └── front/                # Front Angular (Dockerfile multi-stage Node → nginx, proxifie /api)
-└── qualiopilote/             # Qualiopilote (qualiopilote.fr) — Angular (prérendu SEO) + Spring Boot + PostgreSQL
-    ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
-    └── front/                # Front Angular SSG (Dockerfile multi-stage Node → nginx, proxifie /api)
+├── qualiopilote/             # Qualiopilote (qualiopilote.fr) — Angular (prérendu SEO) + Spring Boot + PostgreSQL
+│   ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
+│   └── front/                # Front Angular SSG (Dockerfile multi-stage Node → nginx, proxifie /api)
+└── echecs360/                # Échecs360 (echecs360.fr) — Spring Boot monolithe : SSR Thymeleaf (SEO) + app d'échecs JS + H2
 ```
 
 ## Développement local

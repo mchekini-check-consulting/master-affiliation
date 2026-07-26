@@ -1,0 +1,10 @@
+# Build Maven
+target/
+
+# Base H2 locale
+data/
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
