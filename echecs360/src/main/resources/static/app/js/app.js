@@ -937,6 +937,7 @@
     renderMoves(replay.sans, replayPly, replay.cls);
     renderStatus();
     drawEvalGraph();
+    updateEvalBar();
     updateMoveExplain();
     hideSignalsPanel();
     updateSignalsButton();
@@ -991,9 +992,28 @@
     graphWrap.style.display = 'block';
     renderMoves(replay.sans, replayPly, cls);
     drawEvalGraph();
+    updateEvalBar();
   }
 
   function plural(n) { return n > 1 ? 's' : ''; }
+
+  /** Barre d'évaluation verticale : proportion blanche selon l'éval moteur
+      (matériel + position), courbe douce façon lichess. */
+  function updateEvalBar() {
+    const wrap = document.getElementById('eval-wrap');
+    const show = mode === 'games' && replay && replay.evals && replay.evals.length > 0;
+    wrap.style.display = show ? 'block' : 'none';
+    if (!show) return;
+    const cp = replay.evals[Math.min(replayPly, replay.evals.length - 1)];
+    // Sigmoïde : ±100 cp ≈ 60/40, ±400 cp ≈ 83/17, borné pour rester lisible
+    const pct = 50 + 50 * (2 / (1 + Math.exp(-0.004 * cp)) - 1);
+    document.getElementById('eval-fill').style.height = Math.max(3, Math.min(97, pct)) + '%';
+    wrap.classList.toggle('flipped', orientation === 'b');
+    const label = document.getElementById('eval-label');
+    label.textContent = Math.abs(cp) >= 1200
+      ? (cp > 0 ? '1-0' : cp < 0 ? '0-1' : '½-½')
+      : (cp >= 0 ? '+' : '') + (cp / 100).toFixed(1);
+  }
 
   /** Graphique d'évaluation : aire blanche = avantage Blancs, points rouges = gaffes. */
   function drawEvalGraph() {
@@ -2354,6 +2374,7 @@
       }
     }
     updateSignalsButton();
+    updateEvalBar();
   }
 
   for (const btn of document.querySelectorAll('.rail-item')) {
