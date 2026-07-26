@@ -31,6 +31,10 @@
       <svg viewBox="0 0 24 24"><path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5l-7.09 8.09-4-4L2 17l1.5 1.5z"/></svg>
       Mes parties
     </button>
+    <button type="button" class="rail-item" id="nav-exercises" data-mode="exercises">
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 2.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/></svg>
+      Exercices intensifs
+    </button>
     <div class="spacer"></div>
     <div class="user" th:text="${pseudo}">pseudo</div>
     <form th:action="@{/logout}" method="post">
@@ -80,7 +84,26 @@
     <div class="analysis-progress" id="analysis-progress" style="display:none"></div>
     <div class="analysis-summary" id="analysis-summary"></div>
 
+    <div class="ex-toolbar" id="ex-toolbar" style="display:none">
+      <button type="button" class="btn btn-secondary" id="ex-back" title="Retour à la liste">⬅ Liste</button>
+      <button type="button" class="btn btn-secondary" id="ex-prev" title="Exercice précédent">◀</button>
+      <button type="button" class="btn btn-secondary" id="ex-next" title="Exercice suivant">▶</button>
+      <button type="button" class="btn btn-secondary" id="ex-restart">Recommencer</button>
+      <button type="button" class="btn btn-secondary" id="ex-hint">Indice</button>
+      <button type="button" class="btn btn-secondary" id="ex-solution">Solution</button>
+      <button type="button" class="btn btn-primary" id="ex-explain">💡 Explication</button>
+    </div>
+    <div class="ex-explanation" id="ex-explanation" style="display:none"></div>
+
     <div class="moves" id="moves" aria-label="Liste des coups"></div>
+
+    <div class="exercises-panel" id="exercises-panel" style="display:none">
+      <div class="ex-tabs">
+        <button type="button" class="ex-tab active" data-filter="mats">Mats</button>
+        <button type="button" class="ex-tab" data-filter="finales">Finales</button>
+      </div>
+      <div class="ex-cards" id="ex-cards"></div>
+    </div>
 
     <div class="games-panel" id="games-panel" style="display:none"></div>
 
@@ -97,6 +120,7 @@
 <script src="/app/js/pieces.js"></script>
 <script src="/app/js/engine.js"></script>
 <script src="/app/js/pgn.js"></script>
+<script src="/app/js/exercises-data.js"></script>
 <script src="/app/js/app.js"></script>
 </body>
 </html>

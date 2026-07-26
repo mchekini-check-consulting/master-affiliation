@@ -477,6 +477,96 @@
     return false;
   }
 
+  // ------------------------------------------------------------------ FEN --
+
+  /**
+   * Charge une position depuis une chaîne FEN.
+   * Lève une erreur si la FEN est malformée ou la position illégale
+   * (nombre de rois, roi du camp non au trait en prise).
+   */
+  function fromFen(fen) {
+    const parts = fen.trim().split(/\s+/);
+    if (parts.length < 2) throw new Error('FEN incomplète : ' + fen);
+    const [placement, turn] = parts;
+    const castlingField = parts[2] || '-';
+    const epField = parts[3] || '-';
+
+    const board = new Array(64).fill(null);
+    const rows = placement.split('/');
+    if (rows.length !== 8) throw new Error('FEN : 8 rangées attendues');
+    for (let r = 0; r < 8; r++) {
+      let file = 0;
+      for (const ch of rows[r]) {
+        if (/[1-8]/.test(ch)) {
+          file += Number(ch);
+        } else if (/[prnbqkPRNBQK]/.test(ch)) {
+          if (file > 7) throw new Error('FEN : rangée trop longue');
+          board[r * 8 + file] = ch;
+          file++;
+        } else {
+          throw new Error('FEN : caractère inattendu « ' + ch + ' »');
+        }
+      }
+      if (file !== 8) throw new Error('FEN : rangée incomplète');
+    }
+    if (turn !== 'w' && turn !== 'b') throw new Error('FEN : trait invalide');
+
+    // Exactement un roi par camp
+    const whiteKings = board.filter(p => p === 'K').length;
+    const blackKings = board.filter(p => p === 'k').length;
+    if (whiteKings !== 1 || blackKings !== 1) throw new Error('FEN : un roi par camp requis');
+
+    let ep = -1;
+    if (epField !== '-') {
+      const file = 'abcdefgh'.indexOf(epField[0]);
+      const rank = Number(epField[1]);
+      if (file >= 0 && rank >= 1 && rank <= 8) ep = (8 - rank) * 8 + file;
+    }
+
+    const state = {
+      board,
+      turn,
+      castling: {
+        // Droits déclarés, restreints à la présence effective roi/tour
+        wK: castlingField.includes('K') && board[60] === 'K' && board[63] === 'R',
+        wQ: castlingField.includes('Q') && board[60] === 'K' && board[56] === 'R',
+        bK: castlingField.includes('k') && board[4] === 'k' && board[7] === 'r',
+        bQ: castlingField.includes('q') && board[4] === 'k' && board[0] === 'r'
+      },
+      ep,
+      halfmove: parts[4] !== undefined ? Number(parts[4]) || 0 : 0,
+      fullmove: parts[5] !== undefined ? Number(parts[5]) || 1 : 1,
+      history: [],
+      keys: []
+    };
+    // Le roi du camp qui n'a pas le trait ne peut pas être en prise
+    if (inCheck(state, opposite(state.turn))) {
+      throw new Error('FEN illégale : le roi du camp non au trait est en échec');
+    }
+    state.keys.push(positionKey(state));
+    return state;
+  }
+
+  /** Sérialise l'état en FEN (debug et tests). */
+  function toFen(s) {
+    let placement = '';
+    for (let r = 0; r < 8; r++) {
+      let empty = 0;
+      for (let f = 0; f < 8; f++) {
+        const piece = s.board[r * 8 + f];
+        if (piece === null) { empty++; continue; }
+        if (empty > 0) { placement += empty; empty = 0; }
+        placement += piece;
+      }
+      if (empty > 0) placement += empty;
+      if (r < 7) placement += '/';
+    }
+    const castling = (s.castling.wK ? 'K' : '') + (s.castling.wQ ? 'Q' : '')
+        + (s.castling.bK ? 'k' : '') + (s.castling.bQ ? 'q' : '');
+    return placement + ' ' + s.turn + ' ' + (castling || '-') + ' '
+        + (s.ep >= 0 ? algebraic(s.ep) : '-') + ' ' + s.halfmove + ' ' + s.fullmove;
+  }
+
   // ---------------------------------------------------------------- perft --
 
   /** Dénombrement des feuilles de l'arbre des coups (validation du moteur). */
@@ -497,7 +587,7 @@
 
   const Chess = {
     WHITE, BLACK,
-    newGame, legalMoves, movesFrom, play, undo, sanOf, statusOf,
+    newGame, fromFen, toFen, legalMoves, movesFrom, play, undo, sanOf, statusOf,
     attacked, inCheck, kingSquare, perft,
     fileOf, rankOf, algebraic, colorOf, opposite,
     // Variantes rapides sans suivi de répétition (recherche du bot)

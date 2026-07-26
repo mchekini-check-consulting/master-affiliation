@@ -53,6 +53,17 @@
   let replay = null;              // { headers, sans, snapshots, moves, userColor, evals?, cls? }
   let replayPly = 0;
 
+  // Exercices intensifs
+  let exFilter = 'mats';          // sous-onglet : 'mats' | 'finales'
+  let exCurrent = null;           // exercice en cours { type: 'mat'|'finale', data }
+  let exPlayerColor = 'w';        // camp joué par l'utilisateur
+  let exStep = 0;                 // avancement dans la solution (mats)
+  let exBusy = false;             // réponse scriptée / solution en cours
+  let exAutoPlay = false;         // la solution a été déroulée automatiquement
+  let exMessage = '';             // message affiché sous le titre
+  const EX_STORAGE_KEY = 'echecs360-exercices-faits';
+  let exDone = new Set(JSON.parse(localStorage.getItem(EX_STORAGE_KEY) || '[]'));
+
   const squares = [];             // 64 éléments .sq (ordre index moteur)
   const pieceEls = new Map();     // index case → élément .piece
 
@@ -266,6 +277,10 @@
   }
 
   function playerNames() {
+    if (mode === 'exercises' && exCurrent) {
+      const other = exCurrent.type === 'finale' ? 'Bot' : 'Adversaire';
+      return exPlayerColor === 'w' ? { w: PSEUDO, b: other } : { w: other, b: PSEUDO };
+    }
     if (mode === 'bot') {
       const bot = 'Bot (' + botElo + ')';
       return botColor === 'w' ? { w: bot, b: PSEUDO } : { w: PSEUDO, b: bot };
@@ -313,6 +328,16 @@
   // ---------------------------------------------------------------- statut --
 
   function renderStatus() {
+    if (mode === 'exercises') {
+      if (!exCurrent) {
+        statusMain.textContent = 'Exercices intensifs';
+        statusSub.textContent = 'Choisissez un exercice : mats célèbres ou finales de base.';
+      } else {
+        statusMain.textContent = exCurrent.data.titre;
+        statusSub.textContent = exMessage;
+      }
+      return;
+    }
     if (mode === 'games') {
       if (!replay) {
         statusMain.textContent = 'Mes parties';
@@ -372,7 +397,11 @@
     btnUndo.disabled = sanHistory.length === 0 || botThinking;
     if (status.over && opts.justEnded) {
       soundEnd();
-      showGameOverModal(status);
+      if (mode === 'exercises' && exCurrent) {
+        exOnGameOver(status);
+      } else {
+        showGameOverModal(status);
+      }
     }
   }
 
@@ -388,8 +417,14 @@
     if (move.capture) soundCapture(); else soundMove();
     const status = Chess.statusOf(game);
     renderGame({ animate: true, justEnded: status.over });
-    if (!status.over && mode === 'bot' && game.turn === botColor) {
+    const botDefendsExercise = mode === 'exercises' && exCurrent
+        && exCurrent.type === 'finale' && game.turn !== exPlayerColor;
+    if (!status.over && ((mode === 'bot' && game.turn === botColor) || botDefendsExercise)) {
       requestBotMove();
+    }
+    if (mode === 'exercises' && exCurrent && exCurrent.type === 'finale' && !status.over) {
+      exMessage = exFinaleMessage();
+      renderStatus();
     }
   }
 
@@ -397,6 +432,10 @@
   function tryMove(from, to) {
     const candidates = legalTargets.filter(m => m.from === from && m.to === to);
     if (candidates.length === 0) return false;
+    // Mode « trouve le mat » : le coup doit être celui de la solution
+    if (mode === 'exercises' && exCurrent && exCurrent.type === 'mat') {
+      return exTryMatMove(from, to, candidates);
+    }
     if (candidates[0].promo) {
       showPromotionPicker(candidates, to);
     } else {
@@ -442,6 +481,9 @@
   function humanCanMove() {
     if (gameOver || mode === 'games') return false;
     if (mode === 'bot') return !botThinking && game.turn !== botColor;
+    if (mode === 'exercises') {
+      return exCurrent !== null && !exBusy && !botThinking && game.turn === exPlayerColor;
+    }
     return true;
   }
 
@@ -640,7 +682,9 @@
         if (pending.token !== searchToken) return;
         botThinking = false;
         thinkingEl.classList.remove('on');
-        if (msg.move && !gameOver && mode === 'bot' && game.turn === botColor) {
+        const exerciseDefense = mode === 'exercises' && exCurrent
+            && exCurrent.type === 'finale' && game.turn !== exPlayerColor;
+        if (msg.move && !gameOver && ((mode === 'bot' && game.turn === botColor) || exerciseDefense)) {
           // Retrouve le coup équivalent dans la position courante
           const move = Chess.legalMoves(game).find(m =>
               m.from === msg.move.from && m.to === msg.move.to
@@ -954,6 +998,290 @@
     gotoPly(Math.round(ratio * (replay.evals.length - 1)));
   });
 
+  // ---------------------------------------------------- exercices intensifs --
+
+  const exPanelEl = document.getElementById('exercises-panel');
+  const exCardsEl = document.getElementById('ex-cards');
+  const exToolbarEl = document.getElementById('ex-toolbar');
+  const exExplanationEl = document.getElementById('ex-explanation');
+
+  function exList() {
+    return exFilter === 'mats' ? EXERCISES.MATS : EXERCISES.FINALES;
+  }
+
+  function exSaveDone() {
+    localStorage.setItem(EX_STORAGE_KEY, JSON.stringify([...exDone]));
+  }
+
+  /** Grille des exercices : titre, difficulté, progression (fait / non fait). */
+  function renderExerciseCards() {
+    for (const tab of document.querySelectorAll('.ex-tab')) {
+      tab.classList.toggle('active', tab.dataset.filter === exFilter);
+    }
+    exCardsEl.innerHTML = '';
+    for (const data of exList()) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'ex-card' + (exDone.has(data.id) ? ' done' : '');
+      card.innerHTML =
+        '<span class="check">' + (exDone.has(data.id) ? '✓' : '') + '</span>'
+        + '<span class="infos"><span class="titre">' + data.titre + '</span>'
+        + (data.sousTitre ? '<br><span class="sous">' + data.sousTitre + '</span>' : '')
+        + '</span>'
+        + '<span class="badge-diff ' + data.difficulte + '">' + data.difficulte + '</span>';
+      card.addEventListener('click', () => startExercise(data));
+      exCardsEl.appendChild(card);
+    }
+  }
+
+  function startExercise(data) {
+    const type = exFilter === 'mats' ? 'mat' : 'finale';
+    exCurrent = { type, data };
+    exStep = 0;
+    exBusy = false;
+    exAutoPlay = false;
+    searchToken++;
+    botThinking = false;
+    thinkingEl.classList.remove('on');
+
+    game = Chess.fromFen(data.fen);
+    sanHistory = [];
+    lastMove = null;
+    selected = -1;
+    legalTargets = [];
+    gameOver = false;
+    exPlayerColor = type === 'finale' ? data.joueur : game.turn;
+    orientation = exPlayerColor;
+
+    if (type === 'finale') {
+      // Le bot défend l'autre camp à pleine force
+      botColor = exPlayerColor === 'w' ? 'b' : 'w';
+      botElo = 2200;
+      exMessage = exFinaleMessage();
+    } else {
+      exMessage = trouverLeMatLabel(data);
+    }
+
+    exPanelEl.style.display = 'none';
+    exToolbarEl.style.display = 'flex';
+    exExplanationEl.style.display = 'none';
+    movesEl.style.display = '';
+
+    placeSquares();
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    renderGame({});
+  }
+
+  function trouverLeMatLabel(data) {
+    const plies = data.solution.filter((san, i) => i % 2 === 0).length;
+    return 'Trouvez le mat en ' + plies + ' coup' + (plies > 1 ? 's' : '')
+        + ' (trait aux ' + (exPlayerColor === 'w' ? 'Blancs' : 'Noirs') + ').';
+  }
+
+  function exFinaleMessage() {
+    const moveNumber = Math.floor(sanHistory.length / 2) + 1;
+    return 'Objectif : ' + (exCurrent.data.objectif === 'mat' ? 'gagner (mat)' : 'tenir la nulle')
+        + ' · coup ' + moveNumber + ' · règle des 50 coups : ' + Math.floor((100 - game.halfmove) / 2) + ' restants';
+  }
+
+  /** Coup attendu du joueur dans la solution du mat (résolu dans la position courante). */
+  function exExpectedMove() {
+    if (!exCurrent || exStep >= exCurrent.data.solution.length) return null;
+    return Pgn.sanToMove(Chess, game, exCurrent.data.solution[exStep]);
+  }
+
+  /** Valide le coup du joueur contre la solution (mode « trouve le mat »). */
+  function exTryMatMove(from, to, candidates) {
+    if (exBusy) return true;
+    const expected = exExpectedMove();
+    if (!expected) return true;
+    if (expected.from === from && expected.to === to) {
+      // Bon coup : on joue la version exacte de la solution (promotion comprise)
+      exStep++;
+      exMessage = '✓ Bien joué !';
+      playMove(expected);
+      exScheduleReply();
+    } else {
+      // Mauvais coup : feedback sans appliquer, la position reste intacte
+      exMessage = '✗ Ce n\'est pas le bon coup — réessayez. (« Indice » peut aider.)';
+      renderStatus();
+      boardEl.classList.add('ex-feedback-bad');
+      setTimeout(() => boardEl.classList.remove('ex-feedback-bad'), 320);
+      selected = -1;
+      legalTargets = [];
+      refreshHighlights(game.board, Chess.statusOf(game).check ? game.turn : null);
+      void candidates;
+    }
+    return true;
+  }
+
+  /** Joue la réponse adverse scriptée après ~450 ms. */
+  function exScheduleReply() {
+    if (!exCurrent || exCurrent.type !== 'mat') return;
+    if (exStep >= exCurrent.data.solution.length) return; // solution terminée
+    exBusy = true;
+    setTimeout(() => {
+      if (!exCurrent || mode !== 'exercises') return;
+      const reply = exExpectedMove();
+      exBusy = false;
+      if (reply) {
+        exStep++;
+        exMessage = 'À vous : trouvez la suite.';
+        playMove(reply);
+      }
+    }, 450);
+  }
+
+  /** Fin de partie en mode exercices : succès ou échec selon l'objectif. */
+  function exOnGameOver(status) {
+    const data = exCurrent.data;
+    let success;
+    if (exCurrent.type === 'mat') {
+      success = status.reason === 'échec et mat'
+          && status.result === (exPlayerColor === 'w' ? '1-0' : '0-1');
+    } else if (data.objectif === 'mat') {
+      success = status.result === (exPlayerColor === 'w' ? '1-0' : '0-1');
+    } else {
+      // Objectif nulle : la nulle suffit, gagner est encore mieux
+      success = status.result === '1/2-1/2'
+          || status.result === (exPlayerColor === 'w' ? '1-0' : '0-1');
+    }
+    if (success && !exAutoPlay) {
+      exDone.add(data.id);
+      exSaveDone();
+      exMessage = '✓ Exercice réussi !';
+    } else if (success) {
+      exMessage = 'Solution jouée — à vous de la refaire !';
+    } else {
+      exMessage = '✗ Objectif manqué — recommencez.';
+    }
+    renderStatus();
+
+    const modal = openModal(
+      '<h2 style="text-align:center">' + (success ? (exAutoPlay ? 'Solution terminée' : '🎉 Bravo !') : 'Raté…') + '</h2>'
+      + '<p class="reason">' + (success
+          ? 'Exercice réussi : ' + reasonLabel(status.reason).toLowerCase() + '.'
+          : 'Résultat : ' + reasonLabel(status.reason).toLowerCase()
+            + '. Objectif : ' + (exCurrent.type === 'mat' || data.objectif === 'mat' ? 'mat' : 'nulle') + '.') + '</p>'
+      + '<div class="actions">'
+      + (success
+          ? '<button type="button" class="btn btn-primary" id="ex-modal-next">Exercice suivant</button>'
+          : '<button type="button" class="btn btn-primary" id="ex-modal-retry">Recommencer</button>')
+      + '<button type="button" class="btn btn-secondary" id="ex-modal-close">Fermer</button>'
+      + '</div>');
+    const nextBtn = modal.querySelector('#ex-modal-next');
+    if (nextBtn) nextBtn.addEventListener('click', () => { closeModal(); exNavigate(1); });
+    const retryBtn = modal.querySelector('#ex-modal-retry');
+    if (retryBtn) retryBtn.addEventListener('click', () => { closeModal(); startExercise(data); });
+    modal.querySelector('#ex-modal-close').addEventListener('click', closeModal);
+  }
+
+  /** Exercice précédent / suivant dans la liste filtrée courante. */
+  function exNavigate(delta) {
+    if (!exCurrent) return;
+    const list = exList();
+    const index = list.findIndex(e => e.id === exCurrent.data.id);
+    const next = list[(index + delta + list.length) % list.length];
+    startExercise(next);
+  }
+
+  /** Indice : premier coup à jouer (mats) ou conseil textuel (finales). */
+  function exShowHint() {
+    if (!exCurrent) return;
+    if (exCurrent.type === 'mat') {
+      const expected = exExpectedMove();
+      if (!expected) return;
+      exMessage = 'Indice : jouez ' + Chess.sanOf(game, expected) + '.';
+      renderStatus();
+      squares[expected.from].classList.add('hint-move');
+      squares[expected.to].classList.add('hint-move');
+      setTimeout(() => {
+        squares[expected.from].classList.remove('hint-move');
+        squares[expected.to].classList.remove('hint-move');
+      }, 2200);
+    } else {
+      exShowTextPanel('Indice', '<p>' + exCurrent.data.indice + '</p>');
+    }
+  }
+
+  /** Solution : déroule la ligne (mats) ou affiche le plan (finales). */
+  function exShowSolution() {
+    if (!exCurrent || exBusy) return;
+    if (exCurrent.type === 'finale') {
+      exShowTextPanel('Plan de la solution', '<p>' + exCurrent.data.plan + '</p>');
+      return;
+    }
+    // Redémarre proprement puis rejoue toute la ligne, animée
+    startExercise(exCurrent.data);
+    exAutoPlay = true;
+    exBusy = true;
+    exMessage = 'Solution : ' + exCurrent.data.solution.join(' ');
+    renderStatus();
+    const sans = exCurrent.data.solution;
+    let index = 0;
+    const playNext = () => {
+      if (mode !== 'exercises' || !exCurrent || index >= sans.length) { exBusy = false; return; }
+      const move = Pgn.sanToMove(Chess, game, sans[index]);
+      if (!move) { exBusy = false; return; }
+      index++;
+      exStep = index;
+      playMove(move);
+      if (index < sans.length) setTimeout(playNext, 650);
+      else exBusy = false;
+    };
+    setTimeout(playNext, 400);
+  }
+
+  /** Panneau refermable (accordéon) au style de l'application. */
+  function exShowTextPanel(titre, corpsHtml) {
+    exExplanationEl.innerHTML =
+      '<div class="ex-exp-head"><span>' + titre + '</span>'
+      + '<button type="button" class="ex-exp-close" aria-label="Fermer">✕ fermer</button></div>'
+      + corpsHtml;
+    exExplanationEl.style.display = 'block';
+    exExplanationEl.querySelector('.ex-exp-close')
+        .addEventListener('click', () => { exExplanationEl.style.display = 'none'; });
+  }
+
+  /** 💡 Explication pédagogique : 4 rubriques, masquée par défaut. */
+  function exToggleExplanation() {
+    if (!exCurrent) return;
+    if (exExplanationEl.style.display === 'block') {
+      exExplanationEl.style.display = 'none';
+      return;
+    }
+    const exp = exCurrent.data.explication;
+    exShowTextPanel('💡 ' + exCurrent.data.titre,
+      '<h4>L\'idée générale</h4><p>' + exp.idee + '</p>'
+      + '<h4>Le mécanisme</h4><p>' + exp.mecanisme + '</p>'
+      + '<h4>Comment le reconnaître en partie réelle</h4><p>' + exp.reconnaitre + '</p>'
+      + '<h4>L\'erreur typique à éviter</h4><p>' + exp.erreur + '</p>');
+  }
+
+  // Écouteurs des sous-onglets et de la barre d'outils
+  for (const tab of document.querySelectorAll('.ex-tab')) {
+    tab.addEventListener('click', () => {
+      exFilter = tab.dataset.filter;
+      renderExerciseCards();
+    });
+  }
+  document.getElementById('ex-back').addEventListener('click', () => {
+    exCurrent = null;
+    searchToken++;
+    botThinking = false;
+    thinkingEl.classList.remove('on');
+    switchMode('exercises');
+  });
+  document.getElementById('ex-prev').addEventListener('click', () => exNavigate(-1));
+  document.getElementById('ex-next').addEventListener('click', () => exNavigate(1));
+  document.getElementById('ex-restart').addEventListener('click', () => {
+    if (exCurrent) startExercise(exCurrent.data);
+  });
+  document.getElementById('ex-hint').addEventListener('click', exShowHint);
+  document.getElementById('ex-solution').addEventListener('click', exShowSolution);
+  document.getElementById('ex-explain').addEventListener('click', exToggleExplanation);
+
   // ------------------------------------------------------------ navigation --
 
   function switchMode(next) {
@@ -961,6 +1289,10 @@
     if (next === 'games' && mode === 'games' && replay) {
       replay = null;
       replayPly = 0;
+    }
+    // Re-cliquer « Exercices » depuis un exercice ramène à la liste
+    if (next === 'exercises' && mode === 'exercises' && exCurrent) {
+      exCurrent = null;
     }
     mode = next;
     for (const btn of document.querySelectorAll('.rail-item')) {
@@ -973,19 +1305,33 @@
     thinkingEl.classList.remove('on');
 
     const inGames = next === 'games';
+    const inExercises = next === 'exercises';
     gamesPanel.style.display = inGames && !replay ? 'block' : 'none';
-    movesEl.style.display = inGames && !replay ? 'none' : '';
+    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) ? 'none' : '';
     replayNav.style.display = inGames && replay ? 'flex' : 'none';
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
     graphWrap.style.display = inGames && replay && replay.evals ? 'block' : 'none';
     analysisSummary.textContent = inGames && replay && replay.evals ? analysisSummary.textContent : '';
     btnNew.textContent = inGames ? 'Importer' : 'Nouvelle partie';
+    // Panneaux des exercices
+    document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
+    document.getElementById('ex-toolbar').style.display = inExercises && exCurrent ? 'flex' : 'none';
+    document.getElementById('ex-explanation').style.display = 'none';
+    document.getElementById('controls').style.display = inExercises ? 'none' : 'flex';
 
     if (next === 'two') {
       startGame('w');
     } else if (next === 'bot') {
       showBotConfigModal();
+    } else if (next === 'exercises') {
+      if (exCurrent) {
+        renderGame({});
+      } else {
+        startGame('w');
+        renderExerciseCards();
+        renderStatus();
+      }
     } else {
       if (replay) { gotoPly(replayPly); }
       else {
