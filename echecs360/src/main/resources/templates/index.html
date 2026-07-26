@@ -1,102 +1,293 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <th:block th:replace="~{fragments :: metaHead(${metaTitle}, ${metaDescription}, ${canonical})}"></th:block>
+  <link rel="stylesheet" href="/css/landing.css">
   <!-- Données structurées : site web -->
   <script type="application/ld+json" th:utext="'{'
       + '&quot;@context&quot;:&quot;https://schema.org&quot;,'
       + '&quot;@type&quot;:&quot;WebSite&quot;,'
       + '&quot;name&quot;:&quot;Échecs360&quot;,'
       + '&quot;url&quot;:&quot;' + ${baseUrl} + '/&quot;,'
-      + '&quot;description&quot;:&quot;Apprenez les échecs en jouant : jeu à deux, bot à Elo réglable et analyse de parties chess.com.&quot;,'
+      + '&quot;description&quot;:&quot;Le coach d\'échecs qui apprend de tes parties : analyse chess.com, bot à Elo réglable et exercices intensifs.&quot;,'
       + '&quot;inLanguage&quot;:&quot;fr-FR&quot;'
       + '}'"></script>
 </head>
-<body>
-<header th:replace="~{fragments :: header}"></header>
+<body style="font-family: Sora, sans-serif; color: rgb(34, 48, 42);">
+<div style="background: rgb(251, 249, 244); color: rgb(34, 48, 42); font-family: Sora, sans-serif; min-height: 100vh;">
 
-<main>
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div>
-        <h1>Apprenez les échecs <em>en jouant</em></h1>
-        <p class="lead">
-          Jouez à deux sur le même écran, affrontez un bot dont vous réglez le
-          niveau de 400 à 2200 Elo, et analysez vos parties chess.com pour
-          repérer vos gaffes. Tout en français, tout dans votre navigateur.
-        </p>
-        <div class="actions">
-          <a href="/register" class="btn btn-primary">Créer un compte</a>
-          <a href="/login" class="btn btn-ghost">Se connecter</a>
-        </div>
-      </div>
-      <!-- Illustration : position du mat du berger évitée (pur CSS/SVG inline) -->
-      <div class="hero-board" role="img" aria-label="Échiquier illustrant une partie d'échecs en cours">
-        <th:block th:each="row, r : ${#numbers.sequence(0, 7)}">
-          <span th:each="col, c : ${#numbers.sequence(0, 7)}"
-                th:classappend="${(row + col) % 2 == 1} ? 'd'"></span>
-        </th:block>
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 56px; max-width: 1280px; margin: 0px auto; flex-wrap: wrap; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 10px;"><span style="font-size: 24px;">♞</span><span style="font-size: 20px; font-weight: 800; letter-spacing: -0.02em;">echecs360</span></div>
+    <div class="nav-center" style="display: flex; gap: 30px; font-size: 14px; font-weight: 600; color: rgb(76, 91, 83);"><a href="#comment-ca-marche" style="text-decoration: none; cursor: pointer; color: inherit;">Comment ça marche</a><a href="#fonctionnalites" style="text-decoration: none; cursor: pointer; color: inherit;">Fonctionnalités</a><a href="#tarifs" style="text-decoration: none; cursor: pointer; color: inherit;">Tarifs</a><a href="#faq" style="text-decoration: none; cursor: pointer; color: inherit;">FAQ</a></div>
+    <div style="display: flex; gap: 18px; align-items: center;"><th:block sec:authorize="!isAuthenticated()"><a href="/login" style="text-decoration: none; display: inline-block; cursor: pointer;font-size: 14px; font-weight: 600; color: rgb(76, 91, 83);">Se connecter</a><a href="/register" style="text-decoration: none; display: inline-block; cursor: pointer;font-size: 14px; font-weight: 700; background: rgb(46, 125, 91); color: rgb(255, 255, 255); padding: 11px 20px; border-radius: 99px;">Commencer gratuitement</a></th:block><a sec:authorize="isAuthenticated()" href="/app" style="text-decoration: none; display: inline-block; font-size: 14px; font-weight: 700; background: rgb(46, 125, 91); color: rgb(255, 255, 255); padding: 11px 20px; border-radius: 99px;">Jouer</a></div>
+  </div>
+
+  
+  <div style="display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; padding: 64px 56px 72px; max-width: 1280px; margin: 0px auto;">
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      <div style="align-self: flex-start; background: rgb(232, 242, 236); color: rgb(46, 125, 91); font-size: 13px; font-weight: 700; padding: 7px 16px; border-radius: 99px;">Pour les joueurs de 800 à 2000 Elo</div>
+      <h1 style="font-size: 52px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.08; margin: 0px; text-wrap: pretty;">Ton coach d'échecs IA qui apprend de <span style="color: rgb(46, 125, 91);">TES</span> parties.</h1>
+      <p style="font-size: 18px; line-height: 1.6; color: rgb(76, 91, 83); margin: 0px; max-width: 520px;">Connecte ton compte chess.com. On détecte tes faiblesses. Tu progresses avec un plan sur mesure.</p>
+      <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+        <a href="/register" style="text-decoration: none; display: inline-block; cursor: pointer;font-size: 16px; font-weight: 700; background: rgb(46, 125, 91); color: rgb(255, 255, 255); padding: 16px 30px; border-radius: 99px; box-shadow: rgba(46, 125, 91, 0.28) 0px 10px 26px;">Commencer gratuitement</a>
+        <span style="font-size: 13px; color: rgb(122, 135, 127);">Essai Premium 7 jours offert · Sans carte bancaire</span>
       </div>
     </div>
-  </section>
+    <div style="position: relative;"><video src="/videos/echecs360-hero.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Démonstration de l'application Échecs360 : analyse d'une partie" style="width: 100%; display: block; border-radius: 20px; border: 1.5px solid rgb(230, 226, 216); box-shadow: rgba(34, 48, 42, 0.12) 0px 24px 60px;"></video></div>
+  </div>
 
-  <!-- Fonctionnalités -->
-  <section class="section section-alt" id="fonctionnalites">
-    <div class="container">
-      <h2>Trois façons de progresser</h2>
-      <p class="sub">Un seul compte, trois entraînements complémentaires.</p>
-      <div class="features">
-        <div class="feature">
-          <div class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+  
+  <div style="background: rgb(34, 48, 42); color: rgb(242, 239, 231); padding: 72px 56px;">
+    <div style="max-width: 1168px; margin: 0px auto; display: flex; flex-direction: column; gap: 40px;">
+      <h2 style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; margin: 0px; max-width: 680px;">Tu enchaînes les puzzles et les vidéos, mais ton Elo stagne ?</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        
+          <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 26px; display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 24px;"><span class="sc-interp">🧩</span></span>
+            <span style="font-size: 16px; font-weight: 700;"><span class="sc-interp">Un entraînement générique</span></span>
+            <span style="font-size: 14px; line-height: 1.6; color: rgba(242, 239, 231, 0.7);"><span class="sc-interp">Les mêmes puzzles pour tout le monde, jamais adaptés à ton niveau réel ni à ton style de jeu.</span></span>
           </div>
-          <h3>Jouez à deux</h3>
-          <p>Une partie complète sur le même écran : coups légaux affichés,
-             notation automatique, roque, prise en passant, promotion — toutes
-             les règles sont là, sans exception.</p>
-        </div>
-        <div class="feature">
-          <div class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2zM7.5 13a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm9 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
+        
+          <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 26px; display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 24px;"><span class="sc-interp">🔁</span></span>
+            <span style="font-size: 16px; font-weight: 700;"><span class="sc-interp">Les mêmes erreurs, en boucle</span></span>
+            <span style="font-size: 14px; line-height: 1.6; color: rgba(242, 239, 231, 0.7);"><span class="sc-interp">Tu refais les mêmes gaffes de partie en partie — sans jamais t’en rendre compte.</span></span>
           </div>
-          <h3>Affrontez le bot</h3>
-          <p>Un adversaire toujours disponible, du niveau débutant (400 Elo) au
-             niveau expert (2200). Il réfléchit, se trompe à son niveau, et
-             vous fait progresser à votre rythme.</p>
-        </div>
-        <div class="feature">
-          <div class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5l-7.09 8.09-4-4L2 17l1.5 1.5z"/></svg>
+        
+          <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 26px; display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 24px;"><span class="sc-interp">🤖</span></span>
+            <span style="font-size: 16px; font-weight: 700;"><span class="sc-interp">Des chiffres, pas des explications</span></span>
+            <span style="font-size: 14px; line-height: 1.6; color: rgba(242, 239, 231, 0.7);"><span class="sc-interp">Les moteurs te donnent « +1.7 ». Personne ne t’explique pourquoi, avec des mots humains.</span></span>
           </div>
-          <h3>Analysez vos parties</h3>
-          <p>Importez vos 100 dernières parties chess.com : gaffes, erreurs et
-             imprécisions signalées coup par coup, avec graphique d'évaluation
-             et résumé par couleur.</p>
-        </div>
+        
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Derniers articles -->
-  <section class="section" id="blog">
-    <div class="container">
-      <h2>Derniers articles du blog</h2>
-      <p class="sub">Conseils concrets pour débuter et progresser aux échecs.</p>
-      <div class="cards">
-        <article class="card" th:each="a : ${latestArticles}">
-          <time th:datetime="${a.date}" th:text="${a.date.format(dateFr)}">10 juillet 2026</time>
-          <h3><a th:href="'/blog/' + ${a.slug}" th:text="${a.title}">Titre</a></h3>
-          <p th:text="${a.description}">Description</p>
-          <div class="tags">
-            <span class="tag" th:each="t : ${a.tags}" th:text="${t}">tag</span>
-          </div>
-        </article>
+  
+  <div style="padding: 80px 56px 72px; max-width: 1280px; margin: 0px auto;">
+    <div style="text-align: center; margin-bottom: 44px;"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(46, 125, 91); margin-bottom: 10px;">Comment ça marche</div><h2 id="comment-ca-marche" style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin: 0px;">Trois étapes. Zéro configuration.</h2></div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="width: 34px; height: 34px; border-radius: 99px; background: rgb(46, 125, 91); color: rgb(255, 255, 255); font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center;"><span class="sc-interp">1</span></div>
+          <span style="font-size: 17px; font-weight: 700;"><span class="sc-interp">Connecte ton compte chess.com</span></span>
+          <span style="font-size: 14px; line-height: 1.6; color: rgb(93, 106, 99);"><span class="sc-interp">Un clic suffit. Pas d’export de fichiers, pas de configuration : on récupère tes parties automatiquement.</span></span>
+          <div style="margin-top: auto; background: rgb(242, 240, 233); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5; color: rgb(76, 91, 83); font-weight: 600;"><span class="sc-interp">chess.com/membre/tonpseudo → Connecté ✓</span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="width: 34px; height: 34px; border-radius: 99px; background: rgb(46, 125, 91); color: rgb(255, 255, 255); font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center;"><span class="sc-interp">2</span></div>
+          <span style="font-size: 17px; font-weight: 700;"><span class="sc-interp">L’IA dresse ton profil de joueur</span></span>
+          <span style="font-size: 14px; line-height: 1.6; color: rgb(93, 106, 99);"><span class="sc-interp">Tactique, ouvertures, finales, gestion du temps : chaque partie est relue pour cartographier tes forces et tes failles.</span></span>
+          <div style="margin-top: auto; background: rgb(242, 240, 233); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5; color: rgb(76, 91, 83); font-weight: 600;"><span class="sc-interp">Tactique 72 · Ouvertures 61 · Finales 43 · Temps 55</span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 18px; padding: 28px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="width: 34px; height: 34px; border-radius: 99px; background: rgb(46, 125, 91); color: rgb(255, 255, 255); font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center;"><span class="sc-interp">3</span></div>
+          <span style="font-size: 17px; font-weight: 700;"><span class="sc-interp">Suis ton plan hebdomadaire</span></span>
+          <span style="font-size: 14px; line-height: 1.6; color: rgb(93, 106, 99);"><span class="sc-interp">Chaque semaine, un programme sur mesure. Tes résultats le font évoluer, et tu mesures ta progression.</span></span>
+          <div style="margin-top: auto; background: rgb(242, 240, 233); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5; color: rgb(76, 91, 83); font-weight: 600;"><span class="sc-interp">Semaine 4 : finales de tours — 6/10 exercices ✓</span></div>
+        </div>
+      
+    </div>
+  </div>
+
+  
+  <div style="padding: 0px 56px 72px; max-width: 1280px; margin: 0px auto;">
+    <div style="text-align: center; margin-bottom: 44px;"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(46, 125, 91); margin-bottom: 10px;">Le cœur de l'app</div><h2 id="fonctionnalites" style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin: 0px; max-width: 660px; display: inline-block;">Un entraînement construit sur tes parties, pas sur des puzzles génériques.</h2></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 44px; height: 44px; border-radius: 12px; background: rgb(232, 242, 236); display: flex; align-items: center; justify-content: center; font-size: 22px;"><span class="sc-interp">📋</span></div><span style="font-size: 19px; font-weight: 800; letter-spacing: -0.01em;"><span class="sc-interp">Plan d’entraînement adaptatif</span></span></div>
+          <span style="font-size: 15px; line-height: 1.65; color: rgb(76, 91, 83);"><span class="sc-interp">Un programme hebdomadaire généré à partir de tes faiblesses réelles — et qui se réajuste automatiquement selon tes résultats.</span></span>
+          <div style="background: rgb(34, 48, 42); color: rgb(242, 239, 231); border-radius: 12px; padding: 14px 16px; font-size: 13px; line-height: 1.55;"><span style="color: rgb(143, 208, 174); font-weight: 700;"><span class="sc-interp">Cette semaine</span> — </span><span class="sc-interp">« Priorité : les clouages. Détectés dans 9 de tes 12 dernières défaites. »</span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 44px; height: 44px; border-radius: 12px; background: rgb(232, 242, 236); display: flex; align-items: center; justify-content: center; font-size: 22px;"><span class="sc-interp">💥</span></div><span style="font-size: 19px; font-weight: 800; letter-spacing: -0.01em;"><span class="sc-interp">Blunder Trainer</span></span></div>
+          <span style="font-size: 15px; line-height: 1.65; color: rgb(76, 91, 83);"><span class="sc-interp">Rejoue tes propres gaffes sous forme de puzzles. La position exacte où tu as craqué la semaine dernière revient jusqu’à ce que tu la maîtrises.</span></span>
+          <div style="background: rgb(34, 48, 42); color: rgb(242, 239, 231); border-radius: 12px; padding: 14px 16px; font-size: 13px; line-height: 1.55;"><span style="color: rgb(143, 208, 174); font-weight: 700;"><span class="sc-interp">Puzzle du jour</span> — </span><span class="sc-interp">« Partie du 18/07, coup 24 : cette fois, trouve mieux que Dxb2. »</span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 44px; height: 44px; border-radius: 12px; background: rgb(232, 242, 236); display: flex; align-items: center; justify-content: center; font-size: 22px;"><span class="sc-interp">📖</span></div><span style="font-size: 19px; font-weight: 800; letter-spacing: -0.01em;"><span class="sc-interp">Répertoire d’ouvertures personnalisé</span></span></div>
+          <span style="font-size: 15px; line-height: 1.65; color: rgb(76, 91, 83);"><span class="sc-interp">Construit selon ton style, avec détection automatique de tes déviations par rapport à ta théorie.</span></span>
+          <div style="background: rgb(34, 48, 42); color: rgb(242, 239, 231); border-radius: 12px; padding: 14px 16px; font-size: 13px; line-height: 1.55;"><span style="color: rgb(143, 208, 174); font-weight: 700;"><span class="sc-interp">Alerte répertoire</span> — </span><span class="sc-interp">« Tu quittes ta théorie au coup 7 dans 40 % de tes Siciliennes. »</span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 44px; height: 44px; border-radius: 12px; background: rgb(232, 242, 236); display: flex; align-items: center; justify-content: center; font-size: 22px;"><span class="sc-interp">💬</span></div><span style="font-size: 19px; font-weight: 800; letter-spacing: -0.01em;"><span class="sc-interp">Coach conversationnel</span></span></div>
+          <span style="font-size: 15px; line-height: 1.65; color: rgb(76, 91, 83);"><span class="sc-interp">Pose n’importe quelle question sur n’importe quelle position, et reçois une explication claire, comme avec un vrai coach.</span></span>
+          <div style="background: rgb(34, 48, 42); color: rgb(242, 239, 231); border-radius: 12px; padding: 14px 16px; font-size: 13px; line-height: 1.55;"><span style="color: rgb(143, 208, 174); font-weight: 700;"><span class="sc-interp">Toi</span> — </span><span class="sc-interp">« Pourquoi pas Cf5 ici ? » — « Parce que g6 le chasse et ton cavalier n’a plus de case… »</span></div>
+        </div>
+      
+    </div>
+  </div>
+
+  
+  <div style="padding: 0px 56px 72px; max-width: 1280px; margin: 0px auto;">
+    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin: 0px 0px 8px;">Et toute la bibliothèque pour apprendre</h2>
+    <p style="font-size: 15px; color: rgb(93, 106, 99); margin: 0px 0px 32px;">En complément de ton plan personnalisé, un socle pédagogique complet.</p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 18px 20px; display: flex; gap: 14px; align-items: center;">
+          <span style="font-size: 24px; flex: 0 0 auto;"><span class="sc-interp">♚</span></span>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14.5px; font-weight: 700;"><span class="sc-interp">Mats célèbres</span></span><span style="font-size: 12.5px; color: rgb(122, 135, 127);"><span class="sc-interp">Berger, couloir, escalier…</span></span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 18px 20px; display: flex; gap: 14px; align-items: center;">
+          <span style="font-size: 24px; flex: 0 0 auto;"><span class="sc-interp">♘</span></span>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14.5px; font-weight: 700;"><span class="sc-interp">Ouvertures théoriques</span></span><span style="font-size: 12.5px; color: rgb(122, 135, 127);"><span class="sc-interp">120 ouvertures expliquées</span></span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 18px 20px; display: flex; gap: 14px; align-items: center;">
+          <span style="font-size: 24px; flex: 0 0 auto;"><span class="sc-interp">♖</span></span>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14.5px; font-weight: 700;"><span class="sc-interp">Finales essentielles</span></span><span style="font-size: 12.5px; color: rgb(122, 135, 127);"><span class="sc-interp">Opposition, règle du carré…</span></span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 18px 20px; display: flex; gap: 14px; align-items: center;">
+          <span style="font-size: 24px; flex: 0 0 auto;"><span class="sc-interp">♗</span></span>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14.5px; font-weight: 700;"><span class="sc-interp">Problèmes de milieu de jeu</span></span><span style="font-size: 12.5px; color: rgb(122, 135, 127);"><span class="sc-interp">2 400+ exercices calibrés</span></span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 18px 20px; display: flex; gap: 14px; align-items: center;">
+          <span style="font-size: 24px; flex: 0 0 auto;"><span class="sc-interp">📰</span></span>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14.5px; font-weight: 700;"><span class="sc-interp">Articles de stratégie</span></span><span style="font-size: 12.5px; color: rgb(122, 135, 127);"><span class="sc-interp">Écrits pour être compris</span></span></div>
+        </div>
+      
+        <div class="scp0" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 18px 20px; display: flex; gap: 14px; align-items: center;">
+          <span style="font-size: 24px; flex: 0 0 auto;"><span class="sc-interp">📈</span></span>
+          <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 14.5px; font-weight: 700;"><span class="sc-interp">Rapport de progression</span></span><span style="font-size: 12.5px; color: rgb(122, 135, 127);"><span class="sc-interp">Ton bilan chaque mois</span></span></div>
+        </div>
+      
+    </div>
+  </div>
+
+  
+  <div style="background: rgb(232, 242, 236); padding: 26px 56px;"><div style="max-width: 1168px; margin: 0px auto; display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; font-size: 15px; font-weight: 700; color: rgb(46, 125, 91);"><span>12 000 parties analysées</span><span>·</span><span>+120 Elo moyen en 6 mois</span><span>·</span><span>4,8★ de satisfaction</span></div></div>
+  <div style="padding: 64px 56px 72px; max-width: 1280px; margin: 0px auto;">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
+      
+        <div style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 18px; padding: 26px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="letter-spacing: 2px; color: rgb(232, 185, 59); font-size: 14px;">★★★★★</span><span style="background: rgb(232, 242, 236); color: rgb(46, 125, 91); font-size: 12.5px; font-weight: 800; padding: 5px 12px; border-radius: 99px;"><span class="sc-interp">+180 Elo en 3 mois</span></span></div>
+          <span style="font-size: 14.5px; line-height: 1.65; color: rgb(60, 74, 66);">« <span class="sc-interp">Témoignage à venir — place réservée pour un retour sur le Blunder Trainer.</span> »</span>
+          <div style="display: flex; gap: 10px; align-items: center;"><div style="width: 34px; height: 34px; border-radius: 99px; background: repeating-linear-gradient(45deg, rgb(232, 242, 236), rgb(232, 242, 236) 4px, rgb(215, 228, 220) 4px, rgb(215, 228, 220) 8px);"></div><div style="display: flex; flex-direction: column;"><span style="font-size: 13px; font-weight: 700;"><span class="sc-interp">Prénom N.</span></span><span style="font-size: 12px; color: rgb(122, 135, 127);"><span class="sc-interp">1240 → 1420 Elo · chess.com</span></span></div></div>
+        </div>
+      
+        <div style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 18px; padding: 26px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="letter-spacing: 2px; color: rgb(232, 185, 59); font-size: 14px;">★★★★★</span><span style="background: rgb(232, 242, 236); color: rgb(46, 125, 91); font-size: 12.5px; font-weight: 800; padding: 5px 12px; border-radius: 99px;"><span class="sc-interp">+95 Elo en 2 mois</span></span></div>
+          <span style="font-size: 14.5px; line-height: 1.65; color: rgb(60, 74, 66);">« <span class="sc-interp">Témoignage à venir — place réservée pour un retour sur le plan adaptatif.</span> »</span>
+          <div style="display: flex; gap: 10px; align-items: center;"><div style="width: 34px; height: 34px; border-radius: 99px; background: repeating-linear-gradient(45deg, rgb(232, 242, 236), rgb(232, 242, 236) 4px, rgb(215, 228, 220) 4px, rgb(215, 228, 220) 8px);"></div><div style="display: flex; flex-direction: column;"><span style="font-size: 13px; font-weight: 700;"><span class="sc-interp">Prénom N.</span></span><span style="font-size: 12px; color: rgb(122, 135, 127);"><span class="sc-interp">1560 → 1655 Elo · chess.com</span></span></div></div>
+        </div>
+      
+        <div style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 18px; padding: 26px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;"><span style="letter-spacing: 2px; color: rgb(232, 185, 59); font-size: 14px;">★★★★★</span><span style="background: rgb(232, 242, 236); color: rgb(46, 125, 91); font-size: 12.5px; font-weight: 800; padding: 5px 12px; border-radius: 99px;"><span class="sc-interp">+210 Elo en 6 mois</span></span></div>
+          <span style="font-size: 14.5px; line-height: 1.65; color: rgb(60, 74, 66);">« <span class="sc-interp">Témoignage à venir — place réservée pour un retour sur le coach conversationnel.</span> »</span>
+          <div style="display: flex; gap: 10px; align-items: center;"><div style="width: 34px; height: 34px; border-radius: 99px; background: repeating-linear-gradient(45deg, rgb(232, 242, 236), rgb(232, 242, 236) 4px, rgb(215, 228, 220) 4px, rgb(215, 228, 220) 8px);"></div><div style="display: flex; flex-direction: column;"><span style="font-size: 13px; font-weight: 700;"><span class="sc-interp">Prénom N.</span></span><span style="font-size: 12px; color: rgb(122, 135, 127);"><span class="sc-interp">870 → 1080 Elo · chess.com</span></span></div></div>
+        </div>
+      
+    </div>
+  </div>
+
+  
+  <div style="padding: 0px 56px 72px; max-width: 1280px; margin: 0px auto;">
+    <h2 id="tarifs" style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em; text-align: center; margin: 0px 0px 12px;">Un tarif pour chaque ambition</h2>
+    <p style="text-align: center; font-size: 15px; color: rgb(93, 106, 99); margin: 0px 0px 28px;">Essai Premium 7 jours offert, sans carte bancaire. Annulable à tout moment.</p>
+    <div style="display: flex; justify-content: center; margin-bottom: 36px;">
+      <div style="display: flex; background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 99px; padding: 5px; gap: 4px;">
+        <button style="font-family: Sora, sans-serif; font-size: 13.5px; font-weight: 700; padding: 9px 20px; border-radius: 99px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; cursor: pointer; background: rgb(46, 125, 91); color: rgb(255, 255, 255);" data-billing="monthly">Mensuel</button>
+        <button style="font-family: Sora, sans-serif; font-size: 13.5px; font-weight: 700; padding: 9px 20px; border-radius: 99px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; cursor: pointer; background: transparent; color: rgb(76, 91, 83);" data-billing="annual">Annuel <span style="font-weight: 800;">−30 %</span></button>
       </div>
     </div>
-  </section>
-</main>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: stretch;">
+      
+        <div style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 16px; position: relative; box-shadow: none;">
+          
+          <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 16px; font-weight: 800;"><span class="sc-interp">Gratuit</span></span><span style="font-size: 13px; color: rgb(122, 135, 127);"><span class="sc-interp">Pour découvrir</span></span></div>
+          <div style="display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;"><span style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em; color: rgb(46, 125, 91); white-space: nowrap;"><span class="sc-interp">0 €</span></span><span style="font-size: 13px; color: rgb(122, 135, 127);"><span class="sc-interp">pour toujours</span></span></div>
+          <div style="display: flex; flex-direction: column; gap: 9px; font-size: 14px; line-height: 1.5; color: rgb(60, 74, 66); flex: 1 1 0%;"><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">5 puzzles par jour</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">1 analyse de partie par jour</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Articles de stratégie</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Profil de joueur de base</span></span></span></div>
+          <span style="text-align: center; font-size: 14px; font-weight: 700; padding: 13px; border-radius: 99px; background: rgb(238, 242, 238); color: rgb(46, 125, 91);"><a href="/register" class="sc-interp" style="text-decoration: none; cursor: pointer; color: inherit;">Commencer</a></span>
+        </div>
+      
+        <div style="background: rgb(255, 255, 255); border: 2.5px solid rgb(46, 125, 91); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 16px; position: relative; box-shadow: rgba(46, 125, 91, 0.15) 0px 16px 40px;">
+          <div style="position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: rgb(46, 125, 91); color: rgb(255, 255, 255); font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 14px; border-radius: 99px; white-space: nowrap;"><span class="sc-interp">Recommandé</span></div>
+          <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 16px; font-weight: 800;"><span class="sc-interp">Premium</span></span><span style="font-size: 13px; color: rgb(122, 135, 127);"><span class="sc-interp">Pour progresser sérieusement</span></span></div>
+          <div style="display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;"><span style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em; color: rgb(46, 125, 91); white-space: nowrap;"><span class="sc-interp" data-price data-monthly="9,99 €" data-annual="6,99 €">9,99 €</span></span><span style="font-size: 13px; color: rgb(122, 135, 127);"><span class="sc-interp">/mois</span></span></div>
+          <div style="display: flex; flex-direction: column; gap: 9px; font-size: 14px; line-height: 1.5; color: rgb(60, 74, 66); flex: 1 1 0%;"><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Analyses de parties illimitées</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Plan d’entraînement adaptatif</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Blunder Trainer</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Répertoire d’ouvertures personnalisé</span></span></span></div>
+          <span style="text-align: center; font-size: 14px; font-weight: 700; padding: 13px; border-radius: 99px; background: rgb(46, 125, 91); color: rgb(255, 255, 255);"><a href="/register" class="sc-interp" style="text-decoration: none; cursor: pointer; color: inherit;">Essayer 7 jours gratuits</a></span>
+        </div>
+      
+        <div style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 16px; position: relative; box-shadow: none;">
+          
+          <div style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 16px; font-weight: 800;"><span class="sc-interp">Elite</span></span><span style="font-size: 13px; color: rgb(122, 135, 127);"><span class="sc-interp">Pour viser plus haut</span></span></div>
+          <div style="display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;"><span style="font-size: 36px; font-weight: 800; letter-spacing: -0.02em; color: rgb(46, 125, 91); white-space: nowrap;"><span class="sc-interp" data-price data-monthly="19,99 €" data-annual="13,99 €">19,99 €</span></span><span style="font-size: 13px; color: rgb(122, 135, 127);"><span class="sc-interp">/mois</span></span></div>
+          <div style="display: flex; flex-direction: column; gap: 9px; font-size: 14px; line-height: 1.5; color: rgb(60, 74, 66); flex: 1 1 0%;"><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Tout Premium, en illimité</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Coach conversationnel illimité</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Préparation d’adversaire</span></span></span><span style="display: flex; gap: 8px;"><span style="color: rgb(46, 125, 91);">✓</span><span><span class="sc-interp">Support prioritaire</span></span></span></div>
+          <span style="text-align: center; font-size: 14px; font-weight: 700; padding: 13px; border-radius: 99px; background: rgb(238, 242, 238); color: rgb(46, 125, 91);"><a href="/register" class="sc-interp" style="text-decoration: none; cursor: pointer; color: inherit;">Essayer 7 jours gratuits</a></span>
+        </div>
+      
+    </div>
+  </div>
 
-<footer th:replace="~{fragments :: footer}"></footer>
+  
+  <div style="padding: 0px 56px 80px; max-width: 880px; margin: 0px auto;">
+    <h2 id="faq" style="font-size: 30px; font-weight: 800; letter-spacing: -0.02em; text-align: center; margin: 0px 0px 36px;">Questions fréquentes</h2>
+    <div style="display: flex; flex-direction: column; gap: 12px;"><div class="faq-card" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 20px 24px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; justify-content: space-between; align-items: center; gap: 16px;"><span style="font-size: 15.5px; font-weight: 700;">Faut-il un compte chess.com ?</span><span style="font-size: 18px; font-weight: 700; color: rgb(46, 125, 91); flex: 0 0 auto;"><span data-faq-icon>−</span></span></div><span data-faq-answer style="font-size: 14px; line-height: 1.65; color: rgb(76, 91, 83);">Pour l’analyse personnalisée, oui : c’est là que nous lisons tes parties (lecture seule, en un clic). Sans compte, tu peux quand même utiliser toute la bibliothèque pédagogique et les puzzles.</span></div><div class="faq-card" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 20px 24px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; justify-content: space-between; align-items: center; gap: 16px;"><span style="font-size: 15.5px; font-weight: 700;">Pour quel niveau est-ce adapté ?</span><span style="font-size: 18px; font-weight: 700; color: rgb(46, 125, 91); flex: 0 0 auto;"><span data-faq-icon>−</span></span></div><span data-faq-answer style="font-size: 14px; line-height: 1.65; color: rgb(76, 91, 83);">Echecs360 est conçu pour les joueurs de 800 à 2000 Elo. Le plan d’entraînement et les exercices se calibrent automatiquement sur ton niveau réel, mesuré dans tes parties.</span></div><div class="faq-card" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 20px 24px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; justify-content: space-between; align-items: center; gap: 16px;"><span style="font-size: 15.5px; font-weight: 700;">Puis-je annuler à tout moment ?</span><span style="font-size: 18px; font-weight: 700; color: rgb(46, 125, 91); flex: 0 0 auto;"><span data-faq-icon>−</span></span></div><span data-faq-answer style="font-size: 14px; line-height: 1.65; color: rgb(76, 91, 83);">Oui, en deux clics depuis ton compte, sans justification. Tu gardes l’accès jusqu’à la fin de la période payée, et l’essai de 7 jours ne demande aucune carte bancaire.</span></div><div class="faq-card" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 20px 24px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; justify-content: space-between; align-items: center; gap: 16px;"><span style="font-size: 15.5px; font-weight: 700;">En quoi est-ce différent de chess.com ou Lichess ?</span><span style="font-size: 18px; font-weight: 700; color: rgb(46, 125, 91); flex: 0 0 auto;"><span data-faq-icon>−</span></span></div><span data-faq-answer style="font-size: 14px; line-height: 1.65; color: rgb(76, 91, 83);">Ces plateformes sont faites pour jouer. Nous, pour progresser : on analyse TES parties, on détecte TES erreurs récurrentes et on te construit un entraînement sur mesure — avec des explications en français clair, pas des évaluations chiffrées.</span></div><div class="faq-card" style="background: rgb(255, 255, 255); border: 1.5px solid rgb(230, 226, 216); border-radius: 14px; padding: 20px 24px; cursor: pointer; display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; justify-content: space-between; align-items: center; gap: 16px;"><span style="font-size: 15.5px; font-weight: 700;">Mes données sont-elles protégées ?</span><span style="font-size: 18px; font-weight: 700; color: rgb(46, 125, 91); flex: 0 0 auto;"><span data-faq-icon>−</span></span></div><span data-faq-answer style="font-size: 14px; line-height: 1.65; color: rgb(76, 91, 83);">Oui. Nous lisons uniquement tes parties publiques chess.com, rien d’autre. Tes données ne sont jamais revendues et tu peux supprimer ton compte et tout ton historique à tout moment (RGPD).</span></div></div>
+  </div>
+
+  
+  <div style="padding: 0px 56px 72px; max-width: 1280px; margin: 0px auto;">
+    <div style="background: rgb(46, 125, 91); color: rgb(255, 255, 255); border-radius: 24px; padding: 56px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      <h2 style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin: 0px; max-width: 640px; line-height: 1.2;">Ta prochaine partie peut être le début de ta progression.</h2>
+      <a href="/register" style="text-decoration: none; display: inline-block; cursor: pointer;font-size: 16px; font-weight: 700; background: rgb(255, 255, 255); color: rgb(46, 125, 91); padding: 16px 32px; border-radius: 99px;">Commencer gratuitement</a>
+      <span style="font-size: 13px; color: rgba(255, 255, 255, 0.75);">Essai Premium 7 jours offert · Sans carte bancaire · Compatible chess.com</span>
+    </div>
+  </div>
+  <div style="border-top: 1.5px solid rgb(230, 226, 216);">
+    <div style="padding: 32px 56px; max-width: 1280px; margin: 0px auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 24px;">
+      <div style="display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; align-items: center; gap: 8px;"><span style="font-size: 20px;">♞</span><span style="font-size: 16px; font-weight: 800;">echecs360</span></div><span style="font-size: 13px; line-height: 1.6; color: rgb(138, 148, 141); max-width: 280px;">Le coach d'échecs IA qui s'entraîne sur tes parties, pas sur celles des autres.</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: rgb(93, 106, 99);"><span style="font-weight: 800; color: rgb(34, 48, 42); font-size: 13px;">Produit</span><a href="#fonctionnalites" style="text-decoration: none; cursor: pointer; color: inherit;">Fonctionnalités</a><a href="#tarifs" style="text-decoration: none; cursor: pointer; color: inherit;">Tarifs</a><a href="#faq" style="text-decoration: none; cursor: pointer; color: inherit;">FAQ</a></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: rgb(93, 106, 99);"><span style="font-weight: 800; color: rgb(34, 48, 42); font-size: 13px;">Ressources</span><a href="/blog" style="text-decoration: none; cursor: pointer; color: inherit;">Articles stratégie</a><a href="/blog" style="text-decoration: none; cursor: pointer; color: inherit;">Blog</a><a href="mailto:contact@echecs360.fr" style="text-decoration: none; cursor: pointer; color: inherit;">Support</a></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: rgb(93, 106, 99);"><span style="font-weight: 800; color: rgb(34, 48, 42); font-size: 13px;">Légal</span><span>Confidentialité</span><span>CGU</span><a href="mailto:contact@echecs360.fr" style="text-decoration: none; cursor: pointer; color: inherit;">Contact</a></div>
+    </div>
+    <div style="padding: 0px 56px 28px; max-width: 1280px; margin: 0px auto; font-size: 12.5px; color: rgb(138, 148, 141);">© 2026 Echecs360 — fait avec ♟ en France</div>
+  </div></div></div></div>
+
+<script th:inline="none">
+// Accordéon FAQ : replié par défaut (1re question ouverte) ; sans JS, tout reste lisible.
+document.querySelectorAll('.faq-card').forEach(function (card, index) {
+  var answer = card.querySelector('[data-faq-answer]');
+  var icon = card.querySelector('[data-faq-icon]');
+  if (!answer || !icon) return;
+  function setOpen(open) {
+    answer.style.display = open ? '' : 'none';
+    icon.textContent = open ? '\u2212' : '+';
+    card.dataset.open = open ? '1' : '';
+  }
+  setOpen(index === 0);
+  card.addEventListener('click', function () { setOpen(!card.dataset.open); });
+});
+
+// Bascule des tarifs mensuel / annuel (−30 %)
+(function () {
+  var monthly = document.querySelector('[data-billing="monthly"]');
+  var annual = document.querySelector('[data-billing="annual"]');
+  if (!monthly || !annual) return;
+  function setBilling(mode) {
+    document.querySelectorAll('[data-price]').forEach(function (price) {
+      price.textContent = price.dataset[mode];
+    });
+    var pairs = [ [monthly, 'monthly'], [annual, 'annual'] ];
+    pairs.forEach(function (entry) {
+      var active = entry[1] === mode;
+      entry[0].style.background = active ? 'rgb(46, 125, 91)' : 'transparent';
+      entry[0].style.color = active ? 'rgb(255, 255, 255)' : 'rgb(76, 91, 83)';
+    });
+  }
+  monthly.addEventListener('click', function () { setBilling('monthly'); });
+  annual.addEventListener('click', function () { setBilling('annual'); });
+})();
+</script>
 </body>
 </html>
