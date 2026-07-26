@@ -46,6 +46,10 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .permitAll())
+                // Le POST /logout est exempté de CSRF : sinon un jeton périmé
+                // (session expirée, redéploiement) renvoie un 403 au lieu de
+                // déconnecter — le fameux « problème du logout ».
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/logout"))
                 // Session persistante « rester connecté » (14 jours)
                 .rememberMe(remember -> remember
                         .key(rememberMeKey)
