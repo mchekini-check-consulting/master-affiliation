@@ -474,6 +474,32 @@ button { font-family: inherit; }
   75% { transform: translateX(6px); }
 }
 
+/* ---------- Blunder Trainer ---------- */
+.trainer-panel { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.tr-card {
+  background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+  padding: 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.tr-card h3 { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
+.tr-card p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--gray-text); }
+.tr-stats { display: flex; gap: 8px; }
+.tr-stat {
+  flex: 1; background: var(--chip); border-radius: 10px; padding: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.tr-stat b { font-size: 18px; font-weight: 800; color: var(--green); }
+.tr-stat span { font-size: 10.5px; color: var(--gray-text); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; }
+.tr-progress-track { height: 6px; border-radius: 3px; background: var(--chip); }
+.tr-progress-fill { height: 6px; border-radius: 3px; background: var(--green); transition: width .3s ease; }
+.tr-quiz-head { display: flex; align-items: center; justify-content: space-between; }
+.tr-quiz-head .pos { font-size: 13px; font-weight: 800; color: var(--green); }
+.tr-quiz-head .score { font-size: 12px; font-weight: 700; color: var(--ink); background: var(--chip); padding: 4px 10px; border-radius: 99px; }
+.tr-feedback { border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 1.5; font-weight: 600; }
+.tr-feedback.ok { background: #e8f2ec; color: var(--green); border: 1.5px solid rgba(46, 125, 91, .35); }
+.tr-feedback.ko { background: #fbeae6; color: #c0503a; border: 1.5px solid rgba(192, 80, 58, .3); }
+.tr-feedback small { display: block; font-weight: 500; color: var(--ink); margin-top: 4px; }
+.tr-meta { font-size: 11.5px; color: var(--gray-text); }
+
 .thinking {
   display: none; align-items: center; gap: 8px;
   color: var(--gray-text); font-size: .88rem; padding: 8px 20px 0;

@@ -62,6 +62,7 @@
   let exAutoPlay = false;         // la solution a été déroulée automatiquement
   let exMessage = '';             // message affiché sous le titre
   let exSteps = null;             // visionneuse d'étapes { line, ply, attacker, startTurn, finCaption }
+  let trainer = null;             // Blunder Trainer { state, puzzles, index, score, ... }
   const EX_STORAGE_KEY = 'echecs360-exercices-faits';
   let exDone = new Set(JSON.parse(localStorage.getItem(EX_STORAGE_KEY) || '[]'));
 
@@ -289,6 +290,10 @@
     if (mode === 'games' && replay) {
       return { w: replay.headers.White || 'Blancs', b: replay.headers.Black || 'Noirs' };
     }
+    if (mode === 'trainer' && trainer && trainer.puzzles && trainer.puzzles[trainer.index]) {
+      const p = trainer.puzzles[trainer.index];
+      return p.userColor === 'w' ? { w: PSEUDO, b: p.opponent } : { w: p.opponent, b: PSEUDO };
+    }
     return { w: 'Blancs', b: 'Noirs' };
   }
 
@@ -329,6 +334,20 @@
   // ---------------------------------------------------------------- statut --
 
   function renderStatus() {
+    if (mode === 'trainer') {
+      statusMain.textContent = 'Blunder Trainer';
+      if (trainer && (trainer.state === 'guess' || trainer.state === 'feedback')) {
+        const p = trainer.puzzles[trainer.index];
+        statusSub.textContent = trainer.state === 'guess'
+          ? 'Trouvez le meilleur coup pour les ' + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.'
+          : (trainer.lastResult && trainer.lastResult.ok ? '✓ Bien vu !' : '✗ Le meilleur coup est surligné en vert.');
+      } else if (trainer && trainer.state === 'done') {
+        statusSub.textContent = 'Session terminée : ' + trainer.score + '/' + trainer.puzzles.length + '.';
+      } else {
+        statusSub.textContent = 'Vos gaffes deviennent vos exercices.';
+      }
+      return;
+    }
     if (mode === 'exercises') {
       if (!exCurrent) {
         statusMain.textContent = 'Exercices intensifs';
@@ -433,6 +452,11 @@
   function tryMove(from, to) {
     const candidates = legalTargets.filter(m => m.from === from && m.to === to);
     if (candidates.length === 0) return false;
+    // Blunder Trainer : le coup est une réponse au quiz, pas une partie
+    if (mode === 'trainer') {
+      if (trainer && trainer.state === 'guess') return trainerTryMove(from, to, candidates);
+      return false;
+    }
     // Mode « trouve le mat » : le coup doit être celui de la solution
     if (mode === 'exercises' && exCurrent && exCurrent.type === 'mat') {
       return exTryMatMove(from, to, candidates);
@@ -485,6 +509,7 @@
     if (mode === 'exercises') {
       return exCurrent !== null && !exBusy && !botThinking && game.turn === exPlayerColor;
     }
+    if (mode === 'trainer') return trainer !== null && trainer.state === 'guess';
     return true;
   }
 
@@ -698,6 +723,8 @@
       analysisProgress.textContent = 'Analyse en cours… ' + msg.percent + ' %';
     } else if (msg.type === 'analysis') {
       onAnalysisDone(msg.evals);
+    } else if (msg.type === 'blunders') {
+      onBlundersFound(msg);
     }
   }
 
@@ -759,23 +786,7 @@
     btn.textContent = 'Import en cours…';
     errorEl.style.display = 'none';
     try {
-      const archivesResp = await fetch('https://api.chess.com/pub/player/'
-          + encodeURIComponent(username.toLowerCase()) + '/games/archives');
-      if (archivesResp.status === 404) throw new Error('Pseudo chess.com introuvable.');
-      if (!archivesResp.ok) throw new Error('Erreur réseau (' + archivesResp.status + ').');
-      const archives = (await archivesResp.json()).archives || [];
-      // Archives parcourues de la plus récente à la plus ancienne, en série
-      const games = [];
-      for (let i = archives.length - 1; i >= 0 && games.length < 100; i--) {
-        const resp = await fetch(archives[i]);
-        if (!resp.ok) continue;
-        const month = (await resp.json()).games || [];
-        // Dans une archive les parties sont chronologiques : on prend la fin d'abord
-        for (let j = month.length - 1; j >= 0 && games.length < 100; j--) {
-          if (month[j].rules === 'chess') games.push(month[j]);
-        }
-      }
-      if (games.length === 0) throw new Error('Aucune partie d\'échecs classique trouvée pour ce compte.');
+      const games = await fetchChesscomGames(username);
       gamesList = games;
       chesscomUsername = username;
       saveChesscomUsername(username);
@@ -789,6 +800,28 @@
       btn.disabled = false;
       btn.textContent = 'Importer';
     }
+  }
+
+  /** Récupère les ~100 dernières parties classiques via l'API publique chess.com. */
+  async function fetchChesscomGames(username) {
+    const archivesResp = await fetch('https://api.chess.com/pub/player/'
+        + encodeURIComponent(username.toLowerCase()) + '/games/archives');
+    if (archivesResp.status === 404) throw new Error('Pseudo chess.com introuvable.');
+    if (!archivesResp.ok) throw new Error('Erreur réseau (' + archivesResp.status + ').');
+    const archives = (await archivesResp.json()).archives || [];
+    // Archives parcourues de la plus récente à la plus ancienne, en série
+    const games = [];
+    for (let i = archives.length - 1; i >= 0 && games.length < 100; i--) {
+      const resp = await fetch(archives[i]);
+      if (!resp.ok) continue;
+      const month = (await resp.json()).games || [];
+      // Dans une archive les parties sont chronologiques : on prend la fin d'abord
+      for (let j = month.length - 1; j >= 0 && games.length < 100; j--) {
+        if (month[j].rules === 'chess') games.push(month[j]);
+      }
+    }
+    if (games.length === 0) throw new Error('Aucune partie d\'échecs classique trouvée pour ce compte.');
+    return games;
   }
 
   function saveChesscomUsername(username) {
@@ -997,6 +1030,307 @@
     const rect = graphCanvas.getBoundingClientRect();
     const ratio = (event.clientX - rect.left) / rect.width;
     gotoPly(Math.round(ratio * (replay.evals.length - 1)));
+  });
+
+  // ------------------------------------------------------- blunder trainer --
+  // Quiz : 10 positions tirées au hasard des 100 dernières parties chess.com,
+  // là où le joueur a gaffé (perte >= 150 cp). Retrouver le meilleur coup
+  // rapporte un point ; le taux de réussite est affiché et persisté.
+
+  const TRAINER_SIZE = 10;
+  const TRAINER_STATS_KEY = 'echecs360-trainer-stats';
+  const trainerPanel = document.getElementById('trainer-panel');
+  let trainerRequestId = 0;
+
+  function trainerStats() {
+    try {
+      return JSON.parse(localStorage.getItem(TRAINER_STATS_KEY)) || { attempts: 0, correct: 0 };
+    } catch (e) { return { attempts: 0, correct: 0 }; }
+  }
+
+  function trainerSaveAttempt(correct) {
+    const stats = trainerStats();
+    stats.attempts++;
+    if (correct) stats.correct++;
+    localStorage.setItem(TRAINER_STATS_KEY, JSON.stringify(stats));
+  }
+
+  function trainerRate(correct, attempts) {
+    return attempts === 0 ? '—' : Math.round((correct / attempts) * 100) + ' %';
+  }
+
+  async function trainerStart() {
+    trainer = { state: 'prep', puzzles: [], index: 0, score: 0, order: [], oi: 0, gamesScanned: 0 };
+    renderTrainerPanel();
+    renderStatus();
+    if (gamesList.length === 0) {
+      if (!chesscomUsername) {
+        trainer.state = 'needuser';
+        renderTrainerPanel();
+        return;
+      }
+      try {
+        gamesList = await fetchChesscomGames(chesscomUsername);
+      } catch (err) {
+        if (!trainer || trainer.state !== 'prep') return;
+        trainer.state = 'error';
+        trainer.error = err.message;
+        renderTrainerPanel();
+        return;
+      }
+      if (!trainer || trainer.state !== 'prep') return;
+    }
+    // Ordre aléatoire des parties : les positions varient à chaque session
+    trainer.order = [...Array(gamesList.length).keys()];
+    for (let i = trainer.order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [trainer.order[i], trainer.order[j]] = [trainer.order[j], trainer.order[i]];
+    }
+    trainerScanNext();
+  }
+
+  /** Analyse la partie suivante (dans le worker) jusqu'à avoir 10 positions. */
+  function trainerScanNext() {
+    if (!trainer || trainer.state !== 'prep') return;
+    // Au plus 40 parties analysées par session : la préparation reste courte
+    if (trainer.puzzles.length >= TRAINER_SIZE || trainer.oi >= trainer.order.length
+        || trainer.gamesScanned >= 40) {
+      trainerBegin();
+      return;
+    }
+    const g = gamesList[trainer.order[trainer.oi++]];
+    const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
+    const parsed = Pgn.parsePgn(g.pgn || '');
+    if (parsed.sans.length < 10) { trainerScanNext(); return; }
+    trainer.currentGame = {
+      sans: parsed.sans,
+      userColor: meIsWhite ? 'w' : 'b',
+      opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
+    };
+    const requestId = ++trainerRequestId;
+    trainer.requestId = requestId;
+    ensureWorker().postMessage({
+      type: 'blunders', sans: parsed.sans,
+      userColor: trainer.currentGame.userColor, requestId
+    });
+    renderTrainerPanel();
+  }
+
+  function onBlundersFound(msg) {
+    if (!trainer || trainer.state !== 'prep' || msg.requestId !== trainer.requestId) return;
+    const found = msg.items.slice();
+    // Au plus 2 positions par partie, pour varier les contextes
+    while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
+    for (const item of found) {
+      if (trainer.puzzles.length >= TRAINER_SIZE) break;
+      trainer.puzzles.push({
+        ...item,
+        sans: trainer.currentGame.sans,
+        userColor: trainer.currentGame.userColor,
+        opponent: trainer.currentGame.opponent
+      });
+    }
+    trainer.gamesScanned++;
+    trainerScanNext();
+  }
+
+  function trainerBegin() {
+    if (!trainer) return;
+    if (trainer.puzzles.length === 0) {
+      trainer.state = 'empty';
+      renderTrainerPanel();
+      return;
+    }
+    for (let i = trainer.puzzles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [trainer.puzzles[i], trainer.puzzles[j]] = [trainer.puzzles[j], trainer.puzzles[i]];
+    }
+    trainer.index = 0;
+    trainer.score = 0;
+    trainerShowPuzzle();
+  }
+
+  /** Affiche la position du puzzle courant (juste avant la gaffe). */
+  function trainerShowPuzzle() {
+    const p = trainer.puzzles[trainer.index];
+    game = Chess.newGame();
+    sanHistory = [];
+    lastMove = null;
+    let prev = null;
+    for (let i = 0; i < p.ply; i++) {
+      const move = Pgn.sanToMove(Chess, game, p.sans[i]);
+      Chess.play(game, move);
+      sanHistory.push(p.sans[i]);
+      prev = move;
+    }
+    if (prev) lastMove = { from: prev.from, to: prev.to };
+    selected = -1;
+    legalTargets = [];
+    gameOver = false;
+    orientation = p.userColor;
+    placeSquares();
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    for (const el of squares) el.classList.remove('hint-move');
+    trainer.state = 'guess';
+    trainer.lastResult = null;
+    renderGame({});
+    renderTrainerPanel();
+  }
+
+  /** Réponse du joueur : point si le coup est (quasi) le meilleur. */
+  function trainerTryMove(from, to, candidates) {
+    const p = trainer.puzzles[trainer.index];
+    let move = candidates[0];
+    if (move.promo) move = candidates.find(m => m.promo === 'q') || move;
+    const ok = p.acceptable.some(a =>
+        a.from === move.from && a.to === move.to && (a.promo || null) === (move.promo || null));
+    const userSan = Chess.sanOf(game, move);
+    Chess.play(game, move);
+    sanHistory.push(userSan);
+    lastMove = { from: move.from, to: move.to };
+    selected = -1;
+    legalTargets = [];
+    if (ok) trainer.score++;
+    trainer.state = 'feedback';
+    trainer.lastResult = { ok, userSan };
+    trainerSaveAttempt(ok);
+    if (move.capture) soundCapture(); else soundMove();
+    renderGame({ animate: true });
+    // Surligne le meilleur coup sur l'échiquier
+    const best = p.acceptable[0];
+    squares[best.from].classList.add('hint-move');
+    squares[best.to].classList.add('hint-move');
+    renderTrainerPanel();
+    return true;
+  }
+
+  function trainerNext() {
+    if (!trainer) return;
+    trainer.index++;
+    if (trainer.index >= trainer.puzzles.length) {
+      trainer.state = 'done';
+      renderTrainerPanel();
+      renderStatus();
+    } else {
+      trainerShowPuzzle();
+    }
+  }
+
+  function trainerEvalLabel(cp) {
+    const value = cp / 100;
+    return (value >= 0 ? '+' : '') + value.toFixed(1);
+  }
+
+  function renderTrainerPanel() {
+    if (!trainer) {
+      trainerPanel.innerHTML = '';
+      return;
+    }
+    const stats = trainerStats();
+    const globalStats =
+      '<div class="tr-stats">'
+      + '<div class="tr-stat"><b>' + stats.attempts + '</b><span>positions jouées</span></div>'
+      + '<div class="tr-stat"><b>' + stats.correct + '</b><span>réussies</span></div>'
+      + '<div class="tr-stat"><b>' + trainerRate(stats.correct, stats.attempts) + '</b><span>taux global</span></div>'
+      + '</div>';
+
+    if (trainer.state === 'intro') {
+      trainerPanel.innerHTML =
+        '<div class="tr-card"><h3>🧩 Blunder Trainer</h3>'
+        + '<p>' + TRAINER_SIZE + ' positions tirées au hasard de vos 100 dernières parties chess.com, '
+        + 'juste avant une gaffe ou une erreur que vous avez commise. '
+        + 'Retrouvez le meilleur coup : 1 point par bonne réponse.</p>'
+        + globalStats
+        + '<button type="button" class="btn btn-primary" data-tr="start">Démarrer · ' + TRAINER_SIZE + ' positions</button>'
+        + '</div>';
+    } else if (trainer.state === 'needuser') {
+      trainerPanel.innerHTML =
+        '<div class="tr-card"><h3>🧩 Blunder Trainer</h3>'
+        + '<p>Indiquez votre pseudo chess.com : vos 100 dernières parties seront récupérées puis analysées.</p>'
+        + '<input type="text" id="tr-user" placeholder="ex. hikaru" autocomplete="off" '
+        + 'style="padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px">'
+        + '<button type="button" class="btn btn-primary" data-tr="setuser">Analyser mes parties</button>'
+        + '</div>';
+    } else if (trainer.state === 'prep') {
+      const pct = Math.round((trainer.puzzles.length / TRAINER_SIZE) * 100);
+      trainerPanel.innerHTML =
+        '<div class="tr-card"><h3>Recherche de vos gaffes…</h3>'
+        + '<p>' + trainer.gamesScanned + ' partie' + plural(trainer.gamesScanned) + ' analysée'
+        + plural(trainer.gamesScanned) + ' · ' + trainer.puzzles.length + '/' + TRAINER_SIZE
+        + ' position' + plural(trainer.puzzles.length) + ' trouvée' + plural(trainer.puzzles.length) + '</p>'
+        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + pct + '%"></div></div>'
+        + '</div>';
+    } else if (trainer.state === 'guess' || trainer.state === 'feedback') {
+      const p = trainer.puzzles[trainer.index];
+      const moveNumber = Math.floor(p.ply / 2) + 1;
+      const kind = p.loss >= 300 ? 'une gaffe' : 'une erreur';
+      let feedback = '';
+      if (trainer.state === 'feedback') {
+        const r = trainer.lastResult;
+        feedback = r.ok
+          ? '<div class="tr-feedback ok">✓ Exact ! ' + escapeHtml(r.userSan) + ' était le meilleur coup ('
+            + trainerEvalLabel(p.evalBest) + ').'
+            + '<small>En partie, vous aviez joué ' + escapeHtml(p.played) + ' — ' + kind + '.</small></div>'
+          : '<div class="tr-feedback ko">✗ ' + escapeHtml(r.userSan) + '… Le meilleur coup était '
+            + escapeHtml(p.bestSan) + ' (' + trainerEvalLabel(p.evalBest) + '), surligné en vert.'
+            + '<small>En partie, vous aviez joué ' + escapeHtml(p.played) + ' — ' + kind + '.</small></div>';
+        feedback += '<button type="button" class="btn btn-primary" data-tr="next">'
+          + (trainer.index + 1 >= trainer.puzzles.length ? 'Voir le résultat' : 'Position suivante') + '</button>';
+      }
+      trainerPanel.innerHTML =
+        '<div class="tr-card">'
+        + '<div class="tr-quiz-head"><span class="pos">Position ' + (trainer.index + 1) + ' / '
+        + trainer.puzzles.length + '</span><span class="score">Score : ' + trainer.score + '</span></div>'
+        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:'
+        + Math.round((trainer.index / trainer.puzzles.length) * 100) + '%"></div></div>'
+        + '<p class="tr-meta">Contre ' + escapeHtml(p.opponent) + ' · coup n°' + moveNumber
+        + ' · trait aux ' + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.</p>'
+        + (trainer.state === 'guess'
+            ? '<p>Vous avez commis ' + kind + ' ici. Trouvez le meilleur coup !</p>' : '')
+        + feedback
+        + '</div>';
+    } else if (trainer.state === 'done') {
+      const total = trainer.puzzles.length;
+      const pct = Math.round((trainer.score / total) * 100);
+      trainerPanel.innerHTML =
+        '<div class="tr-card"><h3>Session terminée !</h3>'
+        + '<div class="tr-stats">'
+        + '<div class="tr-stat"><b>' + trainer.score + '/' + total + '</b><span>score</span></div>'
+        + '<div class="tr-stat"><b>' + pct + ' %</b><span>réussite session</span></div>'
+        + '</div>'
+        + globalStats
+        + '<button type="button" class="btn btn-primary" data-tr="start">Nouvelle session</button>'
+        + '</div>';
+    } else if (trainer.state === 'empty') {
+      trainerPanel.innerHTML =
+        '<div class="tr-card"><h3>Aucune gaffe trouvée 🎉</h3>'
+        + '<p>Bravo — ou presque : aucune erreur nette n\'a été détectée dans les parties analysées. Réessayez, le tirage est aléatoire.</p>'
+        + '<button type="button" class="btn btn-primary" data-tr="start">Réessayer</button>'
+        + '</div>';
+    } else if (trainer.state === 'error') {
+      trainerPanel.innerHTML =
+        '<div class="tr-card"><h3>Impossible de récupérer vos parties</h3>'
+        + '<p>' + escapeHtml(trainer.error || 'Erreur inconnue.') + '</p>'
+        + '<button type="button" class="btn btn-primary" data-tr="start">Réessayer</button>'
+        + '</div>';
+    }
+  }
+
+  trainerPanel.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-tr]');
+    if (!btn) return;
+    const action = btn.dataset.tr;
+    if (action === 'start') trainerStart();
+    else if (action === 'next') trainerNext();
+    else if (action === 'setuser') {
+      const input = trainerPanel.querySelector('#tr-user');
+      const value = (input && input.value.trim()) || '';
+      if (!value) return;
+      chesscomUsername = value;
+      saveChesscomUsername(value);
+      trainerStart();
+    }
   });
 
   // ---------------------------------------------------- exercices intensifs --
@@ -1554,24 +1888,45 @@
 
     const inGames = next === 'games';
     const inExercises = next === 'exercises';
+    const inTrainer = next === 'trainer';
+    // Quitter le trainer pendant la préparation annule la recherche en cours
+    if (!inTrainer && trainer && trainer.state === 'prep') {
+      trainer = null;
+      trainerRequestId++;
+      renderTrainerPanel();
+    }
     gamesPanel.style.display = inGames && !replay ? 'block' : 'none';
-    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) ? 'none' : '';
+    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer ? 'none' : '';
     replayNav.style.display = inGames && replay ? 'flex' : 'none';
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
     graphWrap.style.display = inGames && replay && replay.evals ? 'block' : 'none';
     analysisSummary.textContent = inGames && replay && replay.evals ? analysisSummary.textContent : '';
     btnNew.textContent = inGames ? 'Importer' : 'Nouvelle partie';
-    // Panneaux des exercices
+    // Panneaux des exercices et du trainer
     document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
     document.getElementById('ex-toolbar').style.display = inExercises && exCurrent ? 'flex' : 'none';
     document.getElementById('ex-explanation').style.display = 'none';
-    document.getElementById('controls').style.display = inExercises ? 'none' : 'flex';
+    document.getElementById('controls').style.display = inExercises || inTrainer ? 'none' : 'flex';
+    trainerPanel.style.display = inTrainer ? 'flex' : 'none';
 
     if (next === 'two') {
       startGame('w');
     } else if (next === 'bot') {
       showBotConfigModal();
+    } else if (next === 'trainer') {
+      if (trainer && trainer.state === 'guess') {
+        trainerShowPuzzle();
+      } else if (trainer && trainer.state === 'feedback') {
+        trainerNext();
+      } else {
+        if (!trainer || (trainer.state !== 'done' && trainer.state !== 'empty' && trainer.state !== 'error')) {
+          trainer = { state: 'intro' };
+        }
+        startGame('w');
+        renderTrainerPanel();
+        renderStatus();
+      }
     } else if (next === 'exercises') {
       if (exCurrent) {
         renderGame({});

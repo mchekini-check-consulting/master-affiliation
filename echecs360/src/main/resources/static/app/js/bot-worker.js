@@ -14,6 +14,9 @@
  * Messages reçus :
  *  { type:'search', position, elo }        → { type:'move', move }
  *  { type:'analyze', sans }                → progression + { type:'analysis', evals }
+ *  { type:'blunders', sans, userColor, requestId }
+ *      → { type:'blunders', requestId, items } (Blunder Trainer :
+ *        gaffes/erreurs du joueur avec meilleur coup et coups acceptés)
  */
 'use strict';
 
@@ -247,6 +250,77 @@ self.onmessage = function (event) {
     if (scored.length === 0) { self.postMessage({ type: 'move', move: null }); return; }
     const move = pickMove(scored, msg.elo);
     self.postMessage({ type: 'move', move });
+    return;
+  }
+
+  if (msg.type === 'blunders') {
+    // Blunder Trainer : repère les gaffes/erreurs du joueur (perte >= 150 cp
+    // à profondeur 3) et calcule le meilleur coup (profondeur 5) sur chacune.
+    const DEPTH = 3;
+    const BEST_DEPTH = 4;
+    const BOUND = 1200;
+    const s = Chess.newGame();
+    const evals = [];
+    const positions = []; // état sérialisé avant chaque demi-coup
+
+    const record = () => {
+      const status = Chess.statusOf(s);
+      if (status.over) {
+        evals.push(status.result === '1-0' ? BOUND : status.result === '0-1' ? -BOUND : 0);
+        return;
+      }
+      const score = negamax(s, DEPTH, -Infinity, Infinity);
+      const white = s.turn === Chess.WHITE ? score : -score;
+      evals.push(Math.max(-BOUND, Math.min(BOUND, white)));
+    };
+
+    record();
+    const played = [];
+    for (let i = 0; i < msg.sans.length; i++) {
+      positions.push({
+        board: s.board.slice(), turn: s.turn, castling: { ...s.castling },
+        ep: s.ep, halfmove: s.halfmove, fullmove: s.fullmove
+      });
+      const move = Pgn.sanToMove(Chess, s, msg.sans[i]);
+      if (!move) break;
+      played.push(msg.sans[i]);
+      Chess.play(s, move);
+      record();
+    }
+
+    const items = [];
+    for (let i = 0; i < played.length && i + 1 < evals.length; i++) {
+      const mover = i % 2 === 0 ? 'w' : 'b';
+      if (mover !== msg.userColor) continue;
+      if (i < 4) continue;                                  // bruit d'ouverture
+      const before = mover === 'w' ? evals[i] : -evals[i];  // perspective joueur
+      if (before <= -1100 || before >= 1100) continue;      // partie déjà pliée
+      const loss = mover === 'w' ? evals[i] - evals[i + 1] : evals[i + 1] - evals[i];
+      if (loss < 150) continue;
+      // Meilleur coup dans la position fautive, à profondeur supérieure
+      const pos = restoreState(positions[i]);
+      const scored = searchRoot(pos, BEST_DEPTH);
+      if (scored.length === 0) continue;
+      const best = scored[0];
+      // Coups acceptés : à moins de 30 cp du meilleur. S'ils sont trop
+      // nombreux, la position est molle (tout se vaut) : pas un bon quiz.
+      const nearBest = scored.filter(entry => best.score - entry.score <= 30);
+      if (nearBest.length > 4) continue;
+      const acceptable = nearBest
+        .map(entry => ({
+          from: entry.move.from, to: entry.move.to, promo: entry.move.promo || null,
+          san: Chess.sanOf(restoreState(positions[i]), entry.move)
+        }));
+      items.push({
+        ply: i,
+        played: played[i],
+        loss,
+        bestSan: acceptable[0].san,
+        evalBest: Math.round(best.score),
+        acceptable
+      });
+    }
+    self.postMessage({ type: 'blunders', requestId: msg.requestId, items });
     return;
   }
 
