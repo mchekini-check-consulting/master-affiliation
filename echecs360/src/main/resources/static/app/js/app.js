@@ -63,6 +63,14 @@
   let exMessage = '';             // message affiché sous le titre
   let exSteps = null;             // visionneuse d'étapes { line, ply, attacker, startTurn, finCaption }
   let trainer = null;             // Blunder Trainer { state, puzzles, index, score, ... }
+
+  // Réglages persistés : sons + aides (badges, alertes, explications)
+  const SETTINGS_KEY = 'echecs360-reglages';
+  let settings = Object.assign({ sons: true, aides: true },
+      JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+  function saveSettings() {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }
   const EX_STORAGE_KEY = 'echecs360-exercices-faits';
   let exDone = new Set(JSON.parse(localStorage.getItem(EX_STORAGE_KEY) || '[]'));
 
@@ -73,6 +81,7 @@
 
   let audioCtx = null;
   function beep(freq, duration, type, gainValue) {
+    if (!settings.sons) return;
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       const osc = audioCtx.createOscillator();
@@ -89,6 +98,29 @@
   const soundMove = () => beep(420, 0.07, 'sine', 0.07);
   const soundCapture = () => beep(210, 0.1, 'triangle', 0.1);
   const soundEnd = () => { beep(392, 0.14, 'sine', 0.08); setTimeout(() => beep(523, 0.22, 'sine', 0.08), 130); };
+
+  /** Nappe grave dissonante : le son du « signal faible ». */
+  function soundWeird() {
+    if (!settings.sons) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.06, now + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+      gain.connect(audioCtx.destination);
+      for (const freq of [98, 104.5]) {          // deux ondes désaccordées : battement inquiétant
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.linearRampToValueAtTime(freq * 0.92, now + 0.9);
+        osc.connect(gain);
+        osc.start(now);
+        osc.stop(now + 0.9);
+      }
+    } catch (e) { /* silencieux */ }
+  }
 
   // ----------------------------------------------------------- échiquier --
 
@@ -908,9 +940,11 @@
     }
     replay = {
       headers: parsed.headers, sans, snapshots,
-      userColor: meIsWhite ? 'w' : 'b', evals: null, cls: null
+      userColor: meIsWhite ? 'w' : 'b', evals: null, cls: null,
+      mistakes: null, weak: null
     };
     replayPly = 0;
+    lastAnnotatedPly = -1;
     orientation = replay.userColor; // échiquier orienté du côté de l'utilisateur
     placeSquares();
     gamesPanel.style.display = 'none';
@@ -941,6 +975,28 @@
     updateMoveExplain();
     hideSignalsPanel();
     updateSignalsButton();
+    updateMoveAnnotations();
+  }
+
+  /** Badges + alertes « signal faible » sur l'échiquier pendant la relecture. */
+  let lastAnnotatedPly = -1;
+  function updateMoveAnnotations() {
+    clearMoveBadge();
+    clearWeakAlert();
+    const advanced = replayPly === lastAnnotatedPly + 1;
+    lastAnnotatedPly = replayPly;
+    if (!replay || !settings.aides || replayPly === 0) return;
+    const snapMove = replay.snapshots[replayPly] && replay.snapshots[replayPly].move;
+    if (!snapMove) return;
+    // Badge de classification sur la case d'arrivée du dernier coup
+    if (replay.cls && replay.cls[replayPly - 1]) {
+      showMoveBadge(snapMove.to, replay.cls[replayPly - 1]);
+    }
+    // Signal faible sur un coup adverse : halo + icône + son (en avançant)
+    if (replay.weak && replay.weak[replayPly - 1]) {
+      showWeakAlert(snapMove.to);
+      if (advanced) soundWeird();
+    }
   }
 
   document.getElementById('nav-first').addEventListener('click', () => gotoPly(0));
@@ -958,12 +1014,203 @@
 
   // --------------------------------------------------------------- analyse --
 
+  // ------------------------------------ annotation Stockfish (classification) --
+
+  let analysisToken = 0;
+
+  /** uci « e2e4 » → coup légal de la position, ou null. */
+  function uciToMove(state, uci) {
+    if (!uci) return null;
+    const files = 'abcdefgh';
+    const from = (8 - +uci[1]) * 8 + files.indexOf(uci[0]);
+    const to = (8 - +uci[3]) * 8 + files.indexOf(uci[2]);
+    const promo = uci[4] || null;
+    return Chess.legalMoves(state).find(m =>
+        m.from === from && m.to === to && (m.promo || null) === promo) || null;
+  }
+
+  /** Composant MoveBadge : pastille de classification sur la case d'arrivée. */
+  function showMoveBadge(sq, cls) {
+    clearMoveBadge();
+    if (!settings.aides || !cls || sq === undefined || sq === null) return;
+    const badge = document.createElement('div');
+    badge.className = 'move-badge mb-' + (cls.css || cls.kind);
+    badge.textContent = cls.symbol;
+    squares[sq].appendChild(badge);
+  }
+  function clearMoveBadge() {
+    document.querySelectorAll('.move-badge').forEach(n => n.remove());
+  }
+
+  /** Alerte visuelle « signal faible » : halo pulsé + icône ⚠️. */
+  function showWeakAlert(sq) {
+    if (!settings.aides) return;
+    squares[sq].classList.remove('weak-halo');
+    void squares[sq].offsetWidth; // relance l'animation
+    squares[sq].classList.add('weak-halo');
+    const icon = document.createElement('div');
+    icon.className = 'weak-eye';
+    icon.textContent = '⚠️';
+    squares[sq].appendChild(icon);
+  }
+  function clearWeakAlert() {
+    document.querySelectorAll('.weak-eye').forEach(n => n.remove());
+    for (const el of squares) el.classList.remove('weak-halo');
+  }
+
   function startAnalysis() {
     if (!replay || replay.evals) return;
     btnAnalyze.disabled = true;
     analysisProgress.style.display = 'block';
-    analysisProgress.textContent = 'Analyse en cours… 0 %';
-    ensureWorker().postMessage({ type: 'analyze', sans: replay.sans });
+    analysisProgress.textContent = 'Chargement de Stockfish…';
+    const token = ++analysisToken;
+    SfEngine.ready().then(ok => {
+      if (token !== analysisToken || !replay) return;
+      if (!ok) {
+        // Stockfish indisponible : on retombe sur le moteur maison
+        analysisProgress.textContent = 'Analyse en cours… 0 %';
+        ensureWorker().postMessage({ type: 'analyze', sans: replay.sans });
+        return;
+      }
+      runSfAnalysis(token);
+    });
+  }
+
+  async function runSfAnalysis(token) {
+    // Rejoue la partie pour collecter FEN et coups joués
+    const state = Chess.newGame();
+    const fens = [Chess.toFen(state)];
+    const played = [];
+    for (const san of replay.sans) {
+      const move = Pgn.sanToMove(Chess, state, san);
+      if (!move) break;
+      played.push({ from: move.from, to: move.to, promo: move.promo || null, san });
+      Chess.play(state, move);
+      fens.push(Chess.toFen(state));
+    }
+    // Analyse de chaque position : MultiPV 5, profondeur 18 bornée en temps
+    const infos = [];
+    for (let i = 0; i < fens.length; i++) {
+      if (token !== analysisToken || !replay) return;
+      const pos = Chess.fromFen(fens[i]);
+      const status = Chess.statusOf(pos);
+      if (status.over) {
+        infos.push({ over: true, result: status.result, lines: [] });
+      } else {
+        const lines = await SfEngine.analyze(fens[i], { multipv: 5, movetime: 450, depth: 18 });
+        if (token !== analysisToken || !replay) return;
+        infos.push({ over: false, lines: lines || [] });
+      }
+      analysisProgress.textContent = 'Analyse Stockfish… ' + Math.round(((i + 1) / fens.length) * 100) + ' %';
+    }
+    onSfAnalysisDone(infos, played);
+  }
+
+  /** Éval « effective » d'une position analysée, perspective Blancs. */
+  function infoEval(info) {
+    if (info.over) return info.result === '1-0' ? 3000 : info.result === '0-1' ? -3000 : 0;
+    const top = info.lines[0];
+    if (!top) return 0;
+    if (top.mate !== null && top.mate !== undefined) return top.mate > 0 ? 3000 : -3000;
+    return top.cp || 0;
+  }
+
+  function onSfAnalysisDone(infos, played) {
+    analysisProgress.style.display = 'none';
+    btnAnalyze.disabled = false;
+    if (!replay) return;
+
+    // Évals pour le graphe et la barre (bornées comme avant)
+    replay.evals = infos.map(info => Math.max(-1200, Math.min(1200, infoEval(info))));
+
+    // Classification + explications + signaux faibles, coup par coup
+    const cls = new Array(played.length).fill(null);
+    const mistakes = new Array(played.length).fill(null);
+    const weak = new Array(played.length).fill(null);
+    const counts = { w: { blunder: 0, mistake: 0, inaccuracy: 0 }, b: { blunder: 0, mistake: 0, inaccuracy: 0 } };
+
+    const state = Chess.newGame();
+    for (let i = 0; i < played.length; i++) {
+      const info = infos[i];
+      const after = infos[i + 1];
+      if (!info || !after) break;
+      const mover = i % 2 === 0 ? 'w' : 'b';
+      const top = info.lines[0];
+      const playedUci = Chess.algebraic(played[i].from) + Chess.algebraic(played[i].to) + (played[i].promo || '');
+      const entry = {
+        cpBefore: top ? top.cp : null,
+        mateBefore: top ? top.mate : null,
+        cpAfter: after.over ? infoEval(after) : (after.lines[0] ? after.lines[0].cp : null),
+        mateAfter: after.over ? null : (after.lines[0] ? after.lines[0].mate : null),
+        mover,
+        isBest: top ? top.uci === playedUci : false
+      };
+      if (info.over) { cls[i] = null; continue; }
+      const c = MoveClassifier.classify(entry);
+      cls[i] = c;
+      if (counts[mover][c.kind] !== undefined) counts[mover][c.kind]++;
+
+      const move = uciToMove(state, playedUci);
+
+      // Signal faible : coups de l'ADVERSAIRE uniquement
+      if (mover !== replay.userColor && move) {
+        const alert = WeakSignalDetector.detect(Chess, Signals, {
+          move,
+          stateBefore: state,
+          topUci: info.lines.map(l => l.uci),
+          cpBefore: infoEval(info),
+          cpAfter: infoEval(after),
+          mover,
+          player: replay.userColor
+        });
+        if (alert) weak[i] = alert;
+      }
+
+      // Explication des fautes : meilleur coup + conséquence (réfutation)
+      if (c.kind === 'blunder' || c.kind === 'mistake' || c.kind === 'inaccuracy') {
+        let sanBest = null;
+        if (top) {
+          const bestMove = uciToMove(state, top.uci);
+          if (bestMove) sanBest = Chess.sanOf(state, bestMove);
+        }
+        if (move) Chess.play(state, move);
+        let refutation = null;
+        if (!after.over && after.lines[0]) {
+          const refMove = uciToMove(state, after.lines[0].uci);
+          if (refMove) refutation = Object.assign({}, refMove, { san: Chess.sanOf(state, refMove) });
+        }
+        mistakes[i] = MoveClassifier.explain(Chess, Signals, {
+          cls: c,
+          sanPlayed: played[i].san,
+          sanBest,
+          evalBestCp: top ? top.cp : null,
+          mateBefore: top ? top.mate : null,
+          mateAfter: after.over ? null : (after.lines[0] ? after.lines[0].mate : null),
+          mover,
+          stateAfter: state,
+          refutation
+        });
+      } else if (move) {
+        Chess.play(state, move);
+      }
+    }
+
+    replay.cls = cls;
+    replay.mistakes = mistakes;
+    replay.weak = weak;
+    analysisSummary.innerHTML =
+      'Blancs : ' + counts.w.blunder + ' gaffe' + plural(counts.w.blunder)
+      + ' · ' + counts.w.mistake + ' erreur' + plural(counts.w.mistake)
+      + ' · ' + counts.w.inaccuracy + ' imprécision' + plural(counts.w.inaccuracy) + '<br>'
+      + 'Noirs : ' + counts.b.blunder + ' gaffe' + plural(counts.b.blunder)
+      + ' · ' + counts.b.mistake + ' erreur' + plural(counts.b.mistake)
+      + ' · ' + counts.b.inaccuracy + ' imprécision' + plural(counts.b.inaccuracy)
+      + '<br><span style="color:var(--green);font-weight:700">Analyse Stockfish 18 · MultiPV 5</span>';
+    graphWrap.style.display = 'block';
+    renderMoves(replay.sans, replayPly, cls);
+    drawEvalGraph();
+    updateEvalBar();
+    gotoPly(replayPly);
   }
 
   function onAnalysisDone(evals) {
@@ -1240,10 +1487,27 @@
           : (loaded ? '<p class="cfg-status ok">✓ ' + gamesList.length + ' parties chargées pour « '
              + escapeHtml(chesscomUsername) + ' ».</p>'
              : '<p class="cfg-status busy">Aucune partie chargée pour l\'instant.</p>'))
+      + '</div>'
+      + '<div class="tr-card"><h3>Préférences</h3>'
+      + '<label class="cfg-toggle"><input type="checkbox" id="cfg-sons"' + (settings.sons ? ' checked' : '') + '>'
+      + '<span>Sons<small>Coups, captures et alerte « signal faible ».</small></span></label>'
+      + '<label class="cfg-toggle"><input type="checkbox" id="cfg-aides"' + (settings.aides ? ' checked' : '') + '>'
+      + '<span>Aides visuelles<small>Badges de coups (??, !, ★), alertes et explications. '
+      + 'Décochez pour un mode « sans aide ».</small></span></label>'
       + '</div>';
     const input = configPanel.querySelector('#cfg-user');
     configPanel.querySelector('#cfg-load').addEventListener('click', () => loadGamesFromConfig(input.value.trim()));
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadGamesFromConfig(input.value.trim()); });
+    configPanel.querySelector('#cfg-sons').addEventListener('change', (e) => {
+      settings.sons = e.target.checked;
+      saveSettings();
+    });
+    configPanel.querySelector('#cfg-aides').addEventListener('change', (e) => {
+      settings.aides = e.target.checked;
+      saveSettings();
+      clearMoveBadge();
+      clearWeakAlert();
+    });
   }
 
   async function loadGamesFromConfig(username) {
@@ -1292,27 +1556,43 @@
     return null;
   }
 
-  /** Explication du coup courant pendant la relecture d'une partie. */
+  /** Panneau d'explication du coup courant : classification Stockfish
+      (gaffe/erreur + meilleur coup + conséquence), signal faible éventuel,
+      et lecture « humaine » du coup. */
   function updateMoveExplain() {
-    if (mode !== 'games' || !replay || replayPly === 0) {
+    if (mode !== 'games' || !replay || replayPly === 0 || !settings.aides) {
       moveExplainEl.style.display = 'none';
       return;
     }
+    const parts = [];
+    const index = replayPly - 1;
+    if (replay.mistakes && replay.mistakes[index]) {
+      parts.push('<b>' + escapeHtml(replay.mistakes[index]) + '</b>');
+    }
+    if (replay.weak && replay.weak[index]) {
+      parts.push('<span style="color:#8e44ad;font-weight:600">' + escapeHtml(replay.weak[index].message) + '</span>');
+    }
+    // Lecture « humaine » du coup (développement, roque, colonne ouverte...)
     const s = Chess.newGame();
-    for (let i = 0; i < replayPly - 1; i++) {
+    let valid = true;
+    for (let i = 0; i < index; i++) {
       const move = Pgn.sanToMove(Chess, s, replay.sans[i]);
-      if (!move) { moveExplainEl.style.display = 'none'; return; }
+      if (!move) { valid = false; break; }
       Chess.play(s, move);
     }
-    const san = replay.sans[replayPly - 1];
-    const move = Pgn.sanToMove(Chess, s, san);
-    if (!move) { moveExplainEl.style.display = 'none'; return; }
-    const reasons = Signals.explainMove(Chess, s, move);
-    if (reasons.length === 0) {
+    if (valid) {
+      const san = replay.sans[index];
+      const move = Pgn.sanToMove(Chess, s, san);
+      if (move && parts.length === 0) {
+        const reasons = Signals.explainMove(Chess, s, move);
+        if (reasons.length > 0) parts.push('<b>' + escapeHtml(san) + '</b> — ' + reasons.join(' · ') + '.');
+      }
+    }
+    if (parts.length === 0) {
       moveExplainEl.style.display = 'none';
       return;
     }
-    moveExplainEl.innerHTML = '<b>' + escapeHtml(san) + '</b> — ' + reasons.join(' · ') + '.';
+    moveExplainEl.innerHTML = parts.join('<br>');
     moveExplainEl.style.display = 'block';
   }
 
@@ -1519,6 +1799,37 @@
     renderGame({});
     renderTrainerPanel();
     updateSignalsButton();
+    sfVerifyPuzzle(p);
+  }
+
+  /** Vérifie le meilleur coup du puzzle avec Stockfish (profondeur 18) :
+      remplace la réponse du moteur maison dès que disponible. */
+  async function sfVerifyPuzzle(p) {
+    if (p.sfDone) return;
+    p.sfDone = true; // une seule tentative
+    const fen = Chess.toFen(game);
+    const ok = await SfEngine.ready();
+    if (!ok) return;
+    const lines = await SfEngine.analyze(fen, { multipv: 4, movetime: 1500, depth: 18 });
+    if (!lines || lines.length === 0) return;
+    const state = Chess.fromFen(fen);
+    const sign = state.turn === 'w' ? 1 : -1;
+    const eff = l => sign * (l.mate !== null && l.mate !== undefined ? (l.mate > 0 ? 3000 : -3000) : (l.cp || 0));
+    const best = eff(lines[0]);
+    const acceptable = [];
+    for (const line of lines) {
+      if (best - eff(line) > 30) continue;
+      const move = uciToMove(state, line.uci);
+      if (move) {
+        acceptable.push({ from: move.from, to: move.to, promo: move.promo || null, san: Chess.sanOf(state, move) });
+      }
+    }
+    if (acceptable.length > 0) {
+      p.acceptable = acceptable;
+      p.bestSan = acceptable[0].san;
+      p.evalBest = Math.round(sign * (lines[0].cp !== null && lines[0].cp !== undefined ? lines[0].cp : 0));
+      p.sfVerified = true;
+    }
   }
 
   /** Position du puzzle rejouée dans `game` (préfixe de la partie). */
@@ -1558,6 +1869,8 @@
     trainerSaveAttempt(ok);
     if (move.capture) soundCapture(); else soundMove();
     renderGame({ animate: true });
+    // Badge façon chess.com sur le coup de l'utilisateur
+    showMoveBadge(move.to, ok ? MoveClassifier.KINDS.best : MoveClassifier.KINDS.mistake);
     squares[best.from].classList.add('hint-move');
     squares[best.to].classList.add('hint-move');
     if (!ok) {
@@ -1654,20 +1967,24 @@
     } else if (trainer.state === 'guess' || trainer.state === 'feedback') {
       const p = trainer.puzzles[trainer.index];
       const moveNumber = Math.floor(p.ply / 2) + 1;
-      const kind = p.loss >= 300 ? 'une gaffe' : 'une erreur';
+      const kind = p.loss >= 200 ? 'gaffe' : p.loss >= 100 ? 'erreur' : 'imprécision';
+      const kindSym = p.loss >= 200 ? '??' : p.loss >= 100 ? '?' : '?!';
       let feedback = '';
       if (trainer.state === 'feedback') {
         const r = trainer.lastResult;
         const why = r.why && r.why.length > 0
           ? '<small>Pourquoi ' + escapeHtml(p.bestSan) + ' ? Ce coup ' + r.why.join(', ') + '.</small>'
           : '';
+        const partie = '<small>' + kindSym + ' ' + kind.charAt(0).toUpperCase() + kind.slice(1)
+          + ' — en partie, vous aviez joué ' + escapeHtml(p.played)
+          + ' (−' + (p.loss / 100).toFixed(1) + '). Le meilleur coup était ' + escapeHtml(p.bestSan)
+          + ' (' + trainerEvalLabel(p.evalBest) + ')' + (p.sfVerified ? ' — vérifié Stockfish 18' : '') + '.</small>';
         feedback = r.ok
           ? '<div class="tr-feedback ok">✓ Exact ! ' + escapeHtml(r.userSan) + ' était le meilleur coup ('
-            + trainerEvalLabel(p.evalBest) + ').' + why
-            + '<small>En partie, vous aviez joué ' + escapeHtml(p.played) + ' — ' + kind + '.</small></div>'
+            + trainerEvalLabel(p.evalBest) + ').' + why + partie + '</div>'
           : '<div class="tr-feedback ko">✗ ' + escapeHtml(r.userSan) + '… Regardez : le meilleur coup ('
-            + escapeHtml(p.bestSan) + ', ' + trainerEvalLabel(p.evalBest) + ') est joué en vert sur l\'échiquier.' + why
-            + '<small>En partie, vous aviez joué ' + escapeHtml(p.played) + ' — ' + kind + '.</small></div>';
+            + escapeHtml(p.bestSan) + ', ' + trainerEvalLabel(p.evalBest) + ') est joué en vert sur l\'échiquier.'
+            + why + partie + '</div>';
         feedback += '<button type="button" class="btn btn-primary" data-tr="next">'
           + (trainer.index + 1 >= trainer.puzzles.length ? 'Voir le résultat' : 'Position suivante') + '</button>';
       }
@@ -1680,7 +1997,7 @@
         + '<p class="tr-meta">Contre ' + escapeHtml(p.opponent) + ' · coup n°' + moveNumber
         + ' · trait aux ' + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.</p>'
         + (trainer.state === 'guess'
-            ? '<p>Vous avez commis ' + kind + ' ici. Trouvez le meilleur coup !</p>'
+            ? '<p>Vous avez commis une ' + kind + ' ici. Trouvez le meilleur coup !</p>'
               + '<button type="button" class="btn btn-secondary" data-tr="hint">💡 Suggestion : quelle pièce jouer ?</button>'
             : '')
         + feedback
@@ -2298,6 +2615,9 @@
       const opArrow = document.getElementById('op-arrow');
       if (opArrow) opArrow.remove();
     }
+    clearMoveBadge();
+    clearWeakAlert();
+    if (next !== 'games') analysisToken++; // stoppe une analyse Stockfish en cours
     // Quitter le trainer pendant la préparation annule la recherche en cours
     if (!inTrainer && trainer && trainer.state === 'prep') {
       trainer = null;
