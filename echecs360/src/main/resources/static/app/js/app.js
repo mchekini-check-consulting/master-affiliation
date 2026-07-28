@@ -64,9 +64,10 @@
   let exSteps = null;             // visionneuse d'étapes { line, ply, attacker, startTurn, finCaption }
   let trainer = null;             // Blunder Trainer { state, puzzles, index, score, ... }
 
-  // Réglages persistés : sons + aides (badges, alertes, explications)
+  // Réglages persistés : sons, aides (badges, alertes, explications)
+  // et moteur d'analyse ('stockfish' | 'maison')
   const SETTINGS_KEY = 'echecs360-reglages';
-  let settings = Object.assign({ sons: true, aides: true },
+  let settings = Object.assign({ sons: true, aides: true, moteur: 'stockfish' },
       JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
   function saveSettings() {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -1062,8 +1063,13 @@
     if (!replay || replay.evals) return;
     btnAnalyze.disabled = true;
     analysisProgress.style.display = 'block';
-    analysisProgress.textContent = 'Chargement de Stockfish…';
     const token = ++analysisToken;
+    if (settings.moteur === 'maison') {
+      analysisProgress.textContent = 'Analyse en cours… 0 %';
+      ensureWorker().postMessage({ type: 'analyze', sans: replay.sans });
+      return;
+    }
+    analysisProgress.textContent = 'Chargement de Stockfish…';
     SfEngine.ready().then(ok => {
       if (token !== analysisToken || !replay) return;
       if (!ok) {
@@ -1494,6 +1500,16 @@
       + '<label class="cfg-toggle"><input type="checkbox" id="cfg-aides"' + (settings.aides ? ' checked' : '') + '>'
       + '<span>Aides visuelles<small>Badges de coups (??, !, ★), alertes et explications. '
       + 'Décochez pour un mode « sans aide ».</small></span></label>'
+      + '</div>'
+      + '<div class="tr-card"><h3>Moteur d\'analyse</h3>'
+      + '<label class="cfg-toggle"><input type="radio" name="cfg-moteur" value="stockfish"'
+      + (settings.moteur !== 'maison' ? ' checked' : '') + '>'
+      + '<span>Stockfish 18<small>Analyse précise (top 5 coups, profondeur 18). '
+      + 'Télécharge ~7 Mo au premier lancement.</small></span></label>'
+      + '<label class="cfg-toggle"><input type="radio" name="cfg-moteur" value="maison"'
+      + (settings.moteur === 'maison' ? ' checked' : '') + '>'
+      + '<span>Moteur maison<small>Analyse rapide et légère (profondeur 3), moins précise. '
+      + 'Sans annotation détaillée des coups.</small></span></label>'
       + '</div>';
     const input = configPanel.querySelector('#cfg-user');
     configPanel.querySelector('#cfg-load').addEventListener('click', () => loadGamesFromConfig(input.value.trim()));
@@ -1507,6 +1523,13 @@
       saveSettings();
       clearMoveBadge();
       clearWeakAlert();
+    });
+    configPanel.querySelectorAll('input[name="cfg-moteur"]').forEach((radio) => {
+      radio.addEventListener('change', (e) => {
+        if (!e.target.checked) return;
+        settings.moteur = e.target.value;
+        saveSettings();
+      });
     });
   }
 
@@ -1807,6 +1830,7 @@
   async function sfVerifyPuzzle(p) {
     if (p.sfDone) return;
     p.sfDone = true; // une seule tentative
+    if (settings.moteur === 'maison') return; // on garde l'éval du moteur maison
     const fen = Chess.toFen(game);
     const ok = await SfEngine.ready();
     if (!ok) return;
