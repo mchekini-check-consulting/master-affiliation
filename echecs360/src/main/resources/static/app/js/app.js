@@ -63,6 +63,8 @@
   let exMessage = '';             // message affiché sous le titre
   let exSteps = null;             // visionneuse d'étapes { line, ply, attacker, startTurn, finCaption }
   let trainer = null;             // Blunder Trainer { state, puzzles, index, score, ... }
+  let missP = null;               // Miss Puzzles { state, puzzles, index, score, ... }
+  let missM = null;               // Miss Mates { state, puzzles, index, score, matesLeft, ... }
 
   // Réglages persistés : sons, aides (badges, alertes, explications)
   // et moteur d'analyse ('stockfish' | 'maison')
@@ -327,6 +329,11 @@
       const p = trainer.puzzles[trainer.index];
       return p.userColor === 'w' ? { w: PSEUDO, b: p.opponent } : { w: p.opponent, b: PSEUDO };
     }
+    const quiz = mode === 'misspuzzles' ? missP : mode === 'missmates' ? missM : null;
+    if (quiz && quiz.puzzles && quiz.puzzles[quiz.index]) {
+      const p = quiz.puzzles[quiz.index];
+      return p.userColor === 'w' ? { w: PSEUDO, b: p.opponent } : { w: p.opponent, b: PSEUDO };
+    }
     return { w: 'Blancs', b: 'Noirs' };
   }
 
@@ -393,6 +400,41 @@
         statusSub.textContent = 'Session terminée : ' + trainer.score + '/' + trainer.puzzles.length + '.';
       } else {
         statusSub.textContent = 'Vos gaffes deviennent vos exercices.';
+      }
+      return;
+    }
+    if (mode === 'misspuzzles') {
+      statusMain.textContent = 'Miss Puzzles';
+      if (missP && (missP.state === 'guess' || missP.state === 'feedback')) {
+        const p = missP.puzzles[missP.index];
+        statusSub.textContent = missP.state === 'guess'
+          ? 'Vous aviez l\'avantage : trouvez le coup qui le garde ('
+            + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + ').'
+          : (missP.lastResult && missP.lastResult.ok ? '✓ Avantage conservé !' : '✗ Le bon coup est surligné en vert.');
+      } else if (missP && missP.state === 'done') {
+        statusSub.textContent = 'Session terminée : ' + missP.score + '/' + missP.puzzles.length + '.';
+      } else {
+        statusSub.textContent = 'Les avantages laissés filer deviennent vos exercices.';
+      }
+      return;
+    }
+    if (mode === 'missmates') {
+      statusMain.textContent = 'Miss Mates';
+      if (missM && (missM.state === 'guess' || missM.state === 'feedback')) {
+        const p = missM.puzzles[missM.index];
+        if (missM.state === 'guess') {
+          statusSub.textContent = missM.busy
+            ? (missM.notice || 'Vérification du mat…')
+            : (missM.notice || 'Mat en ' + missM.matesLeft + ' — trait aux '
+               + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.');
+        } else {
+          statusSub.textContent = missM.lastResult && missM.lastResult.ok
+            ? '✓ Échec et mat !' : '✗ Le mat s\'est échappé — regardez la solution.';
+        }
+      } else if (missM && missM.state === 'done') {
+        statusSub.textContent = 'Note finale : ' + missM.score + '/' + missM.puzzles.length + '.';
+      } else {
+        statusSub.textContent = 'Rejouez les mats en 1 à 3 coups que vous avez ratés.';
       }
       return;
     }
@@ -505,6 +547,15 @@
       if (trainer && trainer.state === 'guess') return trainerTryMove(from, to, candidates);
       return false;
     }
+    // Miss Puzzles / Miss Mates : même principe, le coup répond au puzzle
+    if (mode === 'misspuzzles') {
+      if (missP && missP.state === 'guess') return missPTryMove(from, to, candidates);
+      return false;
+    }
+    if (mode === 'missmates') {
+      if (missM && missM.state === 'guess' && !missM.busy) return missMTryMove(from, to, candidates);
+      return false;
+    }
     // Mode « trouve le mat » : le coup doit être celui de la solution
     if (mode === 'exercises' && exCurrent && exCurrent.type === 'mat') {
       return exTryMatMove(from, to, candidates);
@@ -558,6 +609,8 @@
       return exCurrent !== null && !exBusy && !botThinking && game.turn === exPlayerColor;
     }
     if (mode === 'trainer') return trainer !== null && trainer.state === 'guess';
+    if (mode === 'misspuzzles') return missP !== null && missP.state === 'guess';
+    if (mode === 'missmates') return missM !== null && missM.state === 'guess' && !missM.busy;
     if (mode === 'openings') return false;
     return true;
   }
@@ -773,7 +826,8 @@
     } else if (msg.type === 'analysis') {
       onAnalysisDone(msg.evals);
     } else if (msg.type === 'blunders') {
-      onBlundersFound(msg);
+      onBlundersFound(msg);       // Blunder Trainer
+      onMissPBlunders(msg);       // Miss Puzzles (filtre différent)
     }
   }
 
@@ -1576,6 +1630,9 @@
     if (mode === 'trainer' && trainer && (trainer.state === 'guess' || trainer.state === 'feedback')) {
       return game;
     }
+    if (mode === 'misspuzzles' && missP && (missP.state === 'guess' || missP.state === 'feedback')) {
+      return game;
+    }
     return null;
   }
 
@@ -1631,7 +1688,8 @@
 
   function updateSignalsButton() {
     const available = (mode === 'games' && replay)
-        || (mode === 'trainer' && trainer && (trainer.state === 'guess' || trainer.state === 'feedback'));
+        || (mode === 'trainer' && trainer && (trainer.state === 'guess' || trainer.state === 'feedback'))
+        || (mode === 'misspuzzles' && missP && (missP.state === 'guess' || missP.state === 'feedback'));
     btnSignals.style.display = available ? '' : 'none';
     if (!available) hideSignalsPanel();
   }
@@ -1806,7 +1864,7 @@
   /** Affiche la position du puzzle courant (juste avant la gaffe). */
   function trainerShowPuzzle() {
     const p = trainer.puzzles[trainer.index];
-    trainerReplayPrefix(p);
+    replayPuzzlePrefix(p);
     selected = -1;
     legalTargets = [];
     gameOver = false;
@@ -1856,8 +1914,9 @@
     }
   }
 
-  /** Position du puzzle rejouée dans `game` (préfixe de la partie). */
-  function trainerReplayPrefix(p) {
+  /** Position d'un puzzle (trainer, Miss Puzzles, Miss Mates) rejouée dans
+      `game` : préfixe de la partie jusqu'au coup fautif. */
+  function replayPuzzlePrefix(p) {
     game = Chess.newGame();
     sanHistory = [];
     lastMove = null;
@@ -1901,7 +1960,7 @@
       // Réponse visuelle : on revient à la position et on JOUE le meilleur coup
       setTimeout(() => {
         if (!trainer || trainer.state !== 'feedback' || mode !== 'trainer') return;
-        trainerReplayPrefix(p);
+        replayPuzzlePrefix(p);
         for (const el of pieceEls.values()) el.remove();
         pieceEls.clear();
         syncPieces(game.board);
@@ -2067,6 +2126,756 @@
       chesscomUsername = value;
       saveChesscomUsername(value);
       trainerStart();
+    }
+  });
+
+  // ---------------------------------------------------------- miss puzzles --
+  // Quiz : 10 positions tirées des 100 dernières parties chess.com où le
+  // joueur avait un net avantage (au moins +2) et où son coup l'a laissé
+  // filer. Retrouver le coup qui gardait l'avantage rapporte un point ;
+  // note sur 10 en fin de session.
+
+  const MISSP_SIZE = 10;
+  const MISSP_STATS_KEY = 'echecs360-misspuzzles-stats';
+  const missPPanel = document.getElementById('misspuzzles-panel');
+
+  /** Indices 0..n-1 en ordre aléatoire (mélange de Fisher-Yates). */
+  function shuffledIndexes(n) {
+    const order = [...Array(n).keys()];
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    return order;
+  }
+
+  /** Statistiques persistées d'un quiz (Miss Puzzles / Miss Mates). */
+  function quizStats(key) {
+    try {
+      return JSON.parse(localStorage.getItem(key)) || { attempts: 0, correct: 0 };
+    } catch (e) { return { attempts: 0, correct: 0 }; }
+  }
+
+  function quizSaveAttempt(key, correct) {
+    const stats = quizStats(key);
+    stats.attempts++;
+    if (correct) stats.correct++;
+    localStorage.setItem(key, JSON.stringify(stats));
+  }
+
+  async function missPStart() {
+    missP = { state: 'prep', puzzles: [], index: 0, score: 0, order: [], oi: 0, gamesScanned: 0 };
+    renderMissPPanel();
+    renderStatus();
+    if (gamesList.length === 0) {
+      if (!chesscomUsername) {
+        missP.state = 'needuser';
+        renderMissPPanel();
+        return;
+      }
+      try {
+        gamesList = await fetchChesscomGames(chesscomUsername);
+      } catch (err) {
+        if (!missP || missP.state !== 'prep') return;
+        missP.state = 'error';
+        missP.error = err.message;
+        renderMissPPanel();
+        return;
+      }
+      if (!missP || missP.state !== 'prep') return;
+    }
+    missP.order = shuffledIndexes(gamesList.length);
+    missPScanNext();
+  }
+
+  /** Analyse la partie suivante (dans le worker) jusqu'à avoir 10 positions. */
+  function missPScanNext() {
+    if (!missP || missP.state !== 'prep') return;
+    // Au plus 40 parties analysées par session : la préparation reste courte
+    if (missP.puzzles.length >= MISSP_SIZE || missP.oi >= missP.order.length
+        || missP.gamesScanned >= 40) {
+      missPBegin();
+      return;
+    }
+    const g = gamesList[missP.order[missP.oi++]];
+    const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
+    const parsed = Pgn.parsePgn(g.pgn || '');
+    if (parsed.sans.length < 10) { missPScanNext(); return; }
+    missP.currentGame = {
+      sans: parsed.sans,
+      userColor: meIsWhite ? 'w' : 'b',
+      opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
+    };
+    const requestId = ++trainerRequestId;
+    missP.requestId = requestId;
+    ensureWorker().postMessage({
+      type: 'blunders', sans: parsed.sans,
+      userColor: missP.currentGame.userColor, requestId
+    });
+    renderMissPPanel();
+  }
+
+  /** Ne retient que les avantages gâchés : au moins +2 avant le coup,
+      égalité (ou pire) après. */
+  function onMissPBlunders(msg) {
+    if (!missP || missP.state !== 'prep' || msg.requestId !== missP.requestId) return;
+    const found = msg.items.filter(item => item.before >= 200 && item.after <= 100);
+    // Au plus 2 positions par partie, pour varier les contextes
+    while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
+    for (const item of found) {
+      if (missP.puzzles.length >= MISSP_SIZE) break;
+      missP.puzzles.push({
+        ...item,
+        sans: missP.currentGame.sans,
+        userColor: missP.currentGame.userColor,
+        opponent: missP.currentGame.opponent
+      });
+    }
+    missP.gamesScanned++;
+    missPScanNext();
+  }
+
+  function missPBegin() {
+    if (!missP) return;
+    if (missP.puzzles.length === 0) {
+      missP.state = 'empty';
+      renderMissPPanel();
+      return;
+    }
+    for (let i = missP.puzzles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [missP.puzzles[i], missP.puzzles[j]] = [missP.puzzles[j], missP.puzzles[i]];
+    }
+    missP.index = 0;
+    missP.score = 0;
+    missPShowPuzzle();
+  }
+
+  /** Affiche la position du puzzle courant (juste avant l'avantage gâché). */
+  function missPShowPuzzle() {
+    const p = missP.puzzles[missP.index];
+    clearMoveBadge();
+    replayPuzzlePrefix(p);
+    selected = -1;
+    legalTargets = [];
+    gameOver = false;
+    orientation = p.userColor;
+    placeSquares();
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    for (const el of squares) el.classList.remove('hint-move');
+    const arrow = document.getElementById('missp-arrow');
+    if (arrow) arrow.remove();
+    missP.state = 'guess';
+    missP.lastResult = null;
+    renderGame({});
+    renderMissPPanel();
+    updateSignalsButton();
+    sfVerifyPuzzle(p);
+  }
+
+  /** Réponse du joueur : point si le coup garde l'avantage (quasi meilleur). */
+  function missPTryMove(from, to, candidates) {
+    const p = missP.puzzles[missP.index];
+    let move = candidates[0];
+    if (move.promo) move = candidates.find(m => m.promo === 'q') || move;
+    const ok = p.acceptable.some(a =>
+        a.from === move.from && a.to === move.to && (a.promo || null) === (move.promo || null));
+    const userSan = Chess.sanOf(game, move);
+    // Explication « humaine » du meilleur coup, calculée sur la position du puzzle
+    const best = p.acceptable[0];
+    const bestMove = Chess.legalMoves(game).find(m =>
+        m.from === best.from && m.to === best.to && (m.promo || null) === (best.promo || null));
+    const why = bestMove ? Signals.explainMove(Chess, game, bestMove) : [];
+    Chess.play(game, move);
+    sanHistory.push(userSan);
+    lastMove = { from: move.from, to: move.to };
+    selected = -1;
+    legalTargets = [];
+    if (ok) missP.score++;
+    missP.state = 'feedback';
+    missP.lastResult = { ok, userSan, why };
+    quizSaveAttempt(MISSP_STATS_KEY, ok);
+    if (move.capture) soundCapture(); else soundMove();
+    renderGame({ animate: true });
+    showMoveBadge(move.to, ok ? MoveClassifier.KINDS.best : MoveClassifier.KINDS.mistake);
+    squares[best.from].classList.add('hint-move');
+    squares[best.to].classList.add('hint-move');
+    if (!ok) {
+      // Réponse visuelle : retour à la position puis le coup qui gardait l'avantage
+      setTimeout(() => {
+        if (!missP || missP.state !== 'feedback' || mode !== 'misspuzzles') return;
+        replayPuzzlePrefix(p);
+        for (const el of pieceEls.values()) el.remove();
+        pieceEls.clear();
+        syncPieces(game.board);
+        const replayBest = Chess.legalMoves(game).find(m =>
+            m.from === best.from && m.to === best.to && (m.promo || null) === (best.promo || null));
+        if (!replayBest) return;
+        Chess.play(game, replayBest);
+        sanHistory.push(best.san);
+        lastMove = { from: best.from, to: best.to };
+        soundMove();
+        renderGame({ animate: true });
+        squares[best.from].classList.add('hint-move');
+        squares[best.to].classList.add('hint-move');
+        drawArrow(best.from, best.to, 'rgba(46, 125, 91, .85)', 'missp-arrow');
+      }, 1100);
+    }
+    renderMissPPanel();
+    updateSignalsButton();
+    return true;
+  }
+
+  /** Suggestion : surligne la pièce à jouer (sans révéler la case d'arrivée). */
+  function missPHint() {
+    if (!missP || missP.state !== 'guess') return;
+    const best = missP.puzzles[missP.index].acceptable[0];
+    squares[best.from].classList.add('hint-move');
+    setTimeout(() => squares[best.from].classList.remove('hint-move'), 2200);
+  }
+
+  function missPNext() {
+    if (!missP) return;
+    missP.index++;
+    if (missP.index >= missP.puzzles.length) {
+      missP.state = 'done';
+      renderMissPPanel();
+      renderStatus();
+      updateSignalsButton();
+    } else {
+      missPShowPuzzle();
+    }
+  }
+
+  function renderMissPPanel() {
+    if (!missP) {
+      missPPanel.innerHTML = '';
+      return;
+    }
+    const stats = quizStats(MISSP_STATS_KEY);
+    const globalStats =
+      '<div class="tr-stats">'
+      + '<div class="tr-stat"><b>' + stats.attempts + '</b><span>positions jouées</span></div>'
+      + '<div class="tr-stat"><b>' + stats.correct + '</b><span>réussies</span></div>'
+      + '<div class="tr-stat"><b>' + trainerRate(stats.correct, stats.attempts) + '</b><span>taux global</span></div>'
+      + '</div>';
+
+    if (missP.state === 'intro') {
+      missPPanel.innerHTML =
+        '<div class="tr-card"><h3>💡 Miss Puzzles</h3>'
+        + '<p>' + MISSP_SIZE + ' positions tirées de vos 100 dernières parties chess.com, '
+        + 'là où vous aviez un net avantage… et où votre coup l\'a laissé filer. '
+        + 'Retrouvez le coup qui gardait l\'avantage : 1 point par bonne réponse, note sur '
+        + MISSP_SIZE + ' à la fin.</p>'
+        + globalStats
+        + '<button type="button" class="btn btn-primary" data-mp="start">Démarrer · ' + MISSP_SIZE + ' positions</button>'
+        + '</div>';
+    } else if (missP.state === 'needuser') {
+      missPPanel.innerHTML =
+        '<div class="tr-card"><h3>💡 Miss Puzzles</h3>'
+        + '<p>Indiquez votre pseudo chess.com : vos 100 dernières parties seront récupérées puis analysées.</p>'
+        + '<input type="text" id="mp-user" placeholder="ex. hikaru" autocomplete="off" '
+        + 'style="padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px">'
+        + '<button type="button" class="btn btn-primary" data-mp="setuser">Analyser mes parties</button>'
+        + '</div>';
+    } else if (missP.state === 'prep') {
+      const pct = Math.round((missP.puzzles.length / MISSP_SIZE) * 100);
+      missPPanel.innerHTML =
+        '<div class="tr-card"><h3>Recherche de vos avantages manqués…</h3>'
+        + '<p>' + missP.gamesScanned + ' partie' + plural(missP.gamesScanned) + ' analysée'
+        + plural(missP.gamesScanned) + ' · ' + missP.puzzles.length + '/' + MISSP_SIZE
+        + ' position' + plural(missP.puzzles.length) + ' trouvée' + plural(missP.puzzles.length) + '</p>'
+        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + pct + '%"></div></div>'
+        + '</div>';
+    } else if (missP.state === 'guess' || missP.state === 'feedback') {
+      const p = missP.puzzles[missP.index];
+      const moveNumber = Math.floor(p.ply / 2) + 1;
+      let feedback = '';
+      if (missP.state === 'feedback') {
+        const r = missP.lastResult;
+        const why = r.why && r.why.length > 0
+          ? '<small>Pourquoi ' + escapeHtml(p.bestSan) + ' ? Ce coup ' + r.why.join(', ') + '.</small>'
+          : '';
+        const partie = '<small>En partie, vous aviez joué ' + escapeHtml(p.played)
+          + ' : l\'avantage est passé de ' + trainerEvalLabel(p.before) + ' à ' + trainerEvalLabel(p.after)
+          + '. Le coup juste était ' + escapeHtml(p.bestSan) + ' (' + trainerEvalLabel(p.evalBest) + ')'
+          + (p.sfVerified ? ' — vérifié Stockfish 18' : '') + '.</small>';
+        feedback = r.ok
+          ? '<div class="tr-feedback ok">✓ Bien vu ! ' + escapeHtml(r.userSan) + ' garde l\'avantage ('
+            + trainerEvalLabel(p.evalBest) + ').' + why + partie + '</div>'
+          : '<div class="tr-feedback ko">✗ ' + escapeHtml(r.userSan) + '… Regardez : le coup qui gardait l\'avantage ('
+            + escapeHtml(p.bestSan) + ', ' + trainerEvalLabel(p.evalBest) + ') est joué en vert sur l\'échiquier.'
+            + why + partie + '</div>';
+        feedback += '<button type="button" class="btn btn-primary" data-mp="next">'
+          + (missP.index + 1 >= missP.puzzles.length ? 'Voir la note' : 'Position suivante') + '</button>';
+      }
+      missPPanel.innerHTML =
+        '<div class="tr-card">'
+        + '<div class="tr-quiz-head"><span class="pos">Position ' + (missP.index + 1) + ' / '
+        + missP.puzzles.length + '</span><span class="score">Score : ' + missP.score + '</span></div>'
+        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:'
+        + Math.round((missP.index / missP.puzzles.length) * 100) + '%"></div></div>'
+        + '<p class="tr-meta">Contre ' + escapeHtml(p.opponent) + ' · coup n°' + moveNumber
+        + ' · trait aux ' + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.</p>'
+        + (missP.state === 'guess'
+            ? '<p>Vous aviez ici un avantage de <b>' + trainerEvalLabel(p.before)
+              + '</b>… et vous l\'avez manqué. Trouvez le coup qui le gardait !</p>'
+              + '<button type="button" class="btn btn-secondary" data-mp="hint">💡 Suggestion : quelle pièce jouer ?</button>'
+            : '')
+        + feedback
+        + '</div>';
+    } else if (missP.state === 'done') {
+      const total = missP.puzzles.length;
+      const pct = Math.round((missP.score / total) * 100);
+      missPPanel.innerHTML =
+        '<div class="tr-card"><h3>Session terminée !</h3>'
+        + '<div class="tr-stats">'
+        + '<div class="tr-stat"><b>' + missP.score + ' / ' + total + '</b><span>note</span></div>'
+        + '<div class="tr-stat"><b>' + pct + ' %</b><span>réussite session</span></div>'
+        + '</div>'
+        + globalStats
+        + '<button type="button" class="btn btn-primary" data-mp="start">Nouvelle session</button>'
+        + '</div>';
+    } else if (missP.state === 'empty') {
+      missPPanel.innerHTML =
+        '<div class="tr-card"><h3>Aucun avantage manqué trouvé 🎉</h3>'
+        + '<p>Dans les parties analysées, vous avez converti vos avantages — ou aucun net avantage '
+        + 'n\'a été gâché. Réessayez : le tirage des parties est aléatoire.</p>'
+        + '<button type="button" class="btn btn-primary" data-mp="start">Réessayer</button>'
+        + '</div>';
+    } else if (missP.state === 'error') {
+      missPPanel.innerHTML =
+        '<div class="tr-card"><h3>Impossible de récupérer vos parties</h3>'
+        + '<p>' + escapeHtml(missP.error || 'Erreur inconnue.') + '</p>'
+        + '<button type="button" class="btn btn-primary" data-mp="start">Réessayer</button>'
+        + '</div>';
+    }
+  }
+
+  missPPanel.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-mp]');
+    if (!btn) return;
+    const action = btn.dataset.mp;
+    if (action === 'start') missPStart();
+    else if (action === 'next') missPNext();
+    else if (action === 'hint') missPHint();
+    else if (action === 'setuser') {
+      const input = missPPanel.querySelector('#mp-user');
+      const value = (input && input.value.trim()) || '';
+      if (!value) return;
+      chesscomUsername = value;
+      saveChesscomUsername(value);
+      missPStart();
+    }
+  });
+
+  // ------------------------------------------------------------ miss mates --
+  // Quiz : les mats en 1, 2 ou 3 coups que le joueur a ratés dans ses parties
+  // chess.com, détectés par Stockfish. Chaque mat se rejoue coup par coup
+  // (Stockfish vérifie le coup et joue la meilleure défense) ; mater rapporte
+  // un point, note sur 10 en fin de session.
+
+  const MISSM_SIZE = 10;
+  const MISSM_MAX_GAMES = 20;
+  const MISSM_STATS_KEY = 'echecs360-missmates-stats';
+  const missMPanel = document.getElementById('missmates-panel');
+  let missMToken = 0;
+
+  async function missMStart() {
+    const token = ++missMToken;
+    missM = { state: 'prep', puzzles: [], index: 0, score: 0, order: [], oi: 0,
+      gamesScanned: 0, token, seq: 0 };
+    renderMissMPanel();
+    renderStatus();
+    if (gamesList.length === 0) {
+      if (!chesscomUsername) {
+        missM.state = 'needuser';
+        renderMissMPanel();
+        return;
+      }
+      try {
+        gamesList = await fetchChesscomGames(chesscomUsername);
+      } catch (err) {
+        if (!missM || missM.token !== token) return;
+        missM.state = 'error';
+        missM.error = err.message;
+        renderMissMPanel();
+        return;
+      }
+      if (!missM || missM.token !== token || missM.state !== 'prep') return;
+    }
+    const ok = await SfEngine.ready();
+    if (!missM || missM.token !== token || missM.state !== 'prep') return;
+    if (!ok) {
+      missM.state = 'error';
+      missM.error = 'Stockfish est indisponible sur cet appareil — Miss Mates en a besoin pour détecter les mats forcés.';
+      renderMissMPanel();
+      return;
+    }
+    missM.order = shuffledIndexes(gamesList.length);
+    missMScanLoop(token);
+  }
+
+  /** Passe les parties au crible (en ordre aléatoire) jusqu'à 10 mats ratés. */
+  async function missMScanLoop(token) {
+    while (missM && missM.token === token && missM.state === 'prep') {
+      if (missM.puzzles.length >= MISSM_SIZE || missM.oi >= missM.order.length
+          || missM.gamesScanned >= MISSM_MAX_GAMES) {
+        missMBegin();
+        return;
+      }
+      const g = gamesList[missM.order[missM.oi++]];
+      const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
+      const parsed = Pgn.parsePgn(g.pgn || '');
+      if (parsed.sans.length < 12) continue;
+      await missMScanGame(token, {
+        sans: parsed.sans,
+        userColor: meIsWhite ? 'w' : 'b',
+        opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
+      });
+      if (!missM || missM.token !== token || missM.state !== 'prep') return;
+      missM.gamesScanned++;
+      renderMissMPanel();
+    }
+  }
+
+  /** Cherche dans une partie les mats en 1 à 3 du joueur que son coup a
+      laissés s'échapper (Stockfish, ~100 ms par position). Au plus 2 par partie. */
+  async function missMScanGame(token, meta) {
+    const s = Chess.newGame();
+    const fens = [Chess.toFen(s)];
+    const sans = [];
+    for (const san of meta.sans) {
+      const move = Pgn.sanToMove(Chess, s, san);
+      if (!move) break;
+      Chess.play(s, move);
+      sans.push(san);
+      fens.push(Chess.toFen(s));
+    }
+    const sign = meta.userColor === 'w' ? 1 : -1;
+    let found = 0;
+    // Les mats n'apparaissent presque jamais dans l'ouverture : départ au ply 8
+    for (let i = 8; i < sans.length && found < 2; i++) {
+      if ((i % 2 === 0 ? 'w' : 'b') !== meta.userColor) continue;
+      if (!missM || missM.token !== token || missM.state !== 'prep'
+          || missM.puzzles.length >= MISSM_SIZE) return;
+      const lines = await SfEngine.analyze(fens[i], { multipv: 1, movetime: 110, depth: 12 });
+      if (!missM || missM.token !== token || missM.state !== 'prep') return;
+      const top = lines && lines[0];
+      if (!top || top.mate === null || top.mate === undefined
+          || !top.pv || top.pv.length === 0) continue;
+      const mateIn = sign * top.mate;
+      if (mateIn < 1 || mateIn > 3) continue;
+      // Mat disponible : raté si le coup joué n'y a pas progressé (le mat
+      // s'est échappé, ou il reste aussi long qu'avant — coup non matant)
+      const afterState = Chess.fromFen(fens[i + 1]);
+      if (Chess.statusOf(afterState).over) continue; // le coup joué concluait déjà
+      const alines = await SfEngine.analyze(fens[i + 1], { multipv: 1, movetime: 140, depth: 12 });
+      if (!missM || missM.token !== token || missM.state !== 'prep') return;
+      const atop = alines && alines[0];
+      if (atop && atop.mate !== null && atop.mate !== undefined
+          && sign * atop.mate > 0 && sign * atop.mate < mateIn) continue;
+      missM.puzzles.push({
+        ply: i, sans, userColor: meta.userColor, opponent: meta.opponent,
+        mateIn, played: sans[i],
+        pv: top.pv.slice(0, mateIn * 2 - 1)
+      });
+      found++;
+      renderMissMPanel();
+      i += 6; // le même mat traîne souvent plusieurs coups : on saute plus loin
+    }
+  }
+
+  function missMBegin() {
+    if (!missM) return;
+    if (missM.puzzles.length === 0) {
+      missM.state = 'empty';
+      renderMissMPanel();
+      return;
+    }
+    for (let i = missM.puzzles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [missM.puzzles[i], missM.puzzles[j]] = [missM.puzzles[j], missM.puzzles[i]];
+    }
+    missM.index = 0;
+    missM.score = 0;
+    missMShowPuzzle();
+  }
+
+  /** Affiche la position du puzzle courant (juste avant le mat raté). */
+  function missMShowPuzzle() {
+    const p = missM.puzzles[missM.index];
+    missM.seq = (missM.seq || 0) + 1; // invalide les vérifications en attente
+    clearMoveBadge();
+    replayPuzzlePrefix(p);
+    selected = -1;
+    legalTargets = [];
+    gameOver = false;
+    orientation = p.userColor;
+    placeSquares();
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    for (const el of squares) el.classList.remove('hint-move');
+    const arrow = document.getElementById('missm-arrow');
+    if (arrow) arrow.remove();
+    missM.state = 'guess';
+    missM.busy = false;
+    missM.matesLeft = p.mateIn;
+    missM.notice = null;
+    missM.lastResult = null;
+    renderGame({});
+    renderMissMPanel();
+  }
+
+  /** Coup du joueur : mat immédiat = réussi ; sinon Stockfish vérifie que le
+      mat reste forcé puis joue la meilleure défense. */
+  function missMTryMove(from, to, candidates) {
+    const p = missM.puzzles[missM.index];
+    let move = candidates[0];
+    if (move.promo) move = candidates.find(m => m.promo === 'q') || move;
+    const userSan = Chess.sanOf(game, move);
+    Chess.play(game, move);
+    sanHistory.push(userSan);
+    lastMove = { from: move.from, to: move.to };
+    selected = -1;
+    legalTargets = [];
+    if (move.capture) soundCapture(); else soundMove();
+    renderGame({ animate: true });
+    const status = Chess.statusOf(game);
+    if (status.over && status.reason === 'échec et mat') {
+      missM.score++;
+      missM.state = 'feedback';
+      missM.lastResult = { ok: true, userSan };
+      quizSaveAttempt(MISSM_STATS_KEY, true);
+      showMoveBadge(move.to, MoveClassifier.KINDS.best);
+      soundEnd();
+      renderMissMPanel();
+      renderStatus();
+      return true;
+    }
+    if (status.over) {
+      missMFail(p, userSan + ' arrête la partie sans mat ('
+        + reasonLabel(status.reason).toLowerCase() + ').');
+      return true;
+    }
+    missM.notice = null;
+    missM.busy = true;
+    renderStatus();
+    missMVerify(p, userSan, missM.seq);
+    return true;
+  }
+
+  async function missMVerify(p, userSan, seq) {
+    const lines = await SfEngine.analyze(Chess.toFen(game), { multipv: 1, movetime: 500, depth: 16 });
+    if (!missM || missM.seq !== seq || missM.state !== 'guess' || mode !== 'missmates') return;
+    const sign = p.userColor === 'w' ? 1 : -1;
+    const top = lines && lines[0];
+    const mate = top && top.mate !== null && top.mate !== undefined ? sign * top.mate : null;
+    if (mate !== null && mate > 0 && mate <= missM.matesLeft - 1) {
+      // Le mat reste forcé : l'adversaire joue sa meilleure défense
+      missM.matesLeft = mate;
+      missM.notice = '✓ Le mat reste forcé — l\'adversaire défend…';
+      renderStatus();
+      setTimeout(() => {
+        if (!missM || missM.seq !== seq || missM.state !== 'guess' || mode !== 'missmates') return;
+        const reply = uciToMove(game, top.uci) || Chess.legalMoves(game)[0];
+        if (!reply) return;
+        const replySan = Chess.sanOf(game, reply);
+        Chess.play(game, reply);
+        sanHistory.push(replySan);
+        lastMove = { from: reply.from, to: reply.to };
+        soundMove();
+        missM.busy = false;
+        missM.notice = 'À vous — mat en ' + missM.matesLeft + '.';
+        renderGame({ animate: true });
+        renderStatus();
+      }, 550);
+    } else if (mate !== null && mate > 0) {
+      missMFail(p, userSan + ' mate encore, mais trop lentement : il fallait conclure en '
+        + missM.matesLeft + ' coup' + plural(missM.matesLeft) + '.');
+    } else {
+      missMFail(p, userSan + ' laisse le mat s\'échapper.');
+    }
+  }
+
+  /** Puzzle raté : feedback puis la séquence de mat se rejoue sur l'échiquier. */
+  function missMFail(p, why) {
+    missM.busy = false;
+    missM.state = 'feedback';
+    missM.lastResult = { ok: false, why };
+    quizSaveAttempt(MISSM_STATS_KEY, false);
+    if (lastMove) showMoveBadge(lastMove.to, MoveClassifier.KINDS.blunder);
+    renderMissMPanel();
+    renderStatus();
+    missMPlaySolution(p, missM.seq);
+  }
+
+  /** Rejoue la séquence gagnante (PV Stockfish du scan), animée. */
+  function missMPlaySolution(p, seq) {
+    setTimeout(() => {
+      if (!missM || missM.seq !== seq || missM.state !== 'feedback' || mode !== 'missmates') return;
+      clearMoveBadge();
+      replayPuzzlePrefix(p);
+      for (const el of pieceEls.values()) el.remove();
+      pieceEls.clear();
+      syncPieces(game.board);
+      let index = 0;
+      const step = () => {
+        if (!missM || missM.seq !== seq || missM.state !== 'feedback' || mode !== 'missmates') return;
+        const move = uciToMove(game, p.pv[index]);
+        if (!move) return;
+        const san = Chess.sanOf(game, move);
+        Chess.play(game, move);
+        sanHistory.push(san);
+        lastMove = { from: move.from, to: move.to };
+        if (index === 0) drawArrow(move.from, move.to, 'rgba(46, 125, 91, .85)', 'missm-arrow');
+        soundMove();
+        renderGame({ animate: true });
+        index++;
+        if (index < p.pv.length) setTimeout(step, 700);
+      };
+      step();
+    }, 1100);
+  }
+
+  /** Suggestion : demande à Stockfish le coup à jouer et surligne la pièce. */
+  async function missMHint() {
+    if (!missM || missM.state !== 'guess' || missM.busy) return;
+    const seq = missM.seq;
+    const lines = await SfEngine.analyze(Chess.toFen(game), { multipv: 1, movetime: 350, depth: 14 });
+    if (!missM || missM.seq !== seq || missM.state !== 'guess' || missM.busy || mode !== 'missmates') return;
+    const move = lines && lines[0] ? uciToMove(game, lines[0].uci) : null;
+    if (!move) return;
+    squares[move.from].classList.add('hint-move');
+    setTimeout(() => squares[move.from].classList.remove('hint-move'), 2200);
+  }
+
+  function missMNext() {
+    if (!missM) return;
+    missM.index++;
+    if (missM.index >= missM.puzzles.length) {
+      missM.state = 'done';
+      missM.seq = (missM.seq || 0) + 1; // stoppe une éventuelle solution en cours
+      renderMissMPanel();
+      renderStatus();
+    } else {
+      missMShowPuzzle();
+    }
+  }
+
+  function renderMissMPanel() {
+    if (!missM) {
+      missMPanel.innerHTML = '';
+      return;
+    }
+    const stats = quizStats(MISSM_STATS_KEY);
+    const globalStats =
+      '<div class="tr-stats">'
+      + '<div class="tr-stat"><b>' + stats.attempts + '</b><span>mats joués</span></div>'
+      + '<div class="tr-stat"><b>' + stats.correct + '</b><span>conclus</span></div>'
+      + '<div class="tr-stat"><b>' + trainerRate(stats.correct, stats.attempts) + '</b><span>taux global</span></div>'
+      + '</div>';
+
+    if (missM.state === 'intro') {
+      missMPanel.innerHTML =
+        '<div class="tr-card"><h3>👑 Miss Mates</h3>'
+        + '<p>Stockfish repère dans vos 100 dernières parties chess.com les mats en 1, 2 ou 3 coups '
+        + 'que vous avez ratés. Rejouez chaque mat coup par coup — l\'adversaire défend au mieux. '
+        + '1 point par mat conclu : note sur ' + MISSM_SIZE + ' à la fin.</p>'
+        + globalStats
+        + '<button type="button" class="btn btn-primary" data-mm="start">Démarrer · ' + MISSM_SIZE + ' mats</button>'
+        + '</div>';
+    } else if (missM.state === 'needuser') {
+      missMPanel.innerHTML =
+        '<div class="tr-card"><h3>👑 Miss Mates</h3>'
+        + '<p>Indiquez votre pseudo chess.com : vos 100 dernières parties seront récupérées puis passées au crible.</p>'
+        + '<input type="text" id="mm-user" placeholder="ex. hikaru" autocomplete="off" '
+        + 'style="padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px">'
+        + '<button type="button" class="btn btn-primary" data-mm="setuser">Analyser mes parties</button>'
+        + '</div>';
+    } else if (missM.state === 'prep') {
+      const pct = Math.round((missM.puzzles.length / MISSM_SIZE) * 100);
+      missMPanel.innerHTML =
+        '<div class="tr-card"><h3>Recherche de vos mats ratés…</h3>'
+        + '<p>Stockfish passe vos parties au crible — ' + missM.gamesScanned + ' partie'
+        + plural(missM.gamesScanned) + ' analysée' + plural(missM.gamesScanned) + ' · '
+        + missM.puzzles.length + '/' + MISSM_SIZE + ' mat' + plural(missM.puzzles.length)
+        + ' raté' + plural(missM.puzzles.length) + ' trouvé' + plural(missM.puzzles.length) + '</p>'
+        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + pct + '%"></div></div>'
+        + '</div>';
+    } else if (missM.state === 'guess' || missM.state === 'feedback') {
+      const p = missM.puzzles[missM.index];
+      const moveNumber = Math.floor(p.ply / 2) + 1;
+      let feedback = '';
+      if (missM.state === 'feedback') {
+        const r = missM.lastResult;
+        const partie = '<small>En partie, vous aviez joué ' + escapeHtml(p.played)
+          + ' et le mat en ' + p.mateIn + ' vous avait échappé.</small>';
+        feedback = r.ok
+          ? '<div class="tr-feedback ok">✓ Échec et mat ! Cette fois, le mat en ' + p.mateIn
+            + ' est dans la poche.' + partie + '</div>'
+          : '<div class="tr-feedback ko">✗ ' + escapeHtml(r.why)
+            + ' La séquence gagnante se rejoue sur l\'échiquier (flèche verte).' + partie + '</div>';
+        feedback += '<button type="button" class="btn btn-primary" data-mm="next">'
+          + (missM.index + 1 >= missM.puzzles.length ? 'Voir la note' : 'Mat suivant') + '</button>';
+      }
+      missMPanel.innerHTML =
+        '<div class="tr-card">'
+        + '<div class="tr-quiz-head"><span class="pos">Mat ' + (missM.index + 1) + ' / '
+        + missM.puzzles.length + '</span><span class="score">Note : ' + missM.score + '</span></div>'
+        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:'
+        + Math.round((missM.index / missM.puzzles.length) * 100) + '%"></div></div>'
+        + '<p class="tr-meta">Contre ' + escapeHtml(p.opponent) + ' · coup n°' + moveNumber
+        + ' · trait aux ' + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.</p>'
+        + (missM.state === 'guess'
+            ? '<p>Vous étiez passé à côté d\'un <b>mat en ' + p.mateIn + '</b>. Cette fois, concluez !</p>'
+              + '<button type="button" class="btn btn-secondary" data-mm="hint">💡 Suggestion : quelle pièce jouer ?</button>'
+            : '')
+        + feedback
+        + '</div>';
+    } else if (missM.state === 'done') {
+      const total = missM.puzzles.length;
+      const pct = Math.round((missM.score / total) * 100);
+      missMPanel.innerHTML =
+        '<div class="tr-card"><h3>Session terminée !</h3>'
+        + '<div class="tr-stats">'
+        + '<div class="tr-stat"><b>' + missM.score + ' / ' + total + '</b><span>note finale</span></div>'
+        + '<div class="tr-stat"><b>' + pct + ' %</b><span>mats conclus</span></div>'
+        + '</div>'
+        + globalStats
+        + '<button type="button" class="btn btn-primary" data-mm="start">Nouvelle session</button>'
+        + '</div>';
+    } else if (missM.state === 'empty') {
+      missMPanel.innerHTML =
+        '<div class="tr-card"><h3>Aucun mat raté trouvé 🎉</h3>'
+        + '<p>Dans les parties passées au crible, vous n\'avez laissé filer aucun mat en 1 à 3 coups. '
+        + 'Réessayez : le tirage des parties est aléatoire.</p>'
+        + '<button type="button" class="btn btn-primary" data-mm="start">Réessayer</button>'
+        + '</div>';
+    } else if (missM.state === 'error') {
+      missMPanel.innerHTML =
+        '<div class="tr-card"><h3>Impossible de préparer la session</h3>'
+        + '<p>' + escapeHtml(missM.error || 'Erreur inconnue.') + '</p>'
+        + '<button type="button" class="btn btn-primary" data-mm="start">Réessayer</button>'
+        + '</div>';
+    }
+  }
+
+  missMPanel.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-mm]');
+    if (!btn) return;
+    const action = btn.dataset.mm;
+    if (action === 'start') missMStart();
+    else if (action === 'next') missMNext();
+    else if (action === 'hint') missMHint();
+    else if (action === 'setuser') {
+      const input = missMPanel.querySelector('#mm-user');
+      const value = (input && input.value.trim()) || '';
+      if (!value) return;
+      chesscomUsername = value;
+      saveChesscomUsername(value);
+      missMStart();
     }
   });
 
@@ -2633,11 +3442,17 @@
     const inGames = next === 'games';
     const inExercises = next === 'exercises';
     const inTrainer = next === 'trainer';
+    const inMissP = next === 'misspuzzles';
+    const inMissM = next === 'missmates';
     const inConfig = next === 'config';
     const inOpenings = next === 'openings';
     if (!inOpenings) {
       const opArrow = document.getElementById('op-arrow');
       if (opArrow) opArrow.remove();
+    }
+    for (const id of ['missp-arrow', 'missm-arrow']) {
+      const arrow = document.getElementById(id);
+      if (arrow) arrow.remove();
     }
     clearMoveBadge();
     clearWeakAlert();
@@ -2648,8 +3463,19 @@
       trainerRequestId++;
       renderTrainerPanel();
     }
+    // Idem pour Miss Puzzles et Miss Mates
+    if (!inMissP && missP && missP.state === 'prep') {
+      missP = null;
+      trainerRequestId++;
+      renderMissPPanel();
+    }
+    if (!inMissM && missM && missM.state === 'prep') {
+      missM = null;
+      missMToken++;
+      renderMissMPanel();
+    }
     gamesPanel.style.display = inGames && !replay ? 'block' : 'none';
-    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inConfig || inOpenings ? 'none' : '';
+    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inMissP || inMissM || inConfig || inOpenings ? 'none' : '';
     replayNav.style.display = inGames && replay ? 'flex' : 'none';
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
@@ -2660,8 +3486,10 @@
     document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
     document.getElementById('ex-toolbar').style.display = inExercises && exCurrent ? 'flex' : 'none';
     document.getElementById('ex-explanation').style.display = 'none';
-    document.getElementById('controls').style.display = inExercises || inTrainer || inConfig || inOpenings ? 'none' : 'flex';
+    document.getElementById('controls').style.display = inExercises || inTrainer || inMissP || inMissM || inConfig || inOpenings ? 'none' : 'flex';
     trainerPanel.style.display = inTrainer ? 'flex' : 'none';
+    missPPanel.style.display = inMissP ? 'flex' : 'none';
+    missMPanel.style.display = inMissM ? 'flex' : 'none';
     configPanel.style.display = inConfig ? 'flex' : 'none';
     openingsPanel.style.display = inOpenings ? 'flex' : 'none';
     moveExplainEl.style.display = 'none';
@@ -2698,6 +3526,32 @@
         }
         startGame('w');
         renderTrainerPanel();
+        renderStatus();
+      }
+    } else if (next === 'misspuzzles') {
+      if (missP && missP.state === 'guess') {
+        missPShowPuzzle();
+      } else if (missP && missP.state === 'feedback') {
+        missPNext();
+      } else {
+        if (!missP || (missP.state !== 'done' && missP.state !== 'empty' && missP.state !== 'error')) {
+          missP = { state: 'intro' };
+        }
+        startGame('w');
+        renderMissPPanel();
+        renderStatus();
+      }
+    } else if (next === 'missmates') {
+      if (missM && missM.state === 'guess') {
+        missMShowPuzzle();
+      } else if (missM && missM.state === 'feedback') {
+        missMNext();
+      } else {
+        if (!missM || (missM.state !== 'done' && missM.state !== 'empty' && missM.state !== 'error')) {
+          missM = { state: 'intro' };
+        }
+        startGame('w');
+        renderMissMPanel();
         renderStatus();
       }
     } else if (next === 'exercises') {

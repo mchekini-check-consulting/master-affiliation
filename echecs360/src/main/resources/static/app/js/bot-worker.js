@@ -315,6 +315,8 @@ self.onmessage = function (event) {
         ply: i,
         played: played[i],
         loss,
+        before,                                             // éval avant le coup (perspective joueur)
+        after: mover === 'w' ? evals[i + 1] : -evals[i + 1],
         bestSan: acceptable[0].san,
         evalBest: Math.round(best.score),
         acceptable
