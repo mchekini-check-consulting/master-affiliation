@@ -19,6 +19,17 @@
     <meta name="twitter:description" th:content="${description}">
     <link rel="stylesheet" href="/css/site.css">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='16' height='16' fill='%23ebecd0'/%3E%3Crect x='16' width='16' height='16' fill='%23739552'/%3E%3Crect y='16' width='16' height='16' fill='%23739552'/%3E%3Crect x='16' y='16' width='16' height='16' fill='%23ebecd0'/%3E%3C/svg%3E">
+    <!-- PWA : manifest, couleur de thème, icône iOS, service worker -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#22302a">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function () { /* hors ligne / non supporté */ });
+        });
+      }
+    </script>
   </th:block>
 </head>
 <body>

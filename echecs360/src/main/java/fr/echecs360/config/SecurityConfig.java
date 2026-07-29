@@ -50,6 +50,8 @@ public class SecurityConfig {
                 // (session expirée, redéploiement) renvoie un 403 au lieu de
                 // déconnecter — le fameux « problème du logout ».
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/logout"))
+                // L'embarquement reste limité au même domaine (anti-clickjacking)
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 // Session persistante « rester connecté » (14 jours)
                 .rememberMe(remember -> remember
                         .key(rememberMeKey)

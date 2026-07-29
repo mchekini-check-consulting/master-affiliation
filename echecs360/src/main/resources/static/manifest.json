@@ -1,0 +1,16 @@
+{
+  "name": "Échecs360 — Ton coach d'échecs",
+  "short_name": "Échecs360",
+  "description": "Le coach d'échecs qui apprend de tes parties : analyse Stockfish, Blunder Trainer, Miss Puzzles, Miss Mates et exercices intensifs.",
+  "lang": "fr",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#262421",
+  "theme_color": "#22302a",
+  "icons": [
+    { "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

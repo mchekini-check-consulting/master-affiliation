@@ -680,25 +680,51 @@ button { font-family: inherit; }
 }
 @keyframes pulse { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
 
-/* ---------- Responsive : rail en bas sous 1100 px ---------- */
+/* ---------- Responsive : barre de navigation en bas sous 1100 px ---------- */
 @media (max-width: 1100px) {
   body { overflow: auto; }
   .layout {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
     height: auto;
+    min-height: 100dvh;
   }
+  /* Le rail devient une barre d'onglets défilante collée en bas (façon app) */
   .rail {
-    order: 3; flex-direction: row; align-items: center;
-    padding: 8px 10px; position: sticky; bottom: 0; z-index: 20;
-    overflow-y: visible;
+    order: 3; flex-direction: row; align-items: stretch; gap: 2px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    position: sticky; bottom: 0; z-index: 20;
+    overflow-y: visible; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .rail::-webkit-scrollbar { display: none; }
   .rail .brand, .rail .spacer, .rail-group, .progress-card, .user-card, .rail-badge { display: none; }
-  .rail-item { justify-content: center; padding: 10px 6px; font-size: .82rem; }
+  .rail-item {
+    flex: none; flex-direction: column; justify-content: center; gap: 4px;
+    width: auto; min-width: 68px; padding: 8px 10px;
+    font-size: 10px; font-weight: 700; text-align: center;
+  }
+  .rail-item .rail-ico { font-size: 19px; width: auto; }
   .rail-item .rail-label { flex: none; }
+  .rail-item.active { box-shadow: none; }
   .board-zone { order: 1; padding: 8px; }
   .eval-wrap { display: none !important; } /* pas de place pour la barre sur mobile */
-  .player-bar, #board { width: 100%; max-width: min(94vw, 560px); }
-  #board { height: auto; aspect-ratio: 1; }
-  .side { order: 2; border-left: none; border-top: 1.5px solid var(--line); max-height: 46vh; }
+  .player-bar, .board-wrap { width: 100%; max-width: min(96vw, 560px); }
+  #board { width: 100%; height: auto; aspect-ratio: 1; }
+  .side { order: 2; border-left: none; border-top: 1.5px solid var(--line); }
+  /* La page défile ; les listes internes restent bornées et scrollables */
+  .moves, .games-panel, .exercises-panel, .trainer-panel, .config-panel, .openings-panel,
+  .signals-panel, .ex-explanation { max-height: 52vh; }
+}
+
+/* Petits écrans : tout l'espace pour l'échiquier, contrôles compacts */
+@media (max-width: 480px) {
+  .board-zone { padding: 6px 6px 2px; }
+  .player-bar, .board-wrap { max-width: 100%; }
+  .side .status { padding: 14px 14px 10px; font-size: 15px; min-height: 0; }
+  .btn { font-size: .88rem; padding: 10px 8px; }
+  .side .controls { padding: 12px; }
+  .modal { padding: 20px; }
+  .player-bar .name { font-size: .88rem; }
 }
