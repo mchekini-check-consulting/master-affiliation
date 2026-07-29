@@ -3556,6 +3556,9 @@
       }
     } else if (next === 'exercises') {
       if (exCurrent) {
+        // Réoriente côté joueur : un autre mode a pu retourner l'échiquier
+        orientation = exPlayerColor;
+        placeSquares();
         renderGame({});
       } else {
         startGame('w');
@@ -3563,7 +3566,12 @@
         renderStatus();
       }
     } else {
-      if (replay) { gotoPly(replayPly); }
+      if (replay) {
+        // Réoriente côté joueur : un autre mode a pu retourner l'échiquier
+        orientation = replay.userColor;
+        placeSquares();
+        gotoPly(replayPly);
+      }
       else {
         startGame('w');
         renderStatus();

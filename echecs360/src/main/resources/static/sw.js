@@ -9,10 +9,15 @@
  */
 'use strict';
 
-const CACHE = 'echecs360-static-v1';
+const CACHE = 'echecs360-static-v2';
 
 /* Chemins statiques éligibles au cache (jamais /app lui-même ni /api). */
 const STATIC_PATH = /^\/(css|img|fonts|videos)\/|^\/app\/(js|css)\//;
+
+/* Fichiers applicatifs qui changent à chaque déploiement : réseau d'abord
+   (fraîcheur garantie), cache en secours hors ligne. Stockfish (~7 Mo),
+   polices, images et vidéos restent servis depuis le cache d'abord. */
+const FRESH_FIRST = /^\/(css\/|app\/(css\/|js\/(?!stockfish\/)))/;
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -35,15 +40,22 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.open(CACHE).then(async (cache) => {
       const cached = await cache.match(event.request);
-      const refresh = fetch(event.request).then((resp) => {
+      const network = fetch(event.request).then((resp) => {
         // On ne met en cache que les vraies réponses statiques : une
         // redirection (session expirée sur /app/js/…) ne doit jamais y entrer.
         if (resp.ok && resp.type === 'basic' && !resp.redirected) {
           cache.put(event.request, resp.clone());
         }
         return resp;
-      }).catch(() => cached);
-      return cached || refresh;
+      });
+      if (FRESH_FIRST.test(url.pathname)) {
+        return network.catch(() => {
+          if (cached) return cached;
+          throw new Error('hors ligne sans cache');
+        });
+      }
+      network.catch(() => { /* hors ligne : le cache a déjà répondu */ });
+      return cached || network;
     })
   );
 });
