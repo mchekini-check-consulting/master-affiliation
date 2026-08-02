@@ -1,0 +1,251 @@
+/* Natura Prep — espace membre (sidebar + panneaux). */
+
+@import './tokens.css';
+
+body.page-espace {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--page);
+  color: var(--corps);
+  font-family: var(--f-corps);
+  -webkit-font-smoothing: antialiased;
+}
+
+.espace {
+  display: grid;
+  grid-template-columns: 264px 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- Barre latérale ---------- */
+.lateral {
+  background: var(--encre);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 16px;
+  gap: 22px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.lateral-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 0 8px;
+}
+
+.lateral-monogramme {
+  width: 36px;
+  height: 36px;
+  background: var(--bleu);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-titres);
+  font-weight: 800;
+  color: #fff;
+  font-size: 14px;
+}
+
+.lateral-nom {
+  font-family: var(--f-titres);
+  font-weight: 800;
+  color: #fff;
+  font-size: 17px;
+}
+
+.lateral-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.lateral-lien {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--f-corps);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--sombre-texte);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lateral-lien:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.lateral-lien.actif {
+  background: var(--bleu);
+  color: #fff;
+  font-weight: 700;
+}
+
+.lateral-pied {
+  border-top: 1px solid var(--sombre-separateur);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lateral-membre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.lateral-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--rouge);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-titres);
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.lateral-infos {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.lateral-membre-nom {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lateral-membre-email {
+  font-size: 12px;
+  color: var(--sombre-texte);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lateral-deconnexion {
+  width: 100%;
+  padding: 10px;
+  background: none;
+  border: 1px solid var(--sombre-separateur);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--f-corps);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--sombre-texte);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.lateral-deconnexion:hover {
+  border-color: var(--rouge);
+  color: #fff;
+}
+
+/* ---------- Contenu ---------- */
+.contenu {
+  padding: 40px clamp(24px, 5vw, 64px);
+}
+
+.panneau h1 {
+  font-family: var(--f-titres);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--encre);
+  margin: 0 0 28px;
+}
+
+/* État vide (le contenu arrive plus tard) */
+.vide {
+  background: var(--carte);
+  border: 1px dashed var(--bleu-bordure);
+  border-radius: 18px;
+  padding: 56px 32px;
+  text-align: center;
+  max-width: 620px;
+}
+
+.vide-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--bleu-tint);
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+
+.vide h2 {
+  font-family: var(--f-titres);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--encre);
+  margin: 0 0 8px;
+}
+
+.vide p {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--texte-sec);
+  margin: 0 auto;
+  max-width: 400px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .espace {
+    grid-template-columns: 1fr;
+  }
+
+  .lateral {
+    position: static;
+    height: auto;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .lateral-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .lateral-lien {
+    width: auto;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .contenu {
+    padding: 28px 20px;
+  }
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mon espace — Natura Prep</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e2b9e'/%3E%3Ctext x='16' y='21.5' font-family='Arial,sans-serif' font-size='13' font-weight='800' fill='%23fff' text-anchor='middle'%3ENP%3C/text%3E%3C/svg%3E" />
+    <script type="module" src="/src/espace.js"></script>
+  </head>
+  <body class="page-espace">
+    <div class="espace" data-espace hidden>
+      <!-- Barre latérale -->
+      <aside class="lateral">
+        <a class="lateral-logo" href="/">
+          <span class="lateral-monogramme" aria-hidden="true">NP</span>
+          <span class="lateral-nom">Natura Prep</span>
+        </a>
+
+        <nav class="lateral-nav" aria-label="Espace membre">
+          <button type="button" class="lateral-lien" data-section="cours">
+            <span aria-hidden="true">📚</span> Cours
+          </button>
+          <button type="button" class="lateral-lien" data-section="quizz">
+            <span aria-hidden="true">✅</span> Quizz
+          </button>
+          <button type="button" class="lateral-lien" data-section="simulations">
+            <span aria-hidden="true">🎙️</span> Simulations d'entretiens
+          </button>
+          <button type="button" class="lateral-lien" data-section="rapports">
+            <span aria-hidden="true">📊</span> Rapports
+          </button>
+        </nav>
+
+        <div class="lateral-pied">
+          <div class="lateral-membre">
+            <span class="lateral-avatar" data-avatar aria-hidden="true">·</span>
+            <span class="lateral-infos">
+              <span class="lateral-membre-nom" data-nom>…</span>
+              <span class="lateral-membre-email" data-email></span>
+            </span>
+          </div>
+          <button type="button" class="lateral-deconnexion" data-deconnexion>
+            Se déconnecter
+          </button>
+        </div>
+      </aside>
+
+      <!-- Contenu -->
+      <main class="contenu">
+        <section class="panneau" data-panneau="cours" hidden>
+          <h1>Cours</h1>
+          <div class="vide">
+            <span class="vide-ico" aria-hidden="true">📚</span>
+            <h2>Vos cours arrivent bientôt</h2>
+            <p>
+              Histoire, institutions, valeurs de la République, culture
+              générale : les fiches de cours seront disponibles ici.
+            </p>
+          </div>
+        </section>
+
+        <section class="panneau" data-panneau="quizz" hidden>
+          <h1>Quizz</h1>
+          <div class="vide">
+            <span class="vide-ico" aria-hidden="true">✅</span>
+            <h2>Vos quizz arrivent bientôt</h2>
+            <p>
+              Des centaines de questions type entretien, classées par
+              thématique, avec corrections détaillées.
+            </p>
+          </div>
+        </section>
+
+        <section class="panneau" data-panneau="simulations" hidden>
+          <h1>Simulations d'entretiens</h1>
+          <div class="vide">
+            <span class="vide-ico" aria-hidden="true">🎙️</span>
+            <h2>Vos simulations arrivent bientôt</h2>
+            <p>
+              Entraînez-vous à l'oral dans les conditions réelles de
+              l'entretien en préfecture.
+            </p>
+          </div>
+        </section>
+
+        <section class="panneau" data-panneau="rapports" hidden>
+          <h1>Rapports</h1>
+          <div class="vide">
+            <span class="vide-ico" aria-hidden="true">📊</span>
+            <h2>Vos rapports arrivent bientôt</h2>
+            <p>
+              Après chaque simulation, retrouvez ici votre rapport détaillé
+              par thématique.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,45 +1,7 @@
 /* Natura Prep — landing page.
-   Design tokens repris du handoff (design_handoff_natura_prep_landing). */
+   Les tokens (couleurs, typos) sont partagés dans tokens.css. */
 
-:root {
-  /* Primaire (bleu) */
-  --bleu: #1e2b9e;
-  --bleu-fonce: #16207a;
-  --bleu-tint: #eef0fb;
-  --bleu-bordure: #cdd2ee;
-  --onde: #5a68d8;
-  /* Accent (rouge) */
-  --rouge: #d6293a;
-  --rouge-fonce: #b91f2f;
-  --rouge-tint: #fdeef0;
-  /* Encre */
-  --encre: #141a33;
-  --corps: #1b2136;
-  --texte-2: #2b3148;
-  --texte-3: #3b4258;
-  --texte-sec: #4a5168;
-  --estompe: #7a8095;
-  /* Sur fond sombre */
-  --sombre-texte: #9aa2c4;
-  --sombre-clair: #c3c9ea;
-  --sombre-tres-clair: #e6e8f2;
-  --sombre-separateur: #2a3152;
-  /* Fonds */
-  --page: #fafaf7;
-  --carte: #ffffff;
-  --encart: #f4f5fb;
-  --bande: #f1f2f7;
-  --bordure: #e8e8e2;
-  /* Validation sur sombre */
-  --vert: #7dd0a0;
-
-  --f-titres: 'Archivo', sans-serif;
-  --f-corps: 'Public Sans', sans-serif;
-}
-
-* {
-  box-sizing: border-box;
-}
+@import './tokens.css';
 
 html {
   scroll-behavior: smooth;

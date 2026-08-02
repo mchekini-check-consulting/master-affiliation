@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Créer un compte — Natura Prep</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e2b9e'/%3E%3Ctext x='16' y='21.5' font-family='Arial,sans-serif' font-size='13' font-weight='800' fill='%23fff' text-anchor='middle'%3ENP%3C/text%3E%3C/svg%3E" />
+    <script type="module" src="/src/inscription.js"></script>
+  </head>
+  <body class="page-auth">
+    <main class="auth">
+      <a href="/" class="auth-logo">
+        <img src="/logo.png" alt="Natura Prep" />
+      </a>
+      <div class="auth-carte">
+        <h1>Créer un compte</h1>
+        <p class="auth-sous">Gratuit, sans carte bancaire — accès immédiat aux premiers cours.</p>
+
+        <p class="auth-alerte" data-alerte hidden></p>
+
+        <form data-form-inscription>
+          <label class="champ">
+            <span>Nom</span>
+            <input type="text" name="nom" required maxlength="80" autocomplete="name" autofocus />
+          </label>
+          <label class="champ">
+            <span>Adresse email</span>
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label class="champ">
+            <span>Mot de passe <small>(8 caractères minimum)</small></span>
+            <input type="password" name="mot_de_passe" required minlength="8" autocomplete="new-password" />
+          </label>
+          <button type="submit" class="auth-bouton" data-bouton>Créer mon compte</button>
+        </form>
+
+        <p class="auth-alt">Déjà inscrit ? <a href="/connexion/">Se connecter</a></p>
+      </div>
+    </main>
+  </body>
+</html>
