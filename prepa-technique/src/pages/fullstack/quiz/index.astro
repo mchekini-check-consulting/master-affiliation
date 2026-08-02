@@ -1,0 +1,176 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import QuizSession from '../../../components/QuizSession.astro';
+import type { QuizTheme, QuizQuestion } from '../../../components/QuizSession.astro';
+
+// Charger tous les quiz depuis les fichiers JSON
+const quizModules = import.meta.glob('../../../../data/quiz/*.json', {
+  eager: true,
+});
+
+// Construire la liste des questions avec leur thème
+const allQuestions: QuizQuestion[] = [];
+const themesMap = new Map<string, QuizTheme>();
+
+Object.entries(quizModules).forEach(([path, module]: [string, any]) => {
+  const filename = path.split('/').pop()?.replace('.json', '') || '';
+  const questions = module.questions || [];
+  
+  // Créer le thème si nécessaire
+  if (!themesMap.has(filename)) {
+    themesMap.set(filename, {
+      id: filename,
+      label: filename.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+      description: `Quiz sur ${filename}`,
+    });
+  }
+  
+  // Ajouter les questions avec le thème
+  questions.forEach((q: any) => {
+    allQuestions.push({
+      id: `${filename}-${q.question.slice(0, 20).replace(/\s/g, '-')}`,
+      theme: filename,
+      code: q.code || null,
+      lang: q.lang || null,
+      question: q.question,
+      options: q.options,
+      reponse: q.reponse,
+      explication: q.explication,
+    });
+  });
+});
+
+const themes = Array.from(themesMap.values());
+---
+
+<Layout
+  title="Quiz personnalisé — Dév Full Stack | Prépa Technique"
+  description="Créez votre propre quiz en sélectionnant les thèmes que vous souhaitez réviser. Questions à choix multiple, résultats instantanés."
+>
+  <main class="page">
+    <nav class="retour" aria-label="Fil d'Ariane">
+      <a href="/fullstack/">← Retour à la préparation Dév Full Stack</a>
+    </nav>
+
+    <header class="hero">
+      <h1>Quiz personnalisé</h1>
+      <p class="hero-sous">
+        Choisissez les thèmes que vous souhaitez réviser et lancez une session
+        de QCM. Vous aurez les réponses et les explications à chaque question.
+      </p>
+    </header>
+
+    <QuizSession themes={themes} questions={allQuestions} preparation="fullstack" />
+
+    <section class="info-section">
+      <h2>Comment ça marche</h2>
+      <ol>
+        <li>
+          <strong>Sélectionnez des thèmes</strong> – Choisissez parmi Java,
+          Spring, Git, DevOps, etc.
+        </li>
+        <li>
+          <strong>Lancez le quiz</strong> – Les questions s'enchaînent une par
+          une
+        </li>
+        <li>
+          <strong>Recevez un feedback immédiat</strong> – Explication après
+          chaque réponse
+        </li>
+        <li>
+          <strong>Consultez votre score</strong> – Global et par thème
+        </li>
+      </ol>
+      <p class="info-note">
+        Vous pouvez recommencer autant de fois que vous le souhaitez. Les quiz
+        sont générés dynamiquement à partir des fiches.
+      </p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .page {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 3rem clamp(1.25rem, 5vw, 3rem) 5rem;
+  }
+
+  .retour {
+    margin-bottom: 2rem;
+  }
+
+  .retour a {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--estompe);
+    text-decoration: none;
+  }
+
+  .retour a:hover {
+    color: var(--bic);
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+  }
+
+  .hero-sous {
+    font-size: 1.125rem;
+    color: var(--estompe);
+    margin: 0;
+    max-width: 36rem;
+  }
+
+  .info-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+  }
+
+  .info-section h2 {
+    font-size: 1.375rem;
+    font-weight: 750;
+    margin: 0 0 1rem;
+  }
+
+  .info-section ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .info-section li {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+
+  .info-section strong {
+    color: var(--bic);
+  }
+
+  .info-note {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bic-doux);
+    border-left: 3px solid var(--bic);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9375rem;
+    color: var(--encre);
+  }
+
+  @media (max-width: 900px) {
+    .page {
+      padding: 2rem 1.25rem 3rem;
+    }
+  }
+</style>

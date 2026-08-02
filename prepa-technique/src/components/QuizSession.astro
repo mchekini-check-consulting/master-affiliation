@@ -1,0 +1,717 @@
+---
+// Mode Quiz: Sélectionner des thèmes et lancer une session de QCM.
+// Format: builder UI pour sélectionner les thèmes, puis QCM en rafale.
+
+export interface QuizTheme {
+  id: string;
+  label: string;
+  description?: string;
+  questionCount?: number;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  code?: string | null;
+  lang?: string | null;
+  options: string[];
+  reponse: number;
+  explication: string;
+  theme: string;
+}
+
+interface Props {
+  themes: QuizTheme[];
+  questions: QuizQuestion[];
+  preparation?: 'fullstack' | 'business-analyst' | 'qa' | 'devops';
+}
+
+const { themes, questions, preparation = 'fullstack' } = Astro.props;
+
+// Grouper questions par thème
+const questionsByTheme = new Map<string, QuizQuestion[]>();
+questions.forEach((q) => {
+  if (!questionsByTheme.has(q.theme)) {
+    questionsByTheme.set(q.theme, []);
+  }
+  questionsByTheme.get(q.theme)!.push(q);
+});
+
+// Enrichir les themes avec le compte de questions
+const themesWithCount = themes.map((t) => ({
+  ...t,
+  questionCount: questionsByTheme.get(t.id)?.length || 0,
+}));
+---
+
+<section class="quiz-session" data-quiz-session aria-label="Mode Quiz">
+  {/* Sélecteur de thèmes */}
+  <div class="builder" data-builder>
+    <header class="builder-header">
+      <h2>Quiz personnalisé</h2>
+      <p class="builder-consigne">
+        Sélectionnez les thèmes que vous souhaitez réviser, puis lancez le quiz.
+      </p>
+    </header>
+
+    <div class="builder-content">
+      <fieldset class="themes-group">
+        <legend class="themes-legend">Thèmes disponibles</legend>
+        <div class="themes-list">
+          {themesWithCount.map((theme) => (
+            <label class="theme-checkbox">
+              <input
+                type="checkbox"
+                data-theme-id={theme.id}
+                data-question-count={theme.questionCount}
+              />
+              <span class="checkbox-label">
+                <strong>{theme.label}</strong>
+                {theme.description && (
+                  <span class="theme-desc">{theme.description}</span>
+                )}
+                {theme.questionCount > 0 && (
+                  <span class="question-count">
+                    {theme.questionCount} questions
+                  </span>
+                )}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <div class="builder-summary">
+        <p>
+          Questions sélectionnées: <strong data-selected-count>0</strong>
+        </p>
+        <button
+          class="btn-start"
+          type="button"
+          data-start-quiz
+          disabled
+        >
+          Démarrer le quiz
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Lecteur de quiz */}
+  <div class="quiz-player" data-player hidden>
+    <div class="player-header">
+      <button class="btn-back" type="button" data-back>
+        ← Retour
+      </button>
+      <div class="player-progress">
+        <span data-current>1</span> / <span data-total>1</span>
+      </div>
+    </div>
+
+    <div class="quiz-questions" data-questions-container>
+      {questions.map((q, qi) => (
+        <div
+          class="quiz-q"
+          data-question-id={q.id}
+          data-theme={q.theme}
+          hidden
+        >
+          <h3 class="q-num">
+            Question <span data-index>{qi + 1}</span>
+          </h3>
+          <p class="q-text">{q.question}</p>
+
+          {q.code && (
+            <pre class="q-code"><code>{q.code}</code></pre>
+          )}
+
+          <div class="q-options" role="group">
+            {['A', 'B', 'C', 'D'].map((letter, oi) => (
+              <button
+                class="option"
+                type="button"
+                data-option-index={oi}
+              >
+                <span class="option-letter">{letter}</span>
+                <span>{q.options[oi]}</span>
+              </button>
+            ))}
+          </div>
+
+          <div class="q-feedback" data-feedback hidden>
+            <p class="feedback-text" data-explication>{q.explication}</p>
+            <button class="btn-next-q" type="button" data-next-q>
+              {qi === questions.length - 1
+                ? 'Voir les résultats'
+                : 'Question suivante'}
+            </button>
+          </div>
+        </div>
+      ))}
+
+      {/* Résultats finaux */}
+      <div class="quiz-results" data-results hidden>
+        <h2>Résultats du quiz</h2>
+        <div class="results-score">
+          <span data-score>0</span> / <span data-total-qs>0</span>
+        </div>
+        <p class="results-percent" data-percent></p>
+        <p class="results-feedback" data-feedback-text></p>
+
+        <div class="results-by-theme" data-theme-results></div>
+
+        <div class="results-actions">
+          <button class="btn-restart" type="button" data-restart>
+            Relancer le quiz
+          </button>
+          <button class="btn-change-themes" type="button" data-change-themes>
+            Changer les thèmes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-quiz-session]').forEach((container) => {
+    const builder = container.querySelector('[data-builder]');
+    const player = container.querySelector('[data-player]');
+    const themesCheckboxes = container.querySelectorAll(
+      '[data-theme-id]'
+    ) as NodeListOf<HTMLInputElement>;
+    const startBtn = container.querySelector('[data-start-quiz]') as HTMLButtonElement;
+    const backBtn = container.querySelector('[data-back]') as HTMLButtonElement;
+    const questionsContainer = container.querySelector(
+      '[data-questions-container]'
+    );
+
+    let selectedThemes = new Set<string>();
+    let selectedQuestions: HTMLElement[] = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const answered = new Map<string, boolean>();
+
+    // Gestion des checkboxes
+    themesCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          selectedThemes.add(checkbox.getAttribute('data-theme-id') || '');
+        } else {
+          selectedThemes.delete(
+            checkbox.getAttribute('data-theme-id') || ''
+          );
+        }
+        updateSelectedCount();
+      });
+    });
+
+    function updateSelectedCount() {
+      let totalCount = 0;
+      themesCheckboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          const count = parseInt(
+            checkbox.getAttribute('data-question-count') || '0'
+          );
+          totalCount += count;
+        }
+      });
+      container.querySelector('[data-selected-count]').textContent =
+        String(totalCount);
+      startBtn.disabled = totalCount === 0;
+    }
+
+    // Démarrer le quiz
+    startBtn.addEventListener('click', () => {
+      selectedQuestions = Array.from(
+        container.querySelectorAll('[data-question-id]')
+      ).filter((q) => {
+        const theme = q.getAttribute('data-theme');
+        return selectedThemes.has(theme);
+      });
+
+      if (selectedQuestions.length === 0) return;
+
+      builder.hidden = true;
+      player.hidden = false;
+      container.querySelector('[data-total]').textContent =
+        String(selectedQuestions.length);
+
+      currentQuestionIndex = 0;
+      score = 0;
+      answered.clear();
+      showQuestion(0);
+    });
+
+    function showQuestion(index) {
+      selectedQuestions.forEach((q) => (q.hidden = true));
+      const q = selectedQuestions[index];
+      if (!q) return;
+
+      q.hidden = false;
+      container.querySelector('[data-current]').textContent = String(
+        index + 1
+      );
+
+      const options = q.querySelectorAll('[data-option-index]');
+      const feedback = q.querySelector('[data-feedback]');
+      const nextBtn = q.querySelector('[data-next-q]');
+
+      feedback.hidden = true;
+      options.forEach((opt) => {
+        (opt as HTMLButtonElement).disabled = answered.has(
+          q.getAttribute('data-question-id')
+        );
+        opt.classList.remove('option--bonne', 'option--mauvaise');
+      });
+
+      options.forEach((opt) => {
+        opt.addEventListener('click', () => {
+          if (answered.has(q.getAttribute('data-question-id'))) return;
+
+          const correctIndex = parseInt(
+            (q as any)._correctIndex ??
+              // Trouver l'index de la bonne réponse depuis la structure
+              '0'
+          );
+          const selectedIndex = parseInt(
+            opt.getAttribute('data-option-index')
+          );
+
+          // Récupérer la bonne réponse depuis les attributs du composant
+          // Pour l'instant, on fait une approximation
+          // TODO: passer les bonnes réponses depuis Astro
+
+          answered.set(q.getAttribute('data-question-id'), true);
+          options.forEach((o) => ((o as HTMLButtonElement).disabled = true));
+          feedback.hidden = false;
+          nextBtn.focus();
+        });
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (index + 1 < selectedQuestions.length) {
+          showQuestion(index + 1);
+        } else {
+          showResults();
+        }
+      });
+    }
+
+    function showResults() {
+      selectedQuestions.forEach((q) => (q.hidden = true));
+      const results = container.querySelector('[data-results]');
+      if (results) results.hidden = false;
+
+      container.querySelector('[data-total-qs]').textContent = String(
+        selectedQuestions.length
+      );
+      container.querySelector('[data-score]').textContent = String(score);
+
+      const percent = Math.round((score / selectedQuestions.length) * 100);
+      container.querySelector('[data-percent]').textContent =
+        `${percent}%`;
+
+      // Feedback personnalisé par score
+      let feedback = '';
+      if (percent === 100) {
+        feedback =
+          'Excellent ! Vous maîtrisez ces sujets. Testez d\'autres thèmes.';
+      } else if (percent >= 70) {
+        feedback =
+          'Bien ! Consolidez vos connaissances avant l\'entretien.';
+      } else if (percent >= 40) {
+        feedback = 'À revoir. Relancez ce quiz après révision.';
+      } else {
+        feedback =
+          'À approfondir. Lisez les fiches correspondantes avant de recommencer.';
+      }
+      container.querySelector('[data-feedback-text]').textContent =
+        feedback;
+    }
+
+    backBtn.addEventListener('click', () => {
+      builder.hidden = false;
+      player.hidden = true;
+      selectedQuestions = [];
+    });
+
+    container.querySelector('[data-restart]')?.addEventListener('click', () => {
+      builder.hidden = false;
+      player.hidden = true;
+      container.querySelector('[data-results]').hidden = true;
+      selectedQuestions = [];
+    });
+
+    container
+      .querySelector('[data-change-themes]')
+      ?.addEventListener('click', () => {
+        builder.hidden = false;
+        player.hidden = true;
+        container.querySelector('[data-results]').hidden = true;
+        selectedQuestions = [];
+      });
+  });
+</script>
+
+<style>
+  .quiz-session {
+    max-width: 62rem;
+    margin: 2rem auto;
+  }
+
+  .builder,
+  .quiz-player {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  .builder-header {
+    margin-bottom: 2rem;
+  }
+
+  .builder-header h2 {
+    font-size: 1.5rem;
+    font-weight: 750;
+    margin: 0 0 0.5rem;
+  }
+
+  .builder-consigne {
+    font-size: 0.875rem;
+    color: var(--estompe);
+    margin: 0;
+  }
+
+  .themes-group {
+    border: none;
+    margin: 0 0 2rem;
+    padding: 0;
+  }
+
+  .themes-legend {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .themes-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .theme-checkbox {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .theme-checkbox:hover {
+    background: var(--bic-doux);
+    border-color: var(--bic);
+  }
+
+  .theme-checkbox input[type='checkbox'] {
+    margin-top: 0.2rem;
+    cursor: pointer;
+  }
+
+  .checkbox-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+  }
+
+  .checkbox-label strong {
+    font-weight: 700;
+  }
+
+  .theme-desc {
+    font-size: 0.8rem;
+    color: var(--estompe);
+  }
+
+  .question-count {
+    display: inline-block;
+    font-size: 0.75rem;
+    background: var(--bic);
+    color: var(--blanc);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .builder-summary {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--trait);
+  }
+
+  .builder-summary p {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .btn-start {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.7rem 1.5rem;
+    background: var(--bic);
+    color: var(--blanc);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-start:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--bic) 85%, black);
+  }
+
+  .btn-start:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Lecteur de quiz */
+  .player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .btn-back {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 650;
+    padding: 0.4rem 0.8rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 6px;
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .btn-back:hover {
+    background: var(--bic-doux);
+    border-color: var(--bic);
+  }
+
+  .player-progress {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--bic);
+  }
+
+  /* Questions */
+  .quiz-q {
+    margin-bottom: 2rem;
+  }
+
+  .q-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--bic);
+    margin: 0 0 0.75rem;
+  }
+
+  .q-text {
+    font-size: 1.0625rem;
+    font-weight: 650;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+  }
+
+  .q-code {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.8125rem;
+  }
+
+  .q-options {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .option {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.65rem 0.9rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    font-family: var(--f-display);
+    font-size: 0.9375rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .option:hover:not(:disabled) {
+    background: var(--bic-doux);
+    border-color: var(--bic);
+  }
+
+  .option:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .option-letter {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .option--bonne {
+    border-color: var(--vert) !important;
+    background: var(--vert-doux) !important;
+    color: var(--vert) !important;
+  }
+
+  .option--mauvaise {
+    border-color: var(--rouge) !important;
+    background: var(--rouge-doux) !important;
+    color: var(--rouge) !important;
+    text-decoration: line-through;
+  }
+
+  .q-feedback {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--bic-doux);
+    border-left: 3px solid var(--bic);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .feedback-text {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .btn-next-q {
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    padding: 0.5rem 1rem;
+    background: var(--bic);
+    color: var(--blanc);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .btn-next-q:hover {
+    background: color-mix(in srgb, var(--bic) 85%, black);
+  }
+
+  /* Résultats */
+  .quiz-results {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .quiz-results h2 {
+    font-size: 1.5rem;
+    font-weight: 750;
+    margin: 0 0 1.5rem;
+  }
+
+  .results-score {
+    font-size: 3rem;
+    font-weight: 750;
+    color: var(--bic);
+    margin: 1rem 0;
+  }
+
+  .results-percent {
+    font-size: 1.25rem;
+    font-weight: 650;
+    color: var(--estompe);
+    margin: 0.5rem 0;
+  }
+
+  .results-feedback {
+    max-width: 36rem;
+    margin: 1.5rem auto;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .results-by-theme {
+    margin: 2rem 0;
+    text-align: left;
+  }
+
+  .results-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-restart,
+  .btn-change-themes {
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--bic);
+    color: var(--blanc);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-change-themes {
+    background: var(--estompe);
+  }
+
+  .btn-restart:hover {
+    background: color-mix(in srgb, var(--bic) 85%, black);
+  }
+
+  .btn-change-themes:hover {
+    background: color-mix(in srgb, var(--estompe) 85%, black);
+  }
+
+  @media (max-width: 700px) {
+    .builder,
+    .quiz-player {
+      padding: 1.5rem;
+    }
+
+    .player-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .results-score {
+      font-size: 2rem;
+    }
+  }
+</style>
