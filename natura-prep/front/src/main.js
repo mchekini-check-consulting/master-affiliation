@@ -6,15 +6,33 @@ import '@fontsource/public-sans/600.css';
 import '@fontsource/public-sans/700.css';
 import './style.css';
 
-// Vidéo hero : certains navigateurs bloquent l'autoplay si la source
-// n'est pas prête au moment du parsing — on relance par sécurité.
+// Vidéo hero : lecture unique (pas de boucle ni de replay). L'autoplay
+// sonore étant bloqué par les navigateurs, la vidéo démarre muette et le
+// son s'active au clic. On relance aussi l'autoplay par sécurité si la
+// source n'était pas prête au moment du parsing.
 const video = document.querySelector('.hero-video');
-if (video) {
+const boutonSon = document.getElementById('hero-son');
+if (video && boutonSon) {
   const relancer = () => {
     if (video.paused && !video.ended) video.play().catch(() => {});
   };
   video.addEventListener('canplay', relancer, { once: true });
   setTimeout(relancer, 800);
+
+  boutonSon.addEventListener('click', () => {
+    video.muted = !video.muted;
+    if (!video.muted && !video.ended) video.play().catch(() => {});
+    boutonSon.textContent = video.muted ? '🔇 Activer le son' : '🔊 Couper le son';
+    boutonSon.setAttribute(
+      'aria-label',
+      video.muted ? 'Activer le son' : 'Couper le son'
+    );
+  });
+
+  // Une fois la vidéo terminée, le bouton n'a plus d'utilité
+  video.addEventListener('ended', () => {
+    boutonSon.hidden = true;
+  });
 }
 
 // FAQ : accordéon exclusif — une seule réponse ouverte à la fois,

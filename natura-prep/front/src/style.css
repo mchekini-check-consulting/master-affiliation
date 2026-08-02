@@ -51,6 +51,8 @@ body {
   color: var(--corps);
   font-family: var(--f-corps);
   -webkit-font-smoothing: antialiased;
+  /* La vidéo du hero déborde de son conteneur : pas de scroll horizontal */
+  overflow-x: clip;
 }
 
 a {
@@ -206,8 +208,8 @@ h3 {
   padding-bottom: 64px;
   display: grid;
   /* Le texte prend plus de largeur que dans la maquette d'origine */
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 56px;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 36px;
   align-items: center;
 }
 
@@ -263,13 +265,44 @@ h3 {
   margin: 18px 0 0;
 }
 
-/* Vidéo de démonstration */
+/* Vidéo de démonstration : déborde légèrement vers le bord droit
+   de l'écran pour occuper plus de place que sa colonne */
+.hero-visuel {
+  position: relative;
+}
+
 .hero-video {
-  width: 100%;
+  width: calc(100% + 44px);
+  margin-right: -44px;
   display: block;
   border-radius: 18px;
   border: 1px solid var(--bordure);
   box-shadow: 0 20px 50px rgba(20, 26, 51, 0.1);
+}
+
+/* L'autoplay sonore est bloqué par les navigateurs :
+   le son s'active au clic (geste utilisateur requis) */
+.hero-son {
+  position: absolute;
+  right: -30px;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--bleu);
+  border: 1px solid var(--bordure);
+  border-radius: 99px;
+  padding: 9px 16px;
+  font-family: var(--f-corps);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(20, 26, 51, 0.15);
+}
+
+.hero-son:hover {
+  border-color: var(--bleu);
 }
 
 /* ---------- Bande statistiques ---------- */
@@ -865,6 +898,15 @@ h3 {
 
   .hero-visuel {
     max-width: 560px;
+  }
+
+  .hero-video {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .hero-son {
+    right: 14px;
   }
 
   .stats-int {
