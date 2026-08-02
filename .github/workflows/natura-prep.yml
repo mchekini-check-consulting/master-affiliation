@@ -61,6 +61,9 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
+          # Blips réseau runner -> VM : on laisse plus de 30s (défaut) pour
+          # établir la connexion, avec quelques tentatives
+          timeout: 90s
           script: |
             set -e
             REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
