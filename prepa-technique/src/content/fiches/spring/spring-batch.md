@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Batch"
 description: "Le framework de traitement par lots de Spring : architecture Job/Step/Chunk et exemple complet reader-processor-writer avec listener."
 categorie: "spring"

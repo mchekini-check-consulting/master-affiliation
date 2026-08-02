@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Collections Java"
 description: "Le framework des collections Java : List, Set, Map, leurs implémentations et leurs performances."
 categorie: "java"

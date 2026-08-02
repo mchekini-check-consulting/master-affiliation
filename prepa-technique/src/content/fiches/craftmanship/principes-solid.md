@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Principes SOLID"
 description: "Les 5 principes fondamentaux de la programmation orientée objet : SRP, OCP, LSP, ISP et DIP, avec exemples Java."
 categorie: "craftmanship"

@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Fetch vs Pull"
 description: "Comprendre la différence entre récupérer les changements du dépôt distant (fetch) et les intégrer automatiquement (pull)."
 categorie: "git"

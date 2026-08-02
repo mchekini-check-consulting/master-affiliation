@@ -1,0 +1,89 @@
+{
+  "scenarios": [
+    {
+      "id": "backend-arch-01",
+      "title": "Architecture d'une API REST pour e-commerce",
+      "description": "Concevoir une API REST pour un e-commerce – structure, sécurité, scalabilité.",
+      "duration_min": 45,
+      "questions": [
+        {
+          "id": "q1",
+          "question": "Imaginez que vous devez concevoir une API REST pour un e-commerce. Comment organiseriez-vous votre architecture au niveau des endpoints et des ressources ?",
+          "type": "discussion",
+          "guidance": [
+            "Identifier les ressources principales (produits, commandes, utilisateurs, panier)",
+            "Expliquer la structure des URI (/api/v1/products, /api/v1/orders, etc.)",
+            "Décrire les verbes HTTP (GET, POST, PUT, DELETE) et leur utilisation",
+            "Mentionner le versioning de l'API (/v1/ pour la compatibilité future)"
+          ],
+          "model_answer": "Une bonne architecture REST séparera les ressources en endpoints clairs : /api/v1/products (lister/créer), /api/v1/products/{id} (détail/modifier/supprimer), /api/v1/orders (commandes), /api/v1/users (authentification). Le versioning garantit la compatibilité entre les versions. Les codes HTTP doivent être cohérents : 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 404 Not Found, 500 Server Error.",
+          "estimated_time_min": 10
+        },
+        {
+          "id": "q2",
+          "question": "Quels mécanismes de sécurité mettriez-vous en place ? Pourquoi ?",
+          "type": "discussion",
+          "guidance": [
+            "Authentication (JWT, OAuth, sessions)",
+            "Authorization et contrôle d'accès (RBAC, permissions)",
+            "HTTPS et chiffrement des données sensibles",
+            "Validation des entrées (prévention des injections SQL, XSS)",
+            "Rate limiting et protection contre les abus",
+            "Gestion des secrets (clés API, tokens)"
+          ],
+          "model_answer": "Sécurité multi-couches : (1) HTTPS obligatoire pour toutes les communications. (2) JWT ou OAuth pour l'authentification sans état. (3) RBAC (Role-Based Access Control) pour l'autorisation : un utilisateur ne peut accéder qu'à ses propres données. (4) Validation stricte des entrées côté serveur. (5) Rate limiting pour prévenir les abus. (6) Secrets gérés en variables d'env, jamais en hardcoded.",
+          "estimated_time_min": 10
+        },
+        {
+          "id": "q3",
+          "question": "Comment gérerez-vous la scalabilité ? Qu'est-ce que vous mettriez en cache, et pourquoi ?",
+          "type": "discussion",
+          "guidance": [
+            "Base de données : indexation, sharding, réplication",
+            "Cache (Redis, Memcached) : invalidation, stratégies (LRU, TTL)",
+            "Quelles données mettre en cache (produits, catégories, sessions)",
+            "CDN pour assets statiques",
+            "Load balancing et réplication horizontale des services"
+          ],
+          "model_answer": "Scalabilité : (1) BDD : index sur colonnes critiques (product_id, user_id), réplication en lecture pour les queries lourdes. (2) Cache Redis pour produits (TTL 1h), catégories, sessions utilisateur. (3) Invalidation intelligente : après modification d'un produit, invalider son cache. (4) CDN (CloudFront, Cloudflare) pour images et assets. (5) Load balancer (nginx, AWS ELB) devant les instances serveur, scaling horizontal avec containers (Docker, Kubernetes).",
+          "estimated_time_min": 15
+        }
+      ]
+    },
+    {
+      "id": "java-spring-01",
+      "title": "Entretien Spring Boot & Microservices",
+      "description": "Questions sur Spring Boot, les microservices et les patterns d'architecture.",
+      "duration_min": 50,
+      "questions": [
+        {
+          "id": "q1",
+          "question": "Expliquez le concept d'IoC (Inversion of Control) et comment Spring l'implémente.",
+          "type": "discussion",
+          "guidance": [
+            "Définir l'IoC : le framework gère le cycle de vie des objets, pas l'application",
+            "Le conteneur Spring et les beans",
+            "Dependency Injection (constructor, setter, field)",
+            "Avantages : testabilité, découplage, flexibilité"
+          ],
+          "model_answer": "L'IoC inverse le contrôle : au lieu que le code crée ses dépendances, le framework (Spring) les injecte. Spring Container gère le cycle de vie des beans (création, init, destruction). L'injection se fait via constructeur (recommandée pour les dépendances obligatoires), setter (dépendances optionnelles) ou field (@Autowired). Bénéfices : tests unitaires faciles (mocker les dépendances), couplage faible, configuration centralisée.",
+          "estimated_time_min": 10
+        },
+        {
+          "id": "q2",
+          "question": "Quels sont les avantages des microservices par rapport à une architecture monolithique ?",
+          "type": "discussion",
+          "guidance": [
+            "Scalabilité indépendante : un service peut scaler sans les autres",
+            "Déploiement indépendant et plus rapide",
+            "Résilience : défaillance isolée à un service",
+            "Tech stack diversifié par service",
+            "Défis : complexité opérationnelle, latence réseau, données distribuées"
+          ],
+          "model_answer": "Microservices vs Monolithe : (1) Scalabilité : un service critique scal horizontalement sans traîner les autres. (2) Déploiement : chaque équipe déploie son service indépendamment, itération rapide. (3) Résilience : un microservice down n'affecte que sa fonction, circuit breaker isole les pannes. (4) Tech : chaque service peut choisir sa stack (Java, Node, Go). Côté cons : complexité opérationnelle (service discovery, monitoring distribué), latence réseau intra-services, transactions distribuées difficiles.",
+          "estimated_time_min": 15
+        }
+      ]
+    }
+  ]
+}

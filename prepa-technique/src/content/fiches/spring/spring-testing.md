@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Testing"
 description: "Le framework de test intégré de Spring : tests unitaires avec Mockito, tests d'intégration avec @SpringBootTest et slice tests avec @WebMvcTest et @DataJpaTest."
 categorie: "spring"

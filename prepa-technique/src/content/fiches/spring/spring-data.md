@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Data"
 description: "Simplification de l'accès aux données : modules Spring Data, entités JPA et repositories avec requêtes dérivées."
 categorie: "spring"

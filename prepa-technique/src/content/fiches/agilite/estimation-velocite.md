@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Estimation & Vélocité"
 description: "Story points, échelle de Fibonacci, Planning Poker, calcul de la vélocité et autres techniques d'estimation agile."
 categorie: "agilite"

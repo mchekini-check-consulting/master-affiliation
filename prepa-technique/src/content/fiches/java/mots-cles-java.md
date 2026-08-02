@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Mots-clés Java"
 description: "Guide des mots-clés essentiels de Java : modificateurs d'accès, static, final, abstract, interface, synchronized et volatile."
 categorie: "java"

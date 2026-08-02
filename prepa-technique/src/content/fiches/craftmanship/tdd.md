@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Test Driven Development (TDD)"
 description: "Développement piloté par les tests : le cycle Red, Green, Refactor illustré avec une calculatrice JavaScript et Jest."
 categorie: "craftmanship"

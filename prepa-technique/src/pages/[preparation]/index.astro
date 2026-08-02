@@ -1,0 +1,151 @@
+---
+// Pages des préparations dont le programme n'est pas encore écrit
+// (Business Analyst, QA, DevOps). La préparation Dév Full Stack a sa
+// propre page : src/pages/fullstack/index.astro.
+import Layout from '../../layouts/Layout.astro';
+import { preparations } from '../../data/preparations';
+import { modes } from '../../data/modes';
+
+export async function getStaticPaths() {
+  return preparations
+    .filter((p) => !p.disponible)
+    .map((p) => ({ params: { preparation: p.slug }, props: { prepa: p } }));
+}
+
+const { prepa } = Astro.props;
+const modesAVenir = modes.filter((m) => !m.disponible);
+---
+
+<Layout
+  title={`Préparation ${prepa.label} — Prépa Technique`}
+  description={`La préparation ${prepa.label} arrive sur Prépa Technique : ${prepa.description}`}
+>
+  <main class="vierge">
+    <nav class="retour" aria-label="Fil d'Ariane">
+      <a href="/">← Toutes les préparations</a>
+    </nav>
+
+    <p class="eyebrow">Préparation</p>
+    <h1>{prepa.label}</h1>
+    <p class="etat">En préparation</p>
+    <p class="desc">{prepa.description}</p>
+
+    <div class="encart">
+      <p>
+        Le programme de cette préparation est <strong>en cours d'écriture</strong>.
+        Vous retrouverez ici des fiches de révision corrigées au stylo avec
+        leurs interros, puis les modes{' '}
+        {modesAVenir.map((m, i) => (
+          <>{i > 0 && (i === modesAVenir.length - 1 ? ' et ' : ', ')}<em>{m.label}</em></>
+        ))}.
+      </p>
+    </div>
+
+    <a class="bouton" href="/fullstack/">
+      En attendant, découvrez la préparation Dév Full Stack →
+    </a>
+  </main>
+</Layout>
+
+<style>
+  .vierge {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 3.5rem clamp(1.25rem, 5vw, 3rem) 5rem;
+  }
+
+  .retour {
+    margin-bottom: 2.5rem;
+  }
+
+  .retour a {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--estompe);
+    text-decoration: none;
+  }
+
+  .retour a:hover {
+    color: var(--bic);
+  }
+
+  .eyebrow {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--bic);
+    margin: 0 0 0.5rem;
+  }
+
+  h1 {
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.9rem;
+  }
+
+  .etat {
+    display: inline-block;
+    font-family: var(--f-display);
+    font-size: 0.6875rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--estompe);
+    background: var(--blanc);
+    border: 1.5px dashed currentColor;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    transform: rotate(-1.5deg);
+    margin: 0 0 1.25rem;
+  }
+
+  .desc {
+    font-size: 1.125rem;
+    color: var(--estompe);
+    margin: 0 0 1.75rem;
+  }
+
+  .encart {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .encart p {
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  .encart em {
+    font-style: normal;
+    background: var(--bic-doux);
+    color: var(--bic);
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+    font-family: var(--f-display);
+    font-size: 0.9em;
+    font-weight: 650;
+  }
+
+  .bouton {
+    display: inline-block;
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    color: var(--blanc);
+    background: var(--bic);
+    text-decoration: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 999px;
+  }
+
+  .bouton:hover {
+    filter: brightness(1.1);
+  }
+</style>

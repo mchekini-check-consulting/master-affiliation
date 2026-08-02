@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Pipeline CI/CD"
 description: "Les étapes essentielles d'un pipeline CI/CD automatisé, du checkout du code au déploiement Kubernetes, avec un exemple GitLab CI complet."
 categorie: "devops"

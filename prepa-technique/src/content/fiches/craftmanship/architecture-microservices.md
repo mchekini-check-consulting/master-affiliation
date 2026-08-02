@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Architecture Microservices"
 description: "Décomposer une application en services autonomes : stratégies de découpage, patterns de communication et patterns essentiels (API Gateway, Circuit Breaker, Saga)."
 categorie: "craftmanship"

@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Bonnes Pratiques"
 description: "Règles fondamentales pour un code propre : nommage, KISS, DRY, exceptions, formatage et chasse aux magic numbers."
 categorie: "craftmanship"

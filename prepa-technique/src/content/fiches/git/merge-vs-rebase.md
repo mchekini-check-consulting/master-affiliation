@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Merge vs Rebase"
 description: "Deux approches pour intégrer les changements d'une branche : merge qui préserve l'historique, rebase qui le linéarise."
 categorie: "git"

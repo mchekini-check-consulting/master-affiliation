@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Core (IoC/DI)"
 description: "Inversion de contrôle et injection de dépendances : les deux mécanismes fondateurs du conteneur Spring."
 categorie: "spring"

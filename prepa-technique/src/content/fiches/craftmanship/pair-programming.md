@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Pair Programming"
 description: "Deux développeurs, un clavier : les rôles Driver/Navigator, quand pairer, les bénéfices, les défis et les variantes du pair programming."
 categorie: "craftmanship"

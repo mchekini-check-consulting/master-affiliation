@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Versions Java LTS"
 description: "Guide des versions Long Term Support de Java (8, 11, 17, 21) et de leurs nouveautés majeures."
 categorie: "java"

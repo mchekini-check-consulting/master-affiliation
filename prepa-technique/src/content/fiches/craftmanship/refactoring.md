@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Refactoring"
 description: "Améliorer la structure du code sans changer son comportement observable : quand refactoriser, le rôle des tests et les techniques essentielles."
 categorie: "craftmanship"

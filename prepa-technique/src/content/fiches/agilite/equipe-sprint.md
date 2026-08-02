@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Équipe & Sprint"
 description: "Les trois rôles Scrum (Product Owner, Scrum Master, Development Team), le déroulement d'un sprint et la vélocité d'équipe."
 categorie: "agilite"

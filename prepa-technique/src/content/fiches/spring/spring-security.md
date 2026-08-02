@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Security"
 description: "Framework de sécurité pour les applications Spring : authentification, autorisation et configuration de la SecurityFilterChain."
 categorie: "spring"

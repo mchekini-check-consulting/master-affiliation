@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Gestion des Secrets"
 description: "Centralisation et sécurisation des secrets avec HashiCorp Vault : politiques, authentification et intégration Kubernetes."
 categorie: "devops"

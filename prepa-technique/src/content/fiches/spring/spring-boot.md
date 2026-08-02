@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Boot"
 description: "Framework pour créer des applications Spring rapidement grâce à l'auto-configuration, aux starters et au serveur embarqué."
 categorie: "spring"

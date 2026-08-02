@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Monitoring"
 description: "Surveillance des applications et de l'infrastructure avec Prometheus, visualisation Grafana et Alert Manager."
 categorie: "devops"

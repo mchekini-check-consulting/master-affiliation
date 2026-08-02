@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "DDD + Architecture Hexagonale + Clean Architecture"
 description: "Trois approches complémentaires — DDD, architecture hexagonale et Clean Architecture — pour isoler le domaine métier et construire des applications maintenables."
 categorie: "craftmanship"

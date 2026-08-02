@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Behavior Driven Development (BDD)"
 description: "Le BDD transforme les exigences métier en spécifications exécutables en langage naturel (Gherkin), compréhensibles par les devs, la QA et le métier."
 categorie: "craftmanship"

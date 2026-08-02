@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "POO en Java"
 description: "Programmation Orientée Objet en Java : les 4 piliers, classes et objets, concepts avancés."
 categorie: "java"

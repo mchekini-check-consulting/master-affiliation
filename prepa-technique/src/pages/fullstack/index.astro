@@ -1,0 +1,243 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { categories } from '../../data/categories';
+
+const fiches = await getCollection('fiches');
+
+// Filtrer les fiches pour la préparation fullstack
+const fichesFullstack = fiches.filter(f => 
+  f.data.preparations?.includes('fullstack') || !f.data.preparations
+);
+
+const parCategorie = categories.map((cat) => ({
+  ...cat,
+  fiches: fichesFullstack
+    .filter((f) => f.data.categorie === cat.slug)
+    .sort((a, b) => a.data.ordre - b.data.ordre),
+}));
+
+const total = fichesFullstack.length;
+---
+
+<Layout
+  title="Préparation Dév Full Stack — Prépa Technique"
+  description={`${total} fiches de révision avec quiz pour préparer vos entretiens de développeur full stack : Java, Spring, Git, DevOps, craftmanship, agilité et Maven.`}
+>
+  <Sidebar preparation="fullstack" />
+  <main class="page">
+    <header class="hero">
+      <nav class="retour" aria-label="Fil d'Ariane">
+        <a href="/">← Toutes les préparations</a>
+      </nav>
+      <p class="eyebrow">
+        Préparation Dév Full Stack · Java · Spring · Git · DevOps · Craft ·
+        Agilité · Maven
+      </p>
+      <h1>
+        {total} fiches pour préparer vos
+        <span class="marque marque--animee">entretiens techniques</span>
+      </h1>
+      <p class="hero-sous">
+        Un cahier de révision corrigé au stylo : les mauvais exemples barrés en
+        rouge, les bons cochés en vert, et une interro à la fin de chaque fiche
+        pour vérifier que c'est acquis.
+      </p>
+    </header>
+
+    <section class="programme" aria-label="Programme de révision">
+      {
+        parCategorie.map((cat) => (
+          <section class="matiere">
+            <header class="matiere-tete">
+              <h2>{cat.label}</h2>
+              <p>{cat.description}</p>
+            </header>
+            <ol class="matiere-fiches">
+              {cat.fiches.map((f) => (
+                <li>
+                  <a href={`/${cat.slug}/${f.id.split('/').pop()}/`}>
+                    <span class="fiche-num">
+                      {String(f.data.ordre).padStart(2, '0')}
+                    </span>
+                    <span class="fiche-titre">{f.data.title}</span>
+                    <span class="fiche-desc">{f.data.description}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))
+      }
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .page {
+    margin-left: var(--sidebar-l);
+    padding: 4rem clamp(1.25rem, 5vw, 4.5rem) 5rem;
+  }
+
+  @media (max-width: 900px) {
+    .page {
+      margin-left: 0;
+      padding-top: 4.5rem;
+    }
+  }
+
+  .retour {
+    margin-bottom: 1.5rem;
+  }
+
+  .retour a {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--estompe);
+    text-decoration: none;
+  }
+
+  .retour a:hover {
+    color: var(--bic);
+  }
+
+  .eyebrow {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--bic);
+    margin: 0 0 0.75rem;
+  }
+
+  .hero {
+    max-width: 52rem;
+    margin: 0 auto 3.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.1rem, 5vw, 3.2rem);
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+  }
+
+  /* Coup de surligneur sur le mot-clé au chargement */
+  .marque--animee {
+    background-size: 0% 100%;
+    background-repeat: no-repeat;
+    animation: surligner 0.7s ease-out 0.35s forwards;
+  }
+
+  @keyframes surligner {
+    to {
+      background-size: 100% 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marque--animee {
+      background-size: 100% 100%;
+      animation: none;
+    }
+  }
+
+  .hero-sous {
+    font-size: 1.1875rem;
+    color: var(--estompe);
+    margin: 0;
+    max-width: 36rem;
+  }
+
+  .programme {
+    display: grid;
+    gap: 2.5rem;
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+
+  .matiere-tete {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .matiere-tete h2 {
+    font-size: 1.375rem;
+    font-weight: 750;
+    margin: 0;
+  }
+
+  .matiere-tete p {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--estompe);
+    margin: 0;
+  }
+
+  .matiere-fiches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .matiere-fiches li + li {
+    border-top: 1px solid var(--trait);
+  }
+
+  .matiere-fiches a {
+    display: grid;
+    grid-template-columns: 2.2rem 15rem 1fr;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.7rem 1.1rem;
+    text-decoration: none;
+    color: var(--encre);
+  }
+
+  .matiere-fiches a:hover {
+    background: var(--bic-doux);
+  }
+
+  .matiere-fiches a:hover .fiche-titre {
+    color: var(--bic);
+  }
+
+  .fiche-num {
+    font-family: var(--f-mono);
+    font-size: 0.75rem;
+    color: var(--estompe);
+  }
+
+  .fiche-titre {
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+  }
+
+  .fiche-desc {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--estompe);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 700px) {
+    .matiere-fiches a {
+      grid-template-columns: 2.2rem 1fr;
+    }
+    .fiche-desc {
+      display: none;
+    }
+  }
+</style>

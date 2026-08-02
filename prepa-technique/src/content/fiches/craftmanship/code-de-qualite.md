@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Code de Qualité"
 description: "Les 4 piliers d'un code de qualité — maintenable, testable, lisible et extensible — illustrés par des exemples Java."
 categorie: "craftmanship"

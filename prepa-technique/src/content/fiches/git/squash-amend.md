@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Squash & Amend"
 description: "Nettoyer et modifier l'historique des commits : fusionner plusieurs commits en un seul et retoucher le dernier commit."
 categorie: "git"

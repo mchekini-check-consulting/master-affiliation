@@ -1,0 +1,613 @@
+---
+// Simulation d'entretien technique : questions ouvertes posées une à la fois
+// comme dans un vrai entretien, sans QCM MCQ.
+// 
+// Structure des données : src/data/interview-scenarios/{preparation}.json
+// Format : { scenarios: [ { id, title, duration_min, questions: [] } ] }
+
+export interface InterviewQuestion {
+  id: string;
+  question: string;
+  type: 'open' | 'code' | 'discussion';
+  guidance?: string[];  // Points clés à couvrir
+  model_answer?: string;  // Réponse modèle
+  estimated_time_min?: number;
+}
+
+export interface InterviewScenario {
+  id: string;
+  title: string;
+  description: string;
+  duration_min: number;
+  questions: InterviewQuestion[];
+}
+
+interface Props {
+  scenarios: InterviewScenario[];
+}
+
+const { scenarios } = Astro.props;
+---
+
+<section class="interview-sim" data-interview aria-label="Simulation d'entretien">
+  <header class="sim-header">
+    <h2>Simulation d'entretien</h2>
+    <p class="sim-consigne">
+      Choisissez un scénario et répondez aux questions comme face à un recruteur.
+      Vous pouvez voir les points clés et les réponses modèles à la fin.
+    </p>
+  </header>
+
+  <div class="sim-content">
+    {/* Sélecteur de scénario */}
+    <div class="scenario-selector" data-selector>
+      <h3>Choisir un scénario</h3>
+      <div class="scenario-list">
+        {scenarios.map((s) => (
+          <button
+            class="scenario-btn"
+            type="button"
+            data-scenario-id={s.id}
+            data-duration={s.duration_min}
+          >
+            <span class="scenario-title">{s.title}</span>
+            <span class="scenario-meta">
+              {s.questions.length} questions · ~{s.duration_min} min
+            </span>
+            {s.description && (
+              <span class="scenario-desc">{s.description}</span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Zone d'exécution du scénario */}
+    <div class="interview-player" data-player hidden>
+      <div class="player-header">
+        <button class="btn-back" type="button" data-back>
+          ← Autres scénarios
+        </button>
+        <div class="player-info">
+          <h3 data-scenario-title></h3>
+          <div class="player-progress">
+            <span data-current-question>1</span> /
+            <span data-total-questions>1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="questions-container">
+        {scenarios.map((scenario) =>
+          scenario.questions.map((question, qi) => (
+            <div
+              class="interview-question"
+              data-question-id={question.id}
+              data-scenario-id={scenario.id}
+              data-index={qi}
+              hidden
+            >
+              <div class="question-body">
+                <p class="question-num">
+                  Question {qi + 1} / {scenario.questions.length}
+                </p>
+                <h4>{question.question}</h4>
+
+                {question.type === 'code' && (
+                  <div class="question-note">
+                    Note: Vous pouvez partager du code ou pseudocode
+                  </div>
+                )}
+
+                {question.guidance && question.guidance.length > 0 && (
+                  <details class="question-guidance">
+                    <summary>Points clés à couvrir</summary>
+                    <ul>
+                      {question.guidance.map((g) => (
+                        <li>{g}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </div>
+
+              <div class="question-input">
+                <textarea
+                  class="response-textarea"
+                  placeholder="Votre réponse..."
+                  data-response
+                ></textarea>
+                <button class="btn-next" type="button" data-next-btn>
+                  {qi === scenario.questions.length - 1
+                    ? 'Voir le débrief'
+                    : 'Question suivante'}
+                </button>
+              </div>
+
+              {question.model_answer && (
+                <div class="model-answer" data-model hidden>
+                  <details>
+                    <summary>Réponse modèle</summary>
+                    <div class="answer-content">
+                      {question.model_answer}
+                    </div>
+                  </details>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+
+        {/* Écran de fin (débrief) */}
+        <div class="interview-debrief" data-debrief hidden>
+          <h3>Débrief de votre simulation</h3>
+          <div class="debrief-content">
+            <p>
+              Vous avez répondu à toutes les questions. Voici les points clés à
+              retenir pour chaque question :
+            </p>
+
+            <div class="debrief-questions" data-debrief-list></div>
+
+            <button class="btn-restart" type="button" data-restart>
+              Recommencer la simulation
+            </button>
+            <button class="btn-back-home" type="button" data-back-home>
+              Retour à la page de la préparation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-interview]').forEach((container) => {
+    const selector = container.querySelector('[data-selector]');
+    const player = container.querySelector('[data-player]');
+    const scenarioBtns = container.querySelectorAll('[data-scenario-id]');
+    const questionsContainer = container.querySelector(
+      '.questions-container'
+    );
+
+    let currentScenarioId = '';
+    let currentQuestionIndex = 0;
+    const responses = new Map();
+
+    // Clic sur un scénario
+    scenarioBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        currentScenarioId = btn.getAttribute('data-scenario-id') || '';
+        const totalQuestions = btn.getAttribute('data-total-questions') || '1';
+        const title = btn
+          .querySelector('.scenario-title')
+          ?.textContent || '';
+
+        selector.hidden = true;
+        player.hidden = false;
+        container.querySelector('[data-scenario-title]').textContent = title;
+        container.querySelector('[data-total-questions]').textContent =
+          totalQuestions;
+
+        currentQuestionIndex = 0;
+        responses.clear();
+        showQuestion(0);
+      });
+    });
+
+    function showQuestion(index) {
+      const allQuestions = container.querySelectorAll('[data-question-id]');
+      allQuestions.forEach((q) => (q.hidden = true));
+
+      const question = container.querySelector(
+        `[data-question-id][data-scenario-id="${currentScenarioId}"][data-index="${index}"]`
+      );
+      if (question) {
+        question.hidden = false;
+        const textarea = question.querySelector('[data-response]');
+        if (textarea && responses.has(index)) {
+          textarea.value = responses.get(index);
+        }
+        currentQuestionIndex = index;
+        container.querySelector('[data-current-question]').textContent =
+          String(index + 1);
+
+        // Setup button
+        const nextBtn = question.querySelector('[data-next-btn]');
+        nextBtn?.addEventListener('click', () => {
+          const response = textarea?.value || '';
+          responses.set(index, response);
+
+          const allQs = container.querySelectorAll(
+            `[data-scenario-id="${currentScenarioId}"]`
+          );
+          if (index + 1 < allQs.length) {
+            showQuestion(index + 1);
+          } else {
+            showDebrief();
+          }
+        });
+      }
+    }
+
+    function showDebrief() {
+      questionsContainer
+        .querySelectorAll('[data-question-id], [data-debrief]')
+        .forEach((q) => (q.hidden = true));
+
+      const debrief = container.querySelector('[data-debrief]');
+      if (debrief) debrief.hidden = false;
+
+      const debriefList = container.querySelector('[data-debrief-list]');
+      if (debriefList) {
+        const scenarioQuestions = container.querySelectorAll(
+          `[data-scenario-id="${currentScenarioId}"][data-question-id]`
+        );
+        debriefList.innerHTML = Array.from(scenarioQuestions)
+          .map((q, i) => {
+            const question = q.querySelector('h4')?.textContent || '';
+            const model = q.querySelector('[data-model]');
+            return `
+              <div class="debrief-item">
+                <h5>Q${i + 1}: ${question}</h5>
+                ${model ? model.innerHTML : ''}
+              </div>
+            `;
+          })
+          .join('');
+      }
+    }
+
+    // Boutons de navigation
+    container.querySelector('[data-back]')?.addEventListener('click', () => {
+      selector.hidden = false;
+      player.hidden = true;
+      currentScenarioId = '';
+      currentQuestionIndex = 0;
+      responses.clear();
+    });
+
+    container.querySelector('[data-restart]')?.addEventListener('click', () => {
+      responses.clear();
+      currentQuestionIndex = 0;
+      showQuestion(0);
+      player.hidden = false;
+      container.querySelector('[data-debrief]').hidden = true;
+    });
+
+    container.querySelector('[data-back-home]')?.addEventListener('click', () => {
+      window.history.back();
+    });
+  });
+</script>
+
+<style>
+  .interview-sim {
+    max-width: 62rem;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+  }
+
+  .sim-header {
+    margin-bottom: 2rem;
+  }
+
+  .sim-header h2 {
+    font-size: 1.5rem;
+    font-weight: 750;
+    margin: 0 0 0.5rem;
+  }
+
+  .sim-consigne {
+    font-family: var(--f-display);
+    font-size: 0.875rem;
+    color: var(--estompe);
+    margin: 0;
+  }
+
+  .sim-content {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+  }
+
+  /* Sélecteur de scénario */
+  .scenario-selector {
+    padding: 2rem;
+  }
+
+  .scenario-selector h3 {
+    font-size: 1.25rem;
+    font-weight: 750;
+    margin: 0 0 1.5rem;
+  }
+
+  .scenario-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .scenario-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    text-align: left;
+    font-family: var(--f-display);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .scenario-btn:hover {
+    border-color: var(--bic);
+    background: var(--bic-doux);
+  }
+
+  .scenario-title {
+    display: block;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--encre);
+    margin-bottom: 0.3rem;
+  }
+
+  .scenario-meta {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--estompe);
+    margin-bottom: 0.5rem;
+  }
+
+  .scenario-desc {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--estompe);
+  }
+
+  /* Lecteur d'entretien */
+  .interview-player {
+    padding: 1.5rem;
+  }
+
+  .player-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--trait);
+  }
+
+  .btn-back {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 650;
+    padding: 0.4rem 0.8rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 6px;
+    color: var(--encre);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-back:hover {
+    background: var(--bic-doux);
+    border-color: var(--bic);
+  }
+
+  .player-info {
+    flex: 1;
+  }
+
+  .player-info h3 {
+    font-size: 1.125rem;
+    font-weight: 750;
+    margin: 0 0 0.25rem;
+  }
+
+  .player-progress {
+    font-size: 0.75rem;
+    color: var(--estompe);
+  }
+
+  /* Question d'entretien */
+  .interview-question {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .question-body {
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: var(--papier);
+  }
+
+  .question-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--bic);
+    margin: 0 0 0.5rem;
+  }
+
+  .interview-question h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+  }
+
+  .question-note {
+    font-size: 0.875rem;
+    color: var(--estompe);
+    padding: 0.5rem 0.75rem;
+    background: var(--blanc);
+    border-left: 3px solid var(--bic);
+    margin: 0.75rem 0;
+  }
+
+  .question-guidance {
+    margin: 1rem 0 0;
+  }
+
+  .question-guidance summary {
+    font-size: 0.875rem;
+    font-weight: 650;
+    color: var(--bic);
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+
+  .question-guidance ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .question-guidance li {
+    margin: 0.25rem 0;
+    color: var(--estompe);
+  }
+
+  /* Textarea de réponse */
+  .question-input {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .response-textarea {
+    min-height: 150px;
+    padding: 1rem;
+    font-family: var(--f-mono);
+    font-size: 0.875rem;
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    resize: vertical;
+  }
+
+  .response-textarea:focus {
+    outline: 2px solid var(--bic);
+    outline-offset: 0;
+  }
+
+  .btn-next {
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--bic);
+    color: var(--blanc);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-next:hover {
+    background: color-mix(in srgb, var(--bic) 85%, black);
+  }
+
+  .model-answer {
+    padding: 1rem;
+    background: var(--vert-doux);
+    border-left: 3px solid var(--vert);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .model-answer summary {
+    font-size: 0.875rem;
+    font-weight: 650;
+    color: var(--vert);
+    cursor: pointer;
+  }
+
+  .answer-content {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  /* Débrief */
+  .interview-debrief {
+    padding: 2rem;
+  }
+
+  .interview-debrief h3 {
+    font-size: 1.375rem;
+    font-weight: 750;
+    margin: 0 0 1rem;
+  }
+
+  .debrief-content {
+    max-width: 44rem;
+  }
+
+  .debrief-content > p {
+    color: var(--estompe);
+    margin-bottom: 1.5rem;
+  }
+
+  .debrief-questions {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--papier);
+    border-radius: 8px;
+  }
+
+  .debrief-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .debrief-item h5 {
+    font-size: 0.9375rem;
+    font-weight: 650;
+    margin: 0 0 0.5rem;
+  }
+
+  .btn-restart,
+  .btn-back-home {
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    padding: 0.6rem 1.2rem;
+    margin-right: 0.5rem;
+    margin-top: 1rem;
+    background: var(--bic);
+    color: var(--blanc);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn-back-home {
+    background: var(--estompe);
+  }
+
+  .btn-restart:hover {
+    background: color-mix(in srgb, var(--bic) 85%, black);
+  }
+
+  .btn-back-home:hover {
+    background: color-mix(in srgb, var(--estompe) 85%, black);
+  }
+
+  @media (max-width: 700px) {
+    .scenario-btn {
+      padding: 0.75rem 1rem;
+    }
+
+    .interview-question {
+      gap: 1rem;
+    }
+
+    .response-textarea {
+      min-height: 120px;
+    }
+  }
+</style>

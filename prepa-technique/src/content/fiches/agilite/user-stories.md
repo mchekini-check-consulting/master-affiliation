@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "User Stories"
 description: "Le format « En tant que… je veux… afin de… », les critères INVEST et la hiérarchie Thème > Epic > User Story."
 categorie: "agilite"

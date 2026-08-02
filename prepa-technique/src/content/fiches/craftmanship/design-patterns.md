@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Design Patterns"
 description: "Les 3 types de design patterns — création, structurel, comportemental — avec exemples pratiques en Java."
 categorie: "craftmanship"

@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Code Review"
 description: "Que regarder lors d'une Pull Request : checklist de revue et exemples de feedback constructif."
 categorie: "craftmanship"

@@ -1,0 +1,141 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import InterviewSimulation from '../../../components/InterviewSimulation.astro';
+import type { InterviewScenario } from '../../../components/InterviewSimulation.astro';
+
+// Charger les scénarios d'entretien
+const scenariosModule = await import('../../../data/interview-scenarios/fullstack.json');
+const scenarios: InterviewScenario[] = scenariosModule.scenarios;
+---
+
+<Layout
+  title="Simulation d'entretien — Dév Full Stack | Prépa Technique"
+  description="Simulez des entretiens techniques en conditions réelles. Questions ouvertes, format entretien, débrief avec réponses modèles."
+>
+  <main class="page">
+    <nav class="retour" aria-label="Fil d'Ariane">
+      <a href="/fullstack/">← Retour à la préparation Dév Full Stack</a>
+    </nav>
+
+    <header class="hero">
+      <h1>Simulation d'entretien technique</h1>
+      <p class="hero-sous">
+        Répondez à des questions comme face à un recruteur. Vous aurez accès aux
+        réponses modèles et aux points clés après la simulation.
+      </p>
+    </header>
+
+    <InterviewSimulation scenarios={scenarios} />
+
+    <section class="info-section">
+      <h2>Comment ça marche</h2>
+      <ol>
+        <li>
+          <strong>Choisissez un scénario</strong> – Chacun dure environ 45-50
+          min
+        </li>
+        <li>
+          <strong>Répondez aux questions</strong> – Comme dans un vrai entretien,
+          pas de QCM
+        </li>
+        <li>
+          <strong>Consultez les réponses modèles</strong> – À la fin, comparez
+          vos réponses aux réponses experts
+        </li>
+        <li>
+          <strong>Itérez</strong> – Relancez-vous sur d'autres scénarios
+        </li>
+      </ol>
+      <p class="info-note">
+        Les simulations sont sans limite : refaites-les autant de fois que vous
+        le souhaitez pour progresser.
+      </p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .page {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 3rem clamp(1.25rem, 5vw, 3rem) 5rem;
+  }
+
+  .retour {
+    margin-bottom: 2rem;
+  }
+
+  .retour a {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--estompe);
+    text-decoration: none;
+  }
+
+  .retour a:hover {
+    color: var(--bic);
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+  }
+
+  .hero-sous {
+    font-size: 1.125rem;
+    color: var(--estompe);
+    margin: 0;
+    max-width: 36rem;
+  }
+
+  .info-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+  }
+
+  .info-section h2 {
+    font-size: 1.375rem;
+    font-weight: 750;
+    margin: 0 0 1rem;
+  }
+
+  .info-section ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .info-section li {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+
+  .info-section strong {
+    color: var(--bic);
+  }
+
+  .info-note {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bic-doux);
+    border-left: 3px solid var(--bic);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9375rem;
+    color: var(--encre);
+  }
+
+  @media (max-width: 900px) {
+    .page {
+      padding: 2rem 1.25rem 3rem;
+    }
+  }
+</style>

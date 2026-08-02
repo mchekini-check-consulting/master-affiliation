@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring MVC"
 description: "Framework web basé sur le pattern Model-View-Controller : architecture, @Controller et @RestController."
 categorie: "spring"

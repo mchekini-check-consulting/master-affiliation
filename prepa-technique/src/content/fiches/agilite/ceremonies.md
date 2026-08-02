@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Cérémonies Agiles"
 description: "Les quatre événements Scrum — Sprint Planning, Daily Scrum, Sprint Review et Sprint Retrospective — avec leurs objectifs, formats et anti-patterns."
 categorie: "agilite"

@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Alerting"
 description: "Concevoir de bonnes alertes : symptômes plutôt que causes, golden signals, sévérités, seuils avec durée et lutte contre la fatigue d'alerte."
 categorie: "devops"

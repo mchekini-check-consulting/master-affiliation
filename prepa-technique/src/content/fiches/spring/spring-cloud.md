@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Cloud"
 description: "Les outils Spring Cloud pour construire des systèmes distribués : service discovery, load balancing, circuit breaker, API gateway, configuration centralisée et tracing."
 categorie: "spring"

@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Workflows Git"
 description: "GitFlow vs Trunk-based Development : deux organisations des branches, de la structure stricte au flux continu."
 categorie: "git"

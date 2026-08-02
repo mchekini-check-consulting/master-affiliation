@@ -5,65 +5,99 @@ import { categories } from '../data/categories';
 interface Props {
   // id de la fiche active, ex. "git/merge-vs-rebase" (vide sur l'accueil)
   actif?: string;
+  // Préparation courante pour filtrer les fiches (défaut: fullstack)
+  preparation?: 'fullstack' | 'business-analyst' | 'qa' | 'devops';
+  // Affichage du sidebar (défaut: true pour pages fullstack)
+  visible?: boolean;
 }
 
-const { actif = '' } = Astro.props;
+const { 
+  actif = '', 
+  preparation = 'fullstack',
+  visible = true 
+} = Astro.props;
 
 const fiches = await getCollection('fiches');
+
+// Filtrer les fiches par préparation courante
+const fichesFiltrées = fiches.filter(f => 
+  f.data.preparations?.includes(preparation) || f.data.preparations?.includes('fullstack')
+);
+
 const parCategorie = categories.map((cat) => ({
   ...cat,
-  fiches: fiches
+  fiches: fichesFiltrées
     .filter((f) => f.data.categorie === cat.slug)
     .sort((a, b) => a.data.ordre - b.data.ordre),
 }));
+
+// Map des labels de préparation
+const prepLabels: Record<string, string> = {
+  'fullstack': 'Dév Full Stack',
+  'business-analyst': 'Business Analyst',
+  'qa': 'QA',
+  'devops': 'DevOps',
+};
 ---
 
-<button class="sommaire-toggle" aria-expanded="false" aria-controls="sommaire">
-  Sommaire
-</button>
+{visible && (
+  <>
+    <button class="sommaire-toggle" aria-expanded="false" aria-controls="sommaire">
+      Sommaire
+    </button>
 
-<nav id="sommaire" class="sommaire" aria-label="Sommaire des fiches">
-  <a class="logo" href="/">
-    <span class="logo-titre">Prépa Technique</span>
-    <span class="logo-sous">Le cahier de révision des entretiens</span>
-  </a>
+    <nav id="sommaire" class="sommaire" aria-label="Sommaire des fiches">
+      <a class="logo" href="/">
+        <span class="logo-titre">Prépa Technique</span>
+        <span class="logo-sous">Le cahier de révision des entretiens</span>
+      </a>
 
-  {
-    parCategorie.map((cat) => (
-      <section class="cat">
-        <h2 class="cat-titre">
-          {cat.label}
-          <span class="cat-compte">{cat.fiches.length} fiches</span>
-        </h2>
-        <ol class="cat-liste">
-          {cat.fiches.map((f) => (
-            <li>
-              <a
-                href={`/${cat.slug}/${f.id.split('/').pop()}/`}
-                aria-current={f.id === actif ? 'page' : undefined}
-              >
-                <span class="fiche-num">
-                  {String(f.data.ordre).padStart(2, '0')}
-                </span>
-                {f.data.title}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
-    ))
-  }
-</nav>
+      <a class="prepa-courante" href={`/${preparation}/`}>
+        Préparation · <strong>{prepLabels[preparation]}</strong>
+      </a>
 
-<script>
-  const toggle = document.querySelector('.sommaire-toggle');
-  const sommaire = document.getElementById('sommaire');
-  toggle?.addEventListener('click', () => {
-    const ouvert = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!ouvert));
-    sommaire?.classList.toggle('sommaire--ouvert', !ouvert);
-  });
-</script>
+      {
+        parCategorie.map((cat) => (
+          <section class="cat">
+            <h2 class="cat-titre">
+              {cat.label}
+              <span class="cat-compte">{cat.fiches.length} fiches</span>
+            </h2>
+            {cat.fiches.length > 0 ? (
+              <ol class="cat-liste">
+                {cat.fiches.map((f) => (
+                  <li>
+                    <a
+                      href={`/${cat.slug}/${f.id.split('/').pop()}/`}
+                      aria-current={f.id === actif ? 'page' : undefined}
+                    >
+                      <span class="fiche-num">
+                        {String(f.data.ordre).padStart(2, '0')}
+                      </span>
+                      {f.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p class="cat-vide">Fiches à venir</p>
+            )}
+          </section>
+        ))
+      }
+    </nav>
+
+    <script>
+      const toggle = document.querySelector('.sommaire-toggle');
+      const sommaire = document.getElementById('sommaire');
+      toggle?.addEventListener('click', () => {
+        const ouvert = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!ouvert));
+        sommaire?.classList.toggle('sommaire--ouvert', !ouvert);
+      });
+    </script>
+  </>
+)}
 
 <style>
   .sommaire {
@@ -109,6 +143,31 @@ const parCategorie = categories.map((cat) => ({
     color: var(--estompe);
   }
 
+  .prepa-courante {
+    display: block;
+    margin: -0.9rem 0 1.5rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px dashed var(--trait);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    color: var(--estompe);
+    text-decoration: none;
+  }
+
+  .prepa-courante strong {
+    color: var(--encre);
+    font-weight: 700;
+  }
+
+  .prepa-courante:hover {
+    border-color: var(--bic);
+    color: var(--bic);
+  }
+
+  .prepa-courante:hover strong {
+    color: var(--bic);
+  }
+
   .cat {
     margin-bottom: 1.4rem;
   }
@@ -137,6 +196,14 @@ const parCategorie = categories.map((cat) => ({
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  .cat-vide {
+    font-size: 0.75rem;
+    color: var(--estompe);
+    font-style: italic;
+    margin: 0;
+    padding: 0.5rem 0;
   }
 
   .cat-liste a {

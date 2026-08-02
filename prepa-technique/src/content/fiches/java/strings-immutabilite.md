@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Strings & Immutabilité"
 description: "Immutabilité des String en Java, String Pool, StringBuilder vs StringBuffer et méthodes essentielles de manipulation de chaînes."
 categorie: "java"

@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Exceptions"
 description: "Gestion des erreurs en Java : hiérarchie des exceptions, checked vs unchecked, try-catch-finally, try-with-resources et exceptions personnalisées."
 categorie: "java"

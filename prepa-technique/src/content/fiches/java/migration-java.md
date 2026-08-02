@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Migration Java"
 description: "Stratégies, outils et bonnes pratiques pour migrer une application entre versions de Java."
 categorie: "java"

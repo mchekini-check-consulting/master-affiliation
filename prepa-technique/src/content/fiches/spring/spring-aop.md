@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring AOP"
 description: "La programmation orientée aspect avec Spring : aspects, pointcuts, types d'advice et exemple complet d'aspect de logging."
 categorie: "spring"

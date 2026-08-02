@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Structure des Dépendances"
 description: "Les coordonnées Maven (GAV) et la structure complète d'une dépendance dans le POM : scope, type, classifier, exclusions."
 categorie: "maven"

@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Gestion des Environnements"
 description: "Stratégies de branches et de déploiement par environnement : branches dédiées, tags de release ou feature flags."
 categorie: "git"

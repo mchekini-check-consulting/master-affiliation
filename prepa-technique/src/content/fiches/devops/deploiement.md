@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Déploiement"
 description: "Déploiement GitOps avec ArgoCD sur Kubernetes : workflow, configuration et avantages de l'approche déclarative."
 categorie: "devops"

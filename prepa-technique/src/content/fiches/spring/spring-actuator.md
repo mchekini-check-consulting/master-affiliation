@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Spring Boot Actuator"
 description: "Monitoring et gestion des applications Spring Boot : endpoints health, metrics, info, et intégration avec Prometheus, Grafana et la stack ELK."
 categorie: "spring"

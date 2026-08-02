@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Génériques (Generics)"
 description: "Type safety et réutilisabilité du code avec les génériques Java : classes et méthodes génériques, wildcards, règle PECS et type erasure."
 categorie: "java"

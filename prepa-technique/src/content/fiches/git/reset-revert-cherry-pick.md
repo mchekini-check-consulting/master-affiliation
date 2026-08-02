@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Reset, Revert, Cherry Pick & Stash"
 description: "Commandes avancées pour gérer l'historique : annuler des commits, en copier un précis ou mettre son travail de côté."
 categorie: "git"

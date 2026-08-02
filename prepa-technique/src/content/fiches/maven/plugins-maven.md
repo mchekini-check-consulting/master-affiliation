@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Plugins Maven"
 description: "Le fonctionnement des plugins Maven (goals, phases), les plugins core essentiels et leur configuration dans le POM."
 categorie: "maven"

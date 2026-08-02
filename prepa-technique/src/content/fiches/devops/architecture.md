@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Architecture DevOps"
 description: "Architecture microservices avec API Gateway, IDP, communication REST/Kafka et services distribués."
 categorie: "devops"

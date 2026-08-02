@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Cycles de Vie Maven"
 description: "Les trois cycles de vie de Maven (default, clean, site) et les phases principales du cycle default, de validate à deploy."
 categorie: "maven"

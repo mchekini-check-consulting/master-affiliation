@@ -1,4 +1,5 @@
 ---
+preparations: ["fullstack"]
 title: "Fondamentaux de l'Agilité"
 description: "Le Manifeste Agile, la comparaison entre cycle en V et approche agile, et les principales méthodes : Scrum, Kanban, XP."
 categorie: "agilite"
