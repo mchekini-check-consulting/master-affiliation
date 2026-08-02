@@ -68,17 +68,24 @@ const compteParPrepa: Record<string, string> = {
       </p>
       <div class="modes">
         {
-          modes.map((m) => (
-            <article class="mode">
-              <span
-                class={`etat ${m.disponible ? 'etat--dispo' : 'etat--bientot'}`}
+          modes.map((m) => {
+            const Carte = m.lien ? 'a' : 'article';
+            return (
+              <Carte
+                class={`mode${m.lien ? ' mode--lien' : ''}`}
+                href={m.lien}
               >
-                {m.disponible ? 'Disponible' : 'À venir'}
-              </span>
-              <h3>{m.label}</h3>
-              <p>{m.description}</p>
-            </article>
-          ))
+                <span
+                  class={`etat ${m.disponible ? 'etat--dispo' : 'etat--bientot'}`}
+                >
+                  {m.disponible ? 'Disponible' : 'À venir'}
+                  {m.precision && ` · ${m.precision}`}
+                </span>
+                <h3>{m.label}</h3>
+                <p>{m.description}</p>
+              </Carte>
+            );
+          })
         }
       </div>
     </section>
@@ -306,6 +313,25 @@ const compteParPrepa: Record<string, string> = {
     line-height: 1.5;
     color: var(--estompe);
     margin: 0;
+  }
+
+  .mode--lien {
+    text-decoration: none;
+    color: var(--encre);
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .mode--lien:hover {
+    border-color: var(--bic);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(25, 29, 43, 0.08);
+  }
+
+  .mode--lien:hover h3 {
+    color: var(--bic);
   }
 
   @media (max-width: 700px) {

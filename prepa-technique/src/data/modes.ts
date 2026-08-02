@@ -1,11 +1,15 @@
 // Modes d'entraînement présentés sur l'accueil, dans l'ordre d'affichage.
-// Les modes à venir toucheront toutes les préparations et d'autres
-// thématiques ; seul le mode « Fiches & quiz » est en ligne aujourd'hui.
+// Les modes en ligne pointent leur page d'entrée via `lien` ; les autres
+// arriveront sur toutes les préparations et d'autres thématiques.
 export interface Mode {
   slug: string;
   label: string;
   description: string;
   disponible: boolean;
+  // Lien d'entrée du mode quand il est en ligne
+  lien?: string;
+  // Précision affichée à côté de l'état (ex. préparation couverte)
+  precision?: string;
 }
 
 export const modes: Mode[] = [
@@ -21,14 +25,18 @@ export const modes: Mode[] = [
     label: 'Simulation d’entretien',
     description:
       'Un entretien technique grandeur nature : les questions s’enchaînent comme face à un recruteur, avec un débrief à la fin.',
-    disponible: false,
+    disponible: true,
+    lien: '/fullstack/simulation/',
+    precision: 'Dév Full Stack',
   },
   {
     slug: 'quiz',
     label: 'Quiz',
     description:
       'Des séries de QCM par thématique pour s’évaluer vite et repérer les chapitres à retravailler.',
-    disponible: false,
+    disponible: true,
+    lien: '/fullstack/quiz/',
+    precision: 'Dév Full Stack',
   },
   {
     slug: 'codingame',

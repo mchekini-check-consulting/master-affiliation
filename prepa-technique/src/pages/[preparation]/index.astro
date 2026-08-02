@@ -13,7 +13,8 @@ export async function getStaticPaths() {
 }
 
 const { prepa } = Astro.props;
-const modesAVenir = modes.filter((m) => !m.disponible);
+// Pour une préparation encore vierge, tous les modes hors fiches sont à venir
+const modesAVenir = modes.filter((m) => m.slug !== 'fiches');
 ---
 
 <Layout

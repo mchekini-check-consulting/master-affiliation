@@ -153,7 +153,7 @@ const { scenarios } = Astro.props;
               Recommencer la simulation
             </button>
             <button class="btn-back-home" type="button" data-back-home>
-              Retour à la page de la préparation
+              Choisir un autre scénario
             </button>
           </div>
         </div>
@@ -163,126 +163,134 @@ const { scenarios } = Astro.props;
 </section>
 
 <script>
-  document.querySelectorAll('[data-interview]').forEach((container) => {
-    const selector = container.querySelector('[data-selector]');
-    const player = container.querySelector('[data-player]');
-    const scenarioBtns = container.querySelectorAll('[data-scenario-id]');
-    const questionsContainer = container.querySelector(
-      '.questions-container'
+  document.querySelectorAll<HTMLElement>('[data-interview]').forEach((container) => {
+    const selector = container.querySelector<HTMLElement>('[data-selector]')!;
+    const player = container.querySelector<HTMLElement>('[data-player]')!;
+    const debrief = container.querySelector<HTMLElement>('[data-debrief]')!;
+    const compteur = container.querySelector('[data-current-question]')!;
+    const totalEl = container.querySelector('[data-total-questions]')!;
+    const titreEl = container.querySelector('[data-scenario-title]')!;
+    const questions = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-question-id]')
     );
 
-    let currentScenarioId = '';
-    let currentQuestionIndex = 0;
-    const responses = new Map();
+    let scenarioCourant = '';
 
-    // Clic sur un scénario
-    scenarioBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        currentScenarioId = btn.getAttribute('data-scenario-id') || '';
-        const totalQuestions = btn.getAttribute('data-total-questions') || '1';
-        const title = btn
-          .querySelector('.scenario-title')
-          ?.textContent || '';
+    /** Questions du scénario, dans l'ordre du balisage. */
+    const questionsDe = (id: string) =>
+      questions.filter((q) => q.getAttribute('data-scenario-id') === id);
 
-        selector.hidden = true;
-        player.hidden = false;
-        container.querySelector('[data-scenario-title]').textContent = title;
-        container.querySelector('[data-total-questions]').textContent =
-          totalQuestions;
+    function montrerQuestion(index: number) {
+      questions.forEach((q) => (q.hidden = true));
+      debrief.hidden = true;
+      const question = questionsDe(scenarioCourant)[index];
+      if (!question) return;
+      question.hidden = false;
+      compteur.textContent = String(index + 1);
+      question.querySelector<HTMLTextAreaElement>('[data-response]')?.focus();
+    }
 
-        currentQuestionIndex = 0;
-        responses.clear();
-        showQuestion(0);
+    /** Petit échappement HTML pour réinjecter la réponse du candidat. */
+    const echapper = (texte: string) => {
+      const div = document.createElement('div');
+      div.textContent = texte;
+      return div.innerHTML.replace(/\n/g, '<br>');
+    };
+
+    function montrerDebrief() {
+      questions.forEach((q) => (q.hidden = true));
+      debrief.hidden = false;
+      const liste = container.querySelector('[data-debrief-list]');
+      if (!liste) return;
+      liste.innerHTML = questionsDe(scenarioCourant)
+        .map((q, i) => {
+          const titre = q.querySelector('h4')?.textContent || '';
+          const reponse = (
+            q.querySelector<HTMLTextAreaElement>('[data-response]')?.value || ''
+          ).trim();
+          const guidance = q.querySelector('.question-guidance ul');
+          const modele = q.querySelector('[data-model] .answer-content');
+          return `
+            <div class="debrief-item">
+              <h5>Q${i + 1} — ${echapper(titre)}</h5>
+              ${
+                reponse
+                  ? `<p class="debrief-reponse"><strong>Votre réponse :</strong><br>${echapper(reponse)}</p>`
+                  : '<p class="debrief-reponse debrief-reponse--vide">Pas de réponse saisie.</p>'
+              }
+              ${guidance ? `<p class="debrief-points"><strong>Points clés attendus :</strong></p>${guidance.outerHTML}` : ''}
+              ${modele ? `<div class="debrief-model"><strong>Réponse modèle :</strong>${modele.outerHTML}</div>` : ''}
+            </div>
+          `;
+        })
+        .join('');
+      debrief.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Choix d'un scénario (les questions portent aussi data-scenario-id :
+    // on ne cible que les boutons du sélecteur)
+    container
+      .querySelectorAll<HTMLButtonElement>('button.scenario-btn')
+      .forEach((btn) => {
+        btn.addEventListener('click', () => {
+          scenarioCourant = btn.getAttribute('data-scenario-id') || '';
+          const liste = questionsDe(scenarioCourant);
+          liste.forEach((q) => {
+            const textarea =
+              q.querySelector<HTMLTextAreaElement>('[data-response]');
+            if (textarea) textarea.value = '';
+          });
+          selector.hidden = true;
+          player.hidden = false;
+          titreEl.textContent =
+            btn.querySelector('.scenario-title')?.textContent || '';
+          totalEl.textContent = String(liste.length);
+          montrerQuestion(0);
+        });
+      });
+
+    // « Question suivante » / « Voir le débrief » : liés une seule fois
+    questions.forEach((q) => {
+      q.querySelector('[data-next-btn]')?.addEventListener('click', () => {
+        const liste = questionsDe(q.getAttribute('data-scenario-id') || '');
+        const index = liste.indexOf(q);
+        if (index + 1 < liste.length) montrerQuestion(index + 1);
+        else montrerDebrief();
       });
     });
 
-    function showQuestion(index) {
-      const allQuestions = container.querySelectorAll('[data-question-id]');
-      allQuestions.forEach((q) => (q.hidden = true));
-
-      const question = container.querySelector(
-        `[data-question-id][data-scenario-id="${currentScenarioId}"][data-index="${index}"]`
-      );
-      if (question) {
-        question.hidden = false;
-        const textarea = question.querySelector('[data-response]');
-        if (textarea && responses.has(index)) {
-          textarea.value = responses.get(index);
-        }
-        currentQuestionIndex = index;
-        container.querySelector('[data-current-question]').textContent =
-          String(index + 1);
-
-        // Setup button
-        const nextBtn = question.querySelector('[data-next-btn]');
-        nextBtn?.addEventListener('click', () => {
-          const response = textarea?.value || '';
-          responses.set(index, response);
-
-          const allQs = container.querySelectorAll(
-            `[data-scenario-id="${currentScenarioId}"]`
-          );
-          if (index + 1 < allQs.length) {
-            showQuestion(index + 1);
-          } else {
-            showDebrief();
-          }
-        });
-      }
-    }
-
-    function showDebrief() {
-      questionsContainer
-        .querySelectorAll('[data-question-id], [data-debrief]')
-        .forEach((q) => (q.hidden = true));
-
-      const debrief = container.querySelector('[data-debrief]');
-      if (debrief) debrief.hidden = false;
-
-      const debriefList = container.querySelector('[data-debrief-list]');
-      if (debriefList) {
-        const scenarioQuestions = container.querySelectorAll(
-          `[data-scenario-id="${currentScenarioId}"][data-question-id]`
-        );
-        debriefList.innerHTML = Array.from(scenarioQuestions)
-          .map((q, i) => {
-            const question = q.querySelector('h4')?.textContent || '';
-            const model = q.querySelector('[data-model]');
-            return `
-              <div class="debrief-item">
-                <h5>Q${i + 1}: ${question}</h5>
-                ${model ? model.innerHTML : ''}
-              </div>
-            `;
-          })
-          .join('');
-      }
-    }
-
-    // Boutons de navigation
+    // Navigation générale
     container.querySelector('[data-back]')?.addEventListener('click', () => {
       selector.hidden = false;
       player.hidden = true;
-      currentScenarioId = '';
-      currentQuestionIndex = 0;
-      responses.clear();
+      scenarioCourant = '';
     });
 
     container.querySelector('[data-restart]')?.addEventListener('click', () => {
-      responses.clear();
-      currentQuestionIndex = 0;
-      showQuestion(0);
-      player.hidden = false;
-      container.querySelector('[data-debrief]').hidden = true;
+      questionsDe(scenarioCourant).forEach((q) => {
+        const textarea = q.querySelector<HTMLTextAreaElement>('[data-response]');
+        if (textarea) textarea.value = '';
+      });
+      montrerQuestion(0);
     });
 
-    container.querySelector('[data-back-home]')?.addEventListener('click', () => {
-      window.history.back();
-    });
+    container
+      .querySelector('[data-back-home]')
+      ?.addEventListener('click', () => {
+        selector.hidden = false;
+        player.hidden = true;
+        debrief.hidden = true;
+        scenarioCourant = '';
+      });
   });
 </script>
 
 <style>
+  /* L'attribut hidden doit gagner sur les display: posés plus bas */
+  .interview-sim [hidden] {
+    display: none !important;
+  }
+
   .interview-sim {
     max-width: 62rem;
     margin: 2rem auto;
@@ -568,6 +576,41 @@ const { scenarios } = Astro.props;
     font-size: 0.9375rem;
     font-weight: 650;
     margin: 0 0 0.5rem;
+  }
+
+  .debrief-item + .debrief-item {
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--trait);
+  }
+
+  .debrief-reponse {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--blanc);
+    border-left: 3px solid var(--bic);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .debrief-reponse--vide {
+    color: var(--estompe);
+    font-style: italic;
+    border-left-color: var(--rouge);
+  }
+
+  .debrief-points {
+    font-size: 0.875rem;
+    margin: 0 0 0.25rem;
+  }
+
+  .debrief-model {
+    font-size: 0.875rem;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--vert-doux);
+    border-left: 3px solid var(--vert);
+    border-radius: 0 8px 8px 0;
   }
 
   .btn-restart,

@@ -1,35 +1,32 @@
 ---
+import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import QuizSession from '../../../components/QuizSession.astro';
-import type { QuizTheme, QuizQuestion } from '../../../components/QuizSession.astro';
+import type { QuizQuestion } from '../../../components/QuizSession.astro';
+import { categories } from '../../../data/categories';
 
-// Charger tous les quiz depuis les fichiers JSON
-const quizModules = import.meta.glob('../../../../data/quiz/*.json', {
-  eager: true,
-});
+// Un thème de quiz = une catégorie du programme (Java, Spring, Git…).
+// Chaque fichier src/data/quiz/<slug>.json correspond à la fiche du même
+// slug ; on retrouve sa catégorie via la collection de fiches.
+const fiches = await getCollection('fiches');
+const categorieParSlug = new Map(
+  fiches.map((f) => [f.id.split('/').pop(), f.data.categorie])
+);
 
-// Construire la liste des questions avec leur thème
+const quizModules = import.meta.glob<{ questions: any[] }>(
+  '../../../data/quiz/*.json',
+  { eager: true }
+);
+
 const allQuestions: QuizQuestion[] = [];
-const themesMap = new Map<string, QuizTheme>();
-
-Object.entries(quizModules).forEach(([path, module]: [string, any]) => {
-  const filename = path.split('/').pop()?.replace('.json', '') || '';
-  const questions = module.questions || [];
-  
-  // Créer le thème si nécessaire
-  if (!themesMap.has(filename)) {
-    themesMap.set(filename, {
-      id: filename,
-      label: filename.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-      description: `Quiz sur ${filename}`,
-    });
-  }
-  
-  // Ajouter les questions avec le thème
-  questions.forEach((q: any) => {
+Object.entries(quizModules).forEach(([path, module]) => {
+  const slug = path.split('/').pop()?.replace('.json', '') || '';
+  const theme = categorieParSlug.get(slug);
+  if (!theme) return; // quiz orphelin : pas de fiche correspondante
+  (module.questions || []).forEach((q, i) => {
     allQuestions.push({
-      id: `${filename}-${q.question.slice(0, 20).replace(/\s/g, '-')}`,
-      theme: filename,
+      id: `${slug}-${i}`,
+      theme,
       code: q.code || null,
       lang: q.lang || null,
       question: q.question,
@@ -40,7 +37,11 @@ Object.entries(quizModules).forEach(([path, module]: [string, any]) => {
   });
 });
 
-const themes = Array.from(themesMap.values());
+const themes = categories.map((c) => ({
+  id: c.slug,
+  label: c.label,
+  description: c.description,
+}));
 ---
 
 <Layout

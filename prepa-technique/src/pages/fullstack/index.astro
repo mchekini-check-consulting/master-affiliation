@@ -44,6 +44,10 @@ const total = fichesFullstack.length;
         rouge, les bons cochés en vert, et une interro à la fin de chaque fiche
         pour vérifier que c'est acquis.
       </p>
+      <a class="hero-simulation" href="/fullstack/simulation/">
+        <span class="marque">Nouveau</span>
+        Simulation d'entretien technique →
+      </a>
     </header>
 
     <section class="programme" aria-label="Programme de révision">
@@ -150,6 +154,25 @@ const total = fichesFullstack.length;
     color: var(--estompe);
     margin: 0;
     max-width: 36rem;
+  }
+
+  .hero-simulation {
+    display: inline-block;
+    margin-top: 1.25rem;
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    color: var(--encre);
+    text-decoration: none;
+    padding: 0.55rem 0.9rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 999px;
+  }
+
+  .hero-simulation:hover {
+    border-color: var(--bic);
+    color: var(--bic);
   }
 
   .programme {

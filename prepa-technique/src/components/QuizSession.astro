@@ -114,6 +114,7 @@ const themesWithCount = themes.map((t) => ({
           class="quiz-q"
           data-question-id={q.id}
           data-theme={q.theme}
+          data-reponse={q.reponse}
           hidden
         >
           <h3 class="q-num">
@@ -174,187 +175,177 @@ const themesWithCount = themes.map((t) => ({
 </section>
 
 <script>
-  document.querySelectorAll('[data-quiz-session]').forEach((container) => {
-    const builder = container.querySelector('[data-builder]');
-    const player = container.querySelector('[data-player]');
-    const themesCheckboxes = container.querySelectorAll(
-      '[data-theme-id]'
-    ) as NodeListOf<HTMLInputElement>;
-    const startBtn = container.querySelector('[data-start-quiz]') as HTMLButtonElement;
-    const backBtn = container.querySelector('[data-back]') as HTMLButtonElement;
-    const questionsContainer = container.querySelector(
-      '[data-questions-container]'
+  document.querySelectorAll<HTMLElement>('[data-quiz-session]').forEach((container) => {
+    const builder = container.querySelector<HTMLElement>('[data-builder]')!;
+    const player = container.querySelector<HTMLElement>('[data-player]')!;
+    const results = container.querySelector<HTMLElement>('[data-results]')!;
+    const compteur = container.querySelector('[data-current]')!;
+    const totalEl = container.querySelector('[data-total]')!;
+    const startBtn = container.querySelector<HTMLButtonElement>('[data-start-quiz]')!;
+    const themesCheckboxes = Array.from(
+      container.querySelectorAll<HTMLInputElement>('[data-theme-id]')
+    );
+    const toutesQuestions = Array.from(
+      container.querySelectorAll<HTMLElement>('.quiz-q')
     );
 
-    let selectedThemes = new Set<string>();
-    let selectedQuestions: HTMLElement[] = [];
-    let currentQuestionIndex = 0;
+    let selectionnees: HTMLElement[] = [];
     let score = 0;
-    const answered = new Map<string, boolean>();
+    const repondues = new Set<HTMLElement>();
 
-    // Gestion des checkboxes
-    themesCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          selectedThemes.add(checkbox.getAttribute('data-theme-id') || '');
-        } else {
-          selectedThemes.delete(
-            checkbox.getAttribute('data-theme-id') || ''
-          );
-        }
-        updateSelectedCount();
-      });
-    });
-
-    function updateSelectedCount() {
-      let totalCount = 0;
+    // Compteur de questions sélectionnées dans le builder
+    function majCompteur() {
+      let total = 0;
       themesCheckboxes.forEach((checkbox) => {
         if (checkbox.checked) {
-          const count = parseInt(
-            checkbox.getAttribute('data-question-count') || '0'
+          total += parseInt(
+            checkbox.getAttribute('data-question-count') || '0',
+            10
           );
-          totalCount += count;
         }
       });
-      container.querySelector('[data-selected-count]').textContent =
-        String(totalCount);
-      startBtn.disabled = totalCount === 0;
+      container.querySelector('[data-selected-count]')!.textContent =
+        String(total);
+      startBtn.disabled = total === 0;
     }
+    themesCheckboxes.forEach((c) => c.addEventListener('change', majCompteur));
 
-    // Démarrer le quiz
-    startBtn.addEventListener('click', () => {
-      selectedQuestions = Array.from(
-        container.querySelectorAll('[data-question-id]')
-      ).filter((q) => {
-        const theme = q.getAttribute('data-theme');
-        return selectedThemes.has(theme);
-      });
-
-      if (selectedQuestions.length === 0) return;
-
-      builder.hidden = true;
-      player.hidden = false;
-      container.querySelector('[data-total]').textContent =
-        String(selectedQuestions.length);
-
-      currentQuestionIndex = 0;
-      score = 0;
-      answered.clear();
-      showQuestion(0);
-    });
-
-    function showQuestion(index) {
-      selectedQuestions.forEach((q) => (q.hidden = true));
-      const q = selectedQuestions[index];
-      if (!q) return;
-
-      q.hidden = false;
-      container.querySelector('[data-current]').textContent = String(
-        index + 1
-      );
-
-      const options = q.querySelectorAll('[data-option-index]');
-      const feedback = q.querySelector('[data-feedback]');
-      const nextBtn = q.querySelector('[data-next-q]');
-
-      feedback.hidden = true;
-      options.forEach((opt) => {
-        (opt as HTMLButtonElement).disabled = answered.has(
-          q.getAttribute('data-question-id')
-        );
+    function reinitialiserQuestion(q: HTMLElement) {
+      q.querySelectorAll<HTMLButtonElement>('.option').forEach((opt) => {
+        opt.disabled = false;
         opt.classList.remove('option--bonne', 'option--mauvaise');
       });
+      const feedback = q.querySelector<HTMLElement>('[data-feedback]');
+      if (feedback) feedback.hidden = true;
+    }
 
-      options.forEach((opt) => {
+    function montrerQuestion(index: number) {
+      toutesQuestions.forEach((q) => (q.hidden = true));
+      results.hidden = true;
+      const q = selectionnees[index];
+      if (!q) return;
+      q.hidden = false;
+      compteur.textContent = String(index + 1);
+      // Numéro et libellé du bouton, relatifs à la session en cours
+      const num = q.querySelector('[data-index]');
+      if (num) num.textContent = String(index + 1);
+      const nextBtn = q.querySelector('[data-next-q]');
+      if (nextBtn) {
+        nextBtn.textContent =
+          index === selectionnees.length - 1
+            ? 'Voir les résultats'
+            : 'Question suivante';
+      }
+    }
+
+    function demarrer() {
+      const themes = new Set(
+        themesCheckboxes
+          .filter((c) => c.checked)
+          .map((c) => c.getAttribute('data-theme-id'))
+      );
+      selectionnees = toutesQuestions.filter((q) =>
+        themes.has(q.getAttribute('data-theme'))
+      );
+      if (selectionnees.length === 0) return;
+      score = 0;
+      repondues.clear();
+      selectionnees.forEach(reinitialiserQuestion);
+      builder.hidden = true;
+      player.hidden = false;
+      totalEl.textContent = String(selectionnees.length);
+      montrerQuestion(0);
+    }
+
+    startBtn.addEventListener('click', demarrer);
+
+    // Réponses et navigation : écouteurs liés une seule fois par question
+    toutesQuestions.forEach((q) => {
+      const bonne = parseInt(q.getAttribute('data-reponse') || '0', 10);
+      const options = Array.from(
+        q.querySelectorAll<HTMLButtonElement>('.option')
+      );
+      options.forEach((opt, oi) => {
         opt.addEventListener('click', () => {
-          if (answered.has(q.getAttribute('data-question-id'))) return;
-
-          const correctIndex = parseInt(
-            (q as any)._correctIndex ??
-              // Trouver l'index de la bonne réponse depuis la structure
-              '0'
-          );
-          const selectedIndex = parseInt(
-            opt.getAttribute('data-option-index')
-          );
-
-          // Récupérer la bonne réponse depuis les attributs du composant
-          // Pour l'instant, on fait une approximation
-          // TODO: passer les bonnes réponses depuis Astro
-
-          answered.set(q.getAttribute('data-question-id'), true);
-          options.forEach((o) => ((o as HTMLButtonElement).disabled = true));
-          feedback.hidden = false;
-          nextBtn.focus();
+          if (repondues.has(q)) return;
+          repondues.add(q);
+          if (oi === bonne) {
+            score++;
+            opt.classList.add('option--bonne');
+          } else {
+            opt.classList.add('option--mauvaise');
+            options[bonne]?.classList.add('option--bonne');
+          }
+          options.forEach((o) => (o.disabled = true));
+          const feedback = q.querySelector<HTMLElement>('[data-feedback]');
+          if (feedback) feedback.hidden = false;
+          q.querySelector<HTMLButtonElement>('[data-next-q]')?.focus();
         });
       });
 
-      nextBtn.addEventListener('click', () => {
-        if (index + 1 < selectedQuestions.length) {
-          showQuestion(index + 1);
-        } else {
-          showResults();
-        }
+      q.querySelector('[data-next-q]')?.addEventListener('click', () => {
+        const index = selectionnees.indexOf(q);
+        if (index + 1 < selectionnees.length) montrerQuestion(index + 1);
+        else montrerResultats();
       });
-    }
+    });
 
-    function showResults() {
-      selectedQuestions.forEach((q) => (q.hidden = true));
-      const results = container.querySelector('[data-results]');
-      if (results) results.hidden = false;
+    function montrerResultats() {
+      selectionnees.forEach((q) => (q.hidden = true));
+      results.hidden = false;
 
-      container.querySelector('[data-total-qs]').textContent = String(
-        selectedQuestions.length
+      container.querySelector('[data-total-qs]')!.textContent = String(
+        selectionnees.length
       );
-      container.querySelector('[data-score]').textContent = String(score);
+      container.querySelector('[data-score]')!.textContent = String(score);
 
-      const percent = Math.round((score / selectedQuestions.length) * 100);
-      container.querySelector('[data-percent]').textContent =
-        `${percent}%`;
+      const percent = Math.round((score / selectionnees.length) * 100);
+      container.querySelector('[data-percent]')!.textContent = `${percent}%`;
 
-      // Feedback personnalisé par score
       let feedback = '';
       if (percent === 100) {
         feedback =
-          'Excellent ! Vous maîtrisez ces sujets. Testez d\'autres thèmes.';
+          "Excellent ! Vous maîtrisez ces sujets. Testez d'autres thèmes.";
       } else if (percent >= 70) {
-        feedback =
-          'Bien ! Consolidez vos connaissances avant l\'entretien.';
+        feedback = "Bien ! Consolidez vos connaissances avant l'entretien.";
       } else if (percent >= 40) {
         feedback = 'À revoir. Relancez ce quiz après révision.';
       } else {
         feedback =
           'À approfondir. Lisez les fiches correspondantes avant de recommencer.';
       }
-      container.querySelector('[data-feedback-text]').textContent =
-        feedback;
+      container.querySelector('[data-feedback-text]')!.textContent = feedback;
+      results.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    backBtn.addEventListener('click', () => {
+    function retourBuilder() {
       builder.hidden = false;
       player.hidden = true;
-      selectedQuestions = [];
-    });
+      results.hidden = true;
+      selectionnees = [];
+    }
 
-    container.querySelector('[data-restart]')?.addEventListener('click', () => {
-      builder.hidden = false;
-      player.hidden = true;
-      container.querySelector('[data-results]').hidden = true;
-      selectedQuestions = [];
-    });
-
+    container.querySelector('[data-back]')?.addEventListener('click', retourBuilder);
     container
       .querySelector('[data-change-themes]')
-      ?.addEventListener('click', () => {
-        builder.hidden = false;
-        player.hidden = true;
-        container.querySelector('[data-results]').hidden = true;
-        selectedQuestions = [];
-      });
+      ?.addEventListener('click', retourBuilder);
+
+    // Relancer le même quiz (mêmes thèmes), remise à zéro complète
+    container.querySelector('[data-restart]')?.addEventListener('click', () => {
+      score = 0;
+      repondues.clear();
+      selectionnees.forEach(reinitialiserQuestion);
+      montrerQuestion(0);
+    });
   });
 </script>
 
 <style>
+  /* L'attribut hidden doit gagner sur les display: posés plus bas */
+  .quiz-session [hidden] {
+    display: none !important;
+  }
+
   .quiz-session {
     max-width: 62rem;
     margin: 2rem auto;
