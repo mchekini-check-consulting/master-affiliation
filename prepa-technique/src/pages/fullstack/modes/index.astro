@@ -1,0 +1,345 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { modes } from '../../../data/modes';
+
+// Définir les URLs des modes disponibles pour fullstack
+const modeRoutes: Record<string, string> = {
+  'fiches': '/fullstack/',
+  'simulation-entretien': '/fullstack/simulation/',
+  'quiz': '/fullstack/quiz/',
+  'codingame': '#', // À venir, pas cliquable
+};
+---
+
+<Layout
+  title="Modes de préparation — Dév Full Stack | Prépa Technique"
+  description="Choisissez votre mode de révision : fiches & quiz, simulation d'entretien, quiz personnalisé ou codingame."
+>
+  <main class="page">
+    <nav class="retour" aria-label="Fil d'Ariane">
+      <a href="/fullstack/">← Retour à la préparation Dév Full Stack</a>
+    </nav>
+
+    <header class="hero">
+      <h1>Choisissez votre mode de révision</h1>
+      <p class="hero-sous">
+        Différents modes pour différents objectifs. Combinez-les pour une
+        révision complète.
+      </p>
+    </header>
+
+    <div class="modes-grid">
+      {modes.map((mode) => {
+        const route = modeRoutes[mode.slug] || '#';
+        const isAvailable = mode.disponible && route !== '#';
+
+        return (
+          <div
+            class={`mode-card ${!isAvailable ? 'mode-card--disabled' : ''}`}
+          >
+            <span
+              class={`etat ${
+                isAvailable ? 'etat--dispo' : 'etat--bientot'
+              }`}
+            >
+              {isAvailable ? 'Disponible' : 'À venir'}
+            </span>
+
+            <h2>{mode.label}</h2>
+            <p class="mode-description">{mode.description}</p>
+
+            {isAvailable ? (
+              <a href={route} class="btn-mode">
+                Commencer
+              </a>
+            ) : (
+              <button class="btn-mode btn-mode--disabled" disabled>
+                Bientôt disponible
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+
+    <section class="comparaison">
+      <h2>Comparaison des modes</h2>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Format</th>
+            <th>Durée</th>
+            <th>Idéal pour</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Fiches & Quiz</strong></td>
+            <td>Chapitres + QCM</td>
+            <td>Variable</td>
+            <td>Apprentissage progressif, compréhension approfondie</td>
+          </tr>
+          <tr>
+            <td><strong>Simulation d'entretien</strong></td>
+            <td>Questions ouvertes</td>
+            <td>45-50 min</td>
+            <td>Pratique en conditions réelles, gérer le stress</td>
+          </tr>
+          <tr>
+            <td><strong>Quiz</strong></td>
+            <td>QCM rapides</td>
+            <td>10-20 min</td>
+            <td>Révision rapide, auto-évaluation par thème</td>
+          </tr>
+          <tr>
+            <td><strong>Codingame</strong></td>
+            <td>Exercices de code</td>
+            <td>Illimitée</td>
+            <td>Pratique du coding, problèmes algorithmiques</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="conseil">
+      <h2>Conseil de révision</h2>
+      <ol>
+        <li>
+          <strong>Semaine 1-2 :</strong> Fiches & Quiz – Apprenez les
+          fondamentaux
+        </li>
+        <li>
+          <strong>Semaine 3 :</strong> Quiz – Testez votre rétention par thème
+        </li>
+        <li>
+          <strong>Semaine 4 :</strong> Codingame – Pratiquez la logique
+        </li>
+        <li>
+          <strong>Avant l'entretien :</strong> Simulations d'entretien –
+          Entraînement final
+        </li>
+      </ol>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .page {
+    max-width: 62rem;
+    margin: 0 auto;
+    padding: 3rem clamp(1.25rem, 5vw, 3rem) 5rem;
+  }
+
+  .retour {
+    margin-bottom: 2rem;
+  }
+
+  .retour a {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--estompe);
+    text-decoration: none;
+  }
+
+  .retour a:hover {
+    color: var(--bic);
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+  }
+
+  .hero-sous {
+    font-size: 1.125rem;
+    color: var(--estompe);
+    margin: 0;
+    max-width: 36rem;
+  }
+
+  /* Grille de modes */
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .mode-card {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: 1.5rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .mode-card:not(.mode-card--disabled):hover {
+    border-color: var(--bic);
+    box-shadow: 0 8px 20px rgba(32, 68, 196, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .mode-card--disabled {
+    opacity: 0.7;
+  }
+
+  .etat {
+    justify-self: start;
+    font-family: var(--f-display);
+    font-size: 0.6875rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    transform: rotate(-1.5deg);
+  }
+
+  .etat--dispo {
+    color: var(--vert);
+    background: var(--vert-doux);
+    border: 1.5px solid currentColor;
+  }
+
+  .etat--bientot {
+    color: var(--estompe);
+    background: var(--blanc);
+    border: 1.5px dashed currentColor;
+  }
+
+  .mode-card h2 {
+    font-size: 1.25rem;
+    font-weight: 750;
+    margin: 0;
+  }
+
+  .mode-description {
+    font-family: var(--f-display);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--estompe);
+    margin: 0;
+  }
+
+  .btn-mode {
+    display: inline-block;
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--bic);
+    color: var(--blanc);
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: center;
+  }
+
+  .btn-mode:hover {
+    background: color-mix(in srgb, var(--bic) 85%, black);
+  }
+
+  .btn-mode--disabled {
+    background: var(--estompe);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* Comparaison */
+  .comparaison {
+    margin: 3.5rem 0;
+    padding: 2rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+  }
+
+  .comparaison h2 {
+    font-size: 1.375rem;
+    font-weight: 750;
+    margin: 0 0 1.5rem;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--f-display);
+    font-size: 0.9rem;
+  }
+
+  .comparison-table thead {
+    background: var(--bic-doux);
+  }
+
+  .comparison-table th {
+    font-weight: 700;
+    padding: 0.75rem;
+    text-align: left;
+    border: 1px solid var(--trait);
+  }
+
+  .comparison-table td {
+    padding: 0.75rem;
+    border: 1px solid var(--trait);
+  }
+
+  .comparison-table tbody tr:nth-child(even) {
+    background: var(--papier);
+  }
+
+  /* Conseil de révision */
+  .conseil {
+    padding: 2rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+  }
+
+  .conseil h2 {
+    font-size: 1.375rem;
+    font-weight: 750;
+    margin: 0 0 1.5rem;
+  }
+
+  .conseil ol {
+    margin: 0;
+    padding-left: 1.5rem;
+  }
+
+  .conseil li {
+    margin: 0.75rem 0;
+    line-height: 1.6;
+  }
+
+  .conseil strong {
+    color: var(--bic);
+  }
+
+  @media (max-width: 900px) {
+    .page {
+      padding: 2rem 1.25rem 3rem;
+    }
+
+    .comparison-table {
+      font-size: 0.8rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 0.5rem;
+    }
+  }
+</style>
