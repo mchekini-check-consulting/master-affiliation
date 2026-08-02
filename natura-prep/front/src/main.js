@@ -6,16 +6,15 @@ import '@fontsource/public-sans/600.css';
 import '@fontsource/public-sans/700.css';
 import './style.css';
 
-// Forme d'onde du mockup de simulation (hauteurs reprises du design)
-const HAUTEURS_ONDE = [
-  8, 14, 22, 12, 18, 26, 10, 16, 24, 14, 20, 9,
-  15, 23, 11, 19, 25, 13, 17, 8, 21, 12, 16, 10,
-];
-const onde = document.querySelector('[data-onde]');
-if (onde) {
-  onde.innerHTML = HAUTEURS_ONDE
-    .map((h) => `<span style="height:${h}px"></span>`)
-    .join('');
+// Vidéo hero : certains navigateurs bloquent l'autoplay si la source
+// n'est pas prête au moment du parsing — on relance par sécurité.
+const video = document.querySelector('.hero-video');
+if (video) {
+  const relancer = () => {
+    if (video.paused && !video.ended) video.play().catch(() => {});
+  };
+  video.addEventListener('canplay', relancer, { once: true });
+  setTimeout(relancer, 800);
 }
 
 // FAQ : accordéon exclusif — une seule réponse ouverte à la fois,
