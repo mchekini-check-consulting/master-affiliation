@@ -1,0 +1,175 @@
+{
+  "slug": "vivre-en-france",
+  "questions": [
+    {
+      "question": "En quelle année la Sécurité sociale a-t-elle été créée en France ?",
+      "options": ["1905", "1936", "1945", "1958"],
+      "reponse": 2,
+      "explication": "La Sécurité sociale a été créée en 1945, juste après la Seconde Guerre mondiale, pour protéger les habitants contre les risques de la vie."
+    },
+    {
+      "question": "Comment la Sécurité sociale est-elle principalement financée ?",
+      "options": [
+        "Par les dons des associations",
+        "Par les cotisations des entreprises et des travailleurs",
+        "Par les banques",
+        "Par l'Union européenne"
+      ],
+      "reponse": 1,
+      "explication": "La Sécurité sociale est financée par les cotisations versées par les entreprises et les personnes qui travaillent. C'est un système de solidarité."
+    },
+    {
+      "question": "La Sécurité sociale est souvent citée comme un exemple concret de quelle valeur de la République ?",
+      "options": ["La liberté", "L'égalité", "La laïcité", "La fraternité"],
+      "reponse": 3,
+      "explication": "En protégeant tous les habitants grâce aux cotisations de ceux qui travaillent, la Sécurité sociale illustre la fraternité, l'une des valeurs de la devise de la République."
+    },
+    {
+      "question": "Quelle loi a rendu l'instruction obligatoire en France ?",
+      "options": [
+        "La loi Jules Ferry du 28 mars 1882",
+        "La loi Veil de 1975",
+        "La loi de laïcité de 1905",
+        "La loi de 2004 sur les signes religieux"
+      ],
+      "reponse": 0,
+      "explication": "La loi Jules Ferry du 28 mars 1882 a rendu l'école publique gratuite, laïque et obligatoire."
+    },
+    {
+      "question": "Aujourd'hui, l'instruction est obligatoire en France pour les enfants âgés de :",
+      "options": ["6 à 14 ans", "3 à 16 ans", "6 à 18 ans", "5 à 15 ans"],
+      "reponse": 1,
+      "explication": "L'instruction est obligatoire de 3 à 16 ans. Depuis 2019, elle commence à 3 ans au lieu de 6 ans."
+    },
+    {
+      "question": "Quel numéro faut-il appeler pour une urgence médicale (SAMU) ?",
+      "options": ["17", "18", "15", "115"],
+      "reponse": 2,
+      "explication": "Le 15 est le numéro du SAMU pour les urgences médicales. Le 17 est la police, le 18 les pompiers et le 112 le numéro d'urgence européen."
+    },
+    {
+      "question": "Quel est le rôle du médecin traitant ?",
+      "options": [
+        "Il travaille uniquement à l'hôpital",
+        "Il coordonne le parcours de soins et oriente vers les spécialistes",
+        "Il délivre les médicaments en pharmacie",
+        "Il rembourse les frais de santé"
+      ],
+      "reponse": 1,
+      "explication": "Le médecin traitant est le premier interlocuteur : il connaît le dossier médical du patient et l'oriente vers un spécialiste si nécessaire."
+    },
+    {
+      "question": "À quoi sert la carte Vitale ?",
+      "options": [
+        "À voter aux élections",
+        "À prouver son identité à la préfecture",
+        "À ouvrir un compte bancaire",
+        "À prouver ses droits à l'Assurance maladie et être remboursé"
+      ],
+      "reponse": 3,
+      "explication": "La carte Vitale est une carte personnelle qui prouve les droits à l'Assurance maladie. On la présente aux professionnels de santé pour être remboursé."
+    },
+    {
+      "question": "Que faire si une banque refuse d'ouvrir un compte bancaire ?",
+      "options": [
+        "S'adresser à la Banque de France, qui garantit le « droit au compte »",
+        "Porter plainte à la police",
+        "Renoncer à avoir un compte",
+        "Demander à la mairie d'ouvrir un compte"
+      ],
+      "reponse": 0,
+      "explication": "En cas de refus, la Banque de France fait appliquer le « droit au compte » : elle désigne une banque qui doit ouvrir un compte."
+    },
+    {
+      "question": "Qui doit déclarer ses revenus chaque année en France ?",
+      "options": [
+        "Seulement les personnes riches",
+        "Seulement les Français de naissance",
+        "Toute personne majeure vivant en France, même sans revenu",
+        "Seulement les propriétaires de logement"
+      ],
+      "reponse": 2,
+      "explication": "Toute personne de plus de 18 ans qui vit en France doit déclarer ses revenus chaque année, même si elle ne gagne rien."
+    },
+    {
+      "question": "Quelle est la durée légale du travail à temps complet en France ?",
+      "options": ["39 heures par semaine", "40 heures par semaine", "32 heures par semaine", "35 heures par semaine"],
+      "reponse": 3,
+      "explication": "La durée légale du travail à temps complet est de 35 heures par semaine ; au-delà, ce sont des heures supplémentaires."
+    },
+    {
+      "question": "Comment s'appelle le salaire minimum légal en France ?",
+      "options": ["Le RSA", "Le SMIC", "La CAF", "L'APL"],
+      "reponse": 1,
+      "explication": "Le SMIC est le salaire minimum légal en France (environ 1 800 euros brut par mois)."
+    },
+    {
+      "question": "Quel tribunal juge les conflits entre un salarié et son employeur ?",
+      "options": [
+        "Le Conseil constitutionnel",
+        "La cour d'assises",
+        "Le conseil de prud'hommes",
+        "Le tribunal de commerce"
+      ],
+      "reponse": 2,
+      "explication": "Le conseil de prud'hommes est le tribunal spécialisé dans les litiges du travail entre salariés et employeurs."
+    },
+    {
+      "question": "Quel organisme public accompagne les demandeurs d'emploi en France ?",
+      "options": ["France Travail", "La CPAM", "La Banque de France", "L'ENIC-NARIC"],
+      "reponse": 0,
+      "explication": "France Travail (anciennement Pôle emploi) est l'organisme public qui aide à chercher un travail ou à suivre une formation."
+    },
+    {
+      "question": "Dans quel délai faut-il déclarer une naissance à la mairie ?",
+      "options": ["Dans les 24 heures", "Dans les 15 jours", "Dans le mois", "Dans les 5 jours"],
+      "reponse": 3,
+      "explication": "La déclaration de naissance est obligatoire dans les 5 jours après la naissance, à la mairie du lieu de naissance."
+    },
+    {
+      "question": "Quel est le seul mariage reconnu par la loi en France ?",
+      "options": [
+        "Le mariage religieux",
+        "Le mariage civil célébré à la mairie",
+        "Le mariage coutumier",
+        "Le mariage célébré par un notaire"
+      ],
+      "reponse": 1,
+      "explication": "Seul le mariage civil, célébré à la mairie, est reconnu en France. Le consentement des deux époux doit être libre et sincère."
+    },
+    {
+      "question": "Où se déroule l'entretien d'assimilation pour la naturalisation ?",
+      "options": ["À la mairie", "Au tribunal", "En préfecture", "À l'ambassade"],
+      "reponse": 2,
+      "explication": "L'entretien d'assimilation a lieu en préfecture : un agent vérifie le niveau de français, la connaissance de la France et l'adhésion aux valeurs de la République."
+    },
+    {
+      "question": "Pour préparer l'entretien de naturalisation, que faut-il connaître sur sa commune ?",
+      "options": [
+        "Le nom de son maire, son département et sa région",
+        "Le budget exact de la mairie",
+        "Le nombre précis d'habitants de chaque quartier",
+        "La date de construction de la mairie"
+      ],
+      "reponse": 0,
+      "explication": "Il faut connaître le nom de sa commune, de son maire, de son département et de sa région : ces questions sont souvent posées à l'entretien."
+    },
+    {
+      "question": "Que faut-il vérifier juste avant l'entretien de naturalisation, car cela change souvent ?",
+      "options": [
+        "Les dates des guerres mondiales",
+        "Les paroles de La Marseillaise",
+        "Les couleurs du drapeau",
+        "Le nom du Premier ministre, les dernières lois et les prochaines élections"
+      ],
+      "reponse": 3,
+      "explication": "L'actualité change : il faut vérifier juste avant l'entretien le nom du Premier ministre et des principaux ministres, les dernières grandes lois votées, les prochaines élections et l'actualité récente."
+    },
+    {
+      "question": "Combien d'années de résidence en France faut-il, au minimum, pour demander la naturalisation par décret ?",
+      "options": ["2 ans", "5 ans", "10 ans", "1 an"],
+      "reponse": 1,
+      "explication": "La naturalisation par décret demande au minimum 5 ans de résidence en France, avec adhésion aux valeurs de la République."
+    }
+  ]
+}

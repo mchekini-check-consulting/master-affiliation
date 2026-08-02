@@ -1,0 +1,187 @@
+{
+  "slug": "histoire-geographie-culture",
+  "questions": [
+    {
+      "question": "De quelle période datent les peintures des grottes de Lascaux ?",
+      "options": ["De l'Antiquité", "Du Moyen Âge", "De la préhistoire", "De l'époque moderne"],
+      "reponse": 2,
+      "explication": "Les grottes de Lascaux ont été peintes vers 18000-15000 avant J.-C., pendant la préhistoire."
+    },
+    {
+      "question": "Qu'a fait Clovis, roi des Francs (466-511) ?",
+      "options": [
+        "Il a unifié les royaumes francs et adopté la religion chrétienne",
+        "Il a construit le château de Versailles",
+        "Il a créé le Code civil",
+        "Il a écrit la Déclaration des droits de l'homme"
+      ],
+      "reponse": 0,
+      "explication": "Clovis a unifié (rassemblé) les royaumes des Francs et s'est converti à la religion chrétienne."
+    },
+    {
+      "question": "Pendant quelle guerre Jeanne d'Arc a-t-elle conduit les troupes françaises ?",
+      "options": ["La Première Guerre mondiale", "La guerre de Cent Ans", "La guerre d'Algérie", "Les guerres de religion"],
+      "reponse": 1,
+      "explication": "Jeanne d'Arc (1412-1431) a conduit les troupes françaises pendant la guerre de Cent Ans, un long conflit entre les rois de France et d'Angleterre."
+    },
+    {
+      "question": "Quel roi est appelé le « Roi-Soleil » et a fait construire le château de Versailles ?",
+      "options": ["Henri IV", "Louis XVI", "François Ier", "Louis XIV"],
+      "reponse": 3,
+      "explication": "Louis XIV, le Roi-Soleil, symbole de la monarchie absolue, a fait bâtir le château de Versailles. Son règne (1643-1715) est le plus long de l'histoire de France."
+    },
+    {
+      "question": "Qui sont les philosophes des Lumières ?",
+      "options": [
+        "Voltaire, Rousseau, Diderot et Montesquieu",
+        "Molière, Hugo et Dumas",
+        "Monet, Renoir et Cézanne",
+        "Piaf, Brassens et Aznavour"
+      ],
+      "reponse": 0,
+      "explication": "Les philosophes des Lumières (XVIIIème siècle), comme Voltaire, Rousseau, Diderot et Montesquieu, ont inspiré la Révolution française et l'indépendance des États-Unis."
+    },
+    {
+      "question": "Quel événement du 5 mai 1789 marque le début de la Révolution française ?",
+      "options": ["La prise de la Bastille", "L'ouverture des états généraux", "La mort de Louis XVI", "La fête de la Fédération"],
+      "reponse": 1,
+      "explication": "Le 5 mai 1789, le roi ouvre les états généraux, une grande assemblée. C'est le début de la Révolution française."
+    },
+    {
+      "question": "Que s'est-il passé le 14 juillet 1789 ?",
+      "options": [
+        "La signature de l'armistice",
+        "Le sacre de Napoléon",
+        "La prise de la Bastille par le peuple de Paris",
+        "L'abolition de l'esclavage"
+      ],
+      "reponse": 2,
+      "explication": "Le 14 juillet 1789, le peuple de Paris a pris la Bastille, une prison d'État symbole du pouvoir absolu du roi. C'est l'origine de la fête nationale."
+    },
+    {
+      "question": "À quelle date a été adoptée la Déclaration des droits de l'homme et du citoyen ?",
+      "options": ["Le 14 juillet 1790", "Le 21 janvier 1793", "Le 4 octobre 1958", "Le 26 août 1789"],
+      "reponse": 3,
+      "explication": "La Déclaration des droits de l'homme et du citoyen, adoptée le 26 août 1789, garantit les droits individuels : les hommes naissent libres et égaux en droits."
+    },
+    {
+      "question": "Qu'est-il arrivé au roi Louis XVI le 21 janvier 1793 ?",
+      "options": [
+        "Il a été guillotiné (décapité)",
+        "Il a été couronné empereur",
+        "Il s'est enfui en Angleterre",
+        "Il a signé la Constitution"
+      ],
+      "reponse": 0,
+      "explication": "Après la Révolution et l'abolition de la monarchie, Louis XVI a été emprisonné avec sa famille puis guillotiné le 21 janvier 1793."
+    },
+    {
+      "question": "Quand l'esclavage a-t-il été définitivement aboli en France ?",
+      "options": ["Le 14 juillet 1789", "Le 9 décembre 1905", "Le 27 avril 1848", "Le 8 mai 1945"],
+      "reponse": 2,
+      "explication": "L'esclavage a été définitivement aboli le 27 avril 1848, sous la IIème République. La même année, le suffrage universel masculin a été instauré."
+    },
+    {
+      "question": "Grâce à qui l'école publique est-elle devenue gratuite, laïque et obligatoire (lois de 1881-1882) ?",
+      "options": ["Napoléon Bonaparte", "Jules Ferry", "Simone Veil", "Victor Hugo"],
+      "reponse": 1,
+      "explication": "Les lois de Jules Ferry (1881-1882) ont rendu l'école publique gratuite, laïque et obligatoire. L'instruction est obligatoire depuis le 28 mars 1882."
+    },
+    {
+      "question": "Qui a créé le Code civil, un recueil de lois toujours utilisé aujourd'hui ?",
+      "options": ["Louis XIV", "Charles de Gaulle", "Jules Ferry", "Napoléon Bonaparte"],
+      "reponse": 3,
+      "explication": "Napoléon Bonaparte a créé le Code civil sous le Premier Empire (1804-1814)."
+    },
+    {
+      "question": "En quelle année a eu lieu la bataille de Verdun ?",
+      "options": ["1916", "1940", "1944", "1870"],
+      "reponse": 0,
+      "explication": "La bataille de Verdun a eu lieu en 1916, en Lorraine, entre l'armée française et l'armée allemande. Elle a fait énormément de victimes, sans vainqueur."
+    },
+    {
+      "question": "Qui a lancé l'appel du 18 juin 1940 depuis Londres ?",
+      "options": ["Jean Moulin", "Le maréchal Pétain", "Le général de Gaulle", "Georges Pompidou"],
+      "reponse": 2,
+      "explication": "Le 18 juin 1940, le général de Gaulle a appelé les Français à résister à l'occupation allemande, depuis Londres."
+    },
+    {
+      "question": "Qu'a fait Jean Moulin pendant la Seconde Guerre mondiale ?",
+      "options": [
+        "Il a dirigé le régime de Vichy",
+        "Il a créé le Conseil national de la Résistance (CNR)",
+        "Il a commandé le débarquement en Normandie",
+        "Il a signé l'armistice de 1918"
+      ],
+      "reponse": 1,
+      "explication": "Jean Moulin, plus jeune préfet de France en 1937, a créé le Conseil national de la Résistance (CNR) sous l'autorité du général de Gaulle pour unifier la Résistance."
+    },
+    {
+      "question": "Que s'est-il passé le 6 juin 1944 ?",
+      "options": [
+        "Le débarquement des Alliés en Normandie",
+        "La fin de la Seconde Guerre mondiale",
+        "L'appel du général de Gaulle",
+        "La libération de Paris"
+      ],
+      "reponse": 0,
+      "explication": "Le 6 juin 1944, les Alliés (États-Unis, Royaume-Uni, France, URSS pour la guerre) ont débarqué en Normandie pour libérer la France. La guerre s'est terminée en Europe le 8 mai 1945."
+    },
+    {
+      "question": "Que garantit la loi Veil du 17 janvier 1975 ?",
+      "options": [
+        "Le droit de vote des femmes",
+        "L'abolition de la peine de mort",
+        "La majorité à 18 ans",
+        "Le droit à l'IVG (interruption volontaire de grossesse)"
+      ],
+      "reponse": 3,
+      "explication": "La loi Veil, préparée par la ministre Simone Veil, encadre l'IVG. C'est une mesure importante qui garantit à la femme le droit de disposer de son corps."
+    },
+    {
+      "question": "En quelle année la loi sur le mariage pour tous a-t-elle été votée ?",
+      "options": ["1999", "2021", "2013", "1982"],
+      "reponse": 2,
+      "explication": "La loi du 17 mai 2013 permet à deux personnes du même sexe de se marier : c'est le « mariage pour tous »."
+    },
+    {
+      "question": "Quel est le point culminant (le sommet le plus haut) de la France ?",
+      "options": ["Le Massif central", "Le mont Blanc (4 809 m)", "Les Vosges", "Le Jura"],
+      "reponse": 1,
+      "explication": "Le mont Blanc, dans les Alpes, entre la France et l'Italie, culmine à 4 809 mètres."
+    },
+    {
+      "question": "Combien la France compte-t-elle de régions ?",
+      "options": [
+        "18 régions, dont 5 en outre-mer",
+        "101 régions",
+        "13 régions, toutes en métropole",
+        "27 régions"
+      ],
+      "reponse": 0,
+      "explication": "La France compte 18 régions : 13 en métropole (dont la Corse) et 5 en outre-mer. Elle compte aussi 101 départements et environ 36 000 communes."
+    },
+    {
+      "question": "Qui a construit la tour Eiffel, et pour quel événement ?",
+      "options": [
+        "Louis XIV, pour le château de Versailles",
+        "Napoléon Ier, pour célébrer ses victoires",
+        "Jules Ferry, pour l'école publique",
+        "Gustave Eiffel, pour l'Exposition universelle de Paris en 1889"
+      ],
+      "reponse": 3,
+      "explication": "La tour Eiffel a été construite par l'ingénieur Gustave Eiffel pour l'Exposition universelle de Paris en 1889."
+    },
+    {
+      "question": "Qui est Marie Curie ?",
+      "options": [
+        "Une chanteuse française célèbre",
+        "Une grande scientifique naturalisée française, deux fois prix Nobel",
+        "La première femme présidente de la République",
+        "Une peintre impressionniste"
+      ],
+      "reponse": 1,
+      "explication": "Marie Curie, d'origine polonaise et naturalisée française, est une grande scientifique qui a reçu deux prix Nobel."
+    }
+  ]
+}

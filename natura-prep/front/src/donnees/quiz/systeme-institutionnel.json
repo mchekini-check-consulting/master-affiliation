@@ -1,0 +1,137 @@
+{
+  "slug": "systeme-institutionnel",
+  "questions": [
+    {
+      "question": "En quelle année la Constitution de la Ve République a-t-elle été adoptée ?",
+      "options": ["1946", "1958", "1962", "1968"],
+      "reponse": 1,
+      "explication": "La Constitution de la Ve République date du 4 octobre 1958. Elle a été préparée sous l'autorité du général de Gaulle."
+    },
+    {
+      "question": "Qu'a changé la révision constitutionnelle de 1962 ?",
+      "options": ["Le mandat présidentiel est passé à 5 ans", "La peine de mort a été abolie", "Le Sénat a été créé", "Le Président est élu au suffrage universel direct"],
+      "reponse": 3,
+      "explication": "Depuis la révision de 1962, voulue par de Gaulle, le président de la République est élu directement par les citoyens."
+    },
+    {
+      "question": "Depuis la révision de 2000, quelle est la durée du mandat présidentiel ?",
+      "options": ["7 ans", "5 ans", "6 ans", "4 ans"],
+      "reponse": 1,
+      "explication": "La révision de 2000 a instauré le quinquennat : le mandat du Président est passé de 7 à 5 ans."
+    },
+    {
+      "question": "Qu'a inscrit la révision constitutionnelle de 2007 dans la Constitution ?",
+      "options": ["Le droit de vote des femmes", "La laïcité", "L'interdiction de la peine de mort", "Le quinquennat"],
+      "reponse": 2,
+      "explication": "En 2007, l'interdiction de la peine de mort a été inscrite dans la Constitution ; la peine de mort était déjà abolie depuis 1981."
+    },
+    {
+      "question": "Combien de membres compte le Conseil constitutionnel ?",
+      "options": ["7", "12", "9", "15"],
+      "reponse": 2,
+      "explication": "Le Conseil constitutionnel compte 9 membres : 3 nommés par le président de la République, 3 par le président de l'Assemblée nationale et 3 par le président du Sénat."
+    },
+    {
+      "question": "Comment le Conseil constitutionnel est-il renouvelé ?",
+      "options": ["En totalité tous les 9 ans", "Par moitié tous les 3 ans", "En totalité tous les 5 ans", "Par tiers tous les 3 ans"],
+      "reponse": 3,
+      "explication": "Le Conseil constitutionnel est renouvelé par tiers tous les 3 ans : 3 membres sont remplacés tous les 3 ans."
+    },
+    {
+      "question": "Depuis la révision de 2008, comment un citoyen peut-il saisir le Conseil constitutionnel ?",
+      "options": ["Par une pétition en mairie", "Par la question prioritaire de constitutionnalité (QPC), lors d'un procès", "Par une lettre au Président", "Par un vote aux élections législatives"],
+      "reponse": 1,
+      "explication": "Depuis la révision de 2008, un citoyen peut, lors d'un procès, poser une question prioritaire de constitutionnalité pour contester une loi contraire à la Constitution."
+    },
+    {
+      "question": "Qui nomme le Premier ministre ?",
+      "options": ["Le président de la République", "L'Assemblée nationale", "Le Sénat", "Le Conseil constitutionnel"],
+      "reponse": 0,
+      "explication": "Le président de la République nomme le Premier ministre, qui dirige ensuite le Gouvernement depuis l'hôtel de Matignon."
+    },
+    {
+      "question": "Que permet l'article 16 de la Constitution ?",
+      "options": ["De dissoudre le Sénat", "D'organiser un référendum", "De destituer le Président", "De donner les pleins pouvoirs au Président en cas de crise très grave"],
+      "reponse": 3,
+      "explication": "L'article 16 permet au Président de prendre les pleins pouvoirs en cas de crise majeure. De Gaulle l'a utilisé en 1961, pendant la guerre d'Algérie."
+    },
+    {
+      "question": "Combien de parrainages d'élus faut-il pour se présenter à l'élection présidentielle ?",
+      "options": ["100", "500", "1 000", "289"],
+      "reponse": 1,
+      "explication": "Un candidat doit réunir 500 signatures d'élus, répartis sur toute la France et l'outre-mer."
+    },
+    {
+      "question": "Que permet l'article 49.3 de la Constitution ?",
+      "options": ["Au Premier ministre de faire adopter une loi sans vote des députés", "Au Président de dissoudre l'Assemblée nationale", "Aux députés de destituer le Président", "Au Sénat de bloquer une loi"],
+      "reponse": 0,
+      "explication": "Le 49.3 permet au Premier ministre de faire adopter une loi sans vote. Les députés peuvent répliquer par une motion de censure, votée à la majorité absolue (289 voix)."
+    },
+    {
+      "question": "Combien y a-t-il de députés à l'Assemblée nationale ?",
+      "options": ["348", "500", "577", "635"],
+      "reponse": 2,
+      "explication": "L'Assemblée nationale compte 577 députés, qui siègent au Palais Bourbon. La majorité absolue est de 289 sièges."
+    },
+    {
+      "question": "Où siège le Sénat ?",
+      "options": ["Au Palais Bourbon", "À l'Élysée", "À Matignon", "Au palais du Luxembourg"],
+      "reponse": 3,
+      "explication": "Les 348 sénateurs siègent au palais du Luxembourg, à Paris. Le Palais Bourbon est le siège de l'Assemblée nationale."
+    },
+    {
+      "question": "Qui assure l'intérim si le président de la République décède ou démissionne ?",
+      "options": ["Le Premier ministre", "Le président du Sénat", "Le président de l'Assemblée nationale", "Le président du Conseil constitutionnel"],
+      "reponse": 1,
+      "explication": "Le président du Sénat, deuxième personnage de l'État, assure l'intérim jusqu'à l'élection d'un nouveau Président."
+    },
+    {
+      "question": "Comment appelle-t-on un texte de loi présenté par le Gouvernement ?",
+      "options": ["Une proposition de loi", "Un décret", "Un projet de loi", "Une ordonnance"],
+      "reponse": 2,
+      "explication": "Un projet de loi vient du Gouvernement ; une proposition de loi vient d'un ou plusieurs parlementaires (députés ou sénateurs)."
+    },
+    {
+      "question": "En cas de désaccord persistant entre l'Assemblée nationale et le Sénat sur une loi, qui a le dernier mot ?",
+      "options": ["Le Sénat", "Le Conseil constitutionnel", "Le président de la République", "L'Assemblée nationale"],
+      "reponse": 3,
+      "explication": "Après la navette parlementaire, si le désaccord persiste, c'est l'Assemblée nationale qui tranche : elle a le dernier mot."
+    },
+    {
+      "question": "Comment les sénateurs sont-ils élus ?",
+      "options": ["Au suffrage universel indirect, par environ 150 000 grands électeurs", "Au suffrage universel direct à deux tours", "À la proportionnelle à un tour par tous les citoyens", "Ils sont nommés par le Président"],
+      "reponse": 0,
+      "explication": "Les sénateurs sont élus au suffrage indirect par un collège d'environ 150 000 grands électeurs (maires, conseillers municipaux, députés...)."
+    },
+    {
+      "question": "Qu'est-ce que la cohabitation ?",
+      "options": ["Un gouvernement composé de ministres non partisans", "La réunion des deux chambres du Parlement à Versailles", "Un Président et une majorité de l'Assemblée nationale de bords politiques opposés", "Le partage du pouvoir entre le Président et le Sénat"],
+      "reponse": 2,
+      "explication": "Il y a cohabitation quand le Président et la majorité parlementaire sont de couleurs politiques différentes, comme Mitterrand (gauche) avec Chirac (droite) comme Premier ministre."
+    },
+    {
+      "question": "Quand le traité de Rome, qui crée la CEE, a-t-il été signé ?",
+      "options": ["Le 1er novembre 1993", "Le 25 mars 1957", "Le 9 mai 1950", "Le 4 octobre 1958"],
+      "reponse": 1,
+      "explication": "Le traité de Rome du 25 mars 1957 crée la CEE, avec 6 pays fondateurs : Allemagne, Belgique, France, Italie, Luxembourg et Pays-Bas."
+    },
+    {
+      "question": "Combien d'étoiles figurent sur le drapeau européen ?",
+      "options": ["27", "15", "9", "12"],
+      "reponse": 3,
+      "explication": "Le drapeau européen porte 12 étoiles, symbole d'unité, d'harmonie et de solidarité. Leur nombre ne dépend pas du nombre de pays membres."
+    },
+    {
+      "question": "Où siège le Parlement européen ?",
+      "options": ["À Strasbourg", "À Bruxelles", "À Luxembourg", "À Paris"],
+      "reponse": 0,
+      "explication": "Le Parlement européen siège à Strasbourg, en France. La Commission européenne, elle, siège à Bruxelles."
+    },
+    {
+      "question": "Quel pays fait partie de l'espace Schengen sans être membre de l'Union européenne ?",
+      "options": ["L'Irlande", "L'Italie", "La Suisse", "Chypre"],
+      "reponse": 2,
+      "explication": "La Suisse (comme la Norvège, l'Islande et le Liechtenstein) est dans l'espace Schengen sans être dans l'UE. À l'inverse, l'Irlande est dans l'UE mais pas dans Schengen."
+    }
+  ]
+}

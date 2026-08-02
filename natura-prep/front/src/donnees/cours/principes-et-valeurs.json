@@ -20,11 +20,13 @@
         },
         {
           "titre": "La liberté",
-          "texte": "La liberté signifie que chaque personne peut penser, s'exprimer et vivre comme elle le souhaite. Il y a une seule limite : ne pas empêcher la liberté des autres. Ce droit vient de la Déclaration des droits de l'homme et du citoyen de 1789. La liberté s'applique à tout le monde, quelle que soit son origine ou sa religion.",
+          "texte": "La liberté signifie que chaque personne peut penser librement, croire ou ne pas croire, s'exprimer et vivre comme elle le souhaite. Ce droit vient de la Déclaration des droits de l'homme et du citoyen de 1789. Mais la liberté est garantie sans être absolue (sans limite) : « la liberté des uns s'arrête là où commence celle des autres ». Cela veut dire que ma liberté ne doit pas empêcher la liberté des autres personnes.",
           "points": [
-            "Libertés individuelles : liberté de religion, liberté d'expression, liberté de choisir son mode de vie, liberté de se déplacer.",
+            "Liberté de penser : chacun peut avoir ses propres idées et opinions.",
+            "Liberté de croire ou de ne pas croire : chacun choisit sa religion, ou n'en a pas.",
+            "Liberté d'expression : chacun peut dire ce qu'il pense, dans le respect de la loi.",
             "Libertés collectives : droit de se rassembler, de manifester, d'adhérer à un syndicat (organisation qui défend les travailleurs).",
-            "L'État protège les libertés et fixe des limites pour que les libertés de chacun soient respectées."
+            "L'État protège les libertés et fixe des limites pour que les libertés de chacun soient respectées : la liberté est garantie, mais pas absolue."
           ]
         },
         {
@@ -58,37 +60,51 @@
           "titre": "La fraternité",
           "texte": "La fraternité est la solidarité (l'entraide) entre les citoyens. Elle permet de vivre ensemble et de former une société. Elle apparaît dans la devise en 1848 et figure dans les Constitutions de 1946 et de 1958. Chacun peut aussi s'engager grâce à la liberté d'association, créée par la loi de 1901 : bénévolat (aider sans être payé), syndicats, vie politique. Pour créer une association, il faut au moins deux personnes, un objectif non lucratif (sans chercher à gagner de l'argent), des statuts (règles de fonctionnement) et une déclaration à la préfecture ou en ligne.",
           "points": [
+            "La Sécurité sociale, créée en 1945, est un exemple concret de fraternité : elle protège les personnes contre les risques de la vie (maladie, accident, vieillesse) et elle est financée par les entreprises et par les personnes qui travaillent.",
             "Solidarité collective : aides organisées par l'État, financées par les impôts et les cotisations (Sécurité sociale, RSA, aide au logement).",
             "Solidarité entre générations : les personnes qui travaillent financent les retraites.",
             "Engagement associatif : aide alimentaire, soutien scolaire, aide aux réfugiés, protection de l'environnement."
+          ]
+        },
+        {
+          "titre": "La démocratie",
+          "texte": "La France est une démocratie : un régime politique dans lequel le peuple est souverain (c'est le peuple qui a le pouvoir). Les citoyens participent à la vie politique et aux décisions du pays, par leurs représentants élus ou par le référendum (un vote direct du peuple sur une question).",
+          "points": [
+            "Démocratie directe : le peuple décide lui-même, par exemple par référendum.",
+            "Démocratie participative : les citoyens sont consultés et participent aux débats et aux décisions.",
+            "Démocratie représentative : les citoyens élisent des représentants (députés, maires, président) qui décident en leur nom. C'est la forme principale en France."
           ]
         }
       ],
       "aRetenir": [
         "La devise de la France est « Liberté, Égalité, Fraternité » ; elle est officielle depuis 1848 et inscrite dans la Constitution de 1958.",
-        "La liberté de chacun s'arrête là où commence celle des autres.",
+        "La liberté (de penser, de croire ou ne pas croire, de s'exprimer) est garantie mais pas absolue : « la liberté des uns s'arrête là où commence celle des autres ».",
         "La loi est la même pour tous, et la discrimination est interdite et punie par la loi.",
-        "Les femmes et les hommes ont les mêmes droits dans tous les domaines.",
-        "La fraternité, c'est la solidarité entre les citoyens : Sécurité sociale, retraites, associations, bénévolat."
+        "La fraternité, c'est la solidarité entre les citoyens : la Sécurité sociale, créée en 1945, en est un exemple concret.",
+        "La France est une démocratie : le peuple est souverain, et il existe trois formes de démocratie (directe, participative, représentative)."
       ]
     },
     {
       "slug": "les-symboles-de-la-republique",
       "titre": "Les symboles de la République",
-      "resume": "La République française a des symboles officiels : le drapeau tricolore, La Marseillaise, Marianne et la fête nationale du 14 juillet. Le coq est un symbole non officiel.",
+      "resume": "La République française a des symboles officiels : le drapeau tricolore, La Marseillaise, Marianne et la fête nationale du 14 juillet. Le coq est un symbole non officiel, et la fleur de lys est l'emblème de la royauté, pas de la République.",
       "sections": [
         {
           "titre": "Le drapeau tricolore",
-          "texte": "Le drapeau français a trois bandes verticales : bleu, blanc, rouge. Le bleu et le rouge sont les couleurs de Paris, le blanc était la couleur du roi. Ce mélange symbolise l'union du roi et du peuple pendant la Révolution de 1789. Le drapeau devient officiel en 1794 et revient définitivement en 1830. Il est interdit de faire outrage au drapeau (le détruire ou l'utiliser de façon insultante en public).",
+          "texte": "Le drapeau français a trois bandes verticales : bleu, blanc, rouge. Chaque couleur a un sens : le bleu est la couleur de Paris, le blanc est la couleur des rois, et le rouge rappelle le sang versé pour la libération du peuple. Le drapeau devient officiel en 1794 (le dessin est attribué au peintre Jacques-Louis David) et revient définitivement en 1830. Il est interdit de faire outrage au drapeau (le détruire ou l'utiliser de façon insultante en public).",
           "points": [
+            "Bleu : la couleur de Paris ; blanc : la couleur des rois ; rouge : le sang versé pour la libération du peuple.",
+            "Le drapeau tricolore est officiel depuis 1794.",
             "On le voit devant les bâtiments publics, aux cérémonies officielles et aux compétitions sportives.",
             "En 1789, les gardes nationaux de Paris portent une cocarde (insigne rond) aux couleurs de la ville ; le général La Fayette y ajoute le blanc du roi."
           ]
         },
         {
           "titre": "L'hymne national : La Marseillaise",
-          "texte": "L'hymne national (le chant officiel du pays) est La Marseillaise. Il est composé en 1792 comme « Chant de guerre pour l'armée du Rhin », puis chanté par des soldats venus de Marseille, d'où son nom. Il devient définitivement l'hymne national en 1879, sous la Troisième République. Il représente la liberté, la résistance et l'unité du peuple français.",
+          "texte": "L'hymne national (le chant officiel du pays) est La Marseillaise. Il est écrit par Claude Joseph Rouget de Lisle dans la nuit du 25 au 26 avril 1792, après la déclaration de guerre à l'Autriche, comme « Chant de guerre pour l'armée du Rhin ». Il est ensuite chanté par des soldats venus de Marseille, d'où son nom. Il devient définitivement l'hymne national en 1879, sous la Troisième République. Il représente la liberté, la résistance et l'unité du peuple français.",
           "points": [
+            "Auteur : Claude Joseph Rouget de Lisle, dans la nuit du 25 au 26 avril 1792.",
+            "Titre d'origine : « Chant de guerre pour l'armée du Rhin ».",
             "On l'entend lors des cérémonies officielles, comme le défilé du 14 juillet.",
             "On l'entend aussi lors des événements sportifs internationaux et des grands rassemblements nationaux."
           ]
@@ -117,14 +133,22 @@
             "Contrairement au drapeau, à Marianne et à la devise, le coq n'a pas de statut officiel.",
             "Il reste pourtant un symbole national fort, surtout dans le sport."
           ]
+        },
+        {
+          "titre": "Attention : la fleur de lys n'est pas un symbole de la République",
+          "texte": "La fleur de lys est l'emblème (le signe) de la royauté française : elle représentait les rois de France avant la Révolution. Ce n'est donc PAS un symbole de la République. C'est un piège classique à l'entretien de naturalisation : il ne faut pas la confondre avec les symboles républicains (drapeau, Marseillaise, Marianne, devise, 14 juillet).",
+          "points": [
+            "Fleur de lys = royauté (les rois de France).",
+            "Symboles de la République = drapeau tricolore, La Marseillaise, Marianne, la devise, le 14 juillet."
+          ]
         }
       ],
       "aRetenir": [
-        "Le drapeau français est bleu, blanc, rouge, en trois bandes verticales.",
-        "L'hymne national est La Marseillaise, composée en 1792 et devenue hymne officiel en 1879.",
+        "Le drapeau tricolore (officiel depuis 1794) : bleu = couleur de Paris, blanc = couleur des rois, rouge = sang versé pour la libération du peuple.",
+        "L'hymne national est La Marseillaise, écrite par Rouget de Lisle dans la nuit du 25 au 26 avril 1792 pour l'armée du Rhin ; hymne officiel en 1879.",
         "Marianne représente la République ; elle porte le bonnet phrygien, symbole de liberté.",
         "La fête nationale est le 14 juillet ; elle rappelle la prise de la Bastille (1789) et la Fête de la Fédération (1790).",
-        "Le coq est un symbole de la France, mais il n'est pas officiel."
+        "Le coq est un symbole non officiel, et la fleur de lys est l'emblème de la royauté, pas un symbole républicain."
       ]
     },
     {
@@ -139,6 +163,16 @@
             "L'État ne reconnaît aucune religion officielle.",
             "L'État ne finance pas les cultes (les religions) et ne paie pas les religieux.",
             "Les religions n'influencent pas les décisions politiques."
+          ]
+        },
+        {
+          "titre": "Les quatre piliers de la laïcité",
+          "texte": "La laïcité repose sur quatre grands principes (les quatre piliers) qu'il faut connaître pour l'entretien de naturalisation.",
+          "points": [
+            "1. La liberté de conscience : chacun est libre de croire, de ne pas croire ou de changer de religion.",
+            "2. La libre manifestation des croyances : chacun peut exprimer et pratiquer sa religion, dans le respect de l'ordre public (les règles qui garantissent la sécurité et la tranquillité de tous).",
+            "3. La neutralité de l'État : l'État ne favorise et ne reconnaît aucune religion.",
+            "4. L'égalité de tous devant la loi, sans distinction de religion ou de conviction : croyants et non-croyants ont les mêmes droits."
           ]
         },
         {
@@ -191,10 +225,10 @@
         }
       ],
       "aRetenir": [
-        "La laïcité garantit la liberté de croire, de ne pas croire et de changer de religion.",
+        "Les quatre piliers de la laïcité : liberté de conscience, libre manifestation des croyances dans le respect de l'ordre public, neutralité de l'État, égalité de tous devant la loi sans distinction de religion.",
         "La loi de 1905 sépare les Églises et l'État : l'État est neutre et ne finance aucune religion.",
         "L'article 1 de la Constitution : la France est une République indivisible, laïque, démocratique et sociale.",
-        "Les agents publics doivent être neutres ; à l'école publique, les signes religieux ostensibles sont interdits (loi de 2004).",
+        "Les agents des services publics doivent être neutres ; à l'école publique, les signes religieux ostensibles sont interdits (loi du 15 mars 2004).",
         "Le blasphème n'est pas interdit en France, mais la haine et les insultes contre les personnes sont punies."
       ]
     },

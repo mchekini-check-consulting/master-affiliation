@@ -7,6 +7,7 @@ import '@fontsource/public-sans/700.css';
 import './membre.css';
 import { api } from './api.js';
 import { rendreCours } from './cours.js';
+import { rendreQuizz } from './quizz.js';
 
 const SECTIONS = ['cours', 'quizz', 'simulations', 'rapports'];
 
@@ -21,6 +22,7 @@ function rendre() {
   panneaux.forEach((p) => (p.hidden = p.dataset.panneau !== section));
   liens.forEach((l) => l.classList.toggle('actif', l.dataset.section === section));
   if (section === 'cours') rendreCours(segments.slice(1));
+  if (section === 'quizz') rendreQuizz(segments.slice(1));
 }
 
 window.addEventListener('hashchange', rendre);

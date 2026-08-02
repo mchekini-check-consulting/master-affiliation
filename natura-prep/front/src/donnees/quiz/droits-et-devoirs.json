@@ -1,0 +1,203 @@
+{
+  "slug": "droits-et-devoirs",
+  "questions": [
+    {
+      "question": "Qui décide de la naturalisation (l'attribution de la nationalité française) ?",
+      "options": [
+        "Le Président de la République",
+        "Le ministre de l'Intérieur",
+        "Le maire de la commune",
+        "Le Premier ministre"
+      ],
+      "reponse": 1,
+      "explication": "C'est le ministre de l'Intérieur qui décide de la naturalisation, par décret."
+    },
+    {
+      "question": "Lequel de ces éléments est un droit du citoyen français ?",
+      "options": [
+        "Payer les impôts",
+        "Respecter la loi",
+        "Voter",
+        "Défendre la patrie"
+      ],
+      "reponse": 2,
+      "explication": "Voter est un droit du citoyen. Payer les impôts, respecter la loi et défendre la patrie sont des devoirs."
+    },
+    {
+      "question": "Lequel de ces éléments est un devoir du citoyen ?",
+      "options": [
+        "Payer les impôts",
+        "Créer une association",
+        "Circuler librement",
+        "Croire ou ne pas croire"
+      ],
+      "reponse": 0,
+      "explication": "Payer les impôts est un devoir. Les trois autres réponses sont des droits et des libertés."
+    },
+    {
+      "question": "En quelle année la loi Veil sur l'IVG a-t-elle été votée ?",
+      "options": [
+        "1981",
+        "1945",
+        "1958",
+        "1975"
+      ],
+      "reponse": 3,
+      "explication": "La loi Veil date du 17 janvier 1975. Elle encadre l'interruption volontaire de grossesse (IVG)."
+    },
+    {
+      "question": "Que garantit la loi Veil du 17 janvier 1975 ?",
+      "options": [
+        "Le droit de vote des femmes",
+        "Le droit de la femme à disposer de son corps (IVG)",
+        "L'égalité des salaires",
+        "Le divorce par consentement mutuel"
+      ],
+      "reponse": 1,
+      "explication": "La loi Veil encadre l'IVG : c'est une mesure importante qui garantit à la femme le droit de disposer de son corps."
+    },
+    {
+      "question": "Qui a préparé la loi de 1975 sur l'IVG ?",
+      "options": [
+        "Simone Veil",
+        "Marie Curie",
+        "Olympe de Gouges",
+        "Ségolène Royal"
+      ],
+      "reponse": 0,
+      "explication": "La ministre Simone Veil a préparé la loi du 17 janvier 1975 qui encadre l'IVG."
+    },
+    {
+      "question": "Qu'est-ce qu'une discrimination ?",
+      "options": [
+        "Un impôt payé par les entreprises",
+        "Une manifestation non déclarée",
+        "Traiter une personne moins bien qu'une autre à cause de son origine, de sa religion ou de son sexe",
+        "Une infraction au code de la route"
+      ],
+      "reponse": 2,
+      "explication": "La discrimination consiste à traiter une personne moins bien qu'une autre à cause d'un critère interdit par la loi. Elle est interdite et punie en France."
+    },
+    {
+      "question": "Lequel de ces comportements est une discrimination interdite par la loi ?",
+      "options": [
+        "Refuser d'embaucher une personne qui n'a pas le diplôme demandé",
+        "Refuser d'embaucher une personne à cause de son origine, de sa religion ou de son sexe",
+        "Choisir le candidat le plus expérimenté",
+        "Demander un CV avant un entretien"
+      ],
+      "reponse": 1,
+      "explication": "Refuser d'embaucher quelqu'un à cause de son origine, de sa religion ou de son sexe est une discrimination interdite et punie par la loi."
+    },
+    {
+      "question": "Par quel texte l'égalité entre les femmes et les hommes est-elle garantie ?",
+      "options": [
+        "L'article 1er de la Constitution",
+        "Le Code de la route",
+        "Le traité de Rome",
+        "La loi de 1905"
+      ],
+      "reponse": 0,
+      "explication": "La parité femmes-hommes est garantie par l'article 1er de la Constitution : les femmes et les hommes doivent avoir les mêmes droits et obligations."
+    },
+    {
+      "question": "La parité femmes-hommes est-elle atteinte dans tous les domaines en France ?",
+      "options": [
+        "Oui, depuis 1945",
+        "Oui, depuis la loi Veil",
+        "Non, elle n'est garantie par aucun texte",
+        "Non, pas encore partout : il reste par exemple des écarts de salaires"
+      ],
+      "reponse": 3,
+      "explication": "La parité est garantie par la Constitution, mais elle n'est pas encore atteinte dans tous les domaines, par exemple l'égalité des salaires."
+    },
+    {
+      "question": "Comment un citoyen peut-il exprimer son désaccord avec une décision du gouvernement ?",
+      "options": [
+        "En refusant de payer ses impôts",
+        "En bloquant les routes par la force",
+        "Par la manifestation, la grève ou tout autre moyen pacifique et légal",
+        "Il n'a pas le droit d'exprimer son désaccord"
+      ],
+      "reponse": 2,
+      "explication": "Le citoyen peut manifester, faire grève ou utiliser tout autre moyen pacifique (sans violence) et légal (autorisé par la loi)."
+    },
+    {
+      "question": "En cas de conflit armé, à partir de quel âge les citoyens peuvent-ils être appelés pour défendre la patrie ?",
+      "options": [
+        "18 ans",
+        "21 ans",
+        "16 ans",
+        "23 ans"
+      ],
+      "reponse": 2,
+      "explication": "En cas de conflit armé, les citoyens de plus de 16 ans peuvent être appelés pour défendre la patrie."
+    },
+    {
+      "question": "En quelle année la sécurité sociale a-t-elle été créée ?",
+      "options": [
+        "1958",
+        "1945",
+        "1975",
+        "1905"
+      ],
+      "reponse": 1,
+      "explication": "La sécurité sociale a été créée en 1945. Elle protège les personnes contre les risques de la vie (maladie, accident, vieillesse)."
+    },
+    {
+      "question": "Comment la sécurité sociale est-elle financée ?",
+      "options": [
+        "Par le travail : les cotisations payées par les salariés et les entreprises",
+        "Par les dons des associations",
+        "Uniquement par l'Union européenne",
+        "Par la vente des monuments historiques"
+      ],
+      "reponse": 0,
+      "explication": "La sécurité sociale est financée par le travail : les cotisations sont prélevées sur les salaires et payées par les salariés et les entreprises."
+    },
+    {
+      "question": "La sécurité sociale est un exemple concret de quelle valeur de la République ?",
+      "options": [
+        "La liberté",
+        "La laïcité",
+        "L'égalité",
+        "La fraternité"
+      ],
+      "reponse": 3,
+      "explication": "La sécurité sociale illustre la fraternité : ceux qui travaillent aident ceux qui sont malades ou dans le besoin."
+    },
+    {
+      "question": "Qui finance les services publics (école, police, justice, hôpitaux) ?",
+      "options": [
+        "Les entreprises étrangères",
+        "Les citoyens, grâce aux impôts",
+        "Les associations",
+        "L'Union européenne uniquement"
+      ],
+      "reponse": 1,
+      "explication": "Ce sont les impôts payés par les citoyens qui financent les services publics gratuits comme l'école, la police, la justice et les hôpitaux."
+    },
+    {
+      "question": "À qui la fonction publique (travailler pour l'État) est-elle ouverte ?",
+      "options": [
+        "À tout citoyen",
+        "Uniquement aux personnes nées en France",
+        "Uniquement aux diplômés d'université",
+        "Uniquement aux militaires"
+      ],
+      "reponse": 0,
+      "explication": "La fonction publique est ouverte à tout citoyen : chacun peut passer les concours pour travailler pour l'État."
+    },
+    {
+      "question": "Lequel de ces éléments n'est PAS un devoir du citoyen ?",
+      "options": [
+        "Respecter l'environnement",
+        "Respecter les droits des autres",
+        "Disposer de son corps",
+        "Payer les impôts"
+      ],
+      "reponse": 2,
+      "explication": "Disposer de son corps est un droit, pas un devoir. Les devoirs sont : payer les impôts, respecter la loi et les droits des autres, respecter l'environnement, défendre la patrie."
+    }
+  ]
+}

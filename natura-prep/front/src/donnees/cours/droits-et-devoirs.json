@@ -20,6 +20,30 @@
           ]
         },
         {
+          "titre": "Les principaux droits du citoyen",
+          "texte": "En France, chaque citoyen a des droits garantis par l'État. Voici les principaux droits, souvent demandés à l'entretien de naturalisation.",
+          "points": [
+            "Voter : participer aux élections pour choisir ses représentants.",
+            "Circuler librement : se déplacer où l'on veut sur le territoire.",
+            "S'exprimer : dire ce que l'on pense (liberté d'expression).",
+            "Croire ou ne pas croire : chacun est libre d'avoir une religion ou de ne pas en avoir.",
+            "Créer des associations : se regrouper librement autour d'un projet commun.",
+            "Disposer de son corps : chacun fait ses propres choix concernant son corps.",
+            "La propriété : posséder des biens (une maison, une entreprise)."
+          ]
+        },
+        {
+          "titre": "L'interdiction des discriminations et la parité femmes-hommes",
+          "texte": "Une discrimination, c'est traiter une personne moins bien qu'une autre à cause de son origine, de sa religion, de son sexe ou d'un autre critère interdit par la loi. La discrimination est interdite et punie en France.",
+          "points": [
+            "Exemple de discrimination : refuser d'embaucher (de recruter) quelqu'un à cause de son origine, de sa religion ou de son sexe. C'est interdit.",
+            "La parité femmes-hommes signifie que les femmes et les hommes sont égaux : ils doivent avoir les mêmes droits et les mêmes obligations.",
+            "L'égalité entre les femmes et les hommes est garantie par l'article 1er de la Constitution.",
+            "Cette égalité n'est pas encore atteinte dans tous les domaines : par exemple, il reste des écarts de salaires entre les femmes et les hommes.",
+            "Le Défenseur des droits aide les personnes victimes de discrimination."
+          ]
+        },
+        {
           "titre": "Les droits liés à la personne humaine",
           "texte": "Chaque personne a ces droits simplement parce qu'elle est un être humain. Ce sont des droits individuels, civiques et politiques. Personne ne peut les supprimer.",
           "points": [
@@ -37,6 +61,8 @@
             "Le droit au travail : chacun a le devoir de travailler et le droit d'obtenir un emploi, sans discrimination.",
             "Le droit à la protection de la santé : l'État protège la santé, la sécurité matérielle, le repos et les loisirs.",
             "Le droit à l'enseignement gratuit : l'école publique est gratuite et laïque, c'est un devoir de l'État.",
+            "La sécurité sociale, créée en 1945, protège les personnes contre les risques de la vie (maladie, accident, vieillesse). Elle est financée par le travail : les cotisations (sommes prélevées sur les salaires) payées par les salariés et les entreprises.",
+            "La sécurité sociale est un exemple concret de la fraternité : ceux qui travaillent aident ceux qui sont malades ou dans le besoin.",
             "Ces droits viennent surtout du préambule (l'introduction) de la Constitution de 1946."
           ]
         },
@@ -63,10 +89,10 @@
         }
       ],
       "aRetenir": [
-        "Les droits fondamentaux sont universels : ils sont les mêmes pour tous.",
-        "Il existe 3 catégories de droits : liés à la personne, économiques et sociaux, et de troisième génération (collectifs).",
-        "Les 4 droits naturels sont : la liberté, la propriété, la sûreté et la résistance à l'oppression.",
-        "L'égalité devant la loi et l'égalité entre les femmes et les hommes sont des principes essentiels.",
+        "Les principaux droits du citoyen : voter, circuler, s'exprimer, croire ou ne pas croire, créer des associations, disposer de son corps, la propriété.",
+        "La discrimination est interdite : par exemple, refuser d'embaucher quelqu'un à cause de son origine, de sa religion ou de son sexe.",
+        "La parité femmes-hommes est garantie par l'article 1er de la Constitution, mais elle n'est pas encore atteinte partout (exemple : les salaires).",
+        "La sécurité sociale (créée en 1945) est financée par le travail et les cotisations : c'est un exemple de fraternité.",
         "Le Défenseur des droits et la justice aident les personnes dont les droits ne sont pas respectés."
       ]
     },
@@ -101,8 +127,9 @@
         },
         {
           "titre": "L'interruption volontaire de grossesse (IVG)",
-          "texte": "L'IVG (l'avortement) est le droit pour une femme d'arrêter une grossesse. C'est un droit pour toutes les femmes en France.",
+          "texte": "L'IVG (l'avortement) est le droit pour une femme d'arrêter une grossesse. C'est un droit pour toutes les femmes en France. Ce droit vient de la loi Veil du 17 janvier 1975, préparée par la ministre Simone Veil.",
           "points": [
+            "La loi Veil (17 janvier 1975) encadre l'IVG : c'est une mesure importante qui garantit à la femme le droit de disposer de son corps.",
             "L'IVG est possible pour toutes les femmes, sans limite d'âge.",
             "Une mineure n'a pas besoin de l'autorisation de ses parents, mais elle doit être accompagnée d'une personne majeure.",
             "L'IVG est remboursée à 100 % par l'Assurance Maladie.",
@@ -124,7 +151,7 @@
       "aRetenir": [
         "Chaque personne mérite le respect : la torture, l'esclavage et les traitements dégradants sont interdits.",
         "Chaque personne est libre de disposer de son corps : contraception et IVG sont des droits.",
-        "L'IVG est remboursée à 100 % et possible sans autorisation des parents pour les mineures.",
+        "La loi Veil du 17 janvier 1975 (préparée par Simone Veil) encadre l'IVG et garantit à la femme le droit de disposer de son corps.",
         "Le mariage exige le consentement libre des deux personnes : le mariage forcé est interdit.",
         "Dans le couple, chacun garde ses libertés : choisir son partenaire, divorcer, avoir ou non des enfants."
       ]
@@ -182,6 +209,8 @@
           "points": [
             "Droits du citoyen : voter, s'exprimer librement, s'engager, circuler librement.",
             "Devoirs du citoyen : respecter les lois, payer les impôts, remplir les obligations militaires.",
+            "La fonction publique (travailler pour l'État : école, hôpital, mairie...) est ouverte à tout citoyen.",
+            "C'est le ministre de l'Intérieur qui décide de la naturalisation (l'attribution de la nationalité française par décret).",
             "Les étrangers qui vivent en France n'ont pas tous ces droits (par exemple, ils ne votent pas aux élections françaises).",
             "La déchéance de nationalité : dans certains cas très graves, l'État peut retirer la nationalité française. La personne perd alors le droit de vote, le passeport français et la protection diplomatique."
           ]
@@ -192,7 +221,7 @@
         "La Constitution de la Vème République date du 4 octobre 1958.",
         "Le bloc de constitutionnalité regroupe la Constitution de 1958, la DDHC de 1789, le préambule de 1946 et la Charte de l'environnement de 2004.",
         "La Charte de l'environnement (2004) donne le droit à un environnement sain et le devoir de le protéger.",
-        "La citoyenneté donne des droits (voter) et des devoirs (respecter les lois, payer les impôts)."
+        "La citoyenneté donne des droits (voter) et des devoirs (respecter les lois, payer les impôts) ; c'est le ministre de l'Intérieur qui décide de la naturalisation."
       ]
     },
     {
@@ -200,6 +229,16 @@
       "titre": "Respecter la loi : les obligations des résidents et des citoyens",
       "resume": "La liberté s'arrête là où commence celle des autres. Toute personne qui vit en France doit respecter la loi, payer ses impôts et participer au vivre-ensemble.",
       "sections": [
+        {
+          "titre": "Les principaux devoirs du citoyen",
+          "texte": "En échange de ses droits, chaque citoyen a des devoirs (des obligations). Voici les principaux devoirs, souvent demandés à l'entretien de naturalisation.",
+          "points": [
+            "Payer les impôts : c'est l'argent des impôts qui finance les services publics (l'école, la police, la justice, les hôpitaux).",
+            "Respecter la loi et respecter les droits des autres.",
+            "Respecter l'environnement.",
+            "Défendre la patrie (le pays) si elle est menacée : en cas de conflit armé (une guerre), les citoyens de plus de 16 ans peuvent être appelés pour défendre la France."
+          ]
+        },
         {
           "titre": "Les limites des libertés individuelles",
           "texte": "La DDHC dit : « La liberté consiste à faire tout ce qui ne nuit pas à autrui » (qui ne fait pas de mal aux autres). Les libertés ne sont donc pas sans limite.",
@@ -249,14 +288,24 @@
             "Participer à la défense du pays : depuis la fin du service militaire (1997), les jeunes participent à la Journée Défense et Citoyenneté (JDC).",
             "Participer à la justice : un citoyen de plus de 23 ans, inscrit sur les listes électorales, peut être tiré au sort comme juré (citoyen qui juge) en cour d'assises."
           ]
+        },
+        {
+          "titre": "Comment exprimer son désaccord ?",
+          "texte": "Quand un citoyen n'est pas d'accord avec les décisions du gouvernement, il a le droit de le dire, mais toujours par des moyens pacifiques (sans violence) et légaux (autorisés par la loi).",
+          "points": [
+            "La manifestation : défiler dans la rue pour exprimer une opinion (elle doit être déclarée à l'avance).",
+            "La grève : arrêter le travail pour montrer un désaccord.",
+            "Voter, signer une pétition, s'engager dans une association ou un syndicat.",
+            "La violence n'est jamais un moyen acceptable d'exprimer un désaccord."
+          ]
         }
       ],
       "aRetenir": [
-        "La liberté consiste à faire tout ce qui ne nuit pas à autrui : les libertés ont des limites.",
+        "Les principaux devoirs : payer les impôts, respecter la loi et les droits des autres, respecter l'environnement, défendre la patrie si elle est menacée.",
+        "En cas de conflit armé, les citoyens de plus de 16 ans peuvent être appelés pour défendre la patrie.",
+        "Ce sont les impôts qui financent les services publics (école, police, justice, hôpitaux).",
         "Il existe 3 types d'infractions : contravention, délit, crime (du moins grave au plus grave).",
-        "Tout résident doit payer ses impôts, respecter la loi, aider une personne en danger et protéger l'environnement.",
-        "Les étrangers doivent avoir un titre de séjour valide.",
-        "Le citoyen français doit voter (devoir civique), participer à la JDC et peut être juré en cour d'assises."
+        "Pour exprimer son désaccord : la manifestation, la grève ou tout autre moyen pacifique et légal."
       ]
     },
     {

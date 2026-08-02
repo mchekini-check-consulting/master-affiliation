@@ -1,5 +1,5 @@
 // Rendu de la section « Cours » de l'espace membre : thématiques
-// officielles → fiches → lecteur de fiche.
+// officielles → fiches → lecteur pleine largeur avec sommaire.
 import { thematiques } from './donnees/cours/index.js';
 
 const conteneur = () => document.querySelector('[data-cours]');
@@ -25,23 +25,34 @@ export function rendreCours(segments) {
 function rendreAccueil() {
   const totalFiches = thematiques.reduce((n, t) => n + t.fiches.length, 0);
   conteneur().innerHTML = `
-    <h1>Cours</h1>
-    <p class="cours-intro">
-      Les ${totalFiches} fiches de cours suivent les 5 thématiques officielles
-      de la formation civique. Lisez-les à votre rythme : tout ce qu'il faut
-      savoir pour l'entretien y est expliqué simplement.
-    </p>
+    <header class="page-tete">
+      <div>
+        <h1>Cours</h1>
+        <p class="page-sous">
+          ${totalFiches} fiches organisées selon les 5 thématiques officielles de la
+          formation civique. Tout ce qu'il faut savoir pour l'entretien,
+          expliqué simplement.
+        </p>
+      </div>
+    </header>
     <div class="thematiques">
       ${thematiques
         .map(
           (t) => `
         <a class="thematique" href="#cours/${t.slug}">
-          <span class="thematique-ico" aria-hidden="true">${t.icone}</span>
-          <span class="thematique-corps">
-            <strong>${t.titre}</strong>
-            <span class="thematique-desc">${t.description}</span>
+          <div class="thematique-haut">
+            <span class="thematique-ico" aria-hidden="true">${t.icone}</span>
+            <span class="thematique-compte">${t.fiches.length} fiche${t.fiches.length > 1 ? 's' : ''}</span>
+          </div>
+          <strong>${t.titre}</strong>
+          <span class="thematique-desc">${t.description}</span>
+          <span class="thematique-apercu">
+            ${t.fiches
+              .slice(0, 3)
+              .map((f) => `<span>· ${f.titre}</span>`)
+              .join('')}
+            ${t.fiches.length > 3 ? `<span class="thematique-plus">+ ${t.fiches.length - 3} autres…</span>` : ''}
           </span>
-          <span class="thematique-compte">${t.fiches.length} fiche${t.fiches.length > 1 ? 's' : ''}</span>
         </a>`
         )
         .join('')}
@@ -54,29 +65,31 @@ function rendreAccueil() {
 function rendreThematique(thematique) {
   conteneur().innerHTML = `
     <nav class="cours-retour"><a href="#cours">← Toutes les thématiques</a></nav>
-    <h1><span aria-hidden="true">${thematique.icone}</span> ${thematique.titre}</h1>
-    <p class="cours-intro">${thematique.description}</p>
-    <ol class="fiches">
+    <header class="page-tete">
+      <div>
+        <h1><span aria-hidden="true">${thematique.icone}</span> ${thematique.titre}</h1>
+        <p class="page-sous">${thematique.description}</p>
+      </div>
+    </header>
+    <div class="fiches">
       ${thematique.fiches
         .map(
           (f, i) => `
-        <li>
-          <a class="fiche-lien" href="#cours/${thematique.slug}/${f.slug}">
-            <span class="fiche-num">${String(i + 1).padStart(2, '0')}</span>
-            <span class="fiche-corps">
-              <strong>${f.titre}</strong>
-              <span class="fiche-resume">${f.resume}</span>
-            </span>
-            <span class="fiche-fleche" aria-hidden="true">→</span>
-          </a>
-        </li>`
+        <a class="fiche-lien" href="#cours/${thematique.slug}/${f.slug}">
+          <span class="fiche-num">${String(i + 1).padStart(2, '0')}</span>
+          <span class="fiche-corps">
+            <strong>${f.titre}</strong>
+            <span class="fiche-resume">${f.resume}</span>
+          </span>
+          <span class="fiche-meta">${f.sections.length} parties <span aria-hidden="true">→</span></span>
+        </a>`
         )
         .join('')}
-    </ol>
+    </div>
   `;
 }
 
-/* ---------- Niveau 3 : lecteur de fiche ---------- */
+/* ---------- Niveau 3 : lecteur de fiche (pleine largeur + sommaire) ---------- */
 
 function rendreFiche(thematique, fiche) {
   const index = thematique.fiches.indexOf(fiche);
@@ -87,41 +100,65 @@ function rendreFiche(thematique, fiche) {
     <nav class="cours-retour">
       <a href="#cours/${thematique.slug}">← ${thematique.titre}</a>
     </nav>
-    <article class="fiche">
-      <p class="fiche-etiquette">${thematique.icone} ${thematique.titre} · fiche ${index + 1} / ${thematique.fiches.length}</p>
-      <h1>${fiche.titre}</h1>
-      <p class="fiche-chapeau">${fiche.resume}</p>
+    <div class="fiche-layout">
+      <article class="fiche">
+        <p class="fiche-etiquette">${thematique.icone} ${thematique.titre} · fiche ${index + 1} / ${thematique.fiches.length}</p>
+        <h1>${fiche.titre}</h1>
+        <p class="fiche-chapeau">${fiche.resume}</p>
 
-      ${fiche.sections
-        .map(
-          (s) => `
-        <section class="fiche-section">
-          <h2>${s.titre}</h2>
-          ${s.texte ? `<p>${s.texte}</p>` : ''}
-          ${s.points ? `<ul>${s.points.map((p) => `<li>${p}</li>`).join('')}</ul>` : ''}
-        </section>`
-        )
-        .join('')}
+        ${fiche.sections
+          .map(
+            (s, i) => `
+          <section class="fiche-section" data-cible="s${i}">
+            <h2><span class="fiche-section-num">${i + 1}</span> ${s.titre}</h2>
+            ${s.texte ? `<p>${s.texte}</p>` : ''}
+            ${s.points ? `<ul>${s.points.map((p) => `<li>${p}</li>`).join('')}</ul>` : ''}
+          </section>`
+          )
+          .join('')}
 
-      <aside class="a-retenir">
-        <h2>✅ À retenir</h2>
-        <ul>${fiche.aRetenir.map((p) => `<li>${p}</li>`).join('')}</ul>
+        <nav class="fiche-nav">
+          ${
+            precedente
+              ? `<a class="fiche-nav-lien" href="#cours/${thematique.slug}/${precedente.slug}"><small>Fiche précédente</small>← ${precedente.titre}</a>`
+              : '<span></span>'
+          }
+          ${
+            suivante
+              ? `<a class="fiche-nav-lien fiche-nav-lien--suivant" href="#cours/${thematique.slug}/${suivante.slug}"><small>Fiche suivante</small>${suivante.titre} →</a>`
+              : `<a class="fiche-nav-lien fiche-nav-lien--suivant" href="#cours/${thematique.slug}"><small>Thématique terminée</small>Retour au sommaire ✓</a>`
+          }
+        </nav>
+      </article>
+
+      <aside class="fiche-cote">
+        <nav class="sommaire-fiche">
+          <p class="cote-titre">Dans cette fiche</p>
+          ${fiche.sections
+            .map(
+              (s, i) =>
+                `<button type="button" data-aller="s${i}"><span>${i + 1}</span>${s.titre}</button>`
+            )
+            .join('')}
+        </nav>
+        <div class="a-retenir">
+          <p class="cote-titre">✅ À retenir</p>
+          <ul>${fiche.aRetenir.map((p) => `<li>${p}</li>`).join('')}</ul>
+        </div>
       </aside>
-
-      <nav class="fiche-nav">
-        ${
-          precedente
-            ? `<a class="fiche-nav-lien" href="#cours/${thematique.slug}/${precedente.slug}">← ${precedente.titre}</a>`
-            : '<span></span>'
-        }
-        ${
-          suivante
-            ? `<a class="fiche-nav-lien fiche-nav-lien--suivant" href="#cours/${thematique.slug}/${suivante.slug}">${suivante.titre} →</a>`
-            : `<a class="fiche-nav-lien fiche-nav-lien--suivant" href="#cours/${thematique.slug}">Fin de la thématique ✓</a>`
-        }
-      </nav>
-    </article>
+    </div>
   `;
-  conteneur().closest('.contenu').scrollTop = 0;
+
+  // Sommaire : défilement doux vers la section (sans toucher au hash de navigation)
+  conteneur()
+    .querySelectorAll('[data-aller]')
+    .forEach((bouton) => {
+      bouton.addEventListener('click', () => {
+        conteneur()
+          .querySelector(`[data-cible="${bouton.dataset.aller}"]`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
   window.scrollTo(0, 0);
 }

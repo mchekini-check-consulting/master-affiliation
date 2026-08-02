@@ -156,6 +156,16 @@
           ]
         },
         {
+          "titre": "La Sécurité sociale",
+          "texte": "La Sécurité sociale est le grand système de protection sociale de la France. Elle a été créée en 1945, juste après la Seconde Guerre mondiale. Elle protège les habitants contre les risques de la vie : la maladie, les accidents, la maternité, la vieillesse, le chômage.",
+          "points": [
+            "Elle est financée par les cotisations (sommes d'argent versées chaque mois) des entreprises et des travailleurs.",
+            "C'est un système de solidarité : ceux qui travaillent aujourd'hui financent les soins et les retraites de tous.",
+            "La Sécurité sociale est souvent citée comme un exemple concret de la fraternité, l'une des trois valeurs de la devise de la République.",
+            "L'Assurance maladie, qui rembourse les soins, est l'une des branches de la Sécurité sociale."
+          ]
+        },
+        {
           "titre": "L'Assurance maladie et la carte Vitale",
           "texte": "L'inscription à l'Assurance maladie est obligatoire. Les frais de santé sont financés en grande partie par les cotisations sociales des travailleurs : c'est un système de solidarité.",
           "points": [
@@ -204,6 +214,7 @@
         }
       ],
       "aRetenir": [
+        "La Sécurité sociale, créée en 1945, est financée par les cotisations des entreprises et des travailleurs : c'est un exemple de fraternité.",
         "Le médecin traitant est le premier interlocuteur : il coordonne le parcours de soins.",
         "La carte Vitale prouve les droits à l'Assurance maladie ; le numéro de sécurité sociale a 15 chiffres.",
         "La PUMa garantit la prise en charge des frais de santé à toute personne résidant en France de façon stable et régulière (inscription à la CPAM après 3 mois de résidence).",
@@ -338,6 +349,8 @@
           "titre": "L'école en France",
           "texte": "Tous les enfants de 3 à 16 ans qui habitent en France doivent aller à l'école, qu'ils soient français ou étrangers. L'école publique est gratuite et laïque, et la cantine est accessible à tous.",
           "points": [
+            "L'instruction est obligatoire en France depuis la loi Jules Ferry du 28 mars 1882, qui a rendu l'école publique gratuite, laïque et obligatoire.",
+            "Aujourd'hui, l'instruction est obligatoire de 3 à 16 ans (l'âge de début est passé de 6 à 3 ans en 2019).",
             "École maternelle (3-6 ans) : petite, moyenne et grande section ; elle favorise l'apprentissage du français et de la vie collective.",
             "École élémentaire (6-11 ans) : CP, CE1, CE2, CM1, CM2.",
             "Collège (11-15 ans) : de la 6e à la 3e ; diplôme : le brevet (DNB).",
@@ -361,8 +374,86 @@
         "La Convention internationale des droits de l'enfant (1989) protège les enfants ; l'intérêt supérieur de l'enfant passe avant tout.",
         "L'autorité parentale est exercée par les deux parents, même séparés ; toute violence physique ou psychologique envers l'enfant est interdite.",
         "Seul un tribunal peut retirer l'autorité parentale, en cas de danger pour l'enfant.",
-        "L'école est obligatoire de 3 à 16 ans pour tous les enfants vivant en France, gratuite et laïque.",
+        "L'école est obligatoire de 3 à 16 ans pour tous les enfants vivant en France, gratuite et laïque ; l'instruction est obligatoire depuis la loi Jules Ferry du 28 mars 1882.",
         "Le dispositif OEPRE aide gratuitement les parents étrangers : français, valeurs de la République et fonctionnement de l'école."
+      ]
+    },
+    {
+      "slug": "reussir-son-entretien",
+      "titre": "Réussir son entretien de naturalisation",
+      "resume": "L'entretien d'assimilation (vérification de l'intégration) a lieu en préfecture. Un agent pose des questions sur vos motivations, votre vie en France, les valeurs de la République et la culture française. Une bonne préparation fait la différence.",
+      "sections": [
+        {
+          "titre": "À quoi ressemble l'entretien ?",
+          "texte": "L'entretien se déroule en préfecture, avec un agent de l'État. C'est un échange (une conversation) qui dure en général entre 20 minutes et 1 heure. L'agent vérifie votre niveau de français, votre connaissance de la France et votre adhésion (accord sincère) aux principes et valeurs de la République.",
+          "points": [
+            "L'entretien est individuel : vous êtes seul face à l'agent (parfois deux agents).",
+            "Il n'y a pas de liste officielle de questions : chaque entretien est différent, mais les grands thèmes reviennent souvent.",
+            "L'agent évalue aussi votre façon de vous exprimer en français : parlez calmement, avec des phrases simples et claires.",
+            "À la fin, un compte rendu (résumé écrit) de l'entretien est ajouté à votre dossier."
+          ]
+        },
+        {
+          "titre": "Les questions sur vos motivations",
+          "texte": "La question « Pourquoi voulez-vous devenir français ? » est presque toujours posée. Il faut préparer une réponse personnelle et sincère, avec vos propres mots. Une réponse apprise par cœur et récitée fait mauvaise impression.",
+          "points": [
+            "Parlez de votre attachement aux valeurs de la République : liberté, égalité, fraternité, laïcité.",
+            "Expliquez que votre vie est construite en France : travail, amis, famille, habitudes, projets d'avenir.",
+            "Montrez votre intégration : vous vous sentez chez vous en France et vous participez à la vie de la société.",
+            "Exprimez votre envie de participer pleinement à la vie citoyenne : voter, vous engager, vous investir dans la société.",
+            "Préparez aussi des réponses aux questions proches : « Pourquoi êtes-vous venu en France ? », « Qu'avez-vous trouvé en France ? »."
+          ]
+        },
+        {
+          "titre": "Les questions sur votre parcours et votre vie quotidienne",
+          "texte": "L'agent veut comprendre qui vous êtes et comment vous vivez en France. Il pose des questions sur votre parcours (études, travail), votre famille et vos activités de tous les jours.",
+          "points": [
+            "Votre parcours : depuis quand vous êtes en France, pourquoi vous êtes venu, vos études, votre métier actuel.",
+            "Votre vie quotidienne : vos activités, vos loisirs (sport, lecture, cinéma, musique, sorties...), vos vacances et week-ends.",
+            "Votre entourage : vos amis, vos collègues, votre famille en France.",
+            "La vie de couple : l'agent peut demander comment sont partagées les tâches ménagères ; en France, l'égalité entre les femmes et les hommes vaut aussi à la maison.",
+            "Soyez concret : donner des exemples réels de votre vie est plus convaincant que des phrases générales."
+          ]
+        },
+        {
+          "titre": "Les questions sur la République, l'histoire et la culture",
+          "texte": "L'agent vérifie que vous connaissez les bases de la France : ses valeurs, ses symboles, son histoire et sa culture. Ce sont les thèmes des autres fiches de NaturaPrep.",
+          "points": [
+            "Les valeurs et principes : liberté, égalité, fraternité, laïcité, démocratie ; les droits et les devoirs du citoyen.",
+            "Les symboles : le drapeau tricolore, La Marseillaise, Marianne, la devise, le 14 juillet.",
+            "Les institutions : le Président, le Premier ministre, le Parlement (Assemblée nationale et Sénat), les élections.",
+            "L'histoire : les grandes dates (la Révolution de 1789, l'abolition de l'esclavage en 1848, la loi de laïcité de 1905, les deux guerres mondiales, la Ve République depuis 1958).",
+            "La culture : quelques écrivains (Victor Hugo, Molière), artistes, monuments (tour Eiffel, château de Versailles) et spécialités régionales."
+          ]
+        },
+        {
+          "titre": "Les questions sur votre commune et votre région",
+          "texte": "L'agent pose souvent des questions sur l'endroit où vous habitez, pour vérifier que vous connaissez votre environnement proche.",
+          "points": [
+            "Connaissez le nom de votre commune, de votre maire, de votre département et de votre région.",
+            "Renseignez-vous sur votre ville : ses quartiers, ses lieux importants (mairie, bibliothèque, parcs, monuments), ses équipements culturels et sportifs.",
+            "Sachez situer votre ville : les communes voisines, la grande ville la plus proche, le fleuve ou la rivière s'il y en a un.",
+            "Ces informations se trouvent facilement sur le site internet de votre mairie."
+          ]
+        },
+        {
+          "titre": "Bien se préparer : les conseils et le point actualité",
+          "texte": "La préparation est la clé de la réussite. Révisez les fiches, entraînez-vous à répondre à voix haute, et mettez à jour vos connaissances juste avant le grand jour.",
+          "points": [
+            "Préparez vos réponses personnelles à l'avance, mais ne les récitez pas : l'agent cherche la sincérité.",
+            "Entraînez-vous à parler de vous en français : votre travail, vos loisirs, vos motivations.",
+            "⚠️ IMPORTANT — À vérifier juste avant l'entretien car ça change : le nom du Premier ministre et des principaux ministres, les dernières grandes lois votées, les prochaines élections, l'actualité récente (événements marquants en France).",
+            "Le jour de l'entretien : arrivez en avance avec vos documents, habillez-vous correctement, restez calme et poli.",
+            "Si vous ne comprenez pas une question, demandez poliment de la répéter : c'est mieux que de répondre à côté."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "L'entretien d'assimilation a lieu en préfecture : c'est une conversation en français sur vous, la France et les valeurs de la République.",
+        "Préparez une réponse personnelle et sincère à la question « Pourquoi voulez-vous devenir français ? » : valeurs, intégration, vie construite en France, envie de participer à la vie citoyenne.",
+        "Sachez parler de votre vie quotidienne : travail, loisirs, activités, entourage.",
+        "Connaissez votre commune : le nom de votre maire, votre département et votre région.",
+        "Juste avant l'entretien, vérifiez l'actualité : le nom du Premier ministre et des ministres, les dernières lois, les prochaines élections."
       ]
     }
   ]
