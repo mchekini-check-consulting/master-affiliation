@@ -44,6 +44,7 @@ services:
       - fidexil-front
       - my-way-front
       - qualiopilote-front
+      - natura-prep
 
   # ==========================================================
   # Certbot — émission et renouvellement des certificats TLS
@@ -334,6 +335,61 @@ services:
     depends_on:
       - qualiopilote-back
 
+  # ==========================================================
+  # NaturaPrep — Préparation Naturalisation & Blog
+  #   reverse-proxy -> natura-prep:80 -> (/api) natura-prep-back:8080
+  #                                   -> natura-prep-db:5432
+  # ==========================================================
+
+  # --- Base de données -------------------------------------
+  natura-prep-db:
+    image: postgres:16-alpine
+    container_name: natura-prep-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: natura_prep
+      POSTGRES_USER: natura_prep
+      POSTGRES_PASSWORD: ${NATURA_PREP_DB_PASSWORD:-changeme}
+    networks:
+      - natura-prep-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U natura_prep -d natura_prep"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - natura-prep-db-data:/var/lib/postgresql/data
+
+  # --- Backend Spring Boot (API) ---------------------------
+  natura-prep-back:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/natura-prep-back:${NATURA_PREP_BACK_TAG:-latest}
+    build: ./natura-prep/back
+    container_name: natura-prep-back
+    restart: unless-stopped
+    environment:
+      DB_HOST: natura-prep-db
+      DB_PORT: "5432"
+      DB_NAME: natura_prep
+      DB_USERNAME: natura_prep
+      DB_PASSWORD: ${NATURA_PREP_DB_PASSWORD:-changeme}
+    networks:
+      - natura-prep-net
+    depends_on:
+      natura-prep-db:
+        condition: service_healthy
+
+  # --- Frontend (nginx, blog SEO) ---------------------------
+  natura-prep:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/natura-prep:${NATURA_PREP_TAG:-latest}
+    build: ./natura-prep/front
+    container_name: natura-prep
+    restart: unless-stopped
+    networks:
+      - proxy                # joignable par le reverse proxy
+      - natura-prep-net      # pour proxifier /api vers le backend
+    depends_on:
+      - natura-prep-back
+
 # ==========================================================
 # Réseaux
 #   default      : reverse proxy <-> sites de ce projet
@@ -356,6 +412,8 @@ networks:
     name: hi-tech-academy-net
   qualiopilote-net:
     name: qualiopilote-net
+  natura-prep-net:
+    name: natura-prep-net
 
 volumes:
   # Certificats Let's Encrypt (écrits par certbot, lus par le reverse proxy)
@@ -372,4 +430,6 @@ volumes:
   my-way-documents:
   # Base H2 d'Échecs360 (comptes utilisateurs)
   echecs360-data:
+  # Données PostgreSQL de NaturaPrep
+  natura-prep-db-data:
 #   fidexil-db-data:                          # persistance : à activer plus tard
