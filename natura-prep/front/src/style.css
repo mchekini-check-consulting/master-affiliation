@@ -207,9 +207,9 @@ h3 {
   padding-top: 80px;
   padding-bottom: 64px;
   display: grid;
-  /* Le texte prend plus de largeur que dans la maquette d'origine */
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 36px;
+  /* Le texte garde de l'aisance, la vidéo prend une vraie moitié */
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
   align-items: center;
 }
 
@@ -272,8 +272,9 @@ h3 {
 }
 
 .hero-video {
-  width: calc(100% + 44px);
-  margin-right: -44px;
+  width: calc(100% + 80px);
+  margin-right: -80px;
+  aspect-ratio: 16 / 9;
   display: block;
   border-radius: 18px;
   border: 1px solid var(--bordure);
@@ -284,7 +285,7 @@ h3 {
    le son s'active au clic (geste utilisateur requis) */
 .hero-son {
   position: absolute;
-  right: -30px;
+  right: -66px;
   bottom: 14px;
   display: inline-flex;
   align-items: center;
