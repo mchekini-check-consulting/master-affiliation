@@ -1,0 +1,279 @@
+{
+  "slug": "principes-et-valeurs",
+  "titre": "Principes et valeurs de la République",
+  "icone": "🇫🇷",
+  "description": "Cette thématique présente les valeurs fondamentales de la République française : la devise, les symboles, la laïcité, la langue française et le contrat d'engagement républicain. Ce sont des connaissances essentielles pour l'examen civique.",
+  "fiches": [
+    {
+      "slug": "la-devise-de-la-republique",
+      "titre": "La devise de la République : Liberté, Égalité, Fraternité",
+      "resume": "La devise de la France est « Liberté, Égalité, Fraternité ». Elle exprime les trois grandes valeurs de la République et elle est inscrite dans la Constitution.",
+      "sections": [
+        {
+          "titre": "Qu'est-ce que la devise ?",
+          "texte": "La devise (la phrase qui représente le pays) de la République française est « Liberté, Égalité, Fraternité ». Elle est née pendant la Révolution française de 1789. Elle est devenue officielle en 1848, sous la Deuxième République. Aujourd'hui, elle est inscrite dans la Constitution de 1958.",
+          "points": [
+            "On la voit sur les bâtiments publics : mairies, écoles, tribunaux.",
+            "On la trouve sur des pièces de monnaie, des timbres et des documents officiels.",
+            "Elle est rappelée lors des fêtes nationales, comme le 14 juillet."
+          ]
+        },
+        {
+          "titre": "La liberté",
+          "texte": "La liberté signifie que chaque personne peut penser, s'exprimer et vivre comme elle le souhaite. Il y a une seule limite : ne pas empêcher la liberté des autres. Ce droit vient de la Déclaration des droits de l'homme et du citoyen de 1789. La liberté s'applique à tout le monde, quelle que soit son origine ou sa religion.",
+          "points": [
+            "Libertés individuelles : liberté de religion, liberté d'expression, liberté de choisir son mode de vie, liberté de se déplacer.",
+            "Libertés collectives : droit de se rassembler, de manifester, d'adhérer à un syndicat (organisation qui défend les travailleurs).",
+            "L'État protège les libertés et fixe des limites pour que les libertés de chacun soient respectées."
+          ]
+        },
+        {
+          "titre": "L'égalité",
+          "texte": "L'égalité est un principe fondamental inscrit dans la Constitution et dans la Déclaration des droits de l'homme et du citoyen. La loi est la même pour toutes les personnes. Chacun a accès aux services publics (santé, éducation, sécurité) sans discrimination. Des traitements adaptés restent possibles : par exemple, des tarifs réduits pour les étudiants, les chômeurs ou les personnes âgées.",
+          "points": [
+            "Égalité devant la loi : la loi est la même pour tous.",
+            "Égalité des droits civiques : tous les citoyens français peuvent voter et se présenter aux élections.",
+            "Égalité des droits sociaux : accès à l'éducation, à la santé, au logement et à l'emploi."
+          ]
+        },
+        {
+          "titre": "L'égalité entre les femmes et les hommes",
+          "texte": "Depuis la Constitution de 1946, la loi garantit à la femme des droits égaux à ceux de l'homme dans tous les domaines : éducation, travail, santé, vie politique. Des inégalités existent encore : les femmes gagnent souvent des salaires plus bas et occupent moins de postes de direction. Une loi de 2000 sur la parité (l'égalité en nombre) oblige les partis politiques à présenter autant de candidates que de candidats.",
+          "points": [
+            "Les femmes et les hommes ont les mêmes droits et les mêmes devoirs.",
+            "Les partis politiques qui ne respectent pas la parité paient une amende (une somme d'argent en punition).",
+            "Aucune femme n'a encore été présidente de la République française."
+          ]
+        },
+        {
+          "titre": "La lutte contre les discriminations",
+          "texte": "Il y a discrimination quand une personne est moins bien traitée qu'une autre à cause de son origine, son sexe, son âge, son handicap, sa religion, son apparence physique ou son orientation sexuelle. La loi française interdit la discrimination selon plus de 26 critères. Les sanctions sont des amendes, et même la prison en cas de récidive (quand la personne recommence).",
+          "points": [
+            "L'État lutte contre le racisme, l'antisémitisme (haine envers les Juifs), le sexisme et les discriminations anti-LGBT+.",
+            "La discrimination est interdite dans l'emploi, le logement, l'éducation et l'accès aux services.",
+            "La discrimination peut être directe (refus clair) ou indirecte (une règle qui semble neutre mais qui désavantage certaines personnes)."
+          ]
+        },
+        {
+          "titre": "La fraternité",
+          "texte": "La fraternité est la solidarité (l'entraide) entre les citoyens. Elle permet de vivre ensemble et de former une société. Elle apparaît dans la devise en 1848 et figure dans les Constitutions de 1946 et de 1958. Chacun peut aussi s'engager grâce à la liberté d'association, créée par la loi de 1901 : bénévolat (aider sans être payé), syndicats, vie politique. Pour créer une association, il faut au moins deux personnes, un objectif non lucratif (sans chercher à gagner de l'argent), des statuts (règles de fonctionnement) et une déclaration à la préfecture ou en ligne.",
+          "points": [
+            "Solidarité collective : aides organisées par l'État, financées par les impôts et les cotisations (Sécurité sociale, RSA, aide au logement).",
+            "Solidarité entre générations : les personnes qui travaillent financent les retraites.",
+            "Engagement associatif : aide alimentaire, soutien scolaire, aide aux réfugiés, protection de l'environnement."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La devise de la France est « Liberté, Égalité, Fraternité » ; elle est officielle depuis 1848 et inscrite dans la Constitution de 1958.",
+        "La liberté de chacun s'arrête là où commence celle des autres.",
+        "La loi est la même pour tous, et la discrimination est interdite et punie par la loi.",
+        "Les femmes et les hommes ont les mêmes droits dans tous les domaines.",
+        "La fraternité, c'est la solidarité entre les citoyens : Sécurité sociale, retraites, associations, bénévolat."
+      ]
+    },
+    {
+      "slug": "les-symboles-de-la-republique",
+      "titre": "Les symboles de la République",
+      "resume": "La République française a des symboles officiels : le drapeau tricolore, La Marseillaise, Marianne et la fête nationale du 14 juillet. Le coq est un symbole non officiel.",
+      "sections": [
+        {
+          "titre": "Le drapeau tricolore",
+          "texte": "Le drapeau français a trois bandes verticales : bleu, blanc, rouge. Le bleu et le rouge sont les couleurs de Paris, le blanc était la couleur du roi. Ce mélange symbolise l'union du roi et du peuple pendant la Révolution de 1789. Le drapeau devient officiel en 1794 et revient définitivement en 1830. Il est interdit de faire outrage au drapeau (le détruire ou l'utiliser de façon insultante en public).",
+          "points": [
+            "On le voit devant les bâtiments publics, aux cérémonies officielles et aux compétitions sportives.",
+            "En 1789, les gardes nationaux de Paris portent une cocarde (insigne rond) aux couleurs de la ville ; le général La Fayette y ajoute le blanc du roi."
+          ]
+        },
+        {
+          "titre": "L'hymne national : La Marseillaise",
+          "texte": "L'hymne national (le chant officiel du pays) est La Marseillaise. Il est composé en 1792 comme « Chant de guerre pour l'armée du Rhin », puis chanté par des soldats venus de Marseille, d'où son nom. Il devient définitivement l'hymne national en 1879, sous la Troisième République. Il représente la liberté, la résistance et l'unité du peuple français.",
+          "points": [
+            "On l'entend lors des cérémonies officielles, comme le défilé du 14 juillet.",
+            "On l'entend aussi lors des événements sportifs internationaux et des grands rassemblements nationaux."
+          ]
+        },
+        {
+          "titre": "Marianne",
+          "texte": "Marianne est une figure de femme qui représente la République. Elle est apparue pendant la Révolution française. Son prénom, courant dans le peuple, rappelle que la République est fondée sur la volonté du peuple et la démocratie. Elle porte le bonnet phrygien, symbole de liberté porté autrefois par les esclaves libérés dans l'Antiquité.",
+          "points": [
+            "Son buste (sa statue) est présent dans toutes les mairies.",
+            "Elle figure sur les timbres, les pièces de monnaie et les logos de l'État.",
+            "Des actrices célèbres (Brigitte Bardot, Catherine Deneuve, Laetitia Casta) l'ont incarnée, ce qui a modernisé son image."
+          ]
+        },
+        {
+          "titre": "La fête nationale : le 14 juillet",
+          "texte": "Le 14 juillet est la fête nationale de la France depuis 1880. Cette date rappelle deux événements : la prise de la Bastille le 14 juillet 1789 (le début de la Révolution française, la révolte du peuple contre l'Ancien Régime) et la Fête de la Fédération du 14 juillet 1790, qui a réuni les représentants de toutes les provinces à Paris.",
+          "points": [
+            "Un défilé militaire a lieu sur les Champs-Élysées, en présence du président de la République.",
+            "Partout en France, il y a des feux d'artifice, des concerts et des bals populaires."
+          ]
+        },
+        {
+          "titre": "Le coq, symbole non officiel",
+          "texte": "Le coq est un symbole non officiel de la France. En latin, le mot « gallus » signifie à la fois « Gaulois » et « coq » : c'est l'origine de ce symbole. D'abord moqueur, il est devenu un signe de fierté et de courage. On le voit sur les maillots des équipes sportives nationales, sur des monuments et dans la communication de la France (par exemple le logo de la French Tech).",
+          "points": [
+            "Contrairement au drapeau, à Marianne et à la devise, le coq n'a pas de statut officiel.",
+            "Il reste pourtant un symbole national fort, surtout dans le sport."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "Le drapeau français est bleu, blanc, rouge, en trois bandes verticales.",
+        "L'hymne national est La Marseillaise, composée en 1792 et devenue hymne officiel en 1879.",
+        "Marianne représente la République ; elle porte le bonnet phrygien, symbole de liberté.",
+        "La fête nationale est le 14 juillet ; elle rappelle la prise de la Bastille (1789) et la Fête de la Fédération (1790).",
+        "Le coq est un symbole de la France, mais il n'est pas officiel."
+      ]
+    },
+    {
+      "slug": "la-laicite",
+      "titre": "La laïcité",
+      "resume": "La laïcité garantit la liberté de croire ou de ne pas croire. L'État est neutre et séparé des religions depuis la loi de 1905. C'est un principe inscrit dans la Constitution.",
+      "sections": [
+        {
+          "titre": "Définition de la laïcité",
+          "texte": "La laïcité signifie que chaque personne est libre d'avoir une religion, de ne pas en avoir, d'en changer ou de ne plus en avoir. C'est la liberté de conscience. Personne ne peut être forcé de suivre une religion. L'article 1 de la Constitution de 1958 dit que la France est « une République indivisible, laïque, démocratique et sociale ». La laïcité n'est donc pas une opinion : c'est un principe constitutionnel.",
+          "points": [
+            "L'État ne reconnaît aucune religion officielle.",
+            "L'État ne finance pas les cultes (les religions) et ne paie pas les religieux.",
+            "Les religions n'influencent pas les décisions politiques."
+          ]
+        },
+        {
+          "titre": "L'histoire de la laïcité",
+          "texte": "La laïcité s'est construite progressivement sur plus d'un siècle. Avant 1905, l'Église catholique avait une grande place dans la société française, notamment dans l'éducation.",
+          "points": [
+            "1789 : la Déclaration des droits de l'homme et du citoyen crée la liberté de conscience et de religion.",
+            "1882 : l'école publique devient obligatoire, gratuite et sans enseignement religieux (lois de Jules Ferry).",
+            "1905 : la loi de séparation des Églises et de l'État. L'État devient indépendant des religions et ne les finance plus.",
+            "2004 : loi qui interdit les signes religieux ostensibles (très visibles) à l'école publique.",
+            "2021 : une loi renforce le respect de la laïcité dans les services publics et les associations."
+          ]
+        },
+        {
+          "titre": "La laïcité dans l'espace public",
+          "texte": "Dans l'espace public (les lieux ouverts à tous : rues, marchés, magasins, transports), chacun peut montrer sa religion : porter un signe religieux (voile, kippa, croix, turban), participer à des célébrations, exprimer ses convictions. Mais depuis la loi du 11 octobre 2010, il est interdit de cacher son visage dans l'espace public (voile intégral, cagoule, masque), sauf dans les lieux de culte. Les manifestations religieuses peuvent être limitées en cas de trouble à l'ordre public.",
+          "points": [
+            "La liberté religieuse est garantie dans la rue et les lieux ouverts à tous.",
+            "Il est interdit de dissimuler (cacher) son visage dans l'espace public depuis 2010.",
+            "L'ordre public et la sécurité passent avant les pratiques religieuses."
+          ]
+        },
+        {
+          "titre": "La laïcité dans les services publics et au travail",
+          "texte": "Les agents publics (les personnes qui travaillent pour l'État : fonctionnaires, enseignants, etc.) doivent être neutres : ils ne peuvent pas montrer leurs convictions religieuses, politiques ou philosophiques, ni porter de signes religieux au travail. Les usagers (les personnes qui utilisent les services publics) peuvent porter des signes religieux, mais ils ne peuvent pas demander une adaptation du service pour des raisons religieuses. Dans les entreprises privées, les salariés peuvent montrer leur religion, mais l'employeur peut fixer des limites pour des raisons d'hygiène, de sécurité ou de bon fonctionnement.",
+          "points": [
+            "Agents publics : neutralité stricte, pas de signes religieux au travail.",
+            "Usagers des services publics : signes religieux autorisés, mais pas d'adaptation du service pour motif religieux.",
+            "Secteur privé : plus de liberté, avec des limites possibles (hygiène, sécurité).",
+            "La Charte de la laïcité dans les services publics rappelle ces droits et obligations."
+          ]
+        },
+        {
+          "titre": "La laïcité à l'école",
+          "texte": "L'école publique est neutre : elle permet à chaque élève de penser librement et de se construire ses propres opinions. Les enseignants ne montrent pas leurs convictions religieuses ou politiques. Il est interdit de porter des signes ou des vêtements qui montrent ostensiblement (de façon très visible) une appartenance religieuse. Il n'y a pas de cours de religion à l'école publique, mais l'histoire des religions peut être étudiée. Un élève ne peut pas refuser un cours pour des raisons religieuses. La Charte de la laïcité à l'école explique ces règles aux professeurs, aux élèves et aux parents.",
+          "points": [
+            "La laïcité protège les élèves de tout prosélytisme et de toute pression.",
+            "Elle garantit l'égalité entre les filles et les garçons et l'accès à une culture commune.",
+            "Dans les écoles privées sous contrat, le programme est le même ; des cours de religion facultatifs peuvent exister."
+          ]
+        },
+        {
+          "titre": "Prosélytisme et blasphème",
+          "texte": "Le prosélytisme, c'est chercher à convaincre les autres de choisir sa religion. Il est autorisé grâce à la liberté religieuse, mais il ne doit jamais forcer quelqu'un : le harcèlement religieux est interdit. Le prosélytisme est interdit à l'école publique, dans les services publics et les hôpitaux publics. Le blasphème, c'est critiquer ou se moquer d'une religion. En France, le blasphème n'est pas interdit : on peut critiquer une religion ou faire des caricatures. Mais insulter des personnes à cause de leur religion, ou inciter (pousser) à la haine ou à la violence, est puni par la loi.",
+          "points": [
+            "On peut critiquer une religion (les idées), mais pas insulter ou menacer les personnes.",
+            "L'incitation à la haine, à la violence ou à la discrimination est un délit (une infraction punie par la loi).",
+            "Personne ne peut être forcé de croire ou de pratiquer une religion."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La laïcité garantit la liberté de croire, de ne pas croire et de changer de religion.",
+        "La loi de 1905 sépare les Églises et l'État : l'État est neutre et ne finance aucune religion.",
+        "L'article 1 de la Constitution : la France est une République indivisible, laïque, démocratique et sociale.",
+        "Les agents publics doivent être neutres ; à l'école publique, les signes religieux ostensibles sont interdits (loi de 2004).",
+        "Le blasphème n'est pas interdit en France, mais la haine et les insultes contre les personnes sont punies."
+      ]
+    },
+    {
+      "slug": "la-langue-de-la-republique",
+      "titre": "La langue de la République",
+      "resume": "Le français est la langue officielle de la France. La Constitution dit : « La langue de la République est le français ». La langue commune garantit l'égalité et l'unité du pays.",
+      "sections": [
+        {
+          "titre": "Le français, langue officielle",
+          "texte": "Depuis 1992, la Constitution dit que « la langue de la République est le français ». Le français est la seule langue officielle. Il est utilisé dans l'éducation, l'administration, la justice et la vie publique.",
+          "points": [
+            "Dès 1539, le français a remplacé le latin dans les documents administratifs.",
+            "Parler français permet d'accéder aux droits, de travailler et de participer à la vie de la société."
+          ]
+        },
+        {
+          "titre": "Une langue qui évolue",
+          "texte": "Le français s'enrichit sans cesse de mots venus d'autres langues. Par exemple : « banque » vient de l'italien, « week-end » de l'anglais, « chiffre » de l'arabe."
+        },
+        {
+          "titre": "Les langues régionales",
+          "texte": "En France, on parle aussi des langues régionales : le breton, le corse, l'alsacien, le basque, le créole. Elles ne sont pas officielles, mais elles font partie du patrimoine français (l'héritage culturel du pays). Elles peuvent être enseignées à l'école de manière facultative (non obligatoire)."
+        },
+        {
+          "titre": "Le rôle de la langue commune",
+          "texte": "Une langue commune garantit l'égalité entre les personnes : tout le monde peut comprendre les lois, l'école et l'administration. Elle renforce la cohésion nationale (le fait de vivre ensemble, unis)."
+        }
+      ],
+      "aRetenir": [
+        "La langue de la République est le français (Constitution, 1992).",
+        "Le français est la seule langue officielle : école, administration, justice.",
+        "Les langues régionales (breton, corse, basque, alsacien, créole) font partie du patrimoine, mais ne sont pas officielles.",
+        "La langue commune garantit l'égalité d'accès aux droits et l'unité du pays."
+      ]
+    },
+    {
+      "slug": "le-contrat-dengagement-republicain",
+      "titre": "Le contrat d'engagement à respecter les principes de la République",
+      "resume": "Toute personne étrangère qui demande un titre de séjour doit signer un contrat d'engagement à respecter les principes de la République. Sans signature, le titre de séjour ne peut pas être accordé.",
+      "sections": [
+        {
+          "titre": "Qu'est-ce que ce contrat ?",
+          "texte": "Le contrat d'engagement républicain est un document obligatoire. Toute personne étrangère doit le signer au moment de la demande d'un titre de séjour (le document qui autorise à vivre en France). En le signant, la personne s'engage à respecter les principes de la République française pour s'intégrer dans la société."
+        },
+        {
+          "titre": "Quand faut-il le signer ?",
+          "points": [
+            "À chaque demande d'un titre de séjour.",
+            "À chaque renouvellement du titre de séjour.",
+            "Aucun titre de séjour ne peut être accordé sans ce contrat signé.",
+            "Les personnes protégées (réfugiés, apatrides, bénéficiaires de la protection subsidiaire) doivent aussi le signer."
+          ]
+        },
+        {
+          "titre": "Les principes à respecter",
+          "texte": "En signant, la personne s'engage à respecter les principes suivants :",
+          "points": [
+            "La liberté personnelle.",
+            "La liberté d'expression et de conscience.",
+            "L'égalité entre les femmes et les hommes.",
+            "La dignité de la personne humaine (le respect dû à chaque personne).",
+            "La devise de la France : Liberté, Égalité, Fraternité.",
+            "Les symboles de la République (drapeau, hymne, Marianne, 14 juillet).",
+            "L'intégrité des frontières nationales.",
+            "La laïcité."
+          ]
+        },
+        {
+          "titre": "Que se passe-t-il en cas de non-respect ?",
+          "texte": "Si la personne ne respecte pas un principe de la République, le titre de séjour peut être retiré ou non renouvelé."
+        }
+      ],
+      "aRetenir": [
+        "Le contrat d'engagement républicain est obligatoire pour obtenir ou renouveler un titre de séjour.",
+        "En le signant, on s'engage à respecter les principes de la République : liberté, égalité femmes-hommes, dignité, laïcité, devise et symboles.",
+        "Sans signature, aucun titre de séjour n'est accordé.",
+        "Ne pas respecter ces principes peut entraîner le retrait ou le non-renouvellement du titre de séjour."
+      ]
+    }
+  ]
+}

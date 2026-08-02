@@ -1,0 +1,243 @@
+{
+  "slug": "systeme-institutionnel",
+  "titre": "Système institutionnel et politique",
+  "icone": "🏛️",
+  "description": "Cette thématique explique comment la France est gouvernée : la démocratie, le vote, les trois pouvoirs, l'organisation du territoire et l'Union européenne.",
+  "fiches": [
+    {
+      "slug": "etat-de-droit-et-separation-des-pouvoirs",
+      "titre": "État de droit et séparation des pouvoirs",
+      "resume": "En France, la loi est la même pour tous, même pour l'État. Le pouvoir est partagé entre trois autorités qui se contrôlent entre elles.",
+      "sections": [
+        {
+          "titre": "Qu'est-ce que l'État de droit ?",
+          "texte": "Dans un État de droit, la loi est la même pour tous, y compris pour l'État. Le droit est plus fort que les autorités politiques : personne n'est au-dessus de la loi. Des juges indépendants (qui ne reçoivent d'ordre de personne) contrôlent l'action de l'État. L'État de droit s'oppose à l'arbitraire (quand le pouvoir fait ce qu'il veut, sans règle). Par exemple, la police ne peut pas arrêter une personne sans raison prévue par la loi.",
+          "points": [
+            "Primauté du droit : la loi s'applique à tous, même à l'État.",
+            "Égalité devant la loi : chacun a les mêmes droits et les mêmes devoirs.",
+            "Séparation des pouvoirs : le pouvoir n'est pas dans les mains d'une seule personne.",
+            "Lois claires, stables et votées de façon démocratique.",
+            "Protection par la justice : chacun peut se défendre devant un juge."
+          ]
+        },
+        {
+          "titre": "La séparation des pouvoirs",
+          "texte": "En France, trois pouvoirs sont séparés : ils ne sont pas exercés par les mêmes personnes. Le pouvoir législatif fait la loi, le pouvoir exécutif applique la loi, et le pouvoir judiciaire juge quand la loi n'est pas respectée. Chaque pouvoir contrôle les autres : cela protège les citoyens et empêche l'abus de pouvoir. Ce principe est inscrit dans la Constitution (le texte le plus important de la République). Ainsi, un ministre qui ne respecte pas la loi risque les mêmes sanctions qu'un citoyen."
+        },
+        {
+          "titre": "Le pouvoir législatif : le Parlement",
+          "texte": "Le Parlement vote la loi. Il est composé de deux chambres (deux assemblées).",
+          "points": [
+            "L'Assemblée nationale : 577 députés élus directement par les citoyens.",
+            "Le Sénat : 348 sénateurs élus par les grands électeurs (des élus locaux, comme les maires et les conseillers).",
+            "Le Parlement propose, discute et vote les lois.",
+            "Il contrôle le Gouvernement : il vérifie qu'il agit conformément à la loi.",
+            "Il évalue les politiques publiques (les actions de l'État)."
+          ]
+        },
+        {
+          "titre": "Le pouvoir exécutif : le Président et le Gouvernement",
+          "texte": "Le pouvoir exécutif applique et fait respecter les lois. Il dirige l'administration et conduit la politique de la France, en France et à l'étranger.",
+          "points": [
+            "Le président de la République est le chef de l'État et le chef des armées. Il habite au palais de l'Élysée.",
+            "Le Premier ministre est nommé par le président de la République. Il travaille à l'hôtel de Matignon.",
+            "Le Gouvernement est composé du Premier ministre et des ministres.",
+            "Le Gouvernement met en œuvre (applique) les lois et dirige les services de l'État."
+          ]
+        },
+        {
+          "titre": "L'autorité judiciaire",
+          "texte": "Les juges et les magistrats rendent la justice. Ils sont recrutés par concours (un examen de sélection). Ils appliquent la loi de façon indépendante et impartiale (sans prendre parti). La justice protège, décide et sanctionne. Une aide juridictionnelle (une aide financière pour payer un avocat) existe pour tous, sans condition de nationalité."
+        },
+        {
+          "titre": "Quelle justice pour quel conflit ?",
+          "texte": "Il existe deux grands ordres de justice, et trois niveaux de tribunaux : la première instance (le premier procès), l'appel (pour demander un deuxième jugement) et la cassation (le dernier recours : Cour de cassation ou Conseil d'État).",
+          "points": [
+            "La justice civile règle les conflits entre les personnes (par exemple entre un propriétaire et un locataire).",
+            "La justice pénale sanctionne les personnes qui ne respectent pas la loi (vol, infraction routière...).",
+            "La justice administrative règle les conflits entre les citoyens et l'administration (l'État, les collectivités, les services publics)."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "Dans un État de droit, la loi est la même pour tous, y compris pour l'État.",
+        "Les trois pouvoirs sont séparés : législatif (voter la loi), exécutif (appliquer la loi), judiciaire (juger).",
+        "Le Parlement = Assemblée nationale (577 députés) + Sénat (348 sénateurs).",
+        "Le président de la République et le Gouvernement forment le pouvoir exécutif.",
+        "La justice est indépendante et impartiale ; on peut faire appel d'un jugement."
+      ]
+    },
+    {
+      "slug": "democratie-et-droit-de-vote",
+      "titre": "Démocratie et droit de vote",
+      "resume": "La France est une démocratie et une République : le pouvoir appartient au peuple, qui élit ses représentants par le vote.",
+      "sections": [
+        {
+          "titre": "La démocratie, c'est quoi ?",
+          "texte": "Le mot démocratie vient du grec et signifie « pouvoir du peuple ». Dans une démocratie, le pouvoir appartient au peuple, sans distinction de sexe, de religion, de richesse ou d'origine. La démocratie s'oppose à la dictature, où le pouvoir est dans les mains d'une seule personne ou d'un petit groupe. La Constitution de 1958 définit ce principe : « le gouvernement du peuple, par le peuple et pour le peuple ».",
+          "points": [
+            "Le peuple est consulté régulièrement : vote, élections, référendum (vote direct sur une question).",
+            "Les pouvoirs sont séparés.",
+            "Il existe plusieurs partis politiques (pluralité des partis)."
+          ]
+        },
+        {
+          "titre": "La République, c'est quoi ?",
+          "texte": "Le mot République vient du latin et signifie « chose publique ». Dans une République, le pouvoir est exercé par des représentants élus, et non par un roi qui transmet le pouvoir à ses enfants (monarchie héréditaire). Les biens publics et les services publics appartiennent à tous les citoyens. La démocratie concerne la participation du peuple aux décisions ; la République concerne la forme du gouvernement, c'est-à-dire la manière dont le pouvoir est exercé."
+        },
+        {
+          "titre": "Qui sont les représentants élus ?",
+          "points": [
+            "Le président de la République : élu pour 5 ans directement par les citoyens (suffrage universel direct).",
+            "Les 577 députés de l'Assemblée nationale : élus directement tous les 5 ans.",
+            "Les 348 sénateurs du Sénat : élus indirectement (par les grands électeurs) pour 6 ans, renouvelés par moitié tous les 3 ans.",
+            "Au niveau local : les maires et conseillers municipaux, les conseillers départementaux et les conseillers régionaux sont élus pour 6 ans.",
+            "Les députés européens : élus tous les 5 ans."
+          ]
+        },
+        {
+          "titre": "Les conditions pour voter en France",
+          "texte": "Le droit de vote est un droit fondamental, inscrit dans la Déclaration des droits de l'homme et du citoyen de 1789 et dans la Constitution de 1958. Le vote est personnel, libre et secret. Voter est un droit, pas une obligation. On peut voter par procuration (donner son vote à une personne de confiance).",
+          "points": [
+            "Avoir la nationalité française.",
+            "Être majeur : avoir 18 ans ou plus.",
+            "Avoir ses droits civils et politiques (ils peuvent être retirés après une condamnation par la justice).",
+            "Être inscrit sur les listes électorales.",
+            "Cas particulier : les citoyens de l'Union européenne qui habitent en France peuvent voter aux élections municipales et européennes."
+          ]
+        },
+        {
+          "titre": "La pluralité des partis politiques",
+          "texte": "En France, il existe plusieurs partis politiques : c'est un fondement de la démocratie. Chaque citoyen peut adhérer librement au parti de son choix. L'article 4 de la Constitution dit que « les partis et groupements politiques concourent à l'expression du suffrage » (ils participent à l'expression du vote). Les partis proposent des programmes (des projets de société) et présentent des candidats aux élections. Les médias (télévision, radio) doivent être équitables : pendant les élections, chaque parti a un temps de parole égal."
+        },
+        {
+          "titre": "Comment une loi est-elle votée ?",
+          "texte": "La loi est l'expression de la volonté générale. Elle est discutée et votée par le Parlement, puis signée par le président de la République.",
+          "points": [
+            "L'initiative : le Gouvernement présente un « projet de loi », un député ou un sénateur dépose une « proposition de loi ».",
+            "Le texte est examiné en commission, puis discuté, modifié (par des amendements) et voté par l'Assemblée nationale et le Sénat.",
+            "La navette parlementaire : le texte va d'une chambre à l'autre jusqu'à un accord sur le même texte.",
+            "En cas de désaccord, une commission mixte paritaire (7 députés + 7 sénateurs) cherche un accord ; sinon, l'Assemblée nationale a le dernier mot.",
+            "Le président de la République promulgue (signe) la loi dans un délai de 15 jours ; elle est publiée au Journal officiel et entre en vigueur. Le Conseil constitutionnel peut vérifier que la loi respecte la Constitution."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La démocratie : le pouvoir appartient au peuple. La République : le pouvoir est exercé par des représentants élus.",
+        "Pour voter : nationalité française, 18 ans, droits civils et politiques, inscription sur les listes électorales.",
+        "Le vote est personnel, libre et secret ; il est un droit, pas une obligation.",
+        "Élections : présidentielle et législatives tous les 5 ans ; municipales, départementales et régionales tous les 6 ans ; européennes tous les 5 ans.",
+        "La loi est votée par le Parlement, puis promulguée par le président de la République dans un délai de 15 jours."
+      ]
+    },
+    {
+      "slug": "organisation-de-la-republique-francaise",
+      "titre": "Organisation de la République française",
+      "resume": "La France est organisée en communes, départements et régions. L'État transfère certaines compétences à ces collectivités : c'est la décentralisation.",
+      "sections": [
+        {
+          "titre": "La décentralisation, qu'est-ce que c'est ?",
+          "texte": "La décentralisation, c'est quand l'État transfère des compétences (des responsabilités) et des moyens (de l'argent, du personnel) à des autorités locales appelées collectivités territoriales. Il existe plusieurs niveaux : les communes, les départements, les régions, les collectivités à statut particulier et les collectivités d'outre-mer. Les ministères (l'administration centrale de l'État) et les collectivités territoriales gèrent ensemble le pays, chacun selon ses compétences."
+        },
+        {
+          "titre": "Les trois niveaux de collectivités et leurs missions",
+          "texte": "Chaque niveau de collectivité a ses propres missions (ses compétences).",
+          "points": [
+            "La commune (environ 35 000 en France) : dirigée par le maire. Elle s'occupe de l'urbanisme (organisation des constructions), du logement, de l'action sociale, des écoles maternelles et primaires, et des services de proximité comme l'état civil (naissances, mariages, décès).",
+            "Le département (101, dont 5 en outre-mer) : dirigé par le conseil départemental. Il s'occupe de l'action sociale : aide aux personnes handicapées, gestion du RSA (revenu de solidarité active, une aide pour les personnes sans ressources). Il gère les collèges.",
+            "La région (18, dont 5 en outre-mer) : dirigée par le conseil régional. Elle gère les lycées, le développement économique (aide aux entreprises, emploi), l'aménagement du territoire et les transports régionaux."
+          ]
+        },
+        {
+          "titre": "Les collectivités à statut particulier",
+          "points": [
+            "Paris : à la fois commune et département.",
+            "La métropole de Lyon : compétences d'une commune et d'un département.",
+            "La Collectivité européenne d'Alsace : compétences départementales et dispositions spécifiques.",
+            "Les collectivités d'outre-mer : des règles adaptées à leur situation locale."
+          ]
+        },
+        {
+          "titre": "Le préfet, représentant de l'État",
+          "texte": "Le préfet est le représentant de l'État dans le département. Il dirige les services de l'État dans le département (sauf la justice et l'armée) et assure la continuité de l'État.",
+          "points": [
+            "Sécurité : il organise la protection des personnes et des biens avec la police, la gendarmerie et les secours.",
+            "Titres et autorisations : la préfecture délivre des documents administratifs (par exemple les titres de séjour).",
+            "Contrôle : il vérifie que les collectivités territoriales respectent la loi.",
+            "Solidarité : il coordonne les aides pour les personnes en difficulté (emploi, santé, logement).",
+            "Développement : il soutient l'activité économique et sociale du territoire."
+          ]
+        },
+        {
+          "titre": "Un exemple concret : l'école",
+          "texte": "L'école montre bien le partage des compétences. L'État définit les programmes scolaires, recrute et forme les enseignants. Les collectivités gèrent les bâtiments, l'entretien, les équipements et la cantine : les communes s'occupent des écoles maternelles et primaires, les départements des collèges, et les régions des lycées."
+        }
+      ],
+      "aRetenir": [
+        "La décentralisation : l'État transfère des compétences et des moyens aux collectivités territoriales.",
+        "Trois niveaux de collectivités : environ 35 000 communes, 101 départements, 18 régions.",
+        "Communes : écoles maternelles et primaires ; départements : collèges et action sociale ; régions : lycées et développement économique.",
+        "Le préfet est le représentant de l'État dans le département.",
+        "Le maire est élu pour 6 ans et dirige la commune."
+      ]
+    },
+    {
+      "slug": "institutions-europeennes",
+      "titre": "Institutions européennes",
+      "resume": "La France est un pays fondateur de l'Union européenne (UE), qui compte 27 États membres. L'UE a ses institutions, ses symboles et ses élections.",
+      "sections": [
+        {
+          "titre": "Les grandes étapes de la construction européenne",
+          "texte": "L'Union européenne s'est construite progressivement depuis les années 1950, pour garantir la paix et la prospérité après la Seconde Guerre mondiale.",
+          "points": [
+            "1950 : déclaration Schuman, le texte fondateur de la construction européenne (9 mai).",
+            "1951 : traité de Paris, création de la CECA (Communauté européenne du charbon et de l'acier).",
+            "1957 : traité de Rome, création de la CEE (Communauté économique européenne) pour un marché commun.",
+            "1992 : traité de Maastricht, création de l'Union européenne ; les marchandises, les personnes et les capitaux circulent librement.",
+            "2007 : traité de Lisbonne, meilleure coordination des institutions et lutte contre le changement climatique."
+          ]
+        },
+        {
+          "titre": "Les pays membres",
+          "texte": "En 1957, il y avait 6 pays fondateurs : l'Allemagne, la Belgique, la France, l'Italie, le Luxembourg et les Pays-Bas. L'UE s'est ensuite élargie plusieurs fois (1973, 1981, 1986, 1995, 2004, 2007, 2013). En 2020, le Royaume-Uni a quitté l'UE (c'est le « Brexit »). Aujourd'hui, l'Union européenne compte 27 États membres."
+        },
+        {
+          "titre": "Les symboles européens",
+          "points": [
+            "Le drapeau européen : douze étoiles jaunes en cercle sur fond bleu. Il symbolise l'unité, la solidarité et l'harmonie entre les peuples d'Europe.",
+            "L'hymne européen : l'« Ode à la joie » de Ludwig van Beethoven. Il symbolise la liberté, la paix et la solidarité.",
+            "La devise : « Unie dans la diversité » (adoptée en 2000). Les pays construisent l'Europe ensemble, tout en gardant leurs cultures et leurs langues.",
+            "La Journée de l'Europe : le 9 mai, en souvenir de la déclaration Schuman du 9 mai 1950.",
+            "L'euro : la monnaie commune de nombreux pays de l'UE, dont la France."
+          ]
+        },
+        {
+          "titre": "Les institutions de l'Union européenne",
+          "points": [
+            "Le Conseil européen (Bruxelles) : les 27 chefs d'État ou de gouvernement. Il donne les grandes orientations politiques et budgétaires de l'UE.",
+            "Le Conseil de l'Union européenne (Bruxelles) : les ministres des pays membres, selon les sujets. Il vote le budget et coordonne les politiques communes.",
+            "La Commission européenne (Bruxelles) : 27 commissaires. Elle représente l'intérêt commun, propose les lois et le budget.",
+            "Le Parlement européen (Strasbourg) : 720 députés européens. Il vote les lois et le budget avec le Conseil, et contrôle la Commission.",
+            "La Cour de justice de l'Union européenne (Luxembourg) : elle rend la justice à l'échelle européenne et vérifie que les États appliquent le droit européen."
+          ]
+        },
+        {
+          "titre": "Les élections européennes",
+          "texte": "Tous les 5 ans, les citoyens de l'Union européenne élisent les députés du Parlement européen (les eurodéputés). Le nombre de députés dépend de la population de chaque pays : depuis 2024, la France compte 81 eurodéputés. Les électeurs votent pour des listes de partis.",
+          "points": [
+            "Pour voter en France : avoir la nationalité d'un pays de l'UE, résider en France, avoir 18 ans et être inscrit sur les listes électorales.",
+            "Pour être candidat : mêmes conditions, et ne pas être privé de ses droits civils et politiques.",
+            "Les citoyens européens qui vivent en France peuvent aussi voter aux élections municipales."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La France est l'un des 6 pays fondateurs ; l'UE compte aujourd'hui 27 États membres.",
+        "Traités clés : Rome (1957), Maastricht (1992, création de l'UE), Lisbonne (2007).",
+        "Symboles : drapeau aux 12 étoiles, « Ode à la joie », devise « Unie dans la diversité », Journée de l'Europe le 9 mai.",
+        "Institutions principales : Conseil européen, Conseil de l'UE, Commission, Parlement européen (720 députés), Cour de justice.",
+        "Les élections européennes ont lieu tous les 5 ans ; la France élit 81 eurodéputés."
+      ]
+    }
+  ]
+}

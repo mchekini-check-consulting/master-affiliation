@@ -220,6 +220,285 @@ body.page-espace {
   max-width: 400px;
 }
 
+/* ---------- Cours : intro et retours ---------- */
+.cours-intro {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--texte-sec);
+  max-width: 640px;
+  margin: -14px 0 28px;
+}
+
+.cours-retour {
+  margin-bottom: 18px;
+}
+
+.cours-retour a {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--estompe);
+  text-decoration: none;
+}
+
+.cours-retour a:hover {
+  color: var(--bleu);
+}
+
+/* ---------- Cours : cartes des thématiques ---------- */
+.thematiques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  max-width: 880px;
+}
+
+.thematique {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 20px;
+  text-decoration: none;
+  color: var(--corps);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.thematique:hover {
+  border-color: var(--bleu);
+  box-shadow: 0 12px 32px rgba(20, 26, 51, 0.08);
+}
+
+.thematique-ico {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--bleu-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.thematique-corps {
+  flex: 1;
+  min-width: 0;
+}
+
+.thematique-corps strong {
+  display: block;
+  font-family: var(--f-titres);
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--encre);
+  margin-bottom: 3px;
+}
+
+.thematique-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texte-sec);
+}
+
+.thematique-compte {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bleu);
+  background: var(--bleu-tint);
+  padding: 4px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+/* ---------- Cours : liste des fiches d'une thématique ---------- */
+.panneau h1 span {
+  margin-right: 6px;
+}
+
+.fiches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fiche-lien {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-decoration: none;
+  color: var(--corps);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fiche-lien:hover {
+  border-color: var(--bleu);
+  box-shadow: 0 10px 26px rgba(20, 26, 51, 0.07);
+}
+
+.fiche-num {
+  font-family: var(--f-titres);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--bleu);
+  flex-shrink: 0;
+}
+
+.fiche-corps {
+  flex: 1;
+  min-width: 0;
+}
+
+.fiche-corps strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--encre);
+  margin-bottom: 2px;
+}
+
+.fiche-resume {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texte-sec);
+}
+
+.fiche-fleche {
+  color: var(--bleu);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ---------- Cours : lecteur de fiche ---------- */
+.fiche {
+  max-width: 720px;
+}
+
+.fiche-etiquette {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--bleu);
+  margin: 0 0 10px;
+}
+
+.fiche h1 {
+  margin-bottom: 12px;
+}
+
+.fiche-chapeau {
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--texte-sec);
+  margin: 0 0 30px;
+}
+
+.fiche-section {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-bottom: 14px;
+}
+
+.fiche-section h2 {
+  font-family: var(--f-titres);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--encre);
+  margin: 0 0 10px;
+}
+
+.fiche-section p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--texte-2);
+  margin: 0 0 8px;
+}
+
+.fiche-section ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.fiche-section li {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--texte-2);
+}
+
+.a-retenir {
+  background: var(--bleu-tint);
+  border: 1px solid var(--bleu-bordure);
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin: 22px 0;
+}
+
+.a-retenir h2 {
+  font-family: var(--f-titres);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--bleu);
+  margin: 0 0 10px;
+}
+
+.a-retenir ul {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.a-retenir li {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--encre);
+  font-weight: 500;
+}
+
+.fiche-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.fiche-nav-lien {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--bleu);
+  text-decoration: none;
+  padding: 12px 16px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  max-width: 48%;
+}
+
+.fiche-nav-lien:hover {
+  border-color: var(--bleu);
+}
+
+.fiche-nav-lien--suivant {
+  text-align: right;
+  margin-left: auto;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
   .espace {

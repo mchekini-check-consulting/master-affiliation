@@ -1,0 +1,369 @@
+{
+  "slug": "vivre-en-france",
+  "titre": "Vivre dans la société française",
+  "icone": "🤝",
+  "description": "Cette thématique présente la vie quotidienne en France : les démarches administratives, la santé, l'emploi et la parentalité. Elle donne les repères pratiques pour vivre, travailler et élever ses enfants en France.",
+  "fiches": [
+    {
+      "slug": "demarches-du-quotidien",
+      "titre": "Les démarches administratives du quotidien",
+      "resume": "Pour vivre en France dans le respect de la loi, il faut faire certaines démarches : avoir une adresse, un compte bancaire, des assurances, et déclarer ses revenus (dire à l'État combien d'argent on a gagné).",
+      "sections": [
+        {
+          "titre": "L'adresse et la domiciliation",
+          "texte": "Avoir une adresse est indispensable pour recevoir son courrier et accéder à ses droits. Les personnes qui n'ont pas de logement stable peuvent demander une domiciliation : une adresse administrative où elles reçoivent leur courrier.",
+          "points": [
+            "L'adresse sert pour les impôts, la préfecture (titre de séjour), la banque, les assurances et l'école des enfants.",
+            "En cas de déménagement, il faut signaler sa nouvelle adresse rapidement (3 mois maximum).",
+            "On déclare son changement d'adresse sur service-public.fr : cela informe la CAF, les impôts et la Sécurité sociale.",
+            "Il faut aussi prévenir la banque, l'assurance, l'employeur, et mettre à jour la carte grise et l'inscription sur la liste électorale."
+          ]
+        },
+        {
+          "titre": "Le compte bancaire",
+          "texte": "Le compte bancaire protège l'argent contre la perte et le vol. Il est nécessaire pour recevoir un salaire et faire beaucoup de démarches. L'ouverture d'un compte est gratuite.",
+          "points": [
+            "Pour ouvrir un compte, il faut : une pièce d'identité avec photo, être majeur (ou mineur avec accord des parents), un justificatif de domicile de moins de 3 mois, et déposer sa signature.",
+            "Une banque peut refuser d'ouvrir un compte sans donner de raison.",
+            "En cas de refus, la Banque de France fait appliquer le « droit au compte » : elle désigne une banque qui doit ouvrir un compte.",
+            "La Banque de France aide aussi les personnes surendettées (qui ont trop de dettes)."
+          ]
+        },
+        {
+          "titre": "L'assurance responsabilité civile",
+          "texte": "La responsabilité civile est l'obligation de réparer les dommages (dégâts matériels, blessures, préjudices moraux) que l'on cause à d'autres personnes, même sans le vouloir. On est aussi responsable de ses enfants mineurs, de ses animaux et des objets dont on a la garde. L'assurance responsabilité civile est payante et obligatoire : elle paie à votre place les dommages causés aux autres. Il existe notamment l'assurance habitation et l'assurance automobile. Il est conseillé de comparer les offres avant de choisir."
+        },
+        {
+          "titre": "La voiture et le permis de conduire",
+          "texte": "Pour conduire une voiture en France, trois choses sont obligatoires : un permis de conduire valide, une carte grise à jour (le document d'identité du véhicule) et une assurance automobile. Le contrôle technique (vérification de l'état de la voiture) est obligatoire tous les 2 ans pour les voitures de plus de 4 ans.",
+          "points": [
+            "On peut passer le permis à partir de 17 ans si on réside en France.",
+            "Il faut d'abord réussir le code de la route : un examen théorique en questions à choix multiples sur les règles de circulation et la sécurité.",
+            "Il faut ensuite une formation pratique d'au moins 20 heures de conduite.",
+            "L'épreuve pratique dure environ 30 minutes : une manœuvre, des questions de sécurité et un parcours sur route.",
+            "Après le permis, il faut assurer la voiture avant de conduire."
+          ]
+        },
+        {
+          "titre": "L'impôt et la déclaration de revenus",
+          "texte": "L'impôt permet à l'État de faire fonctionner le pays : écoles, routes, hôpitaux, aides sociales. L'impôt sur le revenu dépend des revenus du foyer : plus on gagne, plus on paie. Cette redistribution réduit les écarts de richesse. Il existe aussi des impôts locaux (taxe foncière, ordures ménagères).",
+          "points": [
+            "Toute personne de plus de 18 ans qui vit en France doit déclarer ses revenus chaque année, même si elle ne gagne rien (on écrit alors 0 euro).",
+            "La déclaration se fait entre avril et mai, sur le site impots.gouv.fr, pour les revenus de l'année précédente.",
+            "Pour la première déclaration, il faut créer un compte fiscal ou demander un numéro fiscal au centre des impôts.",
+            "Ne pas déclarer est puni : pénalités financières, remboursement des aides, difficultés d'accès aux droits, et même prison possible."
+          ]
+        },
+        {
+          "titre": "Les numéros d'urgence",
+          "texte": "Les numéros d'urgence sont gratuits et joignables 24h/24 et 7j/7.",
+          "points": [
+            "15 : SAMU (urgence médicale).",
+            "17 : police et gendarmerie (violences, vol, infraction).",
+            "18 : pompiers (incendie, accident).",
+            "112 : numéro d'urgence européen (toutes urgences).",
+            "114 : pour les personnes sourdes ou malentendantes (par SMS ou application).",
+            "Autres numéros utiles : 115 (hébergement d'urgence des sans-abri), 119 (enfance en danger), 3114 (prévention du suicide)."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "En cas de déménagement, il faut déclarer sa nouvelle adresse dans les 3 mois sur service-public.fr.",
+        "Si une banque refuse d'ouvrir un compte, la Banque de France garantit le « droit au compte ».",
+        "L'assurance responsabilité civile est obligatoire : elle répare les dommages causés aux autres.",
+        "Déclarer ses revenus chaque année (avril-mai) est obligatoire pour tous les adultes vivant en France, même sans revenu.",
+        "Numéros d'urgence gratuits : 15 (SAMU), 17 (police), 18 (pompiers), 112 (numéro européen)."
+      ]
+    },
+    {
+      "slug": "sejour-nationalite-etat-civil-logement",
+      "titre": "Séjour, nationalité, état civil et logement",
+      "resume": "Cette fiche présente les démarches liées au titre de séjour, à l'accès à la nationalité française, à l'état civil (naissance, mariage, décès) et au logement.",
+      "sections": [
+        {
+          "titre": "Le titre de séjour",
+          "texte": "Tout étranger doit avoir un titre de séjour valide qui correspond à sa situation. Le type de titre dépend de la durée et du motif (la raison) de l'installation en France. Il faut signaler tout changement d'adresse à la préfecture.",
+          "points": [
+            "Pour s'informer : la préfecture, une maison France Services, le site ANEF (Administration Numérique des Étrangers en France) ou le téléphone 0806 001 620.",
+            "Le renouvellement se demande au moins 3 mois avant la fin du titre de séjour.",
+            "Le dossier comprend les justificatifs, le contrat d'engagement à respecter les principes de la République, l'attestation de réussite de l'examen civique et, pour un titre de plus d'un an, une certification de français de niveau A2."
+          ]
+        },
+        {
+          "titre": "Devenir français : la naturalisation",
+          "texte": "Il existe deux démarches principales pour devenir français quand on est un adulte étranger. L'adhésion aux principes et valeurs de la République est une condition pour devenir français : elle est vérifiée lors d'un entretien d'assimilation en préfecture.",
+          "points": [
+            "La naturalisation par décret : demande en ligne via l'ANEF, avec au minimum 5 ans de résidence en France. L'État accepte ou refuse après examen du dossier.",
+            "La déclaration : pour les personnes mariées à un Français ou membres de la famille de Français (ascendants, frères et sœurs), auprès de la plateforme de naturalisation de la préfecture.",
+            "Avant de déposer le dossier, on peut faire une simulation sur service-public.fr pour connaître les documents à fournir."
+          ]
+        },
+        {
+          "titre": "La déclaration de naissance",
+          "texte": "Déclarer une naissance est obligatoire. La déclaration se fait dans les 5 jours après la naissance, à la mairie du lieu de naissance, par le père, la mère ou une personne qui a assisté à l'accouchement. L'officier d'état civil établit alors l'acte de naissance.",
+          "points": [
+            "L'acte de naissance permet d'obtenir des droits sociaux (allocations, Sécurité sociale), de demander des papiers d'identité et d'inscrire l'enfant à l'école.",
+            "Documents à présenter : pièces d'identité des parents, certificat médical d'accouchement, et le livret de famille si les parents en ont déjà un."
+          ]
+        },
+        {
+          "titre": "Le mariage civil",
+          "texte": "Le mariage civil, célébré à la mairie, est le seul mariage reconnu en France. Deux personnes peuvent se marier, quel que soit leur sexe.",
+          "points": [
+            "Conditions : être majeur (18 ans), ne pas avoir de lien de parenté proche, et donner un consentement libre et sincère (personne ne peut forcer quelqu'un à se marier).",
+            "Le mariage est célébré dans la commune où habite l'un des futurs époux (ou l'un de leurs parents).",
+            "Après la cérémonie, les époux reçoivent un acte de mariage et un livret de famille.",
+            "Un mariage célébré à l'étranger doit être transcrit (enregistré) auprès du consulat français pour être reconnu en France."
+          ]
+        },
+        {
+          "titre": "La déclaration de décès",
+          "texte": "Quand une personne meurt, un médecin établit un certificat de décès. Le décès doit être déclaré rapidement (dans les 24 heures) à la mairie du lieu du décès, par un proche ou par une entreprise de pompes funèbres. La mairie établit l'acte de décès, nécessaire pour les démarches (banque, succession, pensions)."
+        },
+        {
+          "titre": "Le logement",
+          "texte": "Pour se loger, il existe le logement privé (annonces des agences immobilières et sites spécialisés) et le logement social, réservé aux personnes aux revenus modestes (demande sur demande-logement-social.gouv.fr).",
+          "points": [
+            "Le bail est le contrat écrit entre le bailleur (propriétaire) et le locataire : c'est le seul document qui autorise à vivre dans le logement.",
+            "Le locataire s'engage à payer le loyer et les charges, et à respecter ses obligations ; le bailleur met le logement à disposition.",
+            "Le locataire peut quitter le logement avec un préavis (délai d'annonce) de 3 mois, réduit à 1 mois dans certains cas (logement meublé, zone tendue, raisons de santé ou professionnelles).",
+            "Des aides au logement existent, comme l'APL versée par la CAF (Caisse d'allocations familiales), sous conditions de ressources."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "Le renouvellement du titre de séjour se demande au moins 3 mois avant son expiration.",
+        "La naturalisation par décret demande au minimum 5 ans de résidence en France ; l'adhésion aux valeurs de la République est obligatoire.",
+        "Une naissance se déclare dans les 5 jours à la mairie du lieu de naissance.",
+        "Le mariage civil à la mairie est le seul mariage reconnu en France ; le consentement doit être libre.",
+        "Le bail signé par le propriétaire et le locataire est le seul document qui autorise à occuper un logement."
+      ]
+    },
+    {
+      "slug": "sante",
+      "titre": "La santé",
+      "resume": "En France, le système de santé repose sur l'Assurance maladie, qui rembourse une grande partie des soins. Le médecin traitant est au centre du parcours de santé.",
+      "sections": [
+        {
+          "titre": "Le parcours de santé",
+          "texte": "Quand on a un problème de santé, il existe trois possibilités principales.",
+          "points": [
+            "Consulter un médecin : pour les problèmes courants, on commence par son médecin traitant (le médecin généraliste que l'on a déclaré). C'est le « parcours de soins coordonnés » : le médecin traitant oriente ensuite vers un spécialiste si nécessaire (cardiologue, dermatologue...).",
+            "Aller à l'hôpital : en cas de situation grave (accident, douleurs violentes, malaise), on va aux urgences.",
+            "Aller à la pharmacie : le pharmacien conseille pour les petits problèmes du quotidien et délivre les médicaments prescrits sur ordonnance.",
+            "Le médecin traitant connaît le dossier médical, assure la prévention (vaccins, dépistages) et suit le patient dans la durée.",
+            "On prend rendez-vous en appelant le cabinet ou en ligne (par exemple sur Doctolib). La nuit et le week-end, il existe des médecins et des pharmacies de garde."
+          ]
+        },
+        {
+          "titre": "L'Assurance maladie et la carte Vitale",
+          "texte": "L'inscription à l'Assurance maladie est obligatoire. Les frais de santé sont financés en grande partie par les cotisations sociales des travailleurs : c'est un système de solidarité.",
+          "points": [
+            "Le numéro de sécurité sociale est un identifiant unique et personnel à 15 chiffres.",
+            "La carte Vitale est une carte personnelle qui prouve les droits à l'Assurance maladie. On la présente à chaque professionnel de santé pour être remboursé automatiquement.",
+            "Le tiers payant permet de ne pas avancer l'argent chez certains professionnels.",
+            "Le compte ameli (sur ameli.fr) permet de suivre ses remboursements et de communiquer avec sa caisse.",
+            "Pour être bien remboursé, il faut déclarer un médecin traitant."
+          ]
+        },
+        {
+          "titre": "PUMa, mutuelle et Complémentaire santé solidaire",
+          "texte": "La Protection universelle maladie (PUMa) garantit la prise en charge des frais de santé à toute personne qui travaille ou réside en France de façon stable et régulière, même en cas de perte d'emploi.",
+          "points": [
+            "Pour accéder à la PUMa, il faut résider en France depuis plus de 3 mois et s'inscrire à la CPAM (Caisse primaire d'assurance maladie) avec des justificatifs de résidence et d'identité.",
+            "La complémentaire santé (mutuelle) n'est pas obligatoire mais elle est recommandée : elle rembourse la partie non prise en charge par l'Assurance maladie.",
+            "Les employeurs du secteur privé doivent proposer une complémentaire à leurs salariés et en financer une partie.",
+            "La Complémentaire santé solidaire (C2S) est destinée aux personnes aux revenus modestes : gratuite ou moins de 1 euro par jour, elle couvre tout le foyer (consultations, dentaire, lunettes, hospitalisation)."
+          ]
+        },
+        {
+          "titre": "Les structures de soins gratuites",
+          "texte": "La France propose des structures publiques où l'on peut être soigné gratuitement.",
+          "points": [
+            "PASS (Permanences d'accès aux soins de santé) : dans la plupart des hôpitaux publics, pour les personnes sans couverture maladie.",
+            "PMI (Protection maternelle et infantile) : soins et conseils gratuits pour les femmes enceintes et les enfants jusqu'à 6 ans.",
+            "Centres de santé sexuelle : contraception et accompagnement ; CeGIDD : dépistage gratuit du VIH et des infections sexuellement transmissibles.",
+            "CSAPA : aide contre les addictions (dépendances) ; CMP : centres médico-psychologiques pour la santé mentale.",
+            "La vaccination est possible chez le médecin, la sage-femme, l'infirmier ou le pharmacien."
+          ]
+        },
+        {
+          "titre": "La maternité",
+          "texte": "Il faut déclarer sa grossesse dans les 3 premiers mois auprès d'un médecin ou d'une sage-femme. Du 6e mois de grossesse jusqu'à 12 jours après l'accouchement, tous les frais médicaux remboursables sont pris en charge à 100 %, sans avance d'argent. Les examens obligatoires de la grossesse sont pris en charge à 100 % dès le début. L'accouchement et le séjour à la maternité sont remboursés à 100 % dans un établissement conventionné."
+        },
+        {
+          "titre": "Les droits et devoirs du patient",
+          "texte": "Le patient a des droits protégés par la loi, et aussi des devoirs.",
+          "points": [
+            "Libre choix : chacun peut choisir librement son médecin et son établissement de santé (public ou privé).",
+            "Secret médical : le professionnel de santé ne peut rien révéler sur la santé et l'identité du patient, même après son décès.",
+            "Droit à l'information et consentement : le médecin doit expliquer l'état de santé, les soins, les risques et les alternatives ; aucun acte médical ne peut être fait sans l'accord libre et éclairé du patient, qui peut refuser un soin.",
+            "Accès au dossier médical : le patient peut consulter son dossier et en obtenir une copie.",
+            "Devoirs : le patient ne peut pas imposer des choix contraires à l'organisation du service public, par exemple refuser d'être soigné par un professionnel en raison de son sexe. Ces demandes sont refusées au nom de la laïcité."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "Le médecin traitant est le premier interlocuteur : il coordonne le parcours de soins.",
+        "La carte Vitale prouve les droits à l'Assurance maladie ; le numéro de sécurité sociale a 15 chiffres.",
+        "La PUMa garantit la prise en charge des frais de santé à toute personne résidant en France de façon stable et régulière (inscription à la CPAM après 3 mois de résidence).",
+        "La Complémentaire santé solidaire (C2S) aide les personnes aux revenus modestes ; la maternité est prise en charge à 100 % à partir du 6e mois.",
+        "Le patient a des droits (libre choix, secret médical, consentement, accès au dossier) mais ne peut pas imposer de refus de soins contraires à la laïcité."
+      ]
+    },
+    {
+      "slug": "emploi",
+      "titre": "L'emploi et le travail",
+      "resume": "France Travail accompagne la recherche d'emploi. Le travail est encadré par le droit du travail, qui protège les salariés : contrat, salaire minimum, congés payés, syndicats.",
+      "sections": [
+        {
+          "titre": "France Travail et l'orientation",
+          "texte": "Toute personne étrangère en situation régulière et sans emploi doit s'inscrire à France Travail (anciennement Pôle emploi). Cet organisme public aide à chercher un travail ou à suivre une formation.",
+          "points": [
+            "Un questionnaire d'orientation, disponible en cinq langues, fait le point sur la situation, le niveau de français, les compétences numériques et l'expérience professionnelle.",
+            "L'application « Travailler en France » propose des offres d'emploi traduites en plusieurs langues et des conseils pour rédiger un CV.",
+            "D'autres organisations aident : les missions locales (jeunes de 16 à 25 ans), Cap emploi et la MDPH (personnes en situation de handicap), les PLIE, les maisons de l'emploi, l'OFII, les CCAS et les associations."
+          ]
+        },
+        {
+          "titre": "Formation et reconnaissance des compétences",
+          "texte": "Il existe des droits pour se former, notamment pour apprendre le français. Les diplômes étrangers peuvent être reconnus en France (attestation de comparabilité délivrée par le centre ENIC-NARIC).",
+          "points": [
+            "La VAE (Validation des Acquis de l'Expérience) permet de faire reconnaître officiellement ses compétences, comme un diplôme.",
+            "Condition : avoir au moins 1 an d'expérience en lien direct avec le diplôme visé.",
+            "La VAE est ouverte à tous, quel que soit l'âge, la nationalité ou le niveau d'études.",
+            "Étapes : candidature sur le portail France VAE, dossier détaillant les expériences, puis entretien devant un jury.",
+            "Les expériences reconnues incluent le travail salarié, le bénévolat, le volontariat et les responsabilités syndicales."
+          ]
+        },
+        {
+          "titre": "Le contrat de travail",
+          "texte": "Le contrat de travail lie le salarié, qui travaille contre un salaire, et l'employeur. Il précise le salaire, la durée du travail et les tâches, et crée des obligations pour les deux parties.",
+          "points": [
+            "Le CDI (contrat à durée indéterminée) est le contrat le plus courant : il n'a pas de date de fin. Il peut être à temps plein ou à temps partiel.",
+            "Le CDI peut se terminer par un licenciement (décision de l'employeur), une démission (décision du salarié), un départ à la retraite ou une rupture conventionnelle (accord des deux parties).",
+            "Le CDD (contrat à durée déterminée) a une date de fin ; il doit être écrit et sert à une mission temporaire (remplacement, surcroît d'activité). Sa durée maximale est en général de 18 mois.",
+            "On peut aussi créer sa propre entreprise pour travailler à son compte."
+          ]
+        },
+        {
+          "titre": "Le recrutement : CV et lettre de motivation",
+          "texte": "Pour être embauché, on envoie en général une candidature à l'entreprise : un CV et une lettre de motivation.",
+          "points": [
+            "Le CV (curriculum vitae) présente les coordonnées, les expériences professionnelles, la formation, les diplômes et les compétences. La photo est facultative (pas obligatoire).",
+            "La lettre de motivation explique pourquoi on veut le poste et ce que l'on peut apporter à l'entreprise.",
+            "L'employeur ne peut demander que des informations en lien direct avec le travail proposé.",
+            "Donner de fausses informations (faux diplômes, fausse expérience) peut justifier un licenciement après l'embauche."
+          ]
+        },
+        {
+          "titre": "Le droit du travail",
+          "texte": "Le droit du travail est l'ensemble des règles juridiques qui organisent les relations entre salariés et employeurs. Ces règles se trouvent dans le Code du travail, les conventions collectives (règles adaptées à chaque secteur d'activité) et le règlement intérieur de l'entreprise.",
+          "points": [
+            "La durée légale du travail à temps complet est de 35 heures par semaine ; au-delà, ce sont des heures supplémentaires, payées en plus ou récupérées.",
+            "L'âge minimum pour travailler est 16 ans (avec autorisation parentale).",
+            "Le salaire minimum légal est le SMIC (environ 1 800 euros brut par mois). L'employeur doit remettre un bulletin de paie à chaque versement.",
+            "Chaque salarié gagne 2,5 jours ouvrables de congés payés par mois de travail : les congés payés sont un droit.",
+            "Chaque salarié peut créer ou rejoindre un syndicat, qui défend les droits des travailleurs. Personne ne peut être obligé de se syndiquer ni sanctionné pour son adhésion.",
+            "En cas de conflit avec l'employeur, le salarié peut saisir le conseil de prud'hommes, le tribunal spécialisé dans les litiges du travail."
+          ]
+        },
+        {
+          "titre": "Discrimination, inspection du travail et travail non déclaré",
+          "texte": "La loi protège les salariés contre les abus.",
+          "points": [
+            "La discrimination à l'embauche ou au travail (refuser ou défavoriser quelqu'un à cause de son origine, son sexe, sa religion, son handicap...) est interdite et punie par la loi.",
+            "L'inspection du travail contrôle le respect du droit du travail dans les entreprises ; les salariés peuvent la contacter.",
+            "Le travail non déclaré (« travail au noir ») est interdit : c'est un travail sans déclaration officielle à l'embauche ou avec des heures non déclarées.",
+            "Conséquences pour l'employeur : jusqu'à 3 ans de prison et 45 000 euros d'amende (5 ans et 75 000 euros pour l'emploi d'un mineur), fermeture de l'entreprise et remboursement des aides.",
+            "Conséquences pour le salarié : pas de cotisations pour le chômage et la retraite, pas de couverture en cas de maladie ou d'accident, pas de congés payés et pas de recours en cas de conflit."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "France Travail est l'organisme public qui accompagne les demandeurs d'emploi ; l'inscription est nécessaire pour être aidé et indemnisé.",
+        "Les deux principaux contrats sont le CDI (sans date de fin) et le CDD (temporaire, écrit obligatoire).",
+        "Durée légale du travail : 35 heures par semaine ; salaire minimum : le SMIC ; congés payés : 2,5 jours par mois travaillé.",
+        "En cas de conflit avec l'employeur, on peut saisir le conseil de prud'hommes ; les syndicats défendent les droits des travailleurs.",
+        "Le travail non déclaré est interdit et dangereux pour le salarié : pas de retraite, pas de chômage, pas de protection en cas d'accident."
+      ]
+    },
+    {
+      "slug": "parentalite",
+      "titre": "La parentalité et l'école",
+      "resume": "Les parents ont des droits et des devoirs envers leurs enfants : c'est l'autorité parentale. L'école est obligatoire de 3 à 16 ans pour tous les enfants vivant en France.",
+      "sections": [
+        {
+          "titre": "Les droits de l'enfant",
+          "texte": "En 1989, 196 États ont adopté la Convention internationale des droits de l'enfant (CIDE), dans le cadre de l'ONU. Ce texte fixe les droits fondamentaux des enfants ; l'UNICEF s'appuie sur ce document.",
+          "points": [
+            "Principe central : l'intérêt supérieur de l'enfant passe avant la volonté de l'enfant et celle de ses parents.",
+            "Principaux droits : égalité, nom et identité, vie familiale, santé, éducation et loisirs, protection de la vie privée.",
+            "L'enfant est protégé contre la violence, l'exploitation (être utilisé pour travailler) et les conflits armés.",
+            "L'enfant a le droit de s'exprimer et d'être écouté ; les enfants en situation de handicap ont les mêmes droits que les autres."
+          ]
+        },
+        {
+          "titre": "L'autorité parentale",
+          "texte": "L'autorité parentale est l'ensemble des droits et des devoirs des parents envers leur enfant de moins de 18 ans. Les deux parents l'exercent ensemble, qu'ils soient mariés, pacsés, en concubinage ou séparés. Elle s'exerce dans l'intérêt et le respect de l'enfant : toute violence physique ou psychologique est interdite.",
+          "points": [
+            "Protéger et surveiller : assurer la sécurité de l'enfant, surveiller ses relations, ses déplacements et son usage d'internet et des réseaux sociaux (contre le harcèlement, le racket, les addictions).",
+            "Éduquer : faire instruire l'enfant, dont l'instruction est obligatoire de 3 à 16 ans ; ne pas respecter cette obligation expose à des amendes et à des poursuites.",
+            "Soigner : veiller à la santé de l'enfant.",
+            "Entretenir : nourrir, loger et répondre aux besoins de l'enfant (y compris loisirs et culture).",
+            "Respecter sa vie privée et son image."
+          ]
+        },
+        {
+          "titre": "Le retrait de l'autorité parentale",
+          "texte": "Un parent ne peut pas abandonner volontairement son autorité parentale. Mais un tribunal peut la retirer, totalement ou partiellement, quand l'enfant est en danger.",
+          "points": [
+            "Motifs : violences physiques ou psychologiques, désintérêt volontaire pendant plus de 2 ans, ou condamnation pour un crime ou un délit contre l'enfant ou l'autre parent.",
+            "Retrait total : le parent perd tous ses droits de décision sur l'enfant, mais doit continuer à contribuer à son entretien.",
+            "Retrait partiel : seuls certains droits ou devoirs sont retirés."
+          ]
+        },
+        {
+          "titre": "La garde des enfants de moins de 3 ans",
+          "texte": "Avant l'école, les jeunes enfants peuvent être gardés par des professionnels, dès 2 mois et demi. Ce service est payant, mais des aides financières existent pour les familles modestes. La garde collective permet à l'enfant d'être en contact avec d'autres enfants.",
+          "points": [
+            "La crèche : accueil collectif avec des activités pour le développement de l'enfant (crèche collective, d'entreprise ou parentale).",
+            "La micro-crèche : 10 enfants au maximum.",
+            "La halte-garderie : garde ponctuelle, quelques demi-journées par semaine.",
+            "L'assistante maternelle : professionnelle agréée qui accueille des enfants chez elle.",
+            "La garde à domicile : les parents emploient une personne chez eux (solution plus chère)."
+          ]
+        },
+        {
+          "titre": "L'école en France",
+          "texte": "Tous les enfants de 3 à 16 ans qui habitent en France doivent aller à l'école, qu'ils soient français ou étrangers. L'école publique est gratuite et laïque, et la cantine est accessible à tous.",
+          "points": [
+            "École maternelle (3-6 ans) : petite, moyenne et grande section ; elle favorise l'apprentissage du français et de la vie collective.",
+            "École élémentaire (6-11 ans) : CP, CE1, CE2, CM1, CM2.",
+            "Collège (11-15 ans) : de la 6e à la 3e ; diplôme : le brevet (DNB).",
+            "Lycée (15-18 ans) : seconde, première, terminale ; diplôme : le baccalauréat (BAC).",
+            "Après 16 ans, l'école n'est plus obligatoire : apprentissage, université, écoles supérieures.",
+            "Pour les enfants allophones (qui ne parlent pas français), un test de niveau est fait à l'arrivée, puis des classes adaptées (UPE2A) les aident à apprendre le français avant de rejoindre les cours ordinaires."
+          ]
+        },
+        {
+          "titre": "Les parents et l'école",
+          "texte": "Les parents ont un rôle actif dans la scolarité de leur enfant. L'école les informe régulièrement des résultats et du comportement de l'enfant (livret puis bulletin scolaire).",
+          "points": [
+            "Devoirs des parents : consulter le livret ou le bulletin, vérifier le carnet de liaison, communiquer avec les enseignants, participer aux réunions parents-professeurs et faire les démarches d'inscription.",
+            "Les parents peuvent adhérer à une association de parents d'élèves et se présenter aux élections de représentants des parents.",
+            "Le dispositif OEPRE (« Ouvrir l'École aux Parents pour la Réussite des Enfants ») propose aux parents étrangers volontaires des ateliers gratuits dans les écoles : langue française, valeurs de la République et fonctionnement de l'école (60 à 120 heures par an).",
+            "Le soutien à la parentalité existe partout : la CAF, les PMI, les lieux d'accueil enfants-parents et les associations aident les parents dans leur rôle."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La Convention internationale des droits de l'enfant (1989) protège les enfants ; l'intérêt supérieur de l'enfant passe avant tout.",
+        "L'autorité parentale est exercée par les deux parents, même séparés ; toute violence physique ou psychologique envers l'enfant est interdite.",
+        "Seul un tribunal peut retirer l'autorité parentale, en cas de danger pour l'enfant.",
+        "L'école est obligatoire de 3 à 16 ans pour tous les enfants vivant en France, gratuite et laïque.",
+        "Le dispositif OEPRE aide gratuitement les parents étrangers : français, valeurs de la République et fonctionnement de l'école."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+{
+  "slug": "droits-et-devoirs",
+  "titre": "Droits et devoirs",
+  "icone": "⚖️",
+  "description": "En France, chaque personne a des droits fondamentaux protégés par l'État. En échange, chaque personne a aussi des devoirs : respecter la loi, respecter les autres et participer à la vie de la société.",
+  "fiches": [
+    {
+      "slug": "les-droits-fondamentaux",
+      "titre": "Les droits fondamentaux",
+      "resume": "Les droits fondamentaux sont les droits et les libertés de base de chaque personne. Ils garantissent la dignité, le respect, l'égalité et la justice, et ils sont la base de la démocratie française.",
+      "sections": [
+        {
+          "titre": "Qu'est-ce qu'un droit fondamental ?",
+          "texte": "Les droits fondamentaux (on dit aussi « libertés fondamentales ») sont les droits de base que tout le monde doit respecter. Ils sont universels : ils sont les mêmes pour tous, quels que soient le sexe, l'âge, la religion ou le mode de vie.",
+          "points": [
+            "Ils garantissent 4 principes : la dignité, le respect, l'égalité et la justice.",
+            "Ils sont la base de la démocratie française.",
+            "L'État français les protège grâce à des textes de loi français et européens.",
+            "Il existe 3 catégories : les droits liés à la personne humaine, les droits économiques et sociaux, et les droits de troisième génération."
+          ]
+        },
+        {
+          "titre": "Les droits liés à la personne humaine",
+          "texte": "Chaque personne a ces droits simplement parce qu'elle est un être humain. Ce sont des droits individuels, civiques et politiques. Personne ne peut les supprimer.",
+          "points": [
+            "L'égalité devant la loi : la loi est la même pour tous (égalité devant la justice, l'impôt, l'emploi, égalité entre les femmes et les hommes).",
+            "La liberté : liberté d'expression (dire ce que l'on pense), liberté de religion, droit de grève (arrêter le travail pour montrer un désaccord).",
+            "La sûreté (la sécurité) : droit à un procès équitable (juste), à un avocat, et présomption d'innocence (on est innocent tant que la justice n'a pas prouvé le contraire).",
+            "La propriété : le droit de posséder des biens et de créer une entreprise.",
+            "La résistance à l'oppression : le droit de s'opposer à un pouvoir injuste."
+          ]
+        },
+        {
+          "titre": "Les droits économiques et sociaux",
+          "texte": "Ces droits garantissent à chaque personne des conditions de vie décentes (correctes). L'État doit agir pour les assurer.",
+          "points": [
+            "Le droit au travail : chacun a le devoir de travailler et le droit d'obtenir un emploi, sans discrimination.",
+            "Le droit à la protection de la santé : l'État protège la santé, la sécurité matérielle, le repos et les loisirs.",
+            "Le droit à l'enseignement gratuit : l'école publique est gratuite et laïque, c'est un devoir de l'État.",
+            "Ces droits viennent surtout du préambule (l'introduction) de la Constitution de 1946."
+          ]
+        },
+        {
+          "titre": "Les droits de troisième génération",
+          "texte": "Ce sont des droits collectifs, fondés sur la solidarité. Ils concernent les Français et les étrangers, et pensent aux générations futures (les enfants de demain).",
+          "points": [
+            "Le droit à la paix.",
+            "Le droit à un environnement sain : « chacun a le droit de vivre dans un environnement équilibré et respectueux de la santé ».",
+            "La protection des générations futures : préserver les ressources de la planète.",
+            "L'assistance humanitaire : aider les populations en danger (nourriture, soins)."
+          ]
+        },
+        {
+          "titre": "Faire valoir ses droits : à qui s'adresser ?",
+          "texte": "Si vos droits ne sont pas respectés, plusieurs acteurs peuvent vous aider.",
+          "points": [
+            "La police et la gendarmerie : pour porter plainte (déclarer une infraction à la justice) au commissariat ou à la gendarmerie.",
+            "Le Défenseur des droits : autorité indépendante qui défend les personnes, lutte contre les discriminations et règle les conflits avec les services publics.",
+            "Les Maisons de justice et du droit : conseils juridiques gratuits.",
+            "Le conciliateur ou le médiateur : cherche un accord à l'amiable (sans procès) entre deux personnes.",
+            "L'avocat : conseille et défend devant la justice. Une aide financière existe pour les personnes qui ont peu de ressources (aide juridictionnelle)."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "Les droits fondamentaux sont universels : ils sont les mêmes pour tous.",
+        "Il existe 3 catégories de droits : liés à la personne, économiques et sociaux, et de troisième génération (collectifs).",
+        "Les 4 droits naturels sont : la liberté, la propriété, la sûreté et la résistance à l'oppression.",
+        "L'égalité devant la loi et l'égalité entre les femmes et les hommes sont des principes essentiels.",
+        "Le Défenseur des droits et la justice aident les personnes dont les droits ne sont pas respectés."
+      ]
+    },
+    {
+      "slug": "dignite-corps-et-libertes-dans-le-couple",
+      "titre": "Dignité humaine, droit sur son corps et libertés dans le couple",
+      "resume": "Chaque personne a de la valeur et mérite le respect : c'est la dignité humaine. Chacun est libre de faire ses propres choix pour son corps et dans sa vie de couple.",
+      "sections": [
+        {
+          "titre": "La dignité humaine",
+          "texte": "La dignité humaine signifie que chaque personne a de la valeur et mérite le respect, simplement parce qu'elle est un être humain. Ce respect est sans condition : peu importe l'âge, le sexe, la santé, la religion ou l'origine. Personne ne doit être traité comme un objet.",
+          "points": [
+            "La dignité est le fondement (la base) de tous les droits fondamentaux.",
+            "La torture et les traitements inhumains ou dégradants sont interdits.",
+            "L'esclavage et le travail forcé sont interdits.",
+            "Le corps humain ne peut pas être vendu (le trafic d'organes est interdit)."
+          ]
+        },
+        {
+          "titre": "Le droit de disposer de son corps",
+          "texte": "Chaque personne est libre de faire ses propres choix concernant son corps. Personne ne peut décider à sa place."
+        },
+        {
+          "titre": "La contraception",
+          "texte": "La contraception regroupe les moyens d'éviter une grossesse (par exemple : la pilule, le préservatif).",
+          "points": [
+            "La contraception est remboursée à 100 % pour les femmes de moins de 26 ans.",
+            "Les préservatifs sont gratuits en pharmacie pour les moins de 26 ans.",
+            "Pour les mineurs (moins de 18 ans), les consultations peuvent être anonymes et gratuites.",
+            "La contraception d'urgence est donnée sans ordonnance, gratuite et anonyme pour les mineures."
+          ]
+        },
+        {
+          "titre": "L'interruption volontaire de grossesse (IVG)",
+          "texte": "L'IVG (l'avortement) est le droit pour une femme d'arrêter une grossesse. C'est un droit pour toutes les femmes en France.",
+          "points": [
+            "L'IVG est possible pour toutes les femmes, sans limite d'âge.",
+            "Une mineure n'a pas besoin de l'autorisation de ses parents, mais elle doit être accompagnée d'une personne majeure.",
+            "L'IVG est remboursée à 100 % par l'Assurance Maladie.",
+            "Il existe deux méthodes : par médicaments ou par chirurgie."
+          ]
+        },
+        {
+          "titre": "Les libertés au sein du couple",
+          "texte": "Un couple est l'union de deux personnes, de sexe différent ou de même sexe. Dans le couple, chaque personne garde ses libertés individuelles.",
+          "points": [
+            "Chacun choisit librement son partenaire. Le mariage n'est valable que si les deux personnes sont d'accord (consentement libre). Le mariage forcé est interdit.",
+            "Chacun peut choisir : vivre en concubinage (vie commune sans contrat), se pacser (contrat de PACS) ou se marier.",
+            "Chacun peut mettre fin à l'union : le divorce termine le mariage, le PACS peut être rompu simplement, le concubinage peut s'arrêter à tout moment.",
+            "Chacun décide librement d'avoir ou non des enfants, sans autorisation de son partenaire.",
+            "La PMA (procréation médicalement assistée) est ouverte à toutes les femmes, en couple ou seules, depuis 2021. L'adoption est aussi possible."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "Chaque personne mérite le respect : la torture, l'esclavage et les traitements dégradants sont interdits.",
+        "Chaque personne est libre de disposer de son corps : contraception et IVG sont des droits.",
+        "L'IVG est remboursée à 100 % et possible sans autorisation des parents pour les mineures.",
+        "Le mariage exige le consentement libre des deux personnes : le mariage forcé est interdit.",
+        "Dans le couple, chacun garde ses libertés : choisir son partenaire, divorcer, avoir ou non des enfants."
+      ]
+    },
+    {
+      "slug": "les-grands-textes-et-la-citoyennete",
+      "titre": "Les grands textes des droits fondamentaux et la citoyenneté",
+      "resume": "Les droits fondamentaux sont protégés par de grands textes : la Déclaration des droits de l'homme et du citoyen (1789), la Constitution de 1958 et la Charte de l'environnement (2004). La citoyenneté est aussi un droit fondamental.",
+      "sections": [
+        {
+          "titre": "Les textes qui protègent les droits fondamentaux",
+          "points": [
+            "La Déclaration des droits de l'homme et du citoyen (1789).",
+            "Le Code civil (1804).",
+            "Les Constitutions françaises de 1946 et de 1958.",
+            "La Convention européenne des droits de l'homme.",
+            "La Charte des droits fondamentaux de l'Union européenne (2000).",
+            "La Charte de l'environnement (2004)."
+          ]
+        },
+        {
+          "titre": "La Déclaration des droits de l'homme et du citoyen (1789)",
+          "texte": "La DDHC a été adoptée le 26 août 1789, pendant la Révolution française. Elle marque la fin de l'Ancien Régime (la monarchie absolue). Elle contient une introduction et 17 articles. C'est une référence pour les démocraties du monde entier.",
+          "points": [
+            "Article 1 : « Les hommes naissent et demeurent libres et égaux en droits. »",
+            "Elle proclame les droits naturels : liberté, propriété, sûreté, résistance à l'oppression.",
+            "Elle garantit la liberté d'opinion et d'expression, même religieuse.",
+            "Elle pose la souveraineté nationale (le pouvoir vient du peuple) et la séparation des pouvoirs.",
+            "Elle prévoit que chacun paie l'impôt selon ses moyens."
+          ]
+        },
+        {
+          "titre": "La Constitution de la Vème République (1958)",
+          "texte": "Une Constitution est le texte fondamental qui organise l'État : elle répartit le pouvoir et garantit les droits et libertés. La Constitution actuelle date du 4 octobre 1958. Elle a été préparée par le Gouvernement du général de Gaulle et approuvée par référendum (vote direct du peuple) à 82 %.",
+          "points": [
+            "C'est le texte fondateur de la Vème République, toujours en vigueur aujourd'hui.",
+            "Depuis 1962, le président de la République est élu au suffrage universel direct (directement par les citoyens).",
+            "Le « bloc de constitutionnalité » regroupe : la Constitution de 1958, la DDHC de 1789, le préambule de la Constitution de 1946 et la Charte de l'environnement de 2004.",
+            "Le Conseil constitutionnel vérifie que les lois respectent la Constitution."
+          ]
+        },
+        {
+          "titre": "La Charte de l'environnement (2004)",
+          "texte": "La Charte de l'environnement affirme que la protection de l'environnement est vitale pour la France et pour les générations futures. Adoptée en 2004, elle a été intégrée à la Constitution en 2005.",
+          "points": [
+            "Article 1 : chacun a le droit de vivre dans un environnement équilibré et respectueux de la santé.",
+            "Article 2 : toute personne a le devoir de participer à la préservation de l'environnement.",
+            "Elle pose le principe de précaution : agir avec prudence face aux risques graves pour l'environnement.",
+            "Elle défend le développement durable : répondre aux besoins d'aujourd'hui sans compromettre ceux des générations futures."
+          ]
+        },
+        {
+          "titre": "La citoyenneté, un droit fondamental",
+          "texte": "Le citoyen français a la nationalité française. Il est protégé par l'État et, en échange, il respecte les lois du pays.",
+          "points": [
+            "Droits du citoyen : voter, s'exprimer librement, s'engager, circuler librement.",
+            "Devoirs du citoyen : respecter les lois, payer les impôts, remplir les obligations militaires.",
+            "Les étrangers qui vivent en France n'ont pas tous ces droits (par exemple, ils ne votent pas aux élections françaises).",
+            "La déchéance de nationalité : dans certains cas très graves, l'État peut retirer la nationalité française. La personne perd alors le droit de vote, le passeport français et la protection diplomatique."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La DDHC date du 26 août 1789 : « Les hommes naissent et demeurent libres et égaux en droits. »",
+        "La Constitution de la Vème République date du 4 octobre 1958.",
+        "Le bloc de constitutionnalité regroupe la Constitution de 1958, la DDHC de 1789, le préambule de 1946 et la Charte de l'environnement de 2004.",
+        "La Charte de l'environnement (2004) donne le droit à un environnement sain et le devoir de le protéger.",
+        "La citoyenneté donne des droits (voter) et des devoirs (respecter les lois, payer les impôts)."
+      ]
+    },
+    {
+      "slug": "respecter-la-loi-obligations-et-devoirs",
+      "titre": "Respecter la loi : les obligations des résidents et des citoyens",
+      "resume": "La liberté s'arrête là où commence celle des autres. Toute personne qui vit en France doit respecter la loi, payer ses impôts et participer au vivre-ensemble.",
+      "sections": [
+        {
+          "titre": "Les limites des libertés individuelles",
+          "texte": "La DDHC dit : « La liberté consiste à faire tout ce qui ne nuit pas à autrui » (qui ne fait pas de mal aux autres). Les libertés ne sont donc pas sans limite.",
+          "points": [
+            "Les libertés sont limitées par : l'intérêt général, les libertés des autres, l'ordre public (sécurité, tranquillité, salubrité) et le respect de la dignité humaine.",
+            "Exemple : pendant la crise du Covid-19 (2020), la liberté de circuler a été limitée pour protéger la santé de tous.",
+            "Exemple : il est interdit de circuler dans l'espace public avec une tenue qui cache le visage.",
+            "Exemple : la lutte contre le terrorisme peut limiter la liberté de circulation."
+          ]
+        },
+        {
+          "titre": "Les infractions : contravention, délit, crime",
+          "texte": "Une infraction est un acte interdit par la loi. Il existe 3 types d'infractions, du moins grave au plus grave.",
+          "points": [
+            "La contravention (la moins grave) : par exemple un excès de vitesse ou du tapage nocturne (bruit la nuit). Sanction : une amende (de l'argent à payer), sans prison. Jugée par le tribunal de police.",
+            "Le délit (gravité moyenne) : par exemple le vol, la fraude fiscale, le harcèlement, la non-scolarisation des enfants. Sanction : amende et prison possible jusqu'à 10 ans. Jugé par le tribunal correctionnel.",
+            "Le crime (le plus grave) : par exemple le meurtre, le viol, le terrorisme. Sanction : prison de 15 ans jusqu'à la perpétuité (toute la vie). Jugé par la cour d'assises ou la cour criminelle.",
+            "La tentative de crime (essayer de commettre un crime) est toujours punie."
+          ]
+        },
+        {
+          "titre": "Qui fait respecter la loi ?",
+          "texte": "La police et la gendarmerie sont les « forces de l'ordre ». Elles ont les mêmes missions, mais sur des territoires différents.",
+          "points": [
+            "La police intervient dans les villes ; la gendarmerie dans les campagnes et sur les routes. Les gendarmes sont des militaires.",
+            "Leurs missions : prévenir les infractions, maintenir l'ordre public, protéger les personnes et les biens, enquêter, lutter contre le terrorisme.",
+            "Elles peuvent verbaliser (donner une amende), recueillir des témoignages et informer la justice."
+          ]
+        },
+        {
+          "titre": "Les obligations de toute personne résidant en France",
+          "texte": "Toute personne qui habite en France, française ou étrangère, doit respecter des obligations envers l'État et la société.",
+          "points": [
+            "Payer ses impôts : l'impôt finance les services publics gratuits (école, police, justice, hôpitaux).",
+            "Être en situation régulière : les étrangers doivent avoir un titre de séjour valide et le renouveler.",
+            "Porter assistance à personne en danger : ne pas aider une personne en danger est puni par la loi (« non-assistance à personne en danger »).",
+            "Protéger l'environnement au quotidien : trier ses déchets, économiser l'eau et l'énergie, limiter le gaspillage, privilégier les transports en commun et le vélo, respecter les espaces communs.",
+            "Scolariser ses enfants : l'instruction est obligatoire de 3 à 16 ans. Ne pas scolariser ses enfants est un délit."
+          ]
+        },
+        {
+          "titre": "Les obligations du citoyen français",
+          "texte": "Le citoyen français a des devoirs particuliers liés à la vie démocratique.",
+          "points": [
+            "Respecter la loi française et européenne : les citoyens élisent ceux qui votent les lois, ils doivent donc les respecter.",
+            "Voter : « Voter est un droit, c'est aussi un devoir civique » (phrase inscrite sur la carte d'électeur).",
+            "Participer à la défense du pays : depuis la fin du service militaire (1997), les jeunes participent à la Journée Défense et Citoyenneté (JDC).",
+            "Participer à la justice : un citoyen de plus de 23 ans, inscrit sur les listes électorales, peut être tiré au sort comme juré (citoyen qui juge) en cour d'assises."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La liberté consiste à faire tout ce qui ne nuit pas à autrui : les libertés ont des limites.",
+        "Il existe 3 types d'infractions : contravention, délit, crime (du moins grave au plus grave).",
+        "Tout résident doit payer ses impôts, respecter la loi, aider une personne en danger et protéger l'environnement.",
+        "Les étrangers doivent avoir un titre de séjour valide.",
+        "Le citoyen français doit voter (devoir civique), participer à la JDC et peut être juré en cour d'assises."
+      ]
+    },
+    {
+      "slug": "interdiction-des-violences-et-protection-des-victimes",
+      "titre": "L'interdiction des violences et la protection des victimes",
+      "resume": "En France, toutes les formes de violences sont strictement interdites : dans le couple, la famille, au travail ou dans la rue. Les victimes sont protégées et les témoins doivent agir.",
+      "sections": [
+        {
+          "titre": "Toutes les violences sont interdites",
+          "texte": "Une violence est un acte qui fait du mal à une autre personne. La loi interdit toutes les formes de violence, partout : dans le couple, la famille, au travail et dans l'espace public.",
+          "points": [
+            "La violence physique : gifle, coup, bousculade.",
+            "La violence psychologique : insultes, menaces, humiliations, confiscation des papiers d'identité.",
+            "La violence économique : contrôler l'argent de son partenaire pour le dominer.",
+            "La violence sexuelle : imposer un acte sexuel non désiré."
+          ]
+        },
+        {
+          "titre": "Les violences faites aux enfants",
+          "texte": "En France, la maltraitance des enfants est interdite. La violence n'est jamais un outil d'éducation.",
+          "points": [
+            "Les gifles, les fessées, les humiliations et les violences psychologiques sont interdites.",
+            "La privation de soins (refuser volontairement nourriture, médicaments ou hygiène) est une maltraitance.",
+            "Le harcèlement scolaire (violences répétées entre élèves : insultes, moqueries, coups) est un délit.",
+            "Numéros d'aide : 119 (enfance en danger, gratuit, 24h/24) et 3018 (harcèlement scolaire)."
+          ]
+        },
+        {
+          "titre": "L'interdiction des mutilations sexuelles féminines",
+          "texte": "Les mutilations sexuelles féminines (comme l'excision) sont l'ablation (le fait de couper) totale ou partielle des organes génitaux de la femme. Elles sont strictement interdites et lourdement punies par la loi française, même si elles sont commises à l'étranger.",
+          "points": [
+            "Aucune tradition, coutume ou religion ne peut justifier ces actes.",
+            "Les conséquences sont graves : infections, douleurs, accouchements à risque, dépression.",
+            "Les parents ont le devoir de protéger leurs enfants contre ces pratiques."
+          ]
+        },
+        {
+          "titre": "L'interdiction des violences sexuelles",
+          "texte": "Les violences sexuelles sont interdites, y compris dans le couple. Personne n'a le droit d'imposer un acte sexuel non désiré.",
+          "points": [
+            "Le harcèlement sexuel : imposer des propos ou comportements à caractère sexuel (remarques, sifflements, messages).",
+            "L'agression sexuelle : un acte sexuel sans pénétration imposé par violence, menace, contrainte ou surprise (par exemple des attouchements).",
+            "Le viol : une pénétration sexuelle imposée par violence, menace, contrainte ou surprise. C'est un crime.",
+            "Le consentement (être d'accord) doit être mutuel. Il peut être retiré à tout moment. Une personne endormie ou sous l'effet de l'alcool ne peut pas consentir."
+          ]
+        },
+        {
+          "titre": "La traite des êtres humains et la prostitution",
+          "texte": "La traite des êtres humains est le fait de recruter, transporter ou héberger une personne pour l'exploiter. Elle est interdite en France.",
+          "points": [
+            "Formes d'exploitation interdites : proxénétisme (profiter de la prostitution d'autrui), esclavage, travail forcé, mendicité forcée.",
+            "L'achat d'actes sexuels est interdit : les clients et les proxénètes peuvent être punis.",
+            "Les personnes qui veulent sortir de la prostitution sont aidées (Parcours de Sortie de la Prostitution)."
+          ]
+        },
+        {
+          "titre": "Protéger les victimes et agir en tant que témoin",
+          "texte": "La victime de violences n'est jamais responsable. Les victimes et les témoins peuvent et doivent agir.",
+          "points": [
+            "En parler : à une personne de confiance (famille, ami, médecin, travailleur social).",
+            "Se faire accompagner : les associations offrent un soutien psychologique, juridique et social, gratuit et confidentiel.",
+            "Porter plainte au commissariat ou à la gendarmerie, ou écrire au procureur de la République.",
+            "Un témoin de violences doit agir sans se mettre en danger : écouter, orienter la victime, appeler les forces de l'ordre, témoigner.",
+            "Numéros d'urgence : 17 (police), 15 (SAMU), 18 (pompiers), 112 (urgences européen), 3919 (violences faites aux femmes), 119 (enfance en danger), 3018 (harcèlement scolaire)."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "Toutes les violences sont interdites : physiques, psychologiques, économiques et sexuelles, même dans le couple et la famille.",
+        "Les violences contre les enfants sont interdites, y compris les gifles et les fessées ; le harcèlement scolaire est un délit.",
+        "L'excision et toutes les mutilations sexuelles féminines sont des crimes, même commises à l'étranger.",
+        "Le viol est un crime ; sans consentement, tout acte sexuel est interdit.",
+        "La victime n'est jamais responsable ; numéros utiles : 17 (police), 3919 (violences femmes), 119 (enfance en danger)."
+      ]
+    }
+  ]
+}

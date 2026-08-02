@@ -1,0 +1,261 @@
+{
+  "slug": "histoire-geographie-culture",
+  "titre": "Histoire, géographie et culture",
+  "icone": "🗺️",
+  "description": "Cette thématique présente les grandes périodes de l'histoire de France, la géographie du territoire français et la richesse de la culture française. Ce sont des repères importants pour l'examen civique.",
+  "fiches": [
+    {
+      "slug": "les-regimes-politiques-depuis-1789",
+      "titre": "Les régimes politiques depuis 1789",
+      "resume": "Depuis la Révolution de 1789, la France a connu plusieurs régimes politiques (façons de gouverner le pays) : monarchies, empires et républiques. Aujourd'hui, la France est une république.",
+      "sections": [
+        {
+          "titre": "Avant 1789 : l'Ancien Régime",
+          "texte": "Avant la Révolution, la France est une monarchie absolue de droit divin : le roi a tous les pouvoirs et dit qu'il les reçoit de Dieu. Trois familles de rois (dynasties) se sont succédé : les Mérovingiens, les Carolingiens, puis les Capétiens. La société est divisée en trois ordres : le clergé (les religieux), la noblesse et le tiers état (le reste du peuple, qui paie la plupart des impôts)."
+        },
+        {
+          "titre": "La Révolution française (1789)",
+          "texte": "En 1789, le peuple se révolte contre le roi Louis XVI et contre les injustices. C'est un événement fondateur de la France moderne.",
+          "points": [
+            "Le 14 juillet 1789, le peuple de Paris prend la Bastille, une prison symbole du pouvoir du roi. Le 14 juillet est devenu la fête nationale.",
+            "Le 26 août 1789, la Déclaration des droits de l'homme et du citoyen est adoptée : les hommes naissent libres et égaux en droits.",
+            "La devise « Liberté, Égalité, Fraternité » vient de la Révolution.",
+            "En 1792, la monarchie est abolie (supprimée) : c'est le début de la Ière République."
+          ]
+        },
+        {
+          "titre": "Le XIXème siècle : une succession de régimes",
+          "points": [
+            "1799-1804 : le Consulat, dirigé par Napoléon Bonaparte.",
+            "1804-1814 : le Premier Empire. Napoléon Ier crée le Code civil, un recueil de lois toujours utilisé aujourd'hui.",
+            "1814-1848 : retour des rois (la Restauration, puis la Monarchie de Juillet).",
+            "1848-1851 : la IIème République. En 1848, l'esclavage est définitivement aboli (supprimé) grâce à Victor Schœlcher, et le suffrage universel masculin est instauré (tous les hommes peuvent voter).",
+            "1852-1870 : le Second Empire de Napoléon III.",
+            "1870-1940 : la IIIème République, le premier régime républicain durable. Elle crée l'école gratuite, laïque et obligatoire (lois de Jules Ferry) et vote la loi de 1905 de séparation des Églises et de l'État (laïcité)."
+          ]
+        },
+        {
+          "titre": "De 1940 à 1958",
+          "points": [
+            "1940-1944 : le régime de Vichy, dirigé par le maréchal Pétain, collabore (travaille) avec l'Allemagne nazie. Ce n'est pas une république.",
+            "1944-1946 : le Gouvernement provisoire du général de Gaulle rétablit la République. En 1944, les femmes obtiennent le droit de vote ; elles votent pour la première fois en 1945.",
+            "1946-1958 : la IVème République. La Sécurité sociale est créée (1945) et l'égalité entre les femmes et les hommes est inscrite dans la Constitution."
+          ]
+        },
+        {
+          "titre": "Depuis 1958 : la Vème République",
+          "texte": "En 1958, le général de Gaulle fait adopter une nouvelle Constitution (le texte qui organise les pouvoirs). C'est le début de la Vème République, le régime politique actuel de la France."
+        }
+      ],
+      "aRetenir": [
+        "1789 : Révolution française, prise de la Bastille le 14 juillet et Déclaration des droits de l'homme et du citoyen.",
+        "1848 : abolition définitive de l'esclavage et suffrage universel masculin.",
+        "1905 : loi de séparation des Églises et de l'État (laïcité).",
+        "1944 : droit de vote des femmes.",
+        "Depuis 1958, la France vit sous la Vème République."
+      ]
+    },
+    {
+      "slug": "la-cinquieme-republique",
+      "titre": "La Vème République",
+      "resume": "La Vème République est le régime politique de la France depuis 1958. Elle a permis de grandes avancées pour les droits et les libertés.",
+      "sections": [
+        {
+          "titre": "La naissance de la Vème République",
+          "texte": "La Constitution de la Vème République est adoptée par référendum (vote direct des citoyens) le 4 octobre 1958. Elle donne un rôle important au président de la République. Depuis 1962, le président est élu au suffrage universel direct (directement par tous les citoyens). Depuis 2000, son mandat (durée de ses fonctions) est de 5 ans : c'est le quinquennat."
+        },
+        {
+          "titre": "Les présidents de la Vème République",
+          "points": [
+            "Charles de Gaulle (1959-1969), fondateur de la Vème République.",
+            "Georges Pompidou (1969-1974).",
+            "Valéry Giscard d'Estaing (1974-1981).",
+            "François Mitterrand (1981-1995).",
+            "Jacques Chirac (1995-2007).",
+            "Nicolas Sarkozy (2007-2012).",
+            "François Hollande (2012-2017).",
+            "Emmanuel Macron (depuis 2017)."
+          ]
+        },
+        {
+          "titre": "L'abolition de la peine de mort (1981)",
+          "texte": "En 1981, la France abolit (supprime) la peine de mort, grâce à la loi défendue par Robert Badinter, ministre de la Justice. Aujourd'hui, l'interdiction de la peine de mort est inscrite dans la Constitution."
+        },
+        {
+          "titre": "Le droit à l'avortement (1975)",
+          "texte": "En 1975, la loi défendue par Simone Veil autorise l'interruption volontaire de grossesse (IVG, l'avortement). C'est une grande avancée pour les droits des femmes. En 2024, la liberté de recourir à l'IVG a été inscrite dans la Constitution."
+        },
+        {
+          "titre": "Le mariage pour tous (2013)",
+          "texte": "Depuis la loi de 2013, deux personnes du même sexe peuvent se marier en France. C'est le « mariage pour tous ». Cette loi ouvre aussi l'adoption aux couples de même sexe."
+        }
+      ],
+      "aRetenir": [
+        "La Vème République existe depuis 1958 ; sa Constitution date du 4 octobre 1958.",
+        "Le président de la République est élu pour 5 ans au suffrage universel direct.",
+        "1975 : loi Veil sur le droit à l'avortement.",
+        "1981 : abolition de la peine de mort (Robert Badinter).",
+        "2013 : loi sur le mariage pour tous."
+      ]
+    },
+    {
+      "slug": "les-conflits-mondiaux-et-le-nouvel-ordre-mondial",
+      "titre": "Les conflits mondiaux et le nouvel ordre mondial",
+      "resume": "Au XXème siècle, la France a connu deux guerres mondiales. Après 1945, le monde change : décolonisation et construction de l'Europe pour garantir la paix.",
+      "sections": [
+        {
+          "titre": "La Première Guerre mondiale (1914-1918)",
+          "texte": "De 1914 à 1918, la France et ses alliés combattent l'Allemagne et ses alliés. C'est une guerre très meurtrière : environ 1,4 million de soldats français sont morts. La bataille de Verdun (1916) est un symbole de cette guerre. L'armistice (l'accord qui arrête les combats) est signé le 11 novembre 1918. Le 11 novembre est aujourd'hui un jour férié de commémoration (de souvenir)."
+        },
+        {
+          "titre": "La Seconde Guerre mondiale (1939-1945)",
+          "points": [
+            "En 1939, l'Allemagne nazie d'Adolf Hitler envahit la Pologne : la guerre commence.",
+            "En 1940, la France est vaincue et occupée. Le régime de Vichy, dirigé par le maréchal Pétain, collabore avec l'Allemagne nazie.",
+            "Le 18 juin 1940, depuis Londres, le général de Gaulle appelle les Français à résister : c'est l'appel du 18 juin.",
+            "Le 6 juin 1944, les Alliés débarquent en Normandie pour libérer la France.",
+            "La guerre se termine en Europe le 8 mai 1945 : c'est aujourd'hui un jour férié."
+          ]
+        },
+        {
+          "titre": "La Shoah",
+          "texte": "La Shoah est le génocide (l'extermination organisée d'un peuple) des Juifs par l'Allemagne nazie. Environ 6 millions de Juifs ont été assassinés en Europe, notamment dans des camps d'extermination comme Auschwitz. Environ 76 000 Juifs ont été déportés (envoyés de force) depuis la France, avec la participation du régime de Vichy, comme lors de la rafle du Vel d'Hiv en 1942. Se souvenir de la Shoah est un devoir de mémoire : cela rappelle où mènent le racisme et l'antisémitisme (la haine des Juifs)."
+        },
+        {
+          "titre": "La Résistance et la Libération",
+          "texte": "Pendant l'Occupation, des femmes et des hommes ont résisté à l'Allemagne nazie : c'est la Résistance. Ils ont aidé les Alliés, caché des personnes persécutées et informé la population. Jean Moulin a unifié les mouvements de Résistance sous l'autorité du général de Gaulle. À la Libération (1944), la République est rétablie et de grands progrès sociaux sont décidés (Sécurité sociale, droit de vote des femmes)."
+        },
+        {
+          "titre": "La décolonisation",
+          "texte": "Après 1945, les colonies (territoires dominés par la France) demandent leur indépendance. C'est la décolonisation. Elle est parfois pacifique, parfois violente, comme la guerre d'Algérie (1954-1962), qui se termine par l'indépendance de l'Algérie en 1962."
+        },
+        {
+          "titre": "La construction européenne",
+          "points": [
+            "Après 1945, des pays européens décident de s'unir pour garantir la paix. Robert Schuman et Jean Monnet sont des pères fondateurs de l'Europe.",
+            "1957 : le traité de Rome crée la Communauté économique européenne (CEE) avec 6 pays, dont la France et l'Allemagne.",
+            "1992 : le traité de Maastricht crée l'Union européenne (UE).",
+            "2002 : l'euro devient la monnaie commune de nombreux pays européens, dont la France.",
+            "Aujourd'hui, l'Union européenne compte 27 pays. Le drapeau européen est bleu avec 12 étoiles d'or et l'hymne européen est « l'Ode à la joie »."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "11 novembre 1918 : armistice de la Première Guerre mondiale.",
+        "18 juin 1940 : appel à la Résistance du général de Gaulle ; 8 mai 1945 : fin de la Seconde Guerre mondiale en Europe.",
+        "La Shoah est le génocide de 6 millions de Juifs par l'Allemagne nazie ; le régime de Vichy a collaboré.",
+        "La construction européenne assure la paix : traité de Rome (1957), Union européenne (1992), euro (2002).",
+        "La décolonisation suit la Seconde Guerre mondiale ; l'Algérie devient indépendante en 1962."
+      ]
+    },
+    {
+      "slug": "la-geographie-de-la-france",
+      "titre": "La géographie de la France",
+      "resume": "La France est un pays d'Europe de l'Ouest, avec des territoires d'outre-mer sur plusieurs océans. Elle compte environ 68 millions d'habitants.",
+      "sections": [
+        {
+          "titre": "Le territoire français",
+          "texte": "La France métropolitaine (la partie du pays située en Europe) a une forme d'hexagone (figure à six côtés). Elle s'étend sur environ 550 000 km². La France, c'est aussi l'outre-mer : des territoires situés loin de l'Europe, sur plusieurs océans. Les cinq départements et régions d'outre-mer sont la Guadeloupe, la Martinique, la Guyane, La Réunion et Mayotte. Grâce à l'outre-mer, la France possède le deuxième espace maritime du monde."
+        },
+        {
+          "titre": "Frontières et pays voisins",
+          "points": [
+            "La France métropolitaine a des frontières avec 8 pays : Belgique, Luxembourg, Allemagne, Suisse, Italie, Monaco, Espagne et Andorre.",
+            "Elle est bordée par la mer du Nord, la Manche, l'océan Atlantique et la mer Méditerranée.",
+            "La Guyane, en Amérique du Sud, a des frontières avec le Brésil et le Suriname."
+          ]
+        },
+        {
+          "titre": "Fleuves et montagnes",
+          "points": [
+            "Les cinq grands fleuves : la Loire (le plus long), la Seine (qui traverse Paris), le Rhône, la Garonne et le Rhin (frontière avec l'Allemagne).",
+            "Les principales montagnes : les Alpes (avec le mont Blanc, 4 806 m, plus haut sommet d'Europe de l'Ouest), les Pyrénées (frontière avec l'Espagne), le Massif central, le Jura et les Vosges."
+          ]
+        },
+        {
+          "titre": "Population et grandes villes",
+          "texte": "La France compte environ 68 millions d'habitants. C'est le deuxième pays le plus peuplé de l'Union européenne, après l'Allemagne. La majorité de la population vit dans les villes et leurs banlieues.",
+          "points": [
+            "Paris est la capitale : environ 2 millions d'habitants dans la ville, plus de 10 millions avec son agglomération (la ville et ses environs).",
+            "Autres grandes villes : Marseille, Lyon, Toulouse, Nice, Nantes, Montpellier, Strasbourg, Bordeaux, Lille."
+          ]
+        },
+        {
+          "titre": "Les régions françaises",
+          "texte": "La France est divisée en 18 régions : 13 régions en métropole (par exemple Île-de-France, Bretagne, Normandie, Occitanie, Provence-Alpes-Côte d'Azur, Corse) et 5 régions d'outre-mer (Guadeloupe, Martinique, Guyane, La Réunion, Mayotte). Les régions sont elles-mêmes divisées en départements (101 départements au total)."
+        },
+        {
+          "titre": "La France dans l'Europe et dans le monde",
+          "points": [
+            "La France est membre fondateur de l'Union européenne et carrefour des transports européens (routes, trains à grande vitesse, aéroports comme Paris-Charles-de-Gaulle).",
+            "C'est une grande puissance agricole : premier pays agricole de l'Union européenne (blé, vin, produits laitiers).",
+            "C'est une puissance économique, militaire et diplomatique : membre permanent du Conseil de sécurité de l'ONU (Organisation des Nations unies).",
+            "C'est la première destination touristique du monde, avec des dizaines de millions de visiteurs chaque année.",
+            "Ses grands ports (Marseille, Le Havre) et ses aéroports la relient au monde entier."
+          ]
+        }
+      ],
+      "aRetenir": [
+        "La France métropolitaine a une forme d'hexagone ; l'outre-mer comprend notamment la Guadeloupe, la Martinique, la Guyane, La Réunion et Mayotte.",
+        "Cinq grands fleuves : Loire, Seine, Rhône, Garonne, Rhin ; principales montagnes : Alpes (mont Blanc), Pyrénées, Massif central, Jura, Vosges.",
+        "Environ 68 millions d'habitants ; Paris est la capitale.",
+        "18 régions (13 en métropole, 5 en outre-mer) et 101 départements.",
+        "La France est une grande puissance agricole, maritime et touristique, membre fondateur de l'Union européenne."
+      ]
+    },
+    {
+      "slug": "la-culture-francaise",
+      "titre": "La culture française",
+      "resume": "La culture française est connue dans le monde entier : la langue française, le patrimoine, la gastronomie, les artistes et les fêtes font la richesse du pays.",
+      "sections": [
+        {
+          "titre": "La langue française dans le monde",
+          "texte": "Le français est la langue officielle de la France : c'est écrit dans la Constitution. Il est parlé par plus de 300 millions de personnes dans le monde, sur les cinq continents. L'ensemble des pays qui parlent français forme la francophonie. Apprendre le français est essentiel pour s'intégrer et pour obtenir la nationalité française."
+        },
+        {
+          "titre": "Le patrimoine français",
+          "texte": "Le patrimoine, c'est l'ensemble des monuments, des biens et des traditions qui racontent l'histoire du pays. Beaucoup de sites français sont classés au patrimoine mondial de l'UNESCO.",
+          "points": [
+            "Monuments célèbres : la tour Eiffel, le musée du Louvre et la cathédrale Notre-Dame à Paris, le château de Versailles, le Mont-Saint-Michel, les châteaux de la Loire, le pont du Gard.",
+            "Chaque région a son patrimoine : paysages, monuments, langues régionales, fêtes et savoir-faire.",
+            "Le patrimoine est aussi immatériel (non matériel) : musique, traditions, cuisine."
+          ]
+        },
+        {
+          "titre": "La gastronomie",
+          "texte": "La gastronomie (l'art de la cuisine) est très importante en France. Le « repas gastronomique des Français » est inscrit au patrimoine immatériel de l'UNESCO : on se réunit autour d'un repas de plusieurs plats pour les grands événements (mariages, anniversaires). Chaque région a ses spécialités : par exemple la choucroute en Alsace, la ratatouille en Provence, les crêpes en Bretagne, sans oublier les fromages et les vins connus dans le monde entier."
+        },
+        {
+          "titre": "Des artistes et des personnages célèbres",
+          "points": [
+            "Écrivains : Molière (le français est appelé « la langue de Molière »), Victor Hugo, Émile Zola, Marcel Proust, Simone de Beauvoir, Albert Camus.",
+            "Peintres : Claude Monet (impressionnisme), Auguste Renoir, Paul Cézanne.",
+            "Sculpteur : Auguste Rodin.",
+            "Musiciens : Claude Debussy, Maurice Ravel, Édith Piaf, Charles Aznavour.",
+            "Scientifiques : Louis Pasteur (vaccin contre la rage), Marie Curie (deux prix Nobel, d'origine polonaise et naturalisée française).",
+            "De nombreux artistes et savants venus d'ailleurs, comme Pablo Picasso ou Joséphine Baker, ont enrichi la culture française."
+          ]
+        },
+        {
+          "titre": "Les jours fériés",
+          "texte": "La France compte 11 jours fériés nationaux (jours de fête légale définis par la loi). Certains sont civils ou commémoratifs, d'autres sont d'origine religieuse.",
+          "points": [
+            "Jours civils et commémoratifs : 1er janvier (Jour de l'an), 1er mai (fête du Travail, avec le muguet), 8 mai (victoire de 1945), 14 juillet (fête nationale : défilé militaire, feux d'artifice, bals), 11 novembre (armistice de 1918).",
+            "Jours d'origine religieuse : lundi de Pâques, Ascension, lundi de Pentecôte, 15 août (Assomption), 1er novembre (Toussaint), 25 décembre (Noël)."
+          ]
+        },
+        {
+          "titre": "L'accès à la culture",
+          "texte": "En France, la culture est accessible à tous : bibliothèques et médiathèques, musées (souvent gratuits certains jours), fêtes populaires comme la fête de la Musique le 21 juin ou les Journées européennes du patrimoine en septembre. Chaque citoyen est aussi un acteur de la culture : il peut la faire vivre et la transmettre."
+        }
+      ],
+      "aRetenir": [
+        "Le français est la langue de la République ; plus de 300 millions de personnes le parlent dans le monde (la francophonie).",
+        "La France a un patrimoine très riche : tour Eiffel, Louvre, Versailles, Mont-Saint-Michel, et de nombreux sites classés à l'UNESCO.",
+        "Le repas gastronomique des Français est inscrit au patrimoine immatériel de l'UNESCO.",
+        "Des personnages célèbres : Molière, Victor Hugo, Claude Monet, Louis Pasteur, Marie Curie.",
+        "Il y a 11 jours fériés nationaux, dont le 14 juillet, la fête nationale."
+      ]
+    }
+  ]
+}

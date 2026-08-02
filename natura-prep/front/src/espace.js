@@ -6,21 +6,30 @@ import '@fontsource/public-sans/600.css';
 import '@fontsource/public-sans/700.css';
 import './membre.css';
 import { api } from './api.js';
+import { rendreCours } from './cours.js';
+
+const SECTIONS = ['cours', 'quizz', 'simulations', 'rapports'];
 
 const espace = document.querySelector('[data-espace]');
 const liens = Array.from(document.querySelectorAll('.lateral-lien'));
 const panneaux = Array.from(document.querySelectorAll('[data-panneau]'));
 
-// Navigation entre sections (l'ancre permet de revenir sur la même section)
-function afficherSection(nom) {
-  const cible = panneaux.some((p) => p.dataset.panneau === nom) ? nom : 'cours';
-  panneaux.forEach((p) => (p.hidden = p.dataset.panneau !== cible));
-  liens.forEach((l) => l.classList.toggle('actif', l.dataset.section === cible));
-  history.replaceState(null, '', `#${cible}`);
+// Navigation par ancre : #cours, #cours/<thematique>/<fiche>, #quizz…
+function rendre() {
+  const segments = window.location.hash.replace('#', '').split('/').filter(Boolean);
+  const section = SECTIONS.includes(segments[0]) ? segments[0] : 'cours';
+  panneaux.forEach((p) => (p.hidden = p.dataset.panneau !== section));
+  liens.forEach((l) => l.classList.toggle('actif', l.dataset.section === section));
+  if (section === 'cours') rendreCours(segments.slice(1));
 }
 
+window.addEventListener('hashchange', rendre);
+
 liens.forEach((lien) => {
-  lien.addEventListener('click', () => afficherSection(lien.dataset.section));
+  lien.addEventListener('click', () => {
+    if (window.location.hash === `#${lien.dataset.section}`) rendre();
+    else window.location.hash = lien.dataset.section;
+  });
 });
 
 // Garde d'accès : l'espace ne s'affiche qu'une fois le membre identifié
@@ -41,7 +50,7 @@ async function initialiser() {
     .slice(0, 2)
     .join('');
 
-  afficherSection(window.location.hash.replace('#', '') || 'cours');
+  rendre();
   espace.hidden = false;
 }
 
