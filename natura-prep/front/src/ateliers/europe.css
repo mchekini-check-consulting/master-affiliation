@@ -1,0 +1,431 @@
+/* Atelier « L'Europe en un coup d'œil » — styles (préfixe at-eu-). */
+
+.at-eu {
+  max-width: 720px;
+  margin: 0 auto;
+  font-family: var(--f-corps);
+  color: var(--encre);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ---- Titres de section ---- */
+
+.at-eu-section-titre {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-family: var(--f-titres);
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--encre);
+}
+
+.at-eu-section-titre span {
+  color: #ffd166;
+  font-size: 1.05rem;
+  text-shadow: 0 0 0 #ffd166;
+}
+
+.at-eu-section-intro {
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--texte-sec);
+}
+
+/* ---- Mini-frise de la construction européenne ---- */
+
+.at-eu-frise {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 30px;
+  position: relative;
+}
+
+/* Le fil bleu européen de la frise */
+.at-eu-frise::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--bleu), #5a68d8);
+}
+
+.at-eu-jalon {
+  position: relative;
+  margin-bottom: 10px;
+  animation: at-eu-entree 0.4s ease both;
+  animation-delay: var(--delai, 0ms);
+}
+
+@keyframes at-eu-entree {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* L'étoile jaune sur le fil */
+.at-eu-jalon::before {
+  content: '★';
+  position: absolute;
+  left: -30px;
+  top: 12px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #ffd166;
+  background: var(--bleu);
+  border: 2px solid var(--page);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--bordure);
+  transition: transform 0.15s ease;
+}
+
+.at-eu-jalon.ouvert::before {
+  transform: scale(1.25);
+}
+
+.at-eu-jalon-bouton {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 13px 18px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--f-corps);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.at-eu-jalon-bouton:hover {
+  border-color: var(--bleu);
+  box-shadow: 0 8px 22px rgba(20, 26, 51, 0.07);
+}
+
+.at-eu-jalon.ouvert .at-eu-jalon-bouton {
+  border-color: var(--bleu);
+  background: var(--bleu-tint);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.at-eu-jalon-date {
+  font-family: var(--f-titres);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--bleu);
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+.at-eu-jalon-titre {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.at-eu-jalon-chevron {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--estompe);
+}
+
+.at-eu-jalon-detail {
+  background: var(--carte);
+  border: 1px solid var(--bleu);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  padding: 4px 18px 14px;
+  animation: at-eu-entree 0.25s ease both;
+}
+
+.at-eu-jalon-detail p {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--texte-2);
+  margin: 10px 0 4px;
+}
+
+/* ---- Jeu : en-tête et progression ---- */
+
+.at-eu-entete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.at-eu-compteur {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--encre);
+}
+
+.at-eu-points {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texte-sec);
+}
+
+.at-eu-barre {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bleu-tint);
+  border: 1px solid var(--bordure);
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.at-eu-barre-remplie {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--bleu), #5a68d8);
+  transition: width 0.35s ease;
+}
+
+/* ---- Jeu : carte pays ---- */
+
+.at-eu-carte {
+  position: relative;
+  overflow: hidden;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-top: 4px solid var(--bleu);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(20, 26, 51, 0.06);
+  margin-bottom: 20px;
+}
+
+/* Petites étoiles européennes en filigrane dans les coins */
+.at-eu-carte::before,
+.at-eu-carte::after {
+  content: '★';
+  position: absolute;
+  top: 12px;
+  font-size: 15px;
+  color: #ffd166;
+  opacity: 0.9;
+}
+
+.at-eu-carte::before {
+  left: 16px;
+}
+
+.at-eu-carte::after {
+  right: 16px;
+}
+
+.at-eu-carte-entree {
+  animation: at-eu-entree 0.35s ease both;
+}
+
+.at-eu-carte-drapeau {
+  display: block;
+  font-size: 3.2rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.at-eu-carte-nom {
+  margin: 0;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: var(--encre);
+}
+
+/* ---- Jeu : boutons de choix ---- */
+
+.at-eu-boutons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.at-eu-choix {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--encre);
+  background: var(--carte);
+  border: 2px solid var(--bordure);
+  border-radius: 16px;
+  padding: 14px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.at-eu-choix:hover:not(:disabled) {
+  border-color: var(--bleu);
+  background: var(--bleu-tint);
+  transform: translateY(-2px);
+}
+
+.at-eu-choix:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.at-eu-choix.at-eu-bon {
+  border-color: var(--vert);
+  background: #e8f7ee;
+  color: #186a3f;
+  opacity: 1;
+}
+
+.at-eu-choix.at-eu-mauvais {
+  border-color: var(--rouge);
+  background: var(--rouge-tint);
+  color: var(--rouge);
+  opacity: 1;
+}
+
+/* ---- Jeu : feedback ---- */
+
+.at-eu-retour {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 18px 22px;
+  animation: at-eu-entree 0.3s ease both;
+}
+
+.at-eu-verdict {
+  margin: 0 0 6px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.at-eu-verdict-bon {
+  color: #186a3f;
+}
+
+.at-eu-verdict-mauvais {
+  color: var(--rouge);
+}
+
+.at-eu-explication {
+  margin: 0 0 14px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--texte-sec);
+}
+
+.at-eu-suivant,
+.at-eu-rejouer {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  background: var(--bleu);
+  border: none;
+  border-radius: 999px;
+  padding: 11px 26px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.at-eu-suivant:hover,
+.at-eu-rejouer:hover {
+  background: #16207a;
+  transform: translateY(-1px);
+}
+
+/* ---- Jeu : écran de fin ---- */
+
+.at-eu-fin {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-top: 4px solid #ffd166;
+  border-radius: 16px;
+  padding: 40px 28px;
+  text-align: center;
+  animation: at-eu-entree 0.35s ease both;
+}
+
+.at-eu-fin-icone {
+  display: block;
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.at-eu-fin-score {
+  margin: 0 0 8px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--bleu);
+}
+
+.at-eu-fin-message {
+  margin: 0 auto 20px;
+  max-width: 440px;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--texte-2);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .at-eu {
+    gap: 32px;
+  }
+
+  .at-eu-jalon-bouton {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .at-eu-jalon-date {
+    min-width: 0;
+  }
+
+  .at-eu-carte {
+    padding: 24px 18px;
+  }
+
+  .at-eu-carte-nom {
+    font-size: 1.25rem;
+  }
+
+  .at-eu-boutons {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .at-eu-choix {
+    padding: 13px 10px;
+  }
+
+  .at-eu-fin {
+    padding: 30px 18px;
+  }
+}

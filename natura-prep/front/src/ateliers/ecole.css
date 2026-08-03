@@ -1,0 +1,415 @@
+/* Atelier « L'école de 3 à 18 ans » */
+
+.at-ec {
+  max-width: 960px;
+}
+
+.at-ec-intro {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--texte-2);
+  margin: 0 0 28px;
+}
+
+.at-ec-intro strong {
+  color: var(--encre);
+}
+
+.at-ec-section {
+  margin-bottom: 38px;
+}
+
+.at-ec-titre-section {
+  font-family: var(--f-titres);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--encre);
+  margin: 0 0 16px;
+}
+
+/* ---------- Section A : la frise des âges ---------- */
+
+.at-ec-frise {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.at-ec-bloc {
+  /* Largeur proportionnelle à la durée du niveau (en années). */
+  flex: var(--part) 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--carte);
+  border: 2px solid var(--bordure);
+  border-radius: 14px;
+  padding: 16px 8px;
+  cursor: pointer;
+  font-family: var(--f-corps);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Niveaux couverts par l'instruction obligatoire (3-16 ans) : surlignés. */
+.at-ec-bloc.oblig {
+  background: var(--bleu-tint);
+}
+
+.at-ec-bloc:hover {
+  border-color: var(--bleu);
+}
+
+.at-ec-bloc.actif {
+  border-color: var(--bleu);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(30, 43, 158, 0.16);
+}
+
+.at-ec-bloc-icone {
+  font-size: 26px;
+}
+
+.at-ec-bloc-nom {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--encre);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.at-ec-bloc-ages {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bleu);
+}
+
+/* Bandeau « instruction obligatoire » sous la frise (3 → 16 ans). */
+.at-ec-oblig {
+  margin: 10px 0 22px;
+}
+
+.at-ec-oblig-barre {
+  display: block;
+  width: var(--largeur, 86.667%);
+  height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--bleu), var(--rouge));
+}
+
+.at-ec-oblig-texte {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--bleu);
+}
+
+/* Panneau détaillé du niveau sélectionné */
+.at-ec-panneau {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 18px;
+  padding: 26px 30px;
+}
+
+.at-ec-panneau-entree {
+  animation: at-ec-entree 0.3s ease both;
+}
+
+@keyframes at-ec-entree {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.at-ec-panneau-entete {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.at-ec-panneau-icone {
+  font-size: 34px;
+}
+
+.at-ec-panneau-entete h4 {
+  font-family: var(--f-titres);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--encre);
+  margin: 0 0 4px;
+}
+
+.at-ec-panneau-ages {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--estompe);
+}
+
+.at-ec-panneau-classes {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texte-sec);
+  margin: 0;
+}
+
+.at-ec-diplome {
+  display: inline-block;
+  background: var(--bleu-tint);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bleu);
+  margin: 0 0 14px;
+}
+
+.at-ec-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.at-ec-points li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--texte-2);
+  margin-bottom: 8px;
+}
+
+.at-ec-points li:last-child {
+  margin-bottom: 0;
+}
+
+.at-ec-points li::before {
+  content: '●';
+  position: absolute;
+  left: 2px;
+  top: 1px;
+  font-size: 10px;
+  color: var(--rouge);
+}
+
+/* ---------- Section B : vrai ou faux ---------- */
+
+.at-ec-vf-entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.at-ec-vf-compteur,
+.at-ec-vf-points {
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--estompe);
+}
+
+.at-ec-vf-points {
+  color: var(--bleu);
+}
+
+.at-ec-vf-carte {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 18px;
+  padding: 26px 30px;
+  margin-bottom: 16px;
+}
+
+.at-ec-vf-carte-entree {
+  animation: at-ec-entree 0.3s ease both;
+}
+
+.at-ec-vf-etiquette {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--rouge);
+  margin-bottom: 8px;
+}
+
+.at-ec-vf-texte {
+  font-family: var(--f-titres);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.45;
+  color: var(--encre);
+  margin: 0;
+}
+
+.at-ec-vf-boutons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.at-ec-vf-choix {
+  background: var(--carte);
+  border: 2px solid var(--bordure);
+  border-radius: 14px;
+  padding: 18px;
+  cursor: pointer;
+  font-family: var(--f-corps);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--encre);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.at-ec-vf-choix:hover:not(:disabled) {
+  border-color: var(--bleu);
+  transform: translateY(-2px);
+}
+
+.at-ec-vf-choix:disabled {
+  cursor: default;
+}
+
+.at-ec-vf-choix.at-ec-vf-bon {
+  border-color: var(--vert);
+  background: #eaf7ef;
+  color: #1c8a4b;
+}
+
+.at-ec-vf-choix.at-ec-vf-mauvais {
+  border-color: var(--rouge);
+  background: var(--rouge-tint);
+  color: var(--rouge);
+}
+
+.at-ec-vf-retour {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 18px 22px;
+  animation: at-ec-entree 0.25s ease both;
+}
+
+.at-ec-vf-verdict {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.at-ec-vf-verdict-bon {
+  color: #1c8a4b;
+}
+
+.at-ec-vf-verdict-mauvais {
+  color: var(--rouge);
+}
+
+.at-ec-vf-explication {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--texte-2);
+  margin: 0 0 14px;
+}
+
+.at-ec-vf-suivant,
+.at-ec-vf-rejouer {
+  background: var(--bleu);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 22px;
+  cursor: pointer;
+  font-family: var(--f-corps);
+  font-size: 14px;
+  font-weight: 700;
+  transition: filter 0.15s ease;
+}
+
+.at-ec-vf-suivant:hover,
+.at-ec-vf-rejouer:hover {
+  filter: brightness(1.12);
+}
+
+/* Écran de fin */
+.at-ec-vf-fin {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 18px;
+  padding: 34px 30px;
+  text-align: center;
+  animation: at-ec-entree 0.3s ease both;
+}
+
+.at-ec-vf-fin-icone {
+  font-size: 40px;
+}
+
+.at-ec-vf-fin-score {
+  font-family: var(--f-titres);
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--encre);
+  margin: 10px 0 6px;
+}
+
+.at-ec-vf-fin-message {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--texte-sec);
+  margin: 0 0 18px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .at-ec-frise {
+    flex-direction: column;
+  }
+
+  .at-ec-bloc {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .at-ec-bloc-nom {
+    text-align: left;
+  }
+
+  .at-ec-bloc-ages {
+    margin-left: auto;
+  }
+
+  /* En colonne, la barre horizontale n'a plus de sens : on garde la mention. */
+  .at-ec-oblig-barre {
+    display: none;
+  }
+
+  .at-ec-oblig {
+    margin: 6px 0 18px;
+  }
+
+  .at-ec-panneau,
+  .at-ec-vf-carte {
+    padding: 20px;
+  }
+
+  .at-ec-vf-boutons {
+    grid-template-columns: 1fr;
+  }
+}

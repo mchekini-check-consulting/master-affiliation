@@ -5,6 +5,7 @@ import '@fontsource/public-sans/500.css';
 import '@fontsource/public-sans/600.css';
 import '@fontsource/public-sans/700.css';
 import './membre.css';
+import './pwa.js';
 import { api } from './api.js';
 import { rendreCours } from './cours.js';
 import { rendreQuizz } from './quizz.js';

@@ -1,0 +1,16 @@
+{
+  "name": "Natura Prep — Préparez votre naturalisation",
+  "short_name": "Natura Prep",
+  "description": "Cours, quiz, ateliers interactifs et simulations d'entretien pour réussir votre naturalisation française.",
+  "lang": "fr",
+  "start_url": "/espace/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fafaf7",
+  "theme_color": "#1e2b9e",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

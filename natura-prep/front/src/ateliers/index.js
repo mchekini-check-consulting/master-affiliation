@@ -10,19 +10,27 @@ import droitOuDevoir from './droit-ou-devoir.js';
 import conqueteDroits from './conquete-droits.js';
 import bonGuichet from './bon-guichet.js';
 import parcoursSoins from './parcours-soins.js';
+import bonPalais from './bon-palais.js';
+import europe from './europe.js';
+import joursFeries from './jours-feries.js';
+import ecole from './ecole.js';
 
 export const ateliers = [
   frise,
   carteFrance,
   galeriePersonnages,
+  joursFeries,
   parcoursLoi,
   quiElitQui,
+  bonPalais,
+  europe,
   symbolesLaicite,
   vivreLaDevise,
   droitOuDevoir,
   conqueteDroits,
   bonGuichet,
   parcoursSoins,
+  ecole,
 ];
 
 export function ateliersDeThematique(slugThematique) {

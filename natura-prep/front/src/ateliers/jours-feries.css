@@ -1,0 +1,490 @@
+/* Atelier « Le calendrier des jours fériés » — préfixe at-jf- */
+
+.at-jf {
+  --at-jf-or: #a97e14;
+  --at-jf-or-tint: #faf3df;
+  --at-jf-or-bordure: #e3cd93;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  font-family: var(--f-corps);
+  color: var(--encre);
+}
+
+.at-jf-section {
+  margin: 0;
+}
+
+.at-jf-titre-section {
+  font-family: var(--f-titres);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--encre);
+  margin: 0 0 6px;
+}
+
+.at-jf-intro {
+  margin: 0 0 20px;
+  color: var(--texte-sec);
+  font-size: 0.95rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Légende du code couleur                                            */
+/* ------------------------------------------------------------------ */
+
+.at-jf-legende {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.at-jf-legende-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.at-jf-pastille {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.at-jf-legende-civil {
+  color: var(--bleu);
+}
+
+.at-jf-legende-civil .at-jf-pastille {
+  background: var(--bleu);
+}
+
+.at-jf-legende-religieux {
+  color: var(--at-jf-or);
+}
+
+.at-jf-legende-religieux .at-jf-pastille {
+  background: var(--at-jf-or);
+}
+
+/* ------------------------------------------------------------------ */
+/* Section A — frise de l'année                                       */
+/* ------------------------------------------------------------------ */
+
+.at-jf-frise-mois {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 10px;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  border-bottom: 2px solid var(--bordure);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--estompe);
+  text-align: center;
+}
+
+.at-jf-frise-grille {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-flow: row dense;
+  gap: 10px;
+}
+
+.at-jf-vignette {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-height: 108px;
+  padding: 10px 4px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-top-width: 4px;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.15s ease,
+    background 0.2s ease, border-color 0.2s ease;
+}
+
+.at-jf-vignette:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(20, 26, 51, 0.1);
+}
+
+.at-jf-vignette:focus-visible {
+  outline: 2px solid var(--bleu);
+  outline-offset: 3px;
+}
+
+.at-jf-vignette-civil {
+  border-top-color: var(--bleu);
+}
+
+.at-jf-vignette-religieux {
+  border-top-color: var(--at-jf-or);
+}
+
+.at-jf-vignette-civil.at-jf-vignette-active {
+  background: var(--bleu-tint);
+  border-color: var(--bleu);
+  border-top-color: var(--bleu);
+}
+
+.at-jf-vignette-religieux.at-jf-vignette-active {
+  background: var(--at-jf-or-tint);
+  border-color: var(--at-jf-or);
+  border-top-color: var(--at-jf-or);
+}
+
+.at-jf-vignette-date {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.at-jf-vignette-civil .at-jf-vignette-date {
+  color: var(--bleu);
+}
+
+.at-jf-vignette-religieux .at-jf-vignette-date {
+  color: var(--at-jf-or);
+}
+
+.at-jf-vignette-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.at-jf-vignette-nom {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--texte-2);
+}
+
+/* Panneau de détail */
+
+.at-jf-panneau {
+  margin-top: 20px;
+  padding: 20px 22px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-left: 4px solid var(--bordure);
+  border-radius: 12px;
+}
+
+.at-jf-panneau-civil {
+  border-left-color: var(--bleu);
+  background: var(--bleu-tint);
+}
+
+.at-jf-panneau-religieux {
+  border-left-color: var(--at-jf-or);
+  background: var(--at-jf-or-tint);
+}
+
+.at-jf-panneau-indice {
+  margin: 0;
+  color: var(--estompe);
+  font-size: 0.92rem;
+}
+
+.at-jf-panneau-tete {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.at-jf-panneau-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.at-jf-panneau-titres {
+  flex: 1;
+  min-width: 0;
+}
+
+.at-jf-panneau-nom {
+  font-family: var(--f-titres);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.at-jf-panneau-date {
+  font-size: 0.85rem;
+  color: var(--texte-sec);
+}
+
+.at-jf-panneau-origine {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--texte-2);
+}
+
+/* Badges civil / religieux */
+
+.at-jf-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.at-jf-badge-civil {
+  background: var(--bleu-tint);
+  border: 1px solid var(--bleu);
+  color: var(--bleu);
+}
+
+.at-jf-badge-religieux {
+  background: var(--at-jf-or-tint);
+  border: 1px solid var(--at-jf-or);
+  color: var(--at-jf-or);
+}
+
+.at-jf-panneau-civil .at-jf-badge-civil {
+  background: var(--carte);
+}
+
+.at-jf-panneau-religieux .at-jf-badge-religieux {
+  background: var(--carte);
+}
+
+/* ------------------------------------------------------------------ */
+/* Section B — jeu « Civil ou religieux ? »                           */
+/* ------------------------------------------------------------------ */
+
+.at-jf-jeu {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 640px;
+}
+
+.at-jf-progression {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--estompe);
+  margin-bottom: 14px;
+}
+
+.at-jf-enonce {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 22px;
+}
+
+.at-jf-enonce-emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.at-jf-enonce-nom {
+  font-family: var(--f-titres);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--encre);
+}
+
+.at-jf-enonce-date {
+  font-size: 0.88rem;
+  color: var(--texte-sec);
+}
+
+.at-jf-choix {
+  display: flex;
+  gap: 14px;
+}
+
+.at-jf-btn {
+  flex: 1;
+  padding: 16px 20px;
+  font-family: var(--f-titres);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 16px;
+  border: 2px solid var(--bordure);
+  background: var(--page);
+  color: var(--encre);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease,
+    color 0.2s ease, transform 0.15s ease;
+}
+
+.at-jf-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.at-jf-btn-civil:hover:not(:disabled) {
+  border-color: var(--bleu);
+  color: var(--bleu);
+}
+
+.at-jf-btn-religieux:hover:not(:disabled) {
+  border-color: var(--at-jf-or);
+  color: var(--at-jf-or);
+}
+
+.at-jf-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.at-jf-btn.at-jf-btn-vrai {
+  opacity: 1;
+  border-color: var(--vert, #2e8b57);
+  background: #e8f6ee;
+  color: #216b42;
+}
+
+.at-jf-btn.at-jf-btn-faux {
+  opacity: 1;
+  border-color: var(--rouge);
+  background: var(--rouge-tint, #fdeef0);
+  color: var(--rouge);
+}
+
+.at-jf-feedback {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.at-jf-feedback strong {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.at-jf-feedback-vrai {
+  background: #e8f6ee;
+  border: 1px solid #bfe4cd;
+  color: #216b42;
+}
+
+.at-jf-feedback-faux {
+  background: var(--rouge-tint, #fdeef0);
+  border: 1px solid #f2c3c9;
+  color: var(--rouge);
+}
+
+.at-jf-piege-note {
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.at-jf-suite {
+  margin-top: 16px;
+  text-align: right;
+}
+
+.at-jf-btn-suite,
+.at-jf-btn-rejouer {
+  padding: 10px 22px;
+  font-family: var(--f-titres);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 999px;
+  border: none;
+  background: var(--bleu);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.at-jf-btn-suite:hover,
+.at-jf-btn-rejouer:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Score final */
+
+.at-jf-score {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.at-jf-score-note {
+  font-family: var(--f-titres);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--bleu);
+  margin-bottom: 8px;
+}
+
+.at-jf-score-message {
+  color: var(--texte-sec);
+  margin: 0 0 20px;
+  font-size: 0.98rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive                                                         */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+  .at-jf {
+    gap: 36px;
+  }
+
+  .at-jf-frise-mois {
+    display: none;
+  }
+
+  /* La frise de l'année devient une simple grille de vignettes. */
+  .at-jf-frise-grille {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .at-jf-vignette {
+    grid-column: auto !important;
+    min-height: 96px;
+  }
+
+  .at-jf-panneau-tete {
+    flex-wrap: wrap;
+  }
+
+  .at-jf-jeu {
+    padding: 20px;
+    max-width: none;
+  }
+
+  .at-jf-choix {
+    flex-direction: column;
+  }
+
+  .at-jf-titre-section {
+    font-size: 1.3rem;
+  }
+}

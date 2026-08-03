@@ -1,3 +1,4 @@
+import './pwa.js';
 import '@fontsource/archivo/700.css';
 import '@fontsource/archivo/800.css';
 import '@fontsource/public-sans/400.css';

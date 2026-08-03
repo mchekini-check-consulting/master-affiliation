@@ -177,7 +177,12 @@
 @media (max-width: 900px) {
   .at-ps-schema {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .at-ps-station {
+    min-width: 0;
+    padding: 10px 6px;
   }
 
   .at-ps-lien {
