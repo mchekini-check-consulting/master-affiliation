@@ -65,7 +65,8 @@ function rendreAccueil() {
             <input type="radio" name="modele" value="flagship" />
             <span class="simu-modele-corps">
               <strong>Flagship</strong>
-              <span>Voix la plus réaliste et meilleure compréhension (≈ 4× plus cher).</span>
+              <span>Voix la plus réaliste et meilleure compréhension (≈ 4× plus cher).
+              Nécessite l'accès au modèle <code>gpt-realtime</code> sur votre clé OpenAI.</span>
             </span>
           </label>
         </div>
@@ -246,7 +247,14 @@ async function connecter() {
       body: offre.sdp,
     }
   );
-  if (!reponse.ok) throw new Error(`connexion refusée (${reponse.status})`);
+  if (!reponse.ok) {
+    let detail = '';
+    try {
+      const corps = await reponse.json();
+      detail = corps?.error?.message || '';
+    } catch { /* corps non JSON */ }
+    throw new Error(`connexion refusée (${reponse.status})${detail ? ` — ${detail}` : ''}`);
+  }
   await pc.setRemoteDescription({ type: 'answer', sdp: await reponse.text() });
 }
 
