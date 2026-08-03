@@ -8,6 +8,8 @@ import './membre.css';
 import { api } from './api.js';
 import { rendreCours } from './cours.js';
 import { rendreQuizz } from './quizz.js';
+import { rendreSimulations } from './simulations.js';
+import { rendreRapports } from './rapports.js';
 
 const SECTIONS = ['cours', 'quizz', 'simulations', 'rapports'];
 
@@ -23,6 +25,8 @@ function rendre() {
   liens.forEach((l) => l.classList.toggle('actif', l.dataset.section === section));
   if (section === 'cours') rendreCours(segments.slice(1));
   if (section === 'quizz') rendreQuizz(segments.slice(1));
+  if (section === 'simulations') rendreSimulations(segments.slice(1));
+  if (section === 'rapports') rendreRapports(segments.slice(1));
 }
 
 window.addEventListener('hashchange', rendre);

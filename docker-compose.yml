@@ -372,6 +372,9 @@ services:
       DB_NAME: natura_prep
       DB_USERNAME: natura_prep
       DB_PASSWORD: ${NATURA_PREP_DB_PASSWORD:-changeme}
+      # Simulation d'entretien : clé injectée via le .env du serveur (déployé
+      # par la pipeline depuis les secrets GitHub), jamais dans le dépôt
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     networks:
       - natura-prep-net
     depends_on:

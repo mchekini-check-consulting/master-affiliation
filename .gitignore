@@ -28,3 +28,7 @@ prompt
 # Maquettes de design (archives locales, non versionnées)
 natura-prep/Natura Prep landing page.zip
 natura-prep/hero-video.mp4
+
+# Notes de travail et artefacts de build natura-prep
+natura-prep/*.txt
+natura-prep/back/target/

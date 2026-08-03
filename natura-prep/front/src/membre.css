@@ -958,6 +958,641 @@ body.page-espace {
   color: var(--bleu);
 }
 
+/* ---------- Simulations : accueil ---------- */
+.simu-accueil {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 900px;
+}
+
+.simu-bloc {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 24px 28px;
+}
+
+.simu-bloc h2 {
+  font-family: var(--f-titres);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--encre);
+  margin: 0 0 14px;
+}
+
+.simu-modeles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.simu-modele {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.simu-modele:has(input:checked) {
+  border-color: var(--bleu);
+  background: var(--bleu-tint);
+}
+
+.simu-modele input {
+  margin-top: 3px;
+  accent-color: var(--bleu);
+}
+
+.simu-modele-corps strong {
+  display: block;
+  font-size: 15px;
+  color: var(--encre);
+  margin-bottom: 3px;
+}
+
+.simu-modele-corps span {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texte-sec);
+}
+
+.simu-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bleu);
+  background: var(--bleu-tint);
+  border-radius: 99px;
+  padding: 2px 8px;
+  vertical-align: 2px;
+}
+
+.simu-micro {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.simu-vumetre {
+  flex: 1;
+  min-width: 160px;
+  height: 10px;
+  background: var(--bordure);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.simu-vumetre div {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--bleu), var(--rouge));
+  border-radius: 99px;
+  transition: width 0.08s linear;
+}
+
+.simu-micro-etat {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--texte-sec);
+}
+
+.simu-deroule {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--texte-2);
+}
+
+.simu-conseil {
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  background: var(--bleu-tint);
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--encre);
+}
+
+.simu-lancement {
+  text-align: center;
+  padding: 8px 0 0;
+}
+
+.simu-demarrer {
+  font-size: 16px;
+  padding: 16px 34px;
+}
+
+.simu-note {
+  font-size: 12.5px;
+  color: var(--estompe);
+  margin: 12px 0 0;
+}
+
+.simu-note:empty {
+  display: none;
+}
+
+/* ---------- Simulations : entretien en direct ---------- */
+.simu-live {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+  align-items: start;
+}
+
+.simu-scene {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 18px;
+  padding: 28px 32px;
+}
+
+.simu-statut {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--texte-sec);
+  margin: 0 0 26px;
+}
+
+.simu-voix-groupe {
+  display: flex;
+  justify-content: center;
+  gap: 64px;
+  margin: 18px 0 30px;
+}
+
+.simu-voix {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.simu-voix-halo {
+  position: absolute;
+  top: -6px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--bleu-tint);
+  transition: transform 0.1s linear;
+}
+
+.simu-voix-halo--vous {
+  background: #fdeef0;
+}
+
+.simu-voix-avatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--carte);
+  border: 2px solid var(--bordure);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.simu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--texte-sec);
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.simu-toggle input {
+  accent-color: var(--bleu);
+}
+
+.simu-transcript {
+  background: var(--page);
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  padding: 16px 18px;
+  max-height: 300px;
+  overflow: auto;
+  margin-bottom: 20px;
+}
+
+.simu-tour {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--texte-2);
+  margin: 0 0 10px;
+}
+
+.simu-tour strong {
+  display: inline-block;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-right: 8px;
+}
+
+.simu-tour--agent strong {
+  color: var(--bleu);
+}
+
+.simu-tour--candidat strong {
+  color: var(--rouge);
+}
+
+.simu-terminer {
+  display: block;
+  margin: 6px auto 0;
+  background: var(--rouge);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  cursor: pointer;
+  font-family: var(--f-corps);
+  font-size: 15px;
+  font-weight: 700;
+  transition: filter 0.15s ease;
+}
+
+.simu-terminer:hover {
+  filter: brightness(1.1);
+}
+
+/* Bandeau permanent coût / modèle */
+.simu-bandeau {
+  position: sticky;
+  top: 28px;
+  background: var(--encre);
+  border-radius: 16px;
+  padding: 20px;
+  color: #fff;
+}
+
+.simu-bandeau .cote-titre {
+  color: #fff;
+}
+
+.simu-bandeau-ligne {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  padding: 4px 0;
+  color: var(--sombre-texte);
+}
+
+.simu-bandeau-ligne strong {
+  color: #fff;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.simu-bandeau-sep {
+  border-top: 1px solid var(--sombre-separateur);
+  margin: 10px 0;
+}
+
+.simu-bandeau-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--f-titres);
+  font-weight: 800;
+  font-size: 21px;
+  color: #fff;
+}
+
+.simu-bandeau-total span:last-child {
+  font-size: 15px;
+  color: var(--sombre-texte);
+}
+
+/* Écran d'évaluation en cours */
+.simu-evaluation {
+  max-width: 560px;
+  margin: 48px auto;
+  text-align: center;
+}
+
+.simu-evaluation h2 {
+  font-family: var(--f-titres);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--encre);
+  margin: 18px 0 10px;
+}
+
+.simu-evaluation p {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--texte-sec);
+}
+
+.simu-spinner {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 4px solid var(--bordure);
+  border-top-color: var(--bleu);
+  animation: simu-rotation 0.9s linear infinite;
+}
+
+@keyframes simu-rotation {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Rapports ---------- */
+.rapports-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 980px;
+}
+
+.rapport-carte {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 20px 24px;
+  text-decoration: none;
+  color: var(--corps);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rapport-carte:hover {
+  border-color: var(--bleu);
+  box-shadow: 0 10px 26px rgba(20, 26, 51, 0.07);
+}
+
+.rapport-carte-corps {
+  flex: 1;
+  min-width: 0;
+}
+
+.rapport-carte-corps strong {
+  display: block;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--encre);
+  margin-bottom: 3px;
+}
+
+.rapport-carte-corps span {
+  font-size: 13px;
+  color: var(--texte-sec);
+}
+
+.rapport-carte-notes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.rapport-puce {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bleu);
+  background: var(--bleu-tint);
+  border-radius: 99px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.rapport-avis {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 99px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.rapport-avis--favorable {
+  color: #14522e;
+  background: #eaf7ef;
+}
+
+.rapport-avis--reserve {
+  color: #7a5300;
+  background: #fdf3e0;
+}
+
+.rapport-avis--defavorable {
+  color: #8c1a26;
+  background: #fdeef0;
+}
+
+/* Vue détaillée */
+.rapport {
+  max-width: 980px;
+}
+
+.rapport-tete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.rapport-tete h1 {
+  font-family: var(--f-titres);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--encre);
+  margin: 0 0 6px;
+}
+
+.rapport-disclaimer {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7a5300;
+  background: #fdf3e0;
+  border: 1px solid #f3e2b8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 0 0 22px;
+}
+
+.rapport-scores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.rapport-score {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+
+.rapport-score-valeur {
+  font-family: var(--f-titres);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--encre);
+}
+
+.rapport-score-valeur small {
+  font-size: 16px;
+  color: var(--estompe);
+}
+
+.rapport-score-libelle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--texte-sec);
+}
+
+.rapport-score--avis {
+  align-items: center;
+}
+
+.rapport-erreurs {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.rapport-erreurs th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--texte-sec);
+  border-bottom: 2px solid var(--bordure);
+  padding: 8px 10px;
+}
+
+.rapport-erreurs td {
+  border-bottom: 1px solid var(--bordure);
+  padding: 10px;
+  color: var(--texte-2);
+  vertical-align: top;
+}
+
+.rapport-erreurs td:nth-child(3) {
+  color: #14522e;
+  font-weight: 600;
+}
+
+.rapport-plan {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--texte-2);
+}
+
+.rapport-plan li::marker {
+  font-weight: 800;
+  color: var(--bleu);
+}
+
+.rapport-verbatim {
+  margin: 0 0 14px;
+  padding: 14px 18px;
+  background: var(--page);
+  border-left: 4px solid var(--rouge);
+  border-radius: 0 10px 10px 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--texte-2);
+  font-style: italic;
+}
+
+.rapport-verbatim footer {
+  margin-top: 8px;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rouge);
+}
+
+.rapport-couts .simu-bandeau-ligne {
+  color: var(--texte-sec);
+}
+
+.rapport-couts .simu-bandeau-ligne strong {
+  color: var(--encre);
+}
+
+.rapport-cout-total {
+  border-top: 1px solid var(--bordure);
+  margin-top: 8px;
+  padding-top: 10px;
+  font-weight: 700;
+}
+
+.rapport-transcript summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bleu);
+  margin-bottom: 12px;
+}
+
+@media print {
+  .lateral,
+  .rapport-non-imprime {
+    display: none !important;
+  }
+
+  .espace {
+    grid-template-columns: 1fr;
+  }
+
+  .contenu {
+    padding: 0;
+  }
+
+  .fiche-section,
+  .rapport-score {
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
   .fiche-layout {
@@ -1013,5 +1648,18 @@ body.page-espace {
   .quiz-general {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .simu-live {
+    grid-template-columns: 1fr;
+  }
+
+  .simu-bandeau {
+    position: static;
+    order: -1;
+  }
+
+  .rapport-tete {
+    flex-direction: column;
   }
 }
