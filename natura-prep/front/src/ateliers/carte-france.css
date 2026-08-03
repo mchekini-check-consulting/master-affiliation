@@ -1,0 +1,487 @@
+/* Atelier « Carte de France interactive » — toutes les classes sont
+   préfixées at-carte- (aucune collision avec le reste de l'application). */
+
+.at-carte {
+  font-family: var(--f-corps);
+  color: var(--corps, var(--encre));
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Onglets                                                           */
+/* ---------------------------------------------------------------- */
+
+.at-carte-onglets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.at-carte-onglet {
+  appearance: none;
+  border: 1px solid var(--bordure);
+  background: var(--carte);
+  color: var(--texte-sec);
+  font-family: var(--f-titres);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 9px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease,
+    transform 0.15s ease;
+}
+
+.at-carte-onglet:hover {
+  border-color: var(--bleu-bordure, var(--bleu));
+  color: var(--bleu);
+  transform: translateY(-1px);
+}
+
+.at-carte-onglet-actif,
+.at-carte-onglet-actif:hover {
+  background: var(--bleu);
+  border-color: var(--bleu);
+  color: #fff;
+  transform: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* Disposition carte + panneau                                       */
+/* ---------------------------------------------------------------- */
+
+.at-carte-corps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.at-carte-scene {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.at-carte-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------------------------------------------------------------- */
+/* SVG : fond                                                        */
+/* ---------------------------------------------------------------- */
+
+.at-carte-fond {
+  fill: var(--bleu-tint);
+  stroke: var(--bleu-bordure, #cdd2ee);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.at-carte-corse {
+  fill: var(--bleu-tint);
+  stroke: var(--bleu-bordure, #cdd2ee);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* ---------------------------------------------------------------- */
+/* SVG : éléments interactifs                                        */
+/* ---------------------------------------------------------------- */
+
+.at-carte-el {
+  cursor: pointer;
+  outline: none;
+}
+
+.at-carte-el:focus-visible .at-carte-trace,
+.at-carte-el:focus-visible .at-carte-zone,
+.at-carte-el:focus-visible .at-carte-point,
+.at-carte-el:focus-visible .at-carte-etoile {
+  stroke: var(--rouge);
+}
+
+/* Zones de clic invisibles mais généreuses. */
+.at-carte-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.at-carte-hit-rect,
+.at-carte-hit-rond {
+  fill: transparent;
+  stroke: none;
+}
+
+/* Fleuves */
+.at-carte-trace {
+  fill: none;
+  stroke: #4d7fd6;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.25s ease, stroke-width 0.25s ease;
+}
+
+/* Montagnes */
+.at-carte-zone {
+  fill: #dfe6d4;
+  stroke: #b9c5a4;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  transition: fill 0.25s ease, stroke 0.25s ease;
+}
+
+.at-carte-pics {
+  fill: #9dab86;
+  stroke: none;
+  transition: fill 0.25s ease;
+  pointer-events: none;
+}
+
+.at-carte-mtblanc {
+  fill: #fff;
+  stroke: #8a97c9;
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.at-carte-etiquette-mtblanc {
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* Mers */
+.at-carte-mer-texte {
+  font-family: var(--f-titres);
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 600;
+  fill: #5a7fb8;
+  transition: fill 0.25s ease;
+}
+
+.at-carte-vagues {
+  fill: none;
+  stroke: #7fa3d1;
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke 0.25s ease;
+}
+
+/* Villes */
+.at-carte-point {
+  fill: var(--bleu);
+  stroke: #fff;
+  stroke-width: 2;
+  transition: fill 0.25s ease;
+}
+
+.at-carte-etoile {
+  fill: var(--rouge);
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+/* Étiquettes */
+.at-carte-etiquette {
+  font-family: var(--f-corps);
+  font-size: 12.5px;
+  fill: var(--texte-2);
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 3;
+  transition: fill 0.25s ease;
+}
+
+.at-carte-etiquette-ville {
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- */
+/* Couches : seule la couche active est en couleur                   */
+/* ---------------------------------------------------------------- */
+
+.at-carte-couche {
+  transition: opacity 0.3s ease;
+}
+
+.at-carte-couche:not(.at-carte-couche-active) {
+  pointer-events: none;
+}
+
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-trace,
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-vagues {
+  stroke: #dddcd4;
+}
+
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-zone {
+  fill: #efefe9;
+  stroke: #e0dfd7;
+}
+
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-pics,
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-point,
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-etoile {
+  fill: #d8d7cf;
+}
+
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-mtblanc {
+  fill: #f4f4f0;
+  stroke: #d8d7cf;
+}
+
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-etiquette,
+.at-carte-couche:not(.at-carte-couche-active) .at-carte-mer-texte {
+  fill: #c6c5bd;
+}
+
+/* ---------------------------------------------------------------- */
+/* Élément actif : mise en évidence + pulsation                      */
+/* ---------------------------------------------------------------- */
+
+@keyframes at-carte-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.at-carte-el.at-carte-actif .at-carte-trace {
+  stroke: var(--bleu);
+  stroke-width: 6;
+  animation: at-carte-pulse 1.6s ease-in-out infinite;
+}
+
+.at-carte-el.at-carte-actif .at-carte-zone {
+  fill: #cdd8b8;
+  stroke: var(--bleu);
+  stroke-width: 2.5;
+  animation: at-carte-pulse 1.6s ease-in-out infinite;
+}
+
+.at-carte-el.at-carte-actif .at-carte-pics {
+  fill: var(--bleu);
+}
+
+.at-carte-el.at-carte-actif .at-carte-mer-texte {
+  fill: var(--bleu);
+  animation: at-carte-pulse 1.6s ease-in-out infinite;
+}
+
+.at-carte-el.at-carte-actif .at-carte-vagues {
+  stroke: var(--bleu);
+  stroke-width: 3;
+}
+
+.at-carte-el.at-carte-actif .at-carte-point {
+  fill: var(--rouge);
+  animation: at-carte-pulse 1.6s ease-in-out infinite;
+}
+
+.at-carte-el.at-carte-actif .at-carte-etoile {
+  animation: at-carte-pulse 1.6s ease-in-out infinite;
+}
+
+.at-carte-el.at-carte-actif .at-carte-etiquette {
+  fill: var(--bleu);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- */
+/* Panneau latéral : liste + carte d'info                            */
+/* ---------------------------------------------------------------- */
+
+.at-carte-panneau {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.at-carte-liste {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.at-carte-item {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  font-family: var(--f-corps);
+  font-size: 0.95rem;
+  color: var(--texte-2);
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.at-carte-item:hover {
+  background: var(--bleu-tint);
+  color: var(--bleu);
+}
+
+.at-carte-item-actif,
+.at-carte-item-actif:hover {
+  background: var(--bleu);
+  color: #fff;
+}
+
+.at-carte-puce {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bleu-bordure, #cdd2ee);
+  transition: background 0.2s ease;
+}
+
+.at-carte-item-actif .at-carte-puce {
+  background: var(--rouge);
+}
+
+.at-carte-info {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 16px 18px;
+  min-height: 120px;
+}
+
+.at-carte-info-vide {
+  margin: 0;
+  color: var(--estompe);
+  font-size: 0.92rem;
+  font-style: italic;
+}
+
+.at-carte-info-nom {
+  margin: 0 0 8px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.08rem;
+  color: var(--encre);
+}
+
+.at-carte-badge {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--bleu-tint);
+  color: var(--bleu);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.at-carte-info-texte {
+  margin: 0;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: var(--texte-sec);
+}
+
+/* ---------------------------------------------------------------- */
+/* Outre-mer                                                         */
+/* ---------------------------------------------------------------- */
+
+.at-carte-outremer {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+
+.at-carte-outremer-titre {
+  margin: 0 0 12px;
+  font-size: 0.92rem;
+  color: var(--texte-sec);
+}
+
+.at-carte-vignettes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.at-carte-vignette {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  background: var(--page);
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.at-carte-vignette:hover {
+  border-color: var(--bleu-bordure, var(--bleu));
+  transform: translateY(-1px);
+}
+
+.at-carte-vignette-num {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+  background: var(--bleu);
+  border-radius: 8px;
+  padding: 3px 7px;
+}
+
+.at-carte-vignette-nom {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texte-2);
+}
+
+/* ---------------------------------------------------------------- */
+/* Responsive                                                        */
+/* ---------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .at-carte-corps {
+    grid-template-columns: 1fr;
+  }
+
+  .at-carte-liste {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .at-carte-liste li {
+    flex: 1 1 auto;
+  }
+
+  .at-carte-item {
+    width: auto;
+    justify-content: center;
+  }
+}

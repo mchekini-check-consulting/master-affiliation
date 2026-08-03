@@ -1,0 +1,341 @@
+/* Atelier « Symboles et laïcité en pratique » — préfixe at-symb- */
+
+.at-symb {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  font-family: var(--f-corps);
+  color: var(--encre);
+}
+
+.at-symb-section {
+  margin: 0;
+}
+
+.at-symb-titre-section {
+  font-family: var(--f-titres);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--encre);
+  margin: 0 0 6px;
+}
+
+.at-symb-intro {
+  margin: 0 0 20px;
+  color: var(--texte-sec);
+  font-size: 0.95rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Section A — cartes à retourner                                     */
+/* ------------------------------------------------------------------ */
+
+.at-symb-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.at-symb-carte {
+  perspective: 1000px;
+  background: none;
+  border: none;
+  padding: 0;
+  height: 230px;
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+  color: inherit;
+}
+
+.at-symb-carte-int {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.at-symb-carte.at-symb-retournee .at-symb-carte-int {
+  transform: rotateY(180deg);
+}
+
+.at-symb-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--bordure);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.at-symb-face-avant {
+  background: var(--carte);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.at-symb-carte:hover .at-symb-face-avant {
+  box-shadow: 0 6px 18px rgba(20, 26, 51, 0.1);
+}
+
+.at-symb-carte:focus-visible {
+  outline: 2px solid var(--bleu);
+  outline-offset: 3px;
+  border-radius: 16px;
+}
+
+.at-symb-face-arriere {
+  background: var(--bleu-tint);
+  border-color: var(--bleu-bordure, var(--bordure));
+  transform: rotateY(180deg);
+}
+
+.at-symb-emoji {
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.at-symb-nom {
+  font-family: var(--f-titres);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.at-symb-indice {
+  font-size: 0.78rem;
+  color: var(--estompe);
+}
+
+.at-symb-arriere-nom {
+  font-family: var(--f-titres);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--bleu);
+}
+
+.at-symb-essentiel {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--texte-2);
+}
+
+/* Carte piège (fleur de lys) */
+
+.at-symb-badge-piege {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--rouge);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.at-symb-carte-piege .at-symb-face-avant {
+  border-color: var(--rouge);
+  border-style: dashed;
+}
+
+.at-symb-carte-piege .at-symb-face-arriere {
+  background: var(--rouge-tint, #fdeef0);
+  border-color: var(--rouge);
+}
+
+.at-symb-carte-piege .at-symb-arriere-nom {
+  color: var(--rouge);
+}
+
+/* ------------------------------------------------------------------ */
+/* Section B — autorisé ou interdit                                   */
+/* ------------------------------------------------------------------ */
+
+.at-symb-jeu {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 640px;
+}
+
+.at-symb-progression {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--estompe);
+  margin-bottom: 14px;
+}
+
+.at-symb-enonce {
+  font-family: var(--f-titres);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--encre);
+  margin: 0 0 22px;
+}
+
+.at-symb-choix {
+  display: flex;
+  gap: 14px;
+}
+
+.at-symb-btn {
+  flex: 1;
+  padding: 16px 20px;
+  font-family: var(--f-titres);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 16px;
+  border: 2px solid var(--bordure);
+  background: var(--page);
+  color: var(--encre);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease,
+    color 0.2s ease, transform 0.15s ease;
+}
+
+.at-symb-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.at-symb-btn-autorise:hover:not(:disabled) {
+  border-color: var(--bleu);
+  color: var(--bleu);
+}
+
+.at-symb-btn-interdit:hover:not(:disabled) {
+  border-color: var(--rouge);
+  color: var(--rouge);
+}
+
+.at-symb-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.at-symb-btn.at-symb-btn-vrai {
+  opacity: 1;
+  border-color: #2e8b57;
+  background: #e8f6ee;
+  color: #216b42;
+}
+
+.at-symb-btn.at-symb-btn-faux {
+  opacity: 1;
+  border-color: var(--rouge);
+  background: var(--rouge-tint, #fdeef0);
+  color: var(--rouge-fonce, var(--rouge));
+}
+
+.at-symb-feedback {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.at-symb-feedback-vrai {
+  background: #e8f6ee;
+  border: 1px solid #bfe4cd;
+  color: #216b42;
+}
+
+.at-symb-feedback-faux {
+  background: var(--rouge-tint, #fdeef0);
+  border: 1px solid #f2c3c9;
+  color: var(--rouge-fonce, var(--rouge));
+}
+
+.at-symb-suite {
+  margin-top: 16px;
+  text-align: right;
+}
+
+.at-symb-btn-suite,
+.at-symb-btn-rejouer {
+  padding: 10px 22px;
+  font-family: var(--f-titres);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 999px;
+  border: none;
+  background: var(--bleu);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.at-symb-btn-suite:hover,
+.at-symb-btn-rejouer:hover {
+  background: var(--bleu-fonce, var(--bleu));
+  transform: translateY(-1px);
+}
+
+/* Score final */
+
+.at-symb-score {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.at-symb-score-note {
+  font-family: var(--f-titres);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--bleu);
+  margin-bottom: 8px;
+}
+
+.at-symb-score-message {
+  color: var(--texte-sec);
+  margin: 0 0 20px;
+  font-size: 0.98rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive                                                         */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+  .at-symb {
+    gap: 36px;
+  }
+
+  .at-symb-grille {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .at-symb-carte {
+    height: 250px;
+  }
+
+  .at-symb-jeu {
+    padding: 20px;
+    max-width: none;
+  }
+
+  .at-symb-choix {
+    flex-direction: column;
+  }
+
+  .at-symb-titre-section {
+    font-size: 1.3rem;
+  }
+}

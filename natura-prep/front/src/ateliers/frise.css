@@ -1,0 +1,180 @@
+/* Atelier frise chronologique */
+
+.at-frise-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 26px;
+}
+
+.at-frise-filtre {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 99px;
+  cursor: pointer;
+  font-family: var(--f-corps);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--texte-sec);
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.at-frise-filtre i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pastille, var(--bleu));
+}
+
+.at-frise-filtre:hover {
+  border-color: var(--bleu);
+  color: var(--encre);
+}
+
+.at-frise-filtre.actif {
+  background: var(--encre);
+  border-color: var(--encre);
+  color: #fff;
+}
+
+.at-frise-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 26px;
+  position: relative;
+  max-width: 860px;
+}
+
+/* Le fil vertical de la frise */
+.at-frise-liste::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--bordure);
+}
+
+.at-frise-item {
+  position: relative;
+  margin-bottom: 10px;
+  animation: at-frise-entree 0.4s ease both;
+  animation-delay: var(--delai, 0ms);
+}
+
+@keyframes at-frise-entree {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* La pastille sur le fil */
+.at-frise-item::before {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 18px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--pastille, var(--bleu));
+  border: 3px solid var(--page);
+  box-shadow: 0 0 0 1px var(--bordure);
+  transition: transform 0.15s ease;
+}
+
+.at-frise-item.ouvert::before {
+  transform: scale(1.35);
+}
+
+.at-frise-evenement {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--f-corps);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.at-frise-evenement:hover {
+  border-color: var(--bleu);
+  box-shadow: 0 8px 22px rgba(20, 26, 51, 0.07);
+}
+
+.at-frise-item.ouvert .at-frise-evenement {
+  border-color: var(--pastille, var(--bleu));
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.at-frise-date {
+  font-family: var(--f-titres);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--pastille, var(--bleu));
+  white-space: nowrap;
+  min-width: 96px;
+}
+
+.at-frise-titre {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.at-frise-chevron {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--estompe);
+}
+
+.at-frise-detail {
+  background: var(--carte);
+  border: 1px solid var(--pastille, var(--bleu));
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  padding: 4px 18px 14px;
+  animation: at-frise-entree 0.25s ease both;
+}
+
+.at-frise-detail p {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--texte-2);
+  margin: 8px 0 10px;
+}
+
+.at-frise-periode {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--pastille, var(--bleu));
+  background: var(--page);
+  border-radius: 99px;
+  padding: 4px 10px;
+}
+
+@media (max-width: 640px) {
+  .at-frise-evenement {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .at-frise-date {
+    min-width: 0;
+  }
+}

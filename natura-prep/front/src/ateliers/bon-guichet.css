@@ -1,0 +1,248 @@
+/* Atelier « À qui s'adresser ? » — préfixe at-bg- */
+
+.at-bg {
+  font-family: var(--f-corps);
+  color: var(--encre);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* --- En-tête : progression et score --- */
+
+.at-bg-tete {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.at-bg-avancement {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--bleu);
+}
+
+.at-bg-score {
+  font-size: 0.9rem;
+  color: var(--texte-sec);
+}
+
+.at-bg-barre {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bordure);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.at-bg-barre-remplie {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--bleu);
+  transition: width 0.35s ease;
+}
+
+/* --- Carte principale --- */
+
+.at-bg-carte {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.at-bg-enonce {
+  font-family: var(--f-titres);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0 0 6px;
+}
+
+.at-bg-consigne {
+  margin: 0 0 18px;
+  font-size: 0.95rem;
+  color: var(--texte-sec);
+}
+
+/* --- Options --- */
+
+.at-bg-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.at-bg-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  background: var(--page);
+  font-family: var(--f-corps);
+  font-size: 0.95rem;
+  color: var(--encre);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.at-bg-option:hover:not(:disabled) {
+  border-color: var(--bleu);
+  background: var(--bleu-tint);
+  transform: translateY(-1px);
+}
+
+.at-bg-option:focus-visible {
+  outline: 2px solid var(--bleu);
+  outline-offset: 2px;
+}
+
+.at-bg-option:disabled {
+  cursor: default;
+}
+
+.at-bg-vignette {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--bleu-tint);
+  font-size: 1.3rem;
+}
+
+.at-bg-nom {
+  line-height: 1.3;
+}
+
+/* États après réponse */
+
+.at-bg-option--bonne {
+  border-color: var(--vert, #1d7a3f);
+  background: #ecf7ef;
+  box-shadow: inset 0 0 0 1px var(--vert, #1d7a3f);
+}
+
+.at-bg-option--fausse {
+  border-color: var(--rouge);
+  background: var(--rouge-tint, #fdecee);
+  box-shadow: inset 0 0 0 1px var(--rouge);
+}
+
+.at-bg-option--eteinte {
+  opacity: 0.45;
+}
+
+/* --- Feedback --- */
+
+.at-bg-retour {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--bordure);
+}
+
+.at-bg-verdict {
+  margin: 0 0 8px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.at-bg-verdict--ok {
+  color: var(--vert, #1d7a3f);
+}
+
+.at-bg-verdict--ko {
+  color: var(--rouge);
+}
+
+.at-bg-explication {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--texte-sec);
+}
+
+/* --- Boutons d'action --- */
+
+.at-bg-suivant,
+.at-bg-rejouer {
+  display: inline-block;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 999px;
+  background: var(--bleu);
+  color: #fff;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.at-bg-suivant:hover,
+.at-bg-rejouer:hover {
+  background: var(--bleu-fonce, #16207a);
+  transform: translateY(-1px);
+}
+
+.at-bg-suivant:focus-visible,
+.at-bg-rejouer:focus-visible {
+  outline: 2px solid var(--bleu);
+  outline-offset: 2px;
+}
+
+/* --- Écran final --- */
+
+.at-bg-fin {
+  text-align: center;
+}
+
+.at-bg-fin-icone {
+  display: block;
+  font-size: 2.6rem;
+  margin-bottom: 8px;
+}
+
+.at-bg-fin-titre {
+  margin: 0 0 4px;
+  font-family: var(--f-titres);
+  font-size: 1.4rem;
+}
+
+.at-bg-fin-score {
+  margin: 0 0 10px;
+  font-family: var(--f-titres);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--bleu);
+}
+
+.at-bg-fin-message {
+  margin: 0 auto 20px;
+  max-width: 46ch;
+  color: var(--texte-sec);
+  line-height: 1.55;
+}
+
+/* --- Responsive --- */
+
+@media (max-width: 900px) {
+  .at-bg-carte {
+    padding: 20px 16px;
+  }
+
+  .at-bg-options {
+    grid-template-columns: 1fr;
+  }
+
+  .at-bg-enonce {
+    font-size: 1.05rem;
+  }
+}

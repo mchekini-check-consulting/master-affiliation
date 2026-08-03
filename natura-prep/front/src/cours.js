@@ -1,15 +1,28 @@
 // Rendu de la section « Cours » de l'espace membre : thématiques
 // officielles → fiches → lecteur pleine largeur avec sommaire.
 import { thematiques } from './donnees/cours/index.js';
+import { ateliersDeThematique, trouverAtelier } from './ateliers/index.js';
 
 const conteneur = () => document.querySelector('[data-cours]');
 
-/** Rend la section Cours selon le chemin [slugThematique, slugFiche]. */
+/**
+ * Rend la section Cours selon le chemin :
+ * [thematique], [thematique, fiche] ou [thematique, 'atelier', slug].
+ */
 export function rendreCours(segments) {
-  const [slugThematique, slugFiche] = segments;
+  const [slugThematique, second, troisieme] = segments;
   const thematique = thematiques.find((t) => t.slug === slugThematique);
   if (thematique) {
-    const fiche = thematique.fiches.find((f) => f.slug === slugFiche);
+    if (second === 'atelier') {
+      const atelier = trouverAtelier(thematique.slug, troisieme);
+      if (atelier) {
+        rendreAtelier(thematique, atelier);
+        return;
+      }
+      rendreThematique(thematique);
+      return;
+    }
+    const fiche = thematique.fiches.find((f) => f.slug === second);
     if (fiche) {
       rendreFiche(thematique, fiche);
       return;
@@ -71,6 +84,7 @@ function rendreThematique(thematique) {
         <p class="page-sous">${thematique.description}</p>
       </div>
     </header>
+    ${rendreCartesAteliers(thematique)}
     <div class="fiches">
       ${thematique.fiches
         .map(
@@ -87,6 +101,45 @@ function rendreThematique(thematique) {
         .join('')}
     </div>
   `;
+}
+
+/* ---------- Ateliers interactifs ---------- */
+
+function rendreCartesAteliers(thematique) {
+  const liste = ateliersDeThematique(thematique.slug);
+  if (!liste.length) return '';
+  return `
+    <div class="ateliers">
+      ${liste
+        .map(
+          (a) => `
+        <a class="atelier-carte" href="#cours/${thematique.slug}/atelier/${a.slug}">
+          <span class="atelier-ico" aria-hidden="true">${a.icone}</span>
+          <span class="atelier-corps">
+            <span class="atelier-badge">✨ Apprendre en interactif</span>
+            <strong>${a.titre}</strong>
+            <span class="atelier-desc">${a.description}</span>
+          </span>
+          <span class="atelier-cta">Lancer →</span>
+        </a>`
+        )
+        .join('')}
+    </div>`;
+}
+
+function rendreAtelier(thematique, atelier) {
+  conteneur().innerHTML = `
+    <nav class="cours-retour"><a href="#cours/${thematique.slug}">← ${thematique.titre}</a></nav>
+    <header class="page-tete">
+      <div>
+        <h1><span aria-hidden="true">${atelier.icone}</span> ${atelier.titre}</h1>
+        <p class="page-sous">${atelier.description}</p>
+      </div>
+    </header>
+    <div data-atelier></div>
+  `;
+  atelier.rendre(conteneur().querySelector('[data-atelier]'));
+  window.scrollTo(0, 0);
 }
 
 /* ---------- Niveau 3 : lecteur de fiche (pleine largeur + sommaire) ---------- */
