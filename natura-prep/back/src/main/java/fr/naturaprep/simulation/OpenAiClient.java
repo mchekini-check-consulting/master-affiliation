@@ -40,7 +40,7 @@ public class OpenAiClient {
      * Crée un token éphémère pour une session Realtime en WebRTC.
      * Retourne la réponse OpenAI (value = token, expires_at, session).
      */
-    public JsonNode creerTokenEphemere(String modele, String instructions) {
+    public JsonNode creerTokenEphemere(String modele, String modeleTranscription, String instructions) {
         verifierCle();
         Map<String, Object> corps = Map.of(
                 "expires_after", Map.of("anchor", "created_at", "seconds", 600),
@@ -51,7 +51,7 @@ public class OpenAiClient {
                         "audio", Map.of(
                                 "input", Map.of(
                                         "transcription", Map.of(
-                                                "model", "gpt-4o-mini-transcribe",
+                                                "model", modeleTranscription,
                                                 "language", "fr")),
                                 "output", Map.of("voice", "marin"))));
         try {

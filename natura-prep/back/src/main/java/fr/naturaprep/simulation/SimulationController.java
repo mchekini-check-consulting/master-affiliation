@@ -36,6 +36,7 @@ public class SimulationController {
     private final ObjectMapper json;
     private final String modeleMini;
     private final String modeleFlagship;
+    private final String modeleTranscription;
     private final String modeleEvaluation;
     private final double prixEvalEntreeUsd;
     private final double prixEvalSortieUsd;
@@ -46,6 +47,7 @@ public class SimulationController {
                                 ObjectMapper json,
                                 @Value("${simulation.modele-mini}") String modeleMini,
                                 @Value("${simulation.modele-flagship}") String modeleFlagship,
+                                @Value("${simulation.modele-transcription}") String modeleTranscription,
                                 @Value("${simulation.modele-evaluation}") String modeleEvaluation,
                                 @Value("${simulation.prix-evaluation-entree-usd}") double prixEvalEntreeUsd,
                                 @Value("${simulation.prix-evaluation-sortie-usd}") double prixEvalSortieUsd) {
@@ -55,6 +57,7 @@ public class SimulationController {
         this.json = json;
         this.modeleMini = modeleMini;
         this.modeleFlagship = modeleFlagship;
+        this.modeleTranscription = modeleTranscription;
         this.modeleEvaluation = modeleEvaluation;
         this.prixEvalEntreeUsd = prixEvalEntreeUsd;
         this.prixEvalSortieUsd = prixEvalSortieUsd;
@@ -82,7 +85,7 @@ public class SimulationController {
             case "mini" -> modeleMini;
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Modèle inconnu.");
         };
-        JsonNode reponse = openAi.creerTokenEphemere(modele, instructions(requete.questions()));
+        JsonNode reponse = openAi.creerTokenEphemere(modele, modeleTranscription, instructions(requete.questions()));
         String token = reponse.path("value").asText();
         if (token.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Token de session absent de la réponse OpenAI.");

@@ -303,6 +303,20 @@ function traiterEvenement(ev) {
     case 'conversation.item.input_audio_transcription.completed':
       ajouterTour('candidat', ev.transcript);
       break;
+    // Transcription du candidat en échec (ex. modèle de transcription non
+    // autorisé sur la clé OpenAI) : sans elle, aucun rapport n'est possible
+    case 'conversation.item.input_audio_transcription.failed':
+      if (!live.transcriptionEnEchec) {
+        live.transcriptionEnEchec = true;
+        live.statut = '⚠️ Vos réponses ne sont pas transcrites : le rapport ne pourra pas être établi. '
+          + 'Autorisez le modèle de transcription (gpt-4o-mini-transcribe) sur votre clé OpenAI.';
+        majBandeau();
+      }
+      console.warn('[simulation] transcription candidat en échec :', ev.error);
+      break;
+    case 'error':
+      console.warn('[simulation] erreur Realtime :', ev.error);
+      break;
     // Transcription de ce que dit l'agent (les deux noms selon versions d'API)
     case 'response.output_audio_transcript.done':
     case 'response.audio_transcript.done':
@@ -486,11 +500,17 @@ async function terminer() {
   const dureeSecondes = Math.round((Date.now() - session.debut) / 1000);
   const cout = sessionCoutUsd(session);
 
-  if (session.transcript.length < 2) {
+  const toursCandidat = session.transcript.filter((t) => t.role === 'candidat').length;
+  if (session.transcript.length < 2 || toursCandidat === 0) {
+    const message = toursCandidat === 0 && session.transcript.length >= 2
+      ? "Vos réponses n'ont pas pu être transcrites : l'évaluation n'a pas été lancée (le rapport serait vide). "
+        + 'Autorisez le modèle <strong>gpt-4o-mini-transcribe</strong> dans votre projet OpenAI '
+        + '(platform.openai.com → votre projet → Limits → Model usage), puis relancez un entretien.'
+      : 'La session était trop courte pour être évaluée. Vérifiez votre micro et votre connexion, puis réessayez.';
     conteneur().innerHTML = `
       <div class="quiz-resultat simu-resultat-court">
-        <p class="quiz-note">Entretien interrompu</p>
-        <p class="quiz-message">La session était trop courte pour être évaluée. Vérifiez votre micro et votre connexion, puis réessayez.</p>
+        <p class="quiz-note">Entretien non évalué</p>
+        <p class="quiz-message">${message}</p>
         <div class="quiz-resultat-actions">
           <a class="quiz-suivant" href="#simulations" data-relancer>Relancer une simulation</a>
         </div>
