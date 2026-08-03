@@ -1,0 +1,508 @@
+/* Atelier « La conquête des droits » — styles (préfixe at-cd-). */
+
+.at-cd {
+  max-width: 960px;
+  margin: 0 auto;
+  font-family: var(--f-corps);
+  color: var(--encre);
+}
+
+/* ---- En-tête de la phase de jeu ---- */
+
+.at-cd-entete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.at-cd-consigne {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--texte-2);
+}
+
+.at-cd-consigne strong {
+  color: var(--bleu);
+}
+
+.at-cd-scores {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.at-cd-etape-compteur {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--encre);
+}
+
+.at-cd-erreurs {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texte-sec);
+  background: var(--page);
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.at-cd-erreurs-non-nul {
+  color: var(--rouge);
+  background: var(--rouge-tint);
+  border-color: var(--rouge);
+}
+
+/* ---- La frise à compléter (fil horizontal + pastilles) ---- */
+
+.at-cd-frise {
+  list-style: none;
+  margin: 0 0 30px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 8px;
+  position: relative;
+}
+
+/* Le fil horizontal qui relie les pastilles */
+.at-cd-frise::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 12px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--bordure);
+}
+
+.at-cd-emplacement {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.at-cd-pastille {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--carte);
+  border: 2px solid var(--bordure);
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--texte-sec);
+  z-index: 1;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.at-cd-remplie .at-cd-pastille {
+  background: var(--vert);
+  border-color: var(--vert);
+  color: #fff;
+  transform: scale(1.12);
+}
+
+.at-cd-fente {
+  width: 100%;
+  min-height: 104px;
+  border: 2px dashed var(--bordure);
+  border-radius: 16px;
+  background: var(--page);
+  display: grid;
+  place-items: center;
+  font-family: var(--f-titres);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--estompe);
+}
+
+/* Carte posée sur la frise (date révélée, en vert) */
+.at-cd-posee {
+  width: 100%;
+  min-height: 104px;
+  border: 1px solid var(--vert);
+  border-radius: 16px;
+  background: var(--carte);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 6px;
+  text-align: center;
+  animation: at-cd-pose 0.3s ease both;
+}
+
+@keyframes at-cd-pose {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.at-cd-posee-picto {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.at-cd-posee-date {
+  font-family: var(--f-titres);
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--vert);
+  white-space: nowrap;
+}
+
+.at-cd-posee-titre {
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--texte-2);
+}
+
+/* ---- La main : cartes mélangées, sans date ---- */
+
+.at-cd-main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.at-cd-carte {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 15px 16px;
+  cursor: pointer;
+  font-family: var(--f-corps);
+  transition: border-color 0.15s ease, transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.at-cd-carte:hover {
+  border-color: var(--bleu);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(20, 26, 51, 0.08);
+}
+
+.at-cd-carte-picto {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.at-cd-carte-titre {
+  flex: 1;
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.35;
+  color: var(--encre);
+}
+
+/* Mauvaise réponse : la carte tremble */
+.at-cd-secoue {
+  animation: at-cd-secousse 0.4s ease both;
+  border-color: var(--rouge);
+  background: var(--rouge-tint);
+}
+
+@keyframes at-cd-secousse {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(4px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-6px);
+  }
+  40%,
+  60% {
+    transform: translateX(6px);
+  }
+}
+
+/* Clone en vol vers la frise */
+.at-cd-vol {
+  position: fixed;
+  margin: 0;
+  z-index: 60;
+  pointer-events: none;
+  border-color: var(--vert);
+  box-shadow: 0 12px 30px rgba(20, 26, 51, 0.18);
+  transition: transform 0.5s cubic-bezier(0.22, 0.9, 0.3, 1),
+    opacity 0.5s ease;
+}
+
+/* ---- Phase révision : bilan ---- */
+
+.at-cd-bilan {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 34px 28px;
+  text-align: center;
+  margin-bottom: 28px;
+  animation: at-cd-apparition 0.35s ease both;
+}
+
+@keyframes at-cd-apparition {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.at-cd-bilan-icone {
+  display: block;
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.at-cd-bilan-titre {
+  margin: 0 0 4px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--encre);
+}
+
+.at-cd-bilan-erreurs {
+  margin: 0 0 10px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--bleu);
+}
+
+.at-cd-bilan-parfait {
+  color: var(--vert);
+}
+
+.at-cd-bilan-message {
+  margin: 0 auto 20px;
+  max-width: 460px;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--texte-2);
+}
+
+.at-cd-rejouer {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  background: var(--bleu);
+  border: none;
+  border-radius: 999px;
+  padding: 11px 28px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.at-cd-rejouer:hover {
+  background: #16207a;
+  transform: translateY(-1px);
+}
+
+/* ---- Phase révision : frise verticale dépliable ---- */
+
+.at-cd-revision-consigne {
+  margin: 0 0 18px;
+  font-size: 0.95rem;
+  color: var(--texte-sec);
+}
+
+.at-cd-revision {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 26px;
+  position: relative;
+  max-width: 860px;
+}
+
+/* Le fil vertical, vert : les conquêtes sont acquises */
+.at-cd-revision::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--vert);
+  opacity: 0.35;
+}
+
+.at-cd-revision-item {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.at-cd-revision-item::before {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 18px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--vert);
+  border: 3px solid var(--page);
+  box-shadow: 0 0 0 1px var(--bordure);
+  transition: transform 0.15s ease;
+}
+
+.at-cd-revision-item.ouvert::before {
+  transform: scale(1.35);
+}
+
+.at-cd-revision-bouton {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 14px 18px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--f-corps);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.at-cd-revision-bouton:hover {
+  border-color: var(--vert);
+  box-shadow: 0 8px 22px rgba(20, 26, 51, 0.07);
+}
+
+.at-cd-revision-item.ouvert .at-cd-revision-bouton {
+  border-color: var(--vert);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.at-cd-revision-picto {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.at-cd-revision-date {
+  font-family: var(--f-titres);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--vert);
+  white-space: nowrap;
+  min-width: 110px;
+}
+
+.at-cd-revision-titre {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.at-cd-chevron {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--estompe);
+}
+
+.at-cd-revision-detail {
+  background: var(--carte);
+  border: 1px solid var(--vert);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 4px 18px 14px;
+  animation: at-cd-apparition 0.25s ease both;
+}
+
+.at-cd-revision-detail p {
+  margin: 8px 0 4px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--texte-2);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .at-cd-entete {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .at-cd-frise {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  /* Sur trois rangées, le fil horizontal n'a plus de sens */
+  .at-cd-frise::before {
+    display: none;
+  }
+
+  .at-cd-fente,
+  .at-cd-posee {
+    min-height: 92px;
+  }
+
+  .at-cd-main {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .at-cd-bilan {
+    padding: 28px 18px;
+  }
+}
+
+@media (max-width: 560px) {
+  .at-cd-main {
+    grid-template-columns: 1fr;
+  }
+
+  .at-cd-carte {
+    padding: 13px 14px;
+  }
+
+  .at-cd-revision-bouton {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
+  .at-cd-revision-date {
+    min-width: 0;
+  }
+}

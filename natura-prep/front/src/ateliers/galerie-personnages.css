@@ -1,0 +1,317 @@
+/* Atelier « La galerie des personnages » — styles (préfixe at-gp-). */
+
+.at-gp {
+  max-width: 640px;
+  margin: 0 auto;
+  font-family: var(--f-corps);
+  color: var(--encre);
+}
+
+/* ---- En-tête et progression ---- */
+
+.at-gp-entete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.at-gp-compteur {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--encre);
+}
+
+.at-gp-points {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texte-sec);
+}
+
+.at-gp-barre {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bleu-tint);
+  border: 1px solid var(--bordure);
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.at-gp-barre-remplie {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--bleu), #5a68d8);
+  transition: width 0.35s ease;
+}
+
+/* ---- Manche et carte indice ---- */
+
+.at-gp-manche-entree {
+  animation: at-gp-entree 0.35s ease both;
+}
+
+@keyframes at-gp-entree {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.at-gp-indice {
+  position: relative;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 30px 28px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(20, 26, 51, 0.06);
+  margin-bottom: 20px;
+}
+
+.at-gp-domaine {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--texte-sec);
+  background: var(--estompe);
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.at-gp-indice-etiquette {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bleu);
+  background: var(--bleu-tint);
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin-bottom: 14px;
+}
+
+.at-gp-indice-texte {
+  margin: 0;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.35rem;
+  line-height: 1.35;
+  color: var(--encre);
+}
+
+/* ---- Boutons de choix ---- */
+
+.at-gp-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.at-gp-choix {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--encre);
+  background: var(--carte);
+  border: 2px solid var(--bordure);
+  border-radius: 16px;
+  padding: 14px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.at-gp-choix:hover:not(:disabled) {
+  border-color: var(--bleu);
+  background: var(--bleu-tint);
+  transform: translateY(-2px);
+}
+
+.at-gp-choix:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.at-gp-choix.at-gp-bon {
+  border-color: var(--vert);
+  background: #e8f7ee;
+  color: #186a3f;
+  opacity: 1;
+}
+
+.at-gp-choix.at-gp-mauvais {
+  border-color: var(--rouge);
+  background: var(--rouge-tint);
+  color: var(--rouge);
+  opacity: 1;
+}
+
+/* ---- Feedback et mini-carte portrait ---- */
+
+.at-gp-retour {
+  animation: at-gp-entree 0.3s ease both;
+}
+
+.at-gp-verdict {
+  margin: 0 0 10px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.at-gp-verdict-bon {
+  color: #186a3f;
+}
+
+.at-gp-verdict-mauvais {
+  color: var(--rouge);
+}
+
+.at-gp-portrait {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-left: 4px solid var(--bleu);
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin-bottom: 14px;
+  animation: at-gp-deploiement 0.4s ease both;
+  transform-origin: top center;
+}
+
+@keyframes at-gp-deploiement {
+  from {
+    opacity: 0;
+    transform: scaleY(0.85) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+.at-gp-portrait-entete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.at-gp-portrait-emoji {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  font-size: 1.2rem;
+  background: var(--bleu-tint);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.at-gp-portrait-nom {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--bleu);
+}
+
+.at-gp-portrait-lignes {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--texte-sec);
+}
+
+.at-gp-portrait-lignes li + li {
+  margin-top: 4px;
+}
+
+.at-gp-suivant,
+.at-gp-rejouer {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  background: var(--bleu);
+  border: none;
+  border-radius: 999px;
+  padding: 11px 26px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.at-gp-suivant:hover,
+.at-gp-rejouer:hover {
+  background: #16207a;
+  transform: translateY(-1px);
+}
+
+/* ---- Écran de fin ---- */
+
+.at-gp-fin {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 40px 28px;
+  text-align: center;
+  animation: at-gp-entree 0.35s ease both;
+}
+
+.at-gp-fin-icone {
+  display: block;
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.at-gp-fin-score {
+  margin: 0 0 8px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--bleu);
+}
+
+.at-gp-fin-message {
+  margin: 0 auto 20px;
+  max-width: 420px;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--texte-2);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .at-gp-indice {
+    padding: 44px 18px 24px;
+  }
+
+  .at-gp-indice-texte {
+    font-size: 1.15rem;
+  }
+
+  .at-gp-options {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .at-gp-choix {
+    padding: 13px 10px;
+  }
+
+  .at-gp-fin {
+    padding: 30px 18px;
+  }
+}

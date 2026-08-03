@@ -1,0 +1,280 @@
+/* Atelier « Vivre la devise » — styles (préfixe at-vd-). */
+
+.at-vd {
+  max-width: 640px;
+  margin: 0 auto;
+  font-family: var(--f-corps);
+  color: var(--encre);
+}
+
+/* ---- En-tête et progression ---- */
+
+.at-vd-entete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.at-vd-compteur {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--encre);
+}
+
+.at-vd-points {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--texte-sec);
+}
+
+.at-vd-barre {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bleu-tint);
+  border: 1px solid var(--bordure);
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.at-vd-barre-remplie {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--bleu), var(--rouge));
+  transition: width 0.35s ease;
+}
+
+/* ---- Carte de la situation ---- */
+
+.at-vd-carte {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 30px 28px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(20, 26, 51, 0.06);
+  margin-bottom: 20px;
+}
+
+.at-vd-carte-entree {
+  animation: at-vd-entree 0.35s ease both;
+}
+
+@keyframes at-vd-entree {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.at-vd-carte-etiquette {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bleu);
+  background: var(--bleu-tint);
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin-bottom: 14px;
+}
+
+.at-vd-carte-texte {
+  margin: 0;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1.35;
+  color: var(--encre);
+}
+
+/* ---- Boutons tricolores ---- */
+
+.at-vd-boutons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.at-vd-choix {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 16px;
+  padding: 18px 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+.at-vd-choix-liberte {
+  color: #fff;
+  background: var(--bleu);
+  border: 2px solid var(--bleu);
+}
+
+.at-vd-choix-egalite {
+  color: var(--encre);
+  background: #faf7f1;
+  border: 2px solid var(--bordure);
+}
+
+.at-vd-choix-fraternite {
+  color: #fff;
+  background: var(--rouge);
+  border: 2px solid var(--rouge);
+}
+
+.at-vd-choix:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.at-vd-choix:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.at-vd-choix.at-vd-bon {
+  opacity: 1;
+  outline: 3px solid var(--vert);
+  outline-offset: 3px;
+}
+
+.at-vd-choix.at-vd-mauvais {
+  opacity: 0.85;
+  outline: 3px dashed var(--rouge);
+  outline-offset: 3px;
+  animation: at-vd-secousse 0.3s ease;
+}
+
+@keyframes at-vd-secousse {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* ---- Feedback ---- */
+
+.at-vd-retour {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 18px 22px;
+  animation: at-vd-entree 0.3s ease both;
+}
+
+.at-vd-verdict {
+  margin: 0 0 6px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.at-vd-verdict-bon {
+  color: var(--vert);
+}
+
+.at-vd-verdict-mauvais {
+  color: var(--rouge);
+}
+
+.at-vd-explication {
+  margin: 0 0 14px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--texte-sec);
+}
+
+.at-vd-suivant,
+.at-vd-rejouer {
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  background: var(--bleu);
+  border: none;
+  border-radius: 999px;
+  padding: 11px 26px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.at-vd-suivant:hover,
+.at-vd-rejouer:hover {
+  background: #16207a;
+  transform: translateY(-1px);
+}
+
+/* ---- Écran de fin ---- */
+
+.at-vd-fin {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 40px 28px;
+  text-align: center;
+  animation: at-vd-entree 0.35s ease both;
+}
+
+.at-vd-fin-icone {
+  display: block;
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.at-vd-fin-score {
+  margin: 0 0 8px;
+  font-family: var(--f-titres);
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--bleu);
+}
+
+.at-vd-fin-message {
+  margin: 0 auto 20px;
+  max-width: 420px;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--texte-2);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .at-vd-carte {
+    padding: 24px 18px;
+  }
+
+  .at-vd-carte-texte {
+    font-size: 1.2rem;
+  }
+
+  .at-vd-boutons {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .at-vd-choix {
+    padding: 14px 10px;
+  }
+
+  .at-vd-fin {
+    padding: 30px 18px;
+  }
+}

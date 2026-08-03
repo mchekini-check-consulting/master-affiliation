@@ -10,6 +10,7 @@ import { rendreCours } from './cours.js';
 import { rendreQuizz } from './quizz.js';
 import { rendreSimulations } from './simulations.js';
 import { rendreRapports } from './rapports.js';
+import { chargerProgression } from './progression.js';
 
 const SECTIONS = ['cours', 'quizz', 'simulations', 'rapports'];
 
@@ -47,6 +48,7 @@ async function initialiser() {
     window.location.replace('/connexion/');
     return;
   }
+  await chargerProgression();
   const { nom, email } = profil.membre;
   document.querySelector('[data-nom]').textContent = nom;
   document.querySelector('[data-email]').textContent = email;

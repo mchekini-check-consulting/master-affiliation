@@ -324,6 +324,64 @@ body.page-espace {
   white-space: nowrap;
 }
 
+.thematique-avancement {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.thematique-avancement-barre {
+  flex: 1;
+  height: 7px;
+  background: var(--bordure);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.thematique-avancement-barre i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--bleu), #1c8a4b);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.thematique-avancement-pct {
+  font-family: var(--f-titres);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--encre);
+  min-width: 36px;
+  text-align: right;
+}
+
+.fiche-lien--lue .fiche-num {
+  background: #eaf7ef;
+  color: #1c8a4b;
+}
+
+.fiche-lien--lue .fiche-corps strong {
+  color: var(--texte-sec);
+}
+
+.quiz-record {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texte-sec);
+  background: var(--page);
+  border: 1px solid var(--bordure);
+  padding: 4px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.quiz-record--bon {
+  color: #14522e;
+  background: #eaf7ef;
+  border-color: #bfe6cd;
+}
+
 .thematique-apercu {
   display: flex;
   flex-direction: column;

@@ -6,6 +6,7 @@ import {
   tirerQuizGeneral,
   NB_QUESTIONS_GENERAL,
 } from './donnees/quiz/index.js';
+import { enregistrerProgression, meilleurScoreQuiz } from './progression.js';
 
 const conteneur = () => document.querySelector('[data-quizz]');
 
@@ -59,6 +60,7 @@ function rendreAccueil() {
       ${quizParTheme
         .map((q) => {
           const t = infosTheme(q.slug);
+          const record = meilleurScoreQuiz(q.slug);
           return `
         <a class="quiz-carte" href="#quizz/${q.slug}">
           <span class="thematique-ico" aria-hidden="true">${t.icone}</span>
@@ -66,6 +68,7 @@ function rendreAccueil() {
             <strong>${t.titre}</strong>
             <span>${q.questions.length} questions</span>
           </span>
+          ${record !== null ? `<span class="quiz-record ${record >= 70 ? 'quiz-record--bon' : ''}">record ${record}%</span>` : ''}
           <span class="fiche-fleche" aria-hidden="true">→</span>
         </a>`;
         })
@@ -171,6 +174,7 @@ function rendreQuestion() {
 function rendreResultat() {
   const total = session.questions.length;
   const pct = Math.round((session.score / total) * 100);
+  enregistrerProgression('quiz', session.slug, pct);
   let message;
   if (pct >= 90) message = 'Excellent ! Vous êtes prêt pour l\'entretien.';
   else if (pct >= 70) message = 'Très bien ! Encore quelques révisions et ce sera parfait.';

@@ -2,6 +2,13 @@
 // officielles → fiches → lecteur pleine largeur avec sommaire.
 import { thematiques } from './donnees/cours/index.js';
 import { ateliersDeThematique, trouverAtelier } from './ateliers/index.js';
+import {
+  enregistrerProgression,
+  ficheLue,
+  compterFichesLues,
+  atelierLance,
+  avancementThematique,
+} from './progression.js';
 
 const conteneur = () => document.querySelector('[data-cours]');
 
@@ -50,8 +57,9 @@ function rendreAccueil() {
     </header>
     <div class="thematiques">
       ${thematiques
-        .map(
-          (t) => `
+        .map((t) => {
+          const avancement = avancementThematique(t, ateliersDeThematique(t.slug), t.slug);
+          return `
         <a class="thematique" href="#cours/${t.slug}">
           <div class="thematique-haut">
             <span class="thematique-ico" aria-hidden="true">${t.icone}</span>
@@ -59,6 +67,10 @@ function rendreAccueil() {
           </div>
           <strong>${t.titre}</strong>
           <span class="thematique-desc">${t.description}</span>
+          <span class="thematique-avancement">
+            <span class="thematique-avancement-barre"><i style="width:${avancement}%"></i></span>
+            <span class="thematique-avancement-pct">${avancement}%</span>
+          </span>
           <span class="thematique-apercu">
             ${t.fiches
               .slice(0, 3)
@@ -66,8 +78,8 @@ function rendreAccueil() {
               .join('')}
             ${t.fiches.length > 3 ? `<span class="thematique-plus">+ ${t.fiches.length - 3} autres…</span>` : ''}
           </span>
-        </a>`
-        )
+        </a>`;
+        })
         .join('')}
     </div>
   `;
@@ -76,6 +88,7 @@ function rendreAccueil() {
 /* ---------- Niveau 2 : les fiches d'une thématique ---------- */
 
 function rendreThematique(thematique) {
+  const lues = compterFichesLues(thematique);
   conteneur().innerHTML = `
     <nav class="cours-retour"><a href="#cours">← Toutes les thématiques</a></nav>
     <header class="page-tete">
@@ -83,14 +96,15 @@ function rendreThematique(thematique) {
         <h1><span aria-hidden="true">${thematique.icone}</span> ${thematique.titre}</h1>
         <p class="page-sous">${thematique.description}</p>
       </div>
+      <span class="thematique-compte">${lues} / ${thematique.fiches.length} fiche${thematique.fiches.length > 1 ? 's' : ''} lue${lues > 1 ? 's' : ''}</span>
     </header>
     ${rendreCartesAteliers(thematique)}
     <div class="fiches">
       ${thematique.fiches
         .map(
           (f, i) => `
-        <a class="fiche-lien" href="#cours/${thematique.slug}/${f.slug}">
-          <span class="fiche-num">${String(i + 1).padStart(2, '0')}</span>
+        <a class="fiche-lien ${ficheLue(thematique.slug, f.slug) ? 'fiche-lien--lue' : ''}" href="#cours/${thematique.slug}/${f.slug}">
+          <span class="fiche-num">${ficheLue(thematique.slug, f.slug) ? '✓' : String(i + 1).padStart(2, '0')}</span>
           <span class="fiche-corps">
             <strong>${f.titre}</strong>
             <span class="fiche-resume">${f.resume}</span>
@@ -116,11 +130,11 @@ function rendreCartesAteliers(thematique) {
         <a class="atelier-carte" href="#cours/${thematique.slug}/atelier/${a.slug}">
           <span class="atelier-ico" aria-hidden="true">${a.icone}</span>
           <span class="atelier-corps">
-            <span class="atelier-badge">✨ Apprendre en interactif</span>
+            <span class="atelier-badge">✨ Apprendre en interactif${atelierLance(a.slug) ? ' · déjà exploré ✓' : ''}</span>
             <strong>${a.titre}</strong>
             <span class="atelier-desc">${a.description}</span>
           </span>
-          <span class="atelier-cta">Lancer →</span>
+          <span class="atelier-cta">${atelierLance(a.slug) ? 'Rejouer →' : 'Lancer →'}</span>
         </a>`
         )
         .join('')}
@@ -139,6 +153,7 @@ function rendreAtelier(thematique, atelier) {
     <div data-atelier></div>
   `;
   atelier.rendre(conteneur().querySelector('[data-atelier]'));
+  enregistrerProgression('atelier', atelier.slug, 1);
   window.scrollTo(0, 0);
 }
 
@@ -201,6 +216,8 @@ function rendreFiche(thematique, fiche) {
       </aside>
     </div>
   `;
+
+  enregistrerProgression('fiche', `${thematique.slug}/${fiche.slug}`, 1);
 
   // Sommaire : défilement doux vers la section (sans toucher au hash de navigation)
   conteneur()
