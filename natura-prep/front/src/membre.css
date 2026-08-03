@@ -239,6 +239,203 @@ body.page-espace {
   max-width: 400px;
 }
 
+/* ---------- Tableau de bord ---------- */
+.tb-grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.tb-carte {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 18px;
+  padding: 26px 28px;
+}
+
+.tb-carte h2 {
+  font-family: var(--f-titres);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--encre);
+  margin: 0 0 16px;
+}
+
+.tb-progression {
+  grid-row: span 2;
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.tb-anneau {
+  --taille: 132px;
+  width: var(--taille);
+  height: var(--taille);
+  border-radius: 50%;
+  background: conic-gradient(var(--bleu) calc(var(--pct) * 1%), var(--bordure) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tb-anneau::before {
+  content: '';
+  position: absolute;
+  width: calc(var(--taille) - 28px);
+  height: calc(var(--taille) - 28px);
+  border-radius: 50%;
+  background: var(--carte);
+}
+
+.tb-anneau {
+  position: relative;
+}
+
+.tb-anneau-valeur {
+  position: relative;
+  font-family: var(--f-titres);
+  font-size: 27px;
+  font-weight: 800;
+  color: var(--encre);
+}
+
+.tb-progression-detail {
+  flex: 1;
+  min-width: 0;
+}
+
+.tb-ligne {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  margin: 0 -10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.tb-ligne:hover {
+  background: var(--bleu-tint);
+}
+
+.tb-ligne-nom {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--encre);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tb-ligne-barre {
+  width: 110px;
+  height: 7px;
+  background: var(--bordure);
+  border-radius: 99px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.tb-ligne-barre i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--bleu), #1c8a4b);
+  border-radius: 99px;
+}
+
+.tb-ligne-pct {
+  font-family: var(--f-titres);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--texte-sec);
+  min-width: 34px;
+  text-align: right;
+}
+
+.tb-attente,
+.tb-vide-texte {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--texte-sec);
+  margin: 0 0 16px;
+}
+
+.tb-rapport-date {
+  font-size: 13.5px;
+  color: var(--texte-sec);
+  margin: -6px 0 12px;
+}
+
+.tb-rapport-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.tb-rapport-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tb-cta {
+  font-size: 13.5px;
+  padding: 11px 18px;
+}
+
+.tb-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tb-suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--page);
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.tb-suggestion:hover {
+  border-color: var(--bleu);
+  background: var(--bleu-tint);
+}
+
+.tb-suggestion--fait {
+  opacity: 0.8;
+}
+
+.tb-suggestion-type {
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--bleu);
+}
+
+.tb-suggestion strong {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--encre);
+}
+
+.tb-suggestion-detail {
+  font-size: 12.5px;
+  color: var(--texte-sec);
+}
+
 /* ---------- Cours : retours ---------- */
 .cours-retour {
   margin-bottom: 18px;
@@ -1786,6 +1983,19 @@ body.page-espace {
 
   .simu-live {
     grid-template-columns: 1fr;
+  }
+
+  .tb-grille {
+    grid-template-columns: 1fr;
+  }
+
+  .tb-progression {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .tb-progression-detail {
+    width: 100%;
   }
 
   .simu-bandeau {

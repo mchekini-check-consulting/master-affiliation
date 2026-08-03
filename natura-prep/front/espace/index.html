@@ -24,6 +24,9 @@
         </a>
 
         <nav class="lateral-nav" aria-label="Espace membre">
+          <button type="button" class="lateral-lien" data-section="accueil">
+            <span aria-hidden="true">🏠</span> Accueil
+          </button>
           <button type="button" class="lateral-lien" data-section="cours">
             <span aria-hidden="true">📚</span> Cours
           </button>
@@ -54,6 +57,10 @@
 
       <!-- Contenu -->
       <main class="contenu">
+        <section class="panneau" data-panneau="accueil" hidden>
+          <div data-accueil></div>
+        </section>
+
         <section class="panneau" data-panneau="cours" hidden>
           <div data-cours></div>
         </section>

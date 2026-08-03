@@ -12,8 +12,9 @@ import { rendreQuizz } from './quizz.js';
 import { rendreSimulations } from './simulations.js';
 import { rendreRapports } from './rapports.js';
 import { chargerProgression } from './progression.js';
+import { rendreTableauBord } from './tableau-bord.js';
 
-const SECTIONS = ['cours', 'quizz', 'simulations', 'rapports'];
+const SECTIONS = ['accueil', 'cours', 'quizz', 'simulations', 'rapports'];
 
 const espace = document.querySelector('[data-espace]');
 const liens = Array.from(document.querySelectorAll('.lateral-lien'));
@@ -22,9 +23,10 @@ const panneaux = Array.from(document.querySelectorAll('[data-panneau]'));
 // Navigation par ancre : #cours, #cours/<thematique>/<fiche>, #quizz…
 function rendre() {
   const segments = window.location.hash.replace('#', '').split('/').filter(Boolean);
-  const section = SECTIONS.includes(segments[0]) ? segments[0] : 'cours';
+  const section = SECTIONS.includes(segments[0]) ? segments[0] : 'accueil';
   panneaux.forEach((p) => (p.hidden = p.dataset.panneau !== section));
   liens.forEach((l) => l.classList.toggle('actif', l.dataset.section === section));
+  if (section === 'accueil') rendreTableauBord();
   if (section === 'cours') rendreCours(segments.slice(1));
   if (section === 'quizz') rendreQuizz(segments.slice(1));
   if (section === 'simulations') rendreSimulations(segments.slice(1));
