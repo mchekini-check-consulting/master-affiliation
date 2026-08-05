@@ -32,3 +32,4 @@ natura-prep/hero-video.mp4
 # Notes de travail et artefacts de build natura-prep
 natura-prep/*.txt
 natura-prep/back/target/
+immo-scrapper/back/target/

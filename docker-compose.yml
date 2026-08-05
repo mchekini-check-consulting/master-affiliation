@@ -45,6 +45,7 @@ services:
       - my-way-front
       - qualiopilote-front
       - natura-prep
+      - immo-scrapper-front
 
   # ==========================================================
   # Certbot — émission et renouvellement des certificats TLS
@@ -393,6 +394,61 @@ services:
     depends_on:
       - natura-prep-back
 
+  # ==========================================================
+  # Immo Scrapper — Veille immobilière
+  #   reverse-proxy -> immo-scrapper-front:80 -> (/api) immo-scrapper-back:8080
+  #                                           -> immo-scrapper-db:5432
+  # ==========================================================
+
+  # --- Base de données -------------------------------------
+  immo-scrapper-db:
+    image: postgres:16-alpine
+    container_name: immo-scrapper-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: immo_scrapper
+      POSTGRES_USER: immo_scrapper
+      POSTGRES_PASSWORD: ${IMMO_SCRAPPER_DB_PASSWORD:-changeme}
+    networks:
+      - immo-scrapper-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U immo_scrapper -d immo_scrapper"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - immo-scrapper-db-data:/var/lib/postgresql/data
+
+  # --- Backend Spring Boot ----------------------------------
+  immo-scrapper-back:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/immo-scrapper-back:${IMMO_SCRAPPER_BACK_TAG:-latest}
+    build: ./immo-scrapper/back
+    container_name: immo-scrapper-back
+    restart: unless-stopped
+    environment:
+      DB_HOST: immo-scrapper-db
+      DB_PORT: "5432"
+      DB_NAME: immo_scrapper
+      DB_USERNAME: immo_scrapper
+      DB_PASSWORD: ${IMMO_SCRAPPER_DB_PASSWORD:-changeme}
+    networks:
+      - immo-scrapper-net
+    depends_on:
+      immo-scrapper-db:
+        condition: service_healthy
+
+  # --- Frontend Angular (nginx interne, proxifie /api) -------
+  immo-scrapper-front:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/immo-scrapper-front:${IMMO_SCRAPPER_FRONT_TAG:-latest}
+    build: ./immo-scrapper/front
+    container_name: immo-scrapper-front
+    restart: unless-stopped
+    networks:
+      - proxy               # joignable par le reverse proxy
+      - immo-scrapper-net   # pour proxifier /api vers le backend
+    depends_on:
+      - immo-scrapper-back
+
 # ==========================================================
 # Réseaux
 #   default      : reverse proxy <-> sites de ce projet
@@ -417,6 +473,8 @@ networks:
     name: qualiopilote-net
   natura-prep-net:
     name: natura-prep-net
+  immo-scrapper-net:
+    name: immo-scrapper-net
 
 volumes:
   # Certificats Let's Encrypt (écrits par certbot, lus par le reverse proxy)
@@ -435,4 +493,6 @@ volumes:
   echecs360-data:
   # Données PostgreSQL de NaturaPrep
   natura-prep-db-data:
+  # Données PostgreSQL d'Immo Scrapper
+  immo-scrapper-db-data:
 #   fidexil-db-data:                          # persistance : à activer plus tard

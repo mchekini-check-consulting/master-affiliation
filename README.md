@@ -18,6 +18,8 @@ master-affiliation/
 │   ├── prepa-technique.yml   # Pipeline prepa-technique (déclenchée si prepa-technique/** change)
 │   ├── my-way.yml            # Pipeline my-way (fullstack : images back + front)
 │   ├── qualiopilote.yml      # Pipeline qualiopilote (fullstack : images back + front)
+│   ├── natura-prep.yml       # Pipeline natura-prep (fullstack : images front + back)
+│   ├── immo-scrapper.yml     # Pipeline immo-scrapper (fullstack : images back + front)
 │   └── echecs360.yml         # Pipeline echecs360 (monolithe : une image)
 ├── hi-tech-academy/          # Hi-Tech Academy (hi-tech-academy.fr) — React/Vite (SPA) + Spring Boot + PostgreSQL
 │   └── back/                 # API Spring Boot : demandes d'inscription, analyse du besoin, espace admin
@@ -29,6 +31,10 @@ master-affiliation/
 ├── qualiopilote/             # Qualiopilote (qualiopilote.fr) — Angular (prérendu SEO) + Spring Boot + PostgreSQL
 │   ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
 │   └── front/                # Front Angular SSG (Dockerfile multi-stage Node → nginx, proxifie /api)
+├── natura-prep/              # NaturaPrep (naturalisation.check-consulting.net) — Vite JS + Spring Boot + PostgreSQL
+├── immo-scrapper/            # Immo Scrapper (immo-scrapper.check-consulting.net) — Angular + Spring Boot + PostgreSQL
+│   ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
+│   └── front/                # Front Angular (Dockerfile multi-stage Node → nginx, proxifie /api)
 └── echecs360/                # Échecs360 (echecs360.fr) — Spring Boot monolithe : SSR Thymeleaf (SEO) + app d'échecs JS + H2
 ```
 
