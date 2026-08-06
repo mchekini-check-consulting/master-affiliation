@@ -431,11 +431,30 @@ services:
       DB_NAME: immo_scrapper
       DB_USERNAME: immo_scrapper
       DB_PASSWORD: ${IMMO_SCRAPPER_DB_PASSWORD:-changeme}
+      # Clé partagée avec l'agent de scrapping (POST /v1/annonces)
+      SCRAPPER_API_KEY: ${SCRAPPER_API_KEY:-changeme-scrapper}
     networks:
       - immo-scrapper-net
     depends_on:
       immo-scrapper-db:
         condition: service_healthy
+
+  # --- Agent de scrapping Licitor (Python) ------------------
+  # Un passage au démarrage puis chaque nuit à minuit ; envoie les
+  # annonces au backend via POST /api/v1/annonces (clé partagée).
+  immo-scrapper-agent:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/immo-scrapper-agent:${IMMO_SCRAPPER_AGENT_TAG:-latest}
+    build: ./immo-scrapper/agent
+    container_name: immo-scrapper-agent
+    restart: unless-stopped
+    environment:
+      API_URL: http://immo-scrapper-back:8080/api
+      SCRAPPER_API_KEY: ${SCRAPPER_API_KEY:-changeme-scrapper}
+      TZ: Europe/Paris
+    networks:
+      - immo-scrapper-net
+    depends_on:
+      - immo-scrapper-back
 
   # --- Frontend Angular (nginx interne, proxifie /api) -------
   immo-scrapper-front:

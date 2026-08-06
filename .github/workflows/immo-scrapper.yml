@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        component: [back, front]
+        component: [back, front, agent]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,8 +77,8 @@ jobs:
             # Retry : les images tout juste poussées peuvent mettre quelques
             # secondes à être disponibles sur GHCR
             for i in 1 2 3 4 5; do
-              docker compose pull immo-scrapper-back immo-scrapper-front && break
+              docker compose pull immo-scrapper-back immo-scrapper-front immo-scrapper-agent && break
               echo "pull raté (tentative $i), nouvel essai dans 15s..." && sleep 15
             done
-            docker compose up -d immo-scrapper-db immo-scrapper-back immo-scrapper-front
+            docker compose up -d immo-scrapper-db immo-scrapper-back immo-scrapper-front immo-scrapper-agent
             docker image prune -f

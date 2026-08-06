@@ -90,6 +90,9 @@ export class App {
   }
 
   protected classeStatut(statut: string): string {
-    return { Libre: 'statut--libre', 'Occupé': 'statut--occupe', 'Loué': 'statut--loue' }[statut] ?? '';
+    return (
+      { Libre: 'statut--libre', 'Occupé': 'statut--occupe', 'Loué': 'statut--loue' }[statut] ??
+      'statut--inconnu'
+    );
   }
 }

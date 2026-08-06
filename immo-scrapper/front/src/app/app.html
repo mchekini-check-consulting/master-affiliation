@@ -70,6 +70,9 @@
             {{ annonce.adresse }}<br />
             <span class="estompe">{{ annonce.ville }}</span>
           </div>
+          @if (annonce.descriptif) {
+            <p class="carte-descriptif">{{ annonce.descriptif }}</p>
+          }
           <div class="carte-prix">
             <span class="prix">{{ euros(annonce.prix) }}</span>
             <span class="prix-detail">{{ euros(annonce.prix_m2) }}/m² · {{ surface(annonce.surface_m2) }}</span>

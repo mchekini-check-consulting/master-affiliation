@@ -12,8 +12,9 @@ export interface Annonce {
   prix_m2: number;
   surface_m2: number;
   audience: string; // ISO : 2026-08-12T10:30:00
-  statut: 'Libre' | 'Occupé' | 'Loué';
+  statut: 'Libre' | 'Occupé' | 'Loué' | 'Inconnu';
   url: string;
+  descriptif?: string;
 }
 
 @Injectable({ providedIn: 'root' })
