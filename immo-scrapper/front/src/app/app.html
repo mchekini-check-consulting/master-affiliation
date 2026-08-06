@@ -80,7 +80,10 @@
             <p class="carte-descriptif">{{ annonce.descriptif }}</p>
           }
           <div class="carte-prix">
-            <span class="prix">{{ euros(annonce.prix) }}</span>
+            <span>
+              <span class="prix-titre">Mise à prix</span>
+              <span class="prix">{{ euros(annonce.prix) }}</span>
+            </span>
             <span class="prix-detail">{{ euros(annonce.prix_m2) }}/m² · {{ surface(annonce.surface_m2) }}</span>
           </div>
           <div class="carte-pied">
@@ -97,5 +100,5 @@
     </section>
   }
 
-  <footer class="pied">Données scrappées depuis Licitor · photos aériennes © IGN · mise à jour quotidienne</footer>
+  <footer class="pied">Données scrappées depuis Licitor · photos © Google Street View · mise à jour quotidienne</footer>
 </div>

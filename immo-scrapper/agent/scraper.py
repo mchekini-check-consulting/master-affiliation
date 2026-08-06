@@ -16,11 +16,9 @@ import re
 import time
 import urllib.parse
 from datetime import datetime, timedelta
-from io import BytesIO
 
 import requests
 from bs4 import BeautifulSoup
-from PIL import Image
 
 BASE = "https://www.licitor.com"
 API = os.environ.get("API_URL", "http://immo-scrapper-back:8080/api")
@@ -117,44 +115,63 @@ def extraire_surface(texte: str) -> float:
     return candidates[0] if candidates else 0.0
 
 
-def photo_aerienne_ign(lat: float, lng: float) -> str | None:
-    """Photo aérienne IGN (Géoplateforme, open data, sans clé) : assemble
-    une grille de 3×3 tuiles d'orthophoto et recadre 640×400 centré sur le
-    bien. Gratuit et parfaitement adapté : tous les biens sont en France."""
+def cap_vers(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Cap (en degrés 0-360) du point 1 vers le point 2 : sert à orienter
+    la caméra Street View vers la façade du bien."""
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dl = math.radians(lon2 - lon1)
+    y = math.sin(dl) * math.cos(phi2)
+    x = math.cos(phi1) * math.sin(phi2) - math.sin(phi1) * math.cos(phi2) * math.cos(dl)
+    return (math.degrees(math.atan2(y, x)) + 360) % 360
+
+
+# Les services de vignettes Google refusent les User-Agents de bots (403) :
+# on se présente comme un navigateur pour ces deux appels uniquement.
+UA_NAVIGATEUR = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+
+
+def photo_google_maps(lat: float, lng: float) -> str | None:
+    """Première photo de l'adresse sur Google Maps, sans clé : on cherche le
+    panorama Street View le plus proche (le service interne qu'utilise Maps),
+    puis on récupère sa vignette publique, caméra orientée vers le bien."""
     try:
-        z = 18
-        n = 2 ** z
-        xf = (lng + 180) / 360 * n
-        yf = (1 - math.log(math.tan(math.radians(lat)) + 1 / math.cos(math.radians(lat))) / math.pi) / 2 * n
-        x0, y0 = int(xf) - 1, int(yf) - 1
-        toile = Image.new("RGB", (768, 768), (232, 232, 226))
-        for dx in range(3):
-            for dy in range(3):
-                time.sleep(0.2)  # politesse envers la Géoplateforme
-                tuile = requests.get(
-                    "https://data.geopf.fr/wmts",
-                    params={
-                        "SERVICE": "WMTS", "REQUEST": "GetTile", "VERSION": "1.0.0",
-                        "LAYER": "ORTHOIMAGERY.ORTHOPHOTOS", "STYLE": "normal",
-                        "TILEMATRIXSET": "PM", "TILEMATRIX": z,
-                        "TILEROW": y0 + dy, "TILECOL": x0 + dx,
-                        "FORMAT": "image/jpeg",
-                    },
-                    headers={"User-Agent": session.headers["User-Agent"]},
-                    timeout=20,
-                )
-                if tuile.status_code == 200 and tuile.headers.get("Content-Type", "").startswith("image/"):
-                    toile.paste(Image.open(BytesIO(tuile.content)), (dx * 256, dy * 256))
-        cx, cy = (xf - x0) * 256, (yf - y0) * 256
-        gauche = int(min(max(0, cx - 320), 768 - 640))
-        haut = int(min(max(0, cy - 200), 768 - 400))
-        photo = toile.crop((gauche, haut, gauche + 640, haut + 400))
-        tampon = BytesIO()
-        photo.save(tampon, "JPEG", quality=85)
-        return base64.b64encode(tampon.getvalue()).decode()
+        time.sleep(0.3)
+        pb = (f"!1m5!1sapiv3!5sUS!11m2!1m1!1b0!2m4!1m2!3d{lat}!4d{lng}!2d50"
+              "!3m10!2m2!1sfr!2sFR!9m1!1e2!11m4!1m3!1e2!2b1!3e2"
+              "!4m10!1e1!1e2!1e3!1e4!1e8!1e6!5m1!1e2!6m1!1e2")
+        recherche = requests.get(
+            "https://maps.googleapis.com/maps/api/js/GeoPhotoService.SingleImageSearch",
+            params={"pb": pb, "callback": "cb"},
+            headers={"User-Agent": UA_NAVIGATEUR},
+            timeout=20,
+        )
+        pano = re.search(r'"([A-Za-z0-9_-]{22})"', recherche.text)
+        if not pano:
+            return None  # pas de Street View à moins de 50 m
+
+        parametres = {
+            "panoid": pano.group(1),
+            "cb_client": "maps_sv.tactile.gps",
+            "w": 640, "h": 400, "pitch": 0,
+        }
+        position = re.search(r"\[null,null,(-?\d+\.\d+),(-?\d+\.\d+)\]", recherche.text)
+        if position:
+            parametres["yaw"] = round(cap_vers(
+                float(position.group(1)), float(position.group(2)), lat, lng), 1)
+
+        time.sleep(0.3)
+        image = requests.get(
+            "https://streetviewpixels-pa.googleapis.com/v1/thumbnail",
+            params=parametres,
+            headers={"User-Agent": UA_NAVIGATEUR},
+            timeout=30,
+        )
+        if image.status_code == 200 and image.headers.get("Content-Type", "").startswith("image/"):
+            return base64.b64encode(image.content).decode()
+        log(f"vignette refusée ({image.status_code}) pour {lat},{lng}")
     except Exception as e:
-        log(f"photo IGN indisponible pour {lat},{lng} : {e}")
-        return None
+        log(f"photo Google Maps indisponible pour {lat},{lng} : {e}")
+    return None
 
 
 def photo_street_view(coords: str | None, adresse: str, ville: str) -> str | None:
@@ -224,11 +241,11 @@ def parser_fiche(url: str) -> dict | None:
     coords_m = re.search(r"q=(-?\d+\.\d+),(-?\d+\.\d+)", carte_url)
     coords = f"{coords_m.group(1)},{coords_m.group(2)}" if coords_m else None
 
-    # Photo : Street View si une clé Google est fournie, sinon photo
-    # aérienne IGN (gratuite, sans clé) à partir des coordonnées de la fiche
+    # Photo de l'adresse vue depuis Google Maps : API officielle si une clé
+    # est fournie, sinon la vignette Street View publique (gratuite, sans clé)
     photo = photo_street_view(coords, adresse, ville) if CLE_MAPS else None
     if photo is None and coords_m:
-        photo = photo_aerienne_ign(float(coords_m.group(1)), float(coords_m.group(2)))
+        photo = photo_google_maps(float(coords_m.group(1)), float(coords_m.group(2)))
 
     return {
         "type": deviner_type(titre),
