@@ -10,14 +10,17 @@ puis un passage chaque nuit à minuit (heure de Paris via TZ).
 """
 
 import base64
+import math
 import os
 import re
 import time
 import urllib.parse
 from datetime import datetime, timedelta
+from io import BytesIO
 
 import requests
 from bs4 import BeautifulSoup
+from PIL import Image
 
 BASE = "https://www.licitor.com"
 API = os.environ.get("API_URL", "http://immo-scrapper-back:8080/api")
@@ -114,6 +117,46 @@ def extraire_surface(texte: str) -> float:
     return candidates[0] if candidates else 0.0
 
 
+def photo_aerienne_ign(lat: float, lng: float) -> str | None:
+    """Photo aérienne IGN (Géoplateforme, open data, sans clé) : assemble
+    une grille de 3×3 tuiles d'orthophoto et recadre 640×400 centré sur le
+    bien. Gratuit et parfaitement adapté : tous les biens sont en France."""
+    try:
+        z = 18
+        n = 2 ** z
+        xf = (lng + 180) / 360 * n
+        yf = (1 - math.log(math.tan(math.radians(lat)) + 1 / math.cos(math.radians(lat))) / math.pi) / 2 * n
+        x0, y0 = int(xf) - 1, int(yf) - 1
+        toile = Image.new("RGB", (768, 768), (232, 232, 226))
+        for dx in range(3):
+            for dy in range(3):
+                time.sleep(0.2)  # politesse envers la Géoplateforme
+                tuile = requests.get(
+                    "https://data.geopf.fr/wmts",
+                    params={
+                        "SERVICE": "WMTS", "REQUEST": "GetTile", "VERSION": "1.0.0",
+                        "LAYER": "ORTHOIMAGERY.ORTHOPHOTOS", "STYLE": "normal",
+                        "TILEMATRIXSET": "PM", "TILEMATRIX": z,
+                        "TILEROW": y0 + dy, "TILECOL": x0 + dx,
+                        "FORMAT": "image/jpeg",
+                    },
+                    headers={"User-Agent": session.headers["User-Agent"]},
+                    timeout=20,
+                )
+                if tuile.status_code == 200 and tuile.headers.get("Content-Type", "").startswith("image/"):
+                    toile.paste(Image.open(BytesIO(tuile.content)), (dx * 256, dy * 256))
+        cx, cy = (xf - x0) * 256, (yf - y0) * 256
+        gauche = int(min(max(0, cx - 320), 768 - 640))
+        haut = int(min(max(0, cy - 200), 768 - 400))
+        photo = toile.crop((gauche, haut, gauche + 640, haut + 400))
+        tampon = BytesIO()
+        photo.save(tampon, "JPEG", quality=85)
+        return base64.b64encode(tampon.getvalue()).decode()
+    except Exception as e:
+        log(f"photo IGN indisponible pour {lat},{lng} : {e}")
+        return None
+
+
 def photo_street_view(coords: str | None, adresse: str, ville: str) -> str | None:
     """Photo Street View (JPEG base64) de l'adresse, si une clé Maps est
     configurée et qu'une image existe (la requête metadata est gratuite)."""
@@ -181,6 +224,12 @@ def parser_fiche(url: str) -> dict | None:
     coords_m = re.search(r"q=(-?\d+\.\d+),(-?\d+\.\d+)", carte_url)
     coords = f"{coords_m.group(1)},{coords_m.group(2)}" if coords_m else None
 
+    # Photo : Street View si une clé Google est fournie, sinon photo
+    # aérienne IGN (gratuite, sans clé) à partir des coordonnées de la fiche
+    photo = photo_street_view(coords, adresse, ville) if CLE_MAPS else None
+    if photo is None and coords_m:
+        photo = photo_aerienne_ign(float(coords_m.group(1)), float(coords_m.group(2)))
+
     return {
         "type": deviner_type(titre),
         "adresse": adresse or titre[:290],
@@ -192,7 +241,7 @@ def parser_fiche(url: str) -> dict | None:
         "url": url,
         "descriptif": descriptif[:4900],
         "carte_url": carte_url[:490],
-        "photo_base64": photo_street_view(coords, adresse, ville),
+        "photo_base64": photo,
     }
 
 
