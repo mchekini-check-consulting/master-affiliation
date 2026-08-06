@@ -1,0 +1,276 @@
+/* Page annonces — design « licitracker » (Outfit + IBM Plex Mono) */
+
+.page {
+  min-height: 100vh;
+  background: #fff;
+  color: #141414;
+}
+
+.accent {
+  color: oklch(0.55 0.19 255);
+}
+
+.estompe {
+  color: #767676;
+  font-weight: 400;
+}
+
+/* ---------- En-tête ---------- */
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 40px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.nav {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  font-size: 14px;
+  color: #767676;
+}
+
+.nav-actif {
+  color: #141414;
+  font-weight: 500;
+}
+
+.nav-compte {
+  border: 1px solid #141414;
+  border-radius: 99px;
+  padding: 5px 16px;
+  color: #141414;
+}
+
+/* ---------- Bandeau titre + stats ---------- */
+.bandeau {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 32px 40px 0;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.bandeau-titre {
+  font-size: 34px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.stats {
+  display: flex;
+  gap: 36px;
+  text-align: right;
+}
+
+.stat-libelle {
+  font-size: 12px;
+  color: #767676;
+}
+
+.stat-valeur {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+/* ---------- Filtres ---------- */
+.filtres {
+  display: flex;
+  gap: 8px;
+  padding: 24px 40px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background: #fff;
+  color: #141414;
+  border: 1px solid #dcdcdc;
+  border-radius: 99px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+.chip:hover {
+  border-color: #141414;
+}
+
+.chip-libre {
+  color: #767676;
+}
+
+.chip-actif {
+  background: #141414;
+  color: #fff;
+  border-color: #141414;
+}
+
+/* ---------- Grille d'annonces ---------- */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #e8e8e8;
+}
+
+.carte {
+  border-right: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #fff;
+  transition: background 0.15s ease;
+}
+
+.carte:hover {
+  background: #fafafa;
+}
+
+.photo {
+  height: 120px;
+  background: repeating-linear-gradient(45deg, #f2f2f2 0 12px, #ececec 12px 24px);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: #9a9a9a;
+}
+
+.carte-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #767676;
+}
+
+.statut {
+  font-weight: 500;
+}
+
+.statut--libre {
+  color: #0a7d4f;
+}
+
+.statut--occupe {
+  color: #b3620b;
+}
+
+.statut--loue {
+  color: #c22f2f;
+}
+
+.carte-adresse {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.carte-prix {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: auto;
+}
+
+.prix {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.prix-detail {
+  font-size: 12.5px;
+  color: #767676;
+}
+
+.carte-pied {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  border-top: 1px solid #efefef;
+  padding-top: 12px;
+  color: #767676;
+}
+
+.carte-pied a {
+  color: oklch(0.55 0.19 255);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.carte-pied a:hover {
+  color: oklch(0.45 0.19 255);
+  text-decoration: underline;
+}
+
+/* ---------- Messages et pied de page ---------- */
+.message {
+  padding: 48px 40px;
+  font-size: 14px;
+  color: #767676;
+  border-top: 1px solid #e8e8e8;
+  margin: 0;
+}
+
+.pied {
+  display: flex;
+  justify-content: center;
+  padding: 28px;
+  font-size: 13px;
+  color: #767676;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+  .grille {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .entete,
+  .bandeau,
+  .filtres {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .nav {
+    gap: 14px;
+    font-size: 13px;
+  }
+
+  .bandeau-titre {
+    font-size: 26px;
+  }
+
+  .stats {
+    gap: 20px;
+    text-align: left;
+  }
+
+  .grille {
+    grid-template-columns: 1fr;
+  }
+}

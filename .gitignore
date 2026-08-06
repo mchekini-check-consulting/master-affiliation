@@ -33,3 +33,4 @@ natura-prep/hero-video.mp4
 natura-prep/*.txt
 natura-prep/back/target/
 immo-scrapper/back/target/
+immo-scrapper/*.html

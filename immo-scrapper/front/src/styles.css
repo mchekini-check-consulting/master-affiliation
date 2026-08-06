@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+/* Styles globaux */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #141414;
+  -webkit-font-smoothing: antialiased;
+}
