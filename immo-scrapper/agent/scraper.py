@@ -9,9 +9,11 @@ les fiches déjà en base ne sont pas re-visitées. Un passage au démarrage,
 puis un passage chaque nuit à minuit (heure de Paris via TZ).
 """
 
+import base64
 import os
 import re
 import time
+import urllib.parse
 from datetime import datetime, timedelta
 
 import requests
@@ -23,6 +25,7 @@ CLE_API = os.environ.get("SCRAPPER_API_KEY", "changeme-scrapper")
 PAGES_LISTING = int(os.environ.get("PAGES_LISTING", "3"))
 MAX_FICHES = int(os.environ.get("MAX_FICHES_PAR_RUN", "60"))
 DELAI = float(os.environ.get("DELAI_SECONDES", "2.5"))
+CLE_MAPS = os.environ.get("GOOGLE_MAPS_API_KEY", "").strip()
 
 session = requests.Session()
 session.headers["User-Agent"] = (
@@ -111,6 +114,32 @@ def extraire_surface(texte: str) -> float:
     return candidates[0] if candidates else 0.0
 
 
+def photo_street_view(coords: str | None, adresse: str, ville: str) -> str | None:
+    """Photo Street View (JPEG base64) de l'adresse, si une clé Maps est
+    configurée et qu'une image existe (la requête metadata est gratuite)."""
+    if not CLE_MAPS:
+        return None
+    localisation = coords or f"{adresse}, {ville}, France"
+    try:
+        meta = requests.get(
+            "https://maps.googleapis.com/maps/api/streetview/metadata",
+            params={"location": localisation, "key": CLE_MAPS},
+            timeout=20,
+        ).json()
+        if meta.get("status") != "OK":
+            return None
+        image = requests.get(
+            "https://maps.googleapis.com/maps/api/streetview",
+            params={"size": "640x400", "location": localisation, "fov": "80", "key": CLE_MAPS},
+            timeout=30,
+        )
+        if image.status_code == 200 and image.headers.get("Content-Type", "").startswith("image/"):
+            return base64.b64encode(image.content).decode()
+    except Exception as e:
+        log(f"street view indisponible pour {localisation} : {e}")
+    return None
+
+
 def parser_fiche(url: str) -> dict | None:
     soup = BeautifulSoup(obtenir(url), "html.parser")
     contenu = soup.select_one(".AdContent")
@@ -142,6 +171,16 @@ def parser_fiche(url: str) -> dict | None:
     if not ville or prix <= 0:
         return None
 
+    # Lien Google Maps : la fiche Licitor fournit les coordonnées exactes ;
+    # sinon on retombe sur une recherche Maps par adresse.
+    carte_el = contenu.select_one(".Location .Map a[href]")
+    carte_url = carte_el["href"] if carte_el else (
+        "https://www.google.com/maps/search/?api=1&query="
+        + urllib.parse.quote(f"{adresse}, {ville}, France")
+    )
+    coords_m = re.search(r"q=(-?\d+\.\d+),(-?\d+\.\d+)", carte_url)
+    coords = f"{coords_m.group(1)},{coords_m.group(2)}" if coords_m else None
+
     return {
         "type": deviner_type(titre),
         "adresse": adresse or titre[:290],
@@ -152,6 +191,8 @@ def parser_fiche(url: str) -> dict | None:
         "statut": deviner_statut(descriptif),
         "url": url,
         "descriptif": descriptif[:4900],
+        "carte_url": carte_url[:490],
+        "photo_base64": photo_street_view(coords, adresse, ville),
     }
 
 

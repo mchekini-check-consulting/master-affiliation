@@ -56,6 +56,15 @@ public class Annonce {
     @Column(columnDefinition = "text")
     private String descriptif;
 
+    /** Lien Google Maps (coordonnées exactes de la fiche Licitor). */
+    @Column(length = 500)
+    private String carteUrl;
+
+    /** Photo Street View de l'adresse (JPEG), récupérée au scrapping. */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Column(columnDefinition = "bytea")
+    private byte[] photo;
+
     public Annonce() {
     }
 
@@ -131,5 +140,26 @@ public class Annonce {
 
     public String getDescriptif() {
         return descriptif;
+    }
+
+    public String getCarteUrl() {
+        return carteUrl;
+    }
+
+    public void setCarteUrl(String carteUrl) {
+        this.carteUrl = carteUrl;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
+
+    /** Exposé dans le JSON pour que le front sache s'il peut afficher l'image. */
+    public boolean isPhotoDisponible() {
+        return photo != null && photo.length > 0;
     }
 }

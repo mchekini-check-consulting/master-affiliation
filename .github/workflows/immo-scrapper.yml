@@ -54,6 +54,8 @@ jobs:
     steps:
       - name: Redémarrer uniquement les services du projet
         uses: appleboy/ssh-action@v1
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
@@ -61,6 +63,7 @@ jobs:
           # Blips réseau runner -> VM : on laisse plus de 30s (défaut) pour
           # établir la connexion
           timeout: 90s
+          envs: GOOGLE_MAPS_API_KEY
           script: |
             set -e
             REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
@@ -73,6 +76,15 @@ jobs:
             git remote set-url origin "$REPO_URL"
             git fetch origin main
             git reset --hard origin/main
+            # Clé Google Maps (photos Street View) : maintenue dans le .env du
+            # serveur, mise à jour idempotente seulement si le secret est défini
+            if [ -n "$GOOGLE_MAPS_API_KEY" ]; then
+              touch .env
+              grep -v '^GOOGLE_MAPS_API_KEY=' .env > .env.tmp || true
+              printf 'GOOGLE_MAPS_API_KEY=%s\n' "$GOOGLE_MAPS_API_KEY" >> .env.tmp
+              mv .env.tmp .env
+              chmod 600 .env
+            fi
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             # Retry : les images tout juste poussées peuvent mettre quelques
             # secondes à être disponibles sur GHCR

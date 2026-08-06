@@ -450,6 +450,8 @@ services:
     environment:
       API_URL: http://immo-scrapper-back:8080/api
       SCRAPPER_API_KEY: ${SCRAPPER_API_KEY:-changeme-scrapper}
+      # Photo Street View de l'adresse (facultatif : sans clé, pas de photo)
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
       TZ: Europe/Paris
     networks:
       - immo-scrapper-net

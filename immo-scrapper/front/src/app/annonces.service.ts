@@ -15,6 +15,8 @@ export interface Annonce {
   statut: 'Libre' | 'Occupé' | 'Loué' | 'Inconnu';
   url: string;
   descriptif?: string;
+  carte_url?: string;
+  photo_disponible?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

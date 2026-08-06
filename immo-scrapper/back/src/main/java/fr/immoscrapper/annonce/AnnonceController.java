@@ -51,7 +51,9 @@ public class AnnonceController {
             @NotNull LocalDateTime audience,
             @NotBlank @Pattern(regexp = "Libre|Occupé|Loué|Inconnu") String statut,
             @NotBlank @Size(max = 500) String url,
-            @Size(max = 5000) String descriptif) {
+            @Size(max = 5000) String descriptif,
+            @Size(max = 500) String carteUrl,
+            @Size(max = 3_000_000) String photoBase64) {
     }
 
     /**
@@ -66,14 +68,41 @@ public class AnnonceController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Clé d'API invalide.");
         }
         var existante = annonces.findByUrl(requete.url());
+        Annonce annonce;
+        HttpStatus statutHttp;
         if (existante.isPresent()) {
-            Annonce annonce = existante.get();
+            annonce = existante.get();
             annonce.mettreAJour(requete.type(), requete.adresse(), requete.ville(), requete.prix(),
                     requete.surfaceM2(), requete.audience(), requete.statut(), requete.descriptif());
-            return ResponseEntity.ok(annonces.save(annonce));
+            statutHttp = HttpStatus.OK;
+        } else {
+            annonce = new Annonce(requete.type(), requete.adresse(), requete.ville(), requete.prix(),
+                    requete.surfaceM2(), requete.audience(), requete.statut(), requete.url(), requete.descriptif());
+            statutHttp = HttpStatus.CREATED;
         }
-        Annonce annonce = new Annonce(requete.type(), requete.adresse(), requete.ville(), requete.prix(),
-                requete.surfaceM2(), requete.audience(), requete.statut(), requete.url(), requete.descriptif());
-        return ResponseEntity.status(HttpStatus.CREATED).body(annonces.save(annonce));
+        if (requete.carteUrl() != null && !requete.carteUrl().isBlank()) {
+            annonce.setCarteUrl(requete.carteUrl());
+        }
+        if (requete.photoBase64() != null && !requete.photoBase64().isBlank()) {
+            try {
+                annonce.setPhoto(java.util.Base64.getDecoder().decode(requete.photoBase64()));
+            } catch (IllegalArgumentException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "photo_base64 invalide.");
+            }
+        }
+        return ResponseEntity.status(statutHttp).body(annonces.save(annonce));
+    }
+
+    /** Photo Street View de l'annonce (JPEG), si récupérée au scrapping. */
+    @GetMapping(value = "/{id}/photo", produces = org.springframework.http.MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> photo(@org.springframework.web.bind.annotation.PathVariable Long id) {
+        Annonce annonce = annonces.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if (!annonce.isPhotoDisponible()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas de photo pour cette annonce.");
+        }
+        return ResponseEntity.ok()
+                .header("Cache-Control", "public, max-age=86400")
+                .body(annonce.getPhoto());
     }
 }

@@ -61,7 +61,13 @@
     <section class="grille">
       @for (annonce of visibles(); track annonce.id) {
         <article class="carte">
-          <div class="photo"><span>photo · street view</span></div>
+          @if (annonce.photo_disponible) {
+            <div class="photo">
+              <img [src]="'/api/v1/annonces/' + annonce.id + '/photo'" [alt]="'Street View — ' + annonce.adresse" loading="lazy" />
+            </div>
+          } @else {
+            <div class="photo"><span>photo · street view</span></div>
+          }
           <div class="carte-meta">
             <span>{{ annonce.type }}</span>
             <span class="statut" [class]="classeStatut(annonce.statut)">● {{ annonce.statut }}</span>
@@ -79,7 +85,12 @@
           </div>
           <div class="carte-pied">
             <span>Audience {{ dateAudience(annonce.audience) }}</span>
-            <a [href]="annonce.url" target="_blank" rel="noopener">Licitor ↗</a>
+            <span class="carte-liens">
+              @if (annonce.carte_url) {
+                <a [href]="annonce.carte_url" target="_blank" rel="noopener">Plan ↗</a>
+              }
+              <a [href]="annonce.url" target="_blank" rel="noopener">Licitor ↗</a>
+            </span>
           </div>
         </article>
       }

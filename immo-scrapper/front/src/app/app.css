@@ -156,6 +156,19 @@
   color: #9a9a9a;
 }
 
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+}
+
+.carte-liens {
+  display: flex;
+  gap: 14px;
+}
+
 .carte-meta {
   display: flex;
   justify-content: space-between;
