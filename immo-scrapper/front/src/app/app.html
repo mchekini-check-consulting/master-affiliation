@@ -96,6 +96,23 @@
             <div class="ligne-statut statut" [class]="classeStatut(annonce.statut)">
               ● {{ annonce.statut }}
             </div>
+            <div
+              class="ligne-prix ligne-marche"
+              [title]="detailMarche(annonce)"
+            >
+              <div class="prix-libelle">Valeur marché</div>
+              @if (annonce.marche_valeur) {
+                <div class="prix-valeur marche-valeur">{{ euros(annonce.marche_valeur) }}</div>
+                <div class="marche-detail">
+                  {{ euros(annonce.marche_prix_m2!) }}/m² × {{ surface(annonce.surface_m2) }}
+                </div>
+              } @else if (annonce.marche_prix_m2) {
+                <div class="prix-valeur marche-valeur">{{ euros(annonce.marche_prix_m2) }}/m²</div>
+                <div class="marche-detail">surface inconnue</div>
+              } @else {
+                <div class="prix-valeur marche-absente">—</div>
+              }
+            </div>
             <div class="ligne-prix">
               <div class="prix-libelle">Mise à prix</div>
               <div class="prix-valeur">{{ euros(annonce.prix) }}</div>
@@ -110,7 +127,7 @@
               </button>
               <span class="ligne-liens">
                 @if (annonce.carte_url) {
-                  <a [href]="annonce.carte_url" target="_blank" rel="noopener">Maps ↗</a>
+                  <a [href]="lienMaps(annonce)" target="_blank" rel="noopener">Maps ↗</a>
                 }
                 <a [href]="annonce.url" target="_blank" rel="noopener">Licitor ↗</a>
               </span>

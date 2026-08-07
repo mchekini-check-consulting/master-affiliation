@@ -29,11 +29,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class AnnonceController {
 
     private final AnnonceRepository annonces;
+    private final fr.immoscrapper.estimation.EstimationMarcheService estimation;
     private final String cleApi;
 
     public AnnonceController(AnnonceRepository annonces,
+                             fr.immoscrapper.estimation.EstimationMarcheService estimation,
                              @Value("${scrapper.cle-api}") String cleApi) {
         this.annonces = annonces;
+        this.estimation = estimation;
         this.cleApi = cleApi;
     }
 
@@ -90,7 +93,17 @@ public class AnnonceController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "photo_base64 invalide.");
             }
         }
-        return ResponseEntity.status(statutHttp).body(annonces.save(annonce));
+        Annonce sauvee = annonces.save(annonce);
+        // L'estimation DVF part après le commit (l'annonce doit être visible du thread de fond).
+        Long id = sauvee.getId();
+        org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                new org.springframework.transaction.support.TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        estimation.estimerEnTacheDeFond(id);
+                    }
+                });
+        return ResponseEntity.status(statutHttp).body(sauvee);
     }
 
     /** Photo Street View de l'annonce (JPEG), si récupérée au scrapping. */

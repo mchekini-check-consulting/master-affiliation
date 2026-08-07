@@ -65,6 +65,22 @@ public class Annonce {
     @Column(columnDefinition = "bytea")
     private byte[] photo;
 
+    /** Prix au m² médian du marché autour de l'adresse (ventes DVF), en euros. */
+    private Integer marchePrixM2;
+
+    /** Valeur du bien au prix du marché : médiane DVF × surface, en euros. */
+    private Integer marcheValeur;
+
+    /** Nombre de ventes DVF ayant servi au calcul de la médiane. */
+    private Integer marcheNbVentes;
+
+    /** Échelle géographique de la médiane : « rayon 500 m » ou « commune ». */
+    private String marcheEchelle;
+
+    /** Date du dernier calcul d'estimation, même infructueux (évite de retenter en boucle). */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private LocalDateTime marcheCalculeLe;
+
     public Annonce() {
     }
 
@@ -85,6 +101,20 @@ public class Annonce {
         this.prix = prix;
         this.surfaceM2 = surfaceM2;
         this.prixM2 = surfaceM2 > 0 ? (int) Math.round(prix / surfaceM2) : 0;
+        this.marcheValeur = marchePrixM2 != null && surfaceM2 > 0
+                ? (int) Math.round(marchePrixM2 * surfaceM2)
+                : null;
+    }
+
+    /** Enregistre le résultat du calcul DVF ; passer null pour « pas assez de ventes ». */
+    public void appliquerEstimationMarche(Integer prixM2Median, Integer nbVentes, String echelle) {
+        this.marchePrixM2 = prixM2Median;
+        this.marcheNbVentes = nbVentes;
+        this.marcheEchelle = echelle;
+        this.marcheValeur = prixM2Median != null && surfaceM2 > 0
+                ? (int) Math.round(prixM2Median * surfaceM2)
+                : null;
+        this.marcheCalculeLe = LocalDateTime.now();
     }
 
     public void mettreAJour(String type, String adresse, String ville, int prix, double surfaceM2,
@@ -161,5 +191,25 @@ public class Annonce {
     /** Exposé dans le JSON pour que le front sache s'il peut afficher l'image. */
     public boolean isPhotoDisponible() {
         return photo != null && photo.length > 0;
+    }
+
+    public Integer getMarchePrixM2() {
+        return marchePrixM2;
+    }
+
+    public Integer getMarcheValeur() {
+        return marcheValeur;
+    }
+
+    public Integer getMarcheNbVentes() {
+        return marcheNbVentes;
+    }
+
+    public String getMarcheEchelle() {
+        return marcheEchelle;
+    }
+
+    public LocalDateTime getMarcheCalculeLe() {
+        return marcheCalculeLe;
     }
 }

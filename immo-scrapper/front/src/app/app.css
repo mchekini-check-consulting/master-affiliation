@@ -285,6 +285,27 @@
   text-align: right;
 }
 
+.ligne-marche {
+  width: 160px;
+  cursor: help;
+}
+
+.marche-valeur {
+  color: #0a7d4f;
+}
+
+.marche-detail {
+  font-size: 10.5px;
+  color: #8a8c94;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.marche-absente {
+  color: #c9cac2;
+  font-weight: 400;
+}
+
 .prix-libelle {
   font-size: 10.5px;
   text-transform: uppercase;

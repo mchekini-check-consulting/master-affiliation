@@ -36,6 +36,11 @@ cd immo-scrapper/back && ./mvnw spring-boot:run
 
 ## À savoir
 
+- Chaque annonce est estimée en tâche de fond à partir des ventes réelles DVF
+  (fichiers geo-dvf d'Etalab, géocodage BAN) : médiane du prix au m² des ventes
+  du même type de bien dans un rayon de 500 m, sinon à l'échelle de la commune.
+  La valeur marché (médiane × surface) s'affiche sur chaque annonce.
+
 - Le mot de passe PostgreSQL vient de la variable `IMMO_SCRAPPER_DB_PASSWORD`
   (fichier `.env` sur le serveur, jamais commité).
 - Le code applicatif (projet Angular dans `front/`, projet Spring Boot dans

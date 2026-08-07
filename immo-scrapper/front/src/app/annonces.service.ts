@@ -17,6 +17,11 @@ export interface Annonce {
   descriptif?: string;
   carte_url?: string;
   photo_disponible?: boolean;
+  /** Estimation DVF (médiane des ventes réelles autour de l'adresse), calculée en tâche de fond. */
+  marche_prix_m2?: number | null;
+  marche_valeur?: number | null;
+  marche_nb_ventes?: number | null;
+  marche_echelle?: 'rayon 500 m' | 'commune' | null;
 }
 
 @Injectable({ providedIn: 'root' })

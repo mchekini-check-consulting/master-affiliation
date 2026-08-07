@@ -66,6 +66,27 @@ export class App {
       .replace(/[\u0300-\u036f]/g, '');
   }
 
+  /** Lien Maps : ouvre Street View (photo du bien) sur les coordonnées de la fiche ;
+   *  à défaut de coordonnées, retombe sur la carte fournie par Licitor. */
+  protected lienMaps(annonce: Annonce): string {
+    const coords = annonce.carte_url?.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+    return coords
+      ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${coords[1]},${coords[2]}`
+      : (annonce.carte_url ?? '');
+  }
+
+  /** Infobulle de la colonne « Valeur marché » : provenance et fiabilité de la médiane DVF. */
+  protected detailMarche(annonce: Annonce): string {
+    if (!annonce.marche_prix_m2) {
+      return 'Pas assez de ventes DVF comparables autour de cette adresse.';
+    }
+    return (
+      `Médiane des ventes réelles (DVF) : ${this.euros(annonce.marche_prix_m2)}/m² · ` +
+      `${annonce.marche_nb_ventes} vente${(annonce.marche_nb_ventes ?? 0) > 1 ? 's' : ''} ` +
+      `à l'échelle « ${annonce.marche_echelle} »`
+    );
+  }
+
   /** "…/nogent-sur-seine/aube/109447.html" → "Aube" (le département est l'avant-dernier segment de l'URL Licitor). */
   protected departement(annonce: Annonce): string {
     const segments = annonce.url.split('/').filter(Boolean);
@@ -186,7 +207,8 @@ export class App {
   }
 
   protected ouvrirSimulation(annonce: Annonce): void {
-    this.simRevente.set(0);
+    // La valeur de marché DVF sert de valeur de revente par défaut, ajustable.
+    this.simRevente.set(annonce.marche_valeur ?? 0);
     this.simTravaux.set(0);
     this.simAdjudication.set(annonce.prix);
     this.simFraisPrealables.set(11_000);
