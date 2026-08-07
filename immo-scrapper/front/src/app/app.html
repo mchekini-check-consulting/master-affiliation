@@ -27,6 +27,24 @@
               {{ libelles[type] }}
             </button>
           }
+          <span class="filtres-separateur"></span>
+          @for (statut of statuts; track statut) {
+            <button
+              type="button"
+              class="chip"
+              [class.chip-actif]="filtreStatut() === statut"
+              (click)="choisirStatut(statut)"
+            >
+              {{ libellesStatut[statut] }}
+            </button>
+          }
+          <input
+            type="search"
+            class="recherche"
+            placeholder="Ville ou département…"
+            [value]="recherche()"
+            (input)="recherche.set(lireTexte($event))"
+          />
         </div>
       </div>
       <div class="stats">
@@ -41,8 +59,8 @@
         <button
           type="button"
           class="stat stat-libres"
-          [class.stat-libres-actif]="libreUniquement()"
-          (click)="basculerLibre()"
+          [class.stat-libres-actif]="filtreStatut() === 'Libre'"
+          (click)="basculerLibres()"
           title="Afficher uniquement les biens libres"
         >
           <div class="stat-libelle">Biens libres</div>

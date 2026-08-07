@@ -11,6 +11,18 @@ const LIBELLES: Record<string, string> = {
   Parking: 'Parkings',
 };
 
+const STATUTS = ['Tout', 'Libre', 'Occupé', 'Loué'] as const;
+
+const LIBELLES_STATUT: Record<string, string> = {
+  Tout: 'Tous',
+  Libre: 'Libres',
+  'Occupé': 'Occupés',
+  'Loué': 'Loués',
+};
+
+/** Mots de liaison laissés en minuscules dans les noms de départements. */
+const LIAISONS = new Set(['et', 'de', 'du', 'des', 'la', 'le', 'les', 'd', 'l']);
+
 @Component({
   selector: 'app-root',
   imports: [],
@@ -22,21 +34,47 @@ export class App {
 
   protected readonly types = TYPES;
   protected readonly libelles = LIBELLES;
+  protected readonly statuts = STATUTS;
+  protected readonly libellesStatut = LIBELLES_STATUT;
 
   protected readonly annonces = signal<Annonce[]>([]);
   protected readonly chargement = signal(true);
   protected readonly erreur = signal(false);
   protected readonly filtreType = signal<string>('Tout');
-  protected readonly libreUniquement = signal(false);
+  protected readonly filtreStatut = signal<string>('Tout');
+  protected readonly recherche = signal('');
 
   /** Annonces visibles selon les filtres actifs. */
-  protected readonly visibles = computed(() =>
-    this.annonces().filter(
+  protected readonly visibles = computed(() => {
+    const requete = this.normaliser(this.recherche().trim());
+    return this.annonces().filter(
       (a) =>
         (this.filtreType() === 'Tout' || a.type === this.filtreType()) &&
-        (!this.libreUniquement() || a.statut === 'Libre')
-    )
-  );
+        (this.filtreStatut() === 'Tout' || a.statut === this.filtreStatut()) &&
+        (!requete ||
+          this.normaliser(a.ville).includes(requete) ||
+          this.normaliser(a.adresse).includes(requete) ||
+          this.normaliser(this.departement(a)).includes(requete))
+    );
+  });
+
+  /** Minuscules sans accents, pour une recherche insensible à la casse et aux accents. */
+  private normaliser(texte: string): string {
+    return texte
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  /** "…/nogent-sur-seine/aube/109447.html" → "Aube" (le département est l'avant-dernier segment de l'URL Licitor). */
+  protected departement(annonce: Annonce): string {
+    const segments = annonce.url.split('/').filter(Boolean);
+    if (segments.length < 2 || !segments[segments.length - 1].endsWith('.html')) return '';
+    return segments[segments.length - 2]
+      .split('-')
+      .map((mot) => (LIAISONS.has(mot) ? mot : mot.charAt(0).toUpperCase() + mot.slice(1)))
+      .join('-');
+  }
 
   // --- Simulation d'acquisition (règles du fichier Plus-value.xlsx, partie revente) ---
   protected readonly simulation = signal<Annonce | null>(null);
@@ -134,8 +172,17 @@ export class App {
     this.filtreType.set(type);
   }
 
-  protected basculerLibre(): void {
-    this.libreUniquement.update((v) => !v);
+  protected choisirStatut(statut: string): void {
+    this.filtreStatut.set(statut);
+  }
+
+  /** La tuile « Biens libres » bascule le filtre de statut sur Libre. */
+  protected basculerLibres(): void {
+    this.filtreStatut.update((s) => (s === 'Libre' ? 'Tout' : 'Libre'));
+  }
+
+  protected lireTexte(event: Event): string {
+    return (event.target as HTMLInputElement).value;
   }
 
   protected ouvrirSimulation(annonce: Annonce): void {
