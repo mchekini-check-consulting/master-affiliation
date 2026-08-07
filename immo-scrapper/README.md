@@ -41,3 +41,5 @@ cd immo-scrapper/back && ./mvnw spring-boot:run
 - Le code applicatif (projet Angular dans `front/`, projet Spring Boot dans
   `back/`) est à scaffolder avec les CLI officiels (`ng new`, Spring Initializr) ;
   les Dockerfiles attendent la structure standard de chacun.
+
+> Pipeline relancée le 7 août 2026 après l'incident GitHub Actions (la prod avait été déployée manuellement).
