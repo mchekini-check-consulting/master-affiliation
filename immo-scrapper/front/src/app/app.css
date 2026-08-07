@@ -1,183 +1,238 @@
-/* Page annonces — design « licitracker » (Outfit + IBM Plex Mono) */
+/* Page annonces — design « Licitracker Dashboard 1c » (Figtree + IBM Plex Mono) */
 
 .page {
+  display: flex;
   min-height: 100vh;
-  background: #fff;
-  color: #141414;
+  background: #f4f4f1;
+  color: #15161a;
 }
 
 .accent {
-  color: oklch(0.55 0.19 255);
+  color: #7ea2f0;
 }
 
-.estompe {
-  color: #767676;
-  font-weight: 400;
-}
-
-/* ---------- En-tête ---------- */
-.entete {
+/* ---------- Barre latérale ---------- */
+.lateral {
+  width: 200px;
+  flex-shrink: 0;
+  background: #1c2a4a;
+  color: #fff;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 22px 40px;
-  border-bottom: 1px solid #e8e8e8;
+  flex-direction: column;
+  padding: 26px 14px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
 .logo {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 19px;
+  font-weight: 800;
   letter-spacing: -0.01em;
+  padding: 0 10px 30px;
 }
 
-.nav {
+.menu {
   display: flex;
-  gap: 28px;
-  align-items: center;
+  flex-direction: column;
+  gap: 3px;
   font-size: 14px;
-  color: #767676;
 }
 
-.nav-actif {
-  color: #141414;
-  font-weight: 500;
+.menu-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #a9b6d4;
+  cursor: pointer;
 }
 
-.nav-compte {
-  border: 1px solid #141414;
-  border-radius: 99px;
-  padding: 5px 16px;
-  color: #141414;
+.menu-item:hover {
+  color: #fff;
 }
 
-/* ---------- Bandeau titre + stats ---------- */
-.bandeau {
+.menu-actif {
+  background: rgb(126 162 240 / 18%);
+  color: #fff;
+  font-weight: 600;
+}
+
+.menu-compte {
+  margin-top: auto;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #a9b6d4;
+  cursor: pointer;
+}
+
+.menu-compte:hover {
+  color: #fff;
+}
+
+/* ---------- Contenu principal ---------- */
+.contenu {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.entete {
+  background: #fff;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  padding: 32px 40px 0;
+  align-items: flex-start;
   gap: 24px;
+  padding: 26px 36px;
   flex-wrap: wrap;
 }
 
-.bandeau-titre {
-  font-size: 34px;
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+.titre {
   margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.stats {
-  display: flex;
-  gap: 36px;
-  text-align: right;
-}
-
-.stat-libelle {
-  font-size: 12px;
-  color: #767676;
-}
-
-.stat-valeur {
+.titre-nb {
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 400;
+  color: #8a8c94;
 }
 
-/* ---------- Filtres ---------- */
 .filtres {
   display: flex;
-  gap: 8px;
-  padding: 24px 40px;
-  font-size: 13px;
+  gap: 6px;
+  margin-top: 14px;
   flex-wrap: wrap;
 }
 
 .chip {
-  background: #fff;
-  color: #141414;
-  border: 1px solid #dcdcdc;
-  border-radius: 99px;
-  padding: 7px 16px;
-  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
   font-family: inherit;
-  font-size: 13px;
-  transition: border-color 0.15s ease;
+  font-size: 12.5px;
+  color: #44454c;
+  cursor: pointer;
 }
 
 .chip:hover {
-  border-color: #141414;
-}
-
-.chip-libre {
-  color: #767676;
+  background: #f4f4f1;
 }
 
 .chip-actif {
-  background: #141414;
+  background: #1c2a4a;
   color: #fff;
-  border-color: #141414;
+  font-weight: 600;
 }
 
-/* ---------- Grille d'annonces ---------- */
-.grille {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid #e8e8e8;
+.chip-actif:hover {
+  background: #1c2a4a;
 }
 
-.carte {
-  border-right: 1px solid #e8e8e8;
-  border-bottom: 1px solid #e8e8e8;
-  padding: 24px 28px;
+/* ---------- Stats ---------- */
+.stats {
+  display: flex;
+  gap: 14px;
+}
+
+.stat {
+  background: #f4f4f1;
+  border-radius: 10px;
+  padding: 12px 20px;
+  text-align: center;
+}
+
+.stat-libelle {
+  font-size: 11px;
+  color: #8a8c94;
+}
+
+.stat-valeur {
+  font-size: 17px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.stat-libres {
+  background: #1c2a4a;
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stat-libres .stat-libelle {
+  color: #a9b6d4;
+}
+
+.stat-libres-actif {
+  box-shadow: inset 0 0 0 2px #7ea2f0;
+}
+
+/* ---------- Liste des annonces ---------- */
+.liste {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: #fff;
-  transition: background 0.15s ease;
+  gap: 12px;
+  padding: 24px 36px;
 }
 
-.carte:hover {
-  background: #fafafa;
+.ligne {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 20px 12px 12px;
 }
 
 .photo {
-  height: 120px;
-  background: repeating-linear-gradient(45deg, #f2f2f2 0 12px, #ececec 12px 24px);
-  border-radius: 2px;
+  width: 120px;
+  height: 82px;
+  flex-shrink: 0;
+  background: repeating-linear-gradient(45deg, #f2f2ef 0 12px, #ebebe8 12px 24px);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .photo span {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10.5px;
-  color: #9a9a9a;
+  font-size: 10px;
+  color: #9a9c94;
 }
 
 .photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: 8px;
   display: block;
 }
 
-.carte-liens {
-  display: flex;
-  gap: 14px;
+.ligne-infos {
+  flex: 1;
+  min-width: 0;
 }
 
-.carte-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #767676;
+.ligne-titre {
+  font-size: 15px;
+  font-weight: 700;
 }
 
-.statut {
-  font-weight: 500;
+.ligne-sous {
+  font-size: 13px;
+  color: #8a8c94;
+  margin-top: 3px;
+}
+
+.ligne-statut {
+  width: 90px;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
 .statut--libre {
@@ -193,93 +248,77 @@
 }
 
 .statut--inconnu {
-  color: #9a9a9a;
+  color: #8a8c94;
 }
 
-.carte-descriptif {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #767676;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.ligne-prix {
+  width: 130px;
+  flex-shrink: 0;
+  text-align: right;
 }
 
-.carte-adresse {
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-}
-
-.carte-prix {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-top: auto;
-}
-
-.prix-titre {
-  display: block;
-  font-size: 11px;
-  font-weight: 500;
+.prix-libelle {
+  font-size: 10.5px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #767676;
-  margin-bottom: 2px;
+  letter-spacing: 0.05em;
+  color: #8a8c94;
 }
 
-.prix {
-  font-size: 24px;
-  font-weight: 300;
-  letter-spacing: -0.02em;
+.prix-valeur {
+  font-size: 19px;
+  font-weight: 800;
 }
 
-.prix-detail {
-  font-size: 12.5px;
-  color: #767676;
+.ligne-audience {
+  width: 140px;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 13px;
+  color: #55565e;
 }
 
-.carte-pied {
+.ligne-actions {
+  width: 104px;
+  flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
-  font-size: 12.5px;
-  border-top: 1px solid #efefef;
-  padding-top: 12px;
-  color: #767676;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
-.carte-pied a {
-  color: oklch(0.55 0.19 255);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.carte-pied a:hover {
-  color: oklch(0.45 0.19 255);
-  text-decoration: underline;
-}
-
-/* ---------- Simulateur d'acquisition (maquette 1c plus-value) ---------- */
-.carte-simuler {
+.ligne-simuler {
   background: none;
   border: none;
   padding: 0;
   font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: oklch(0.55 0.19 255);
+  font-size: 13px;
+  font-weight: 600;
+  color: #1656d6;
   cursor: pointer;
-  text-align: left;
 }
 
-.carte-simuler:hover {
-  color: oklch(0.45 0.19 255);
+.ligne-simuler:hover {
   text-decoration: underline;
 }
 
+.ligne-liens {
+  display: flex;
+  gap: 10px;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.ligne-liens a {
+  color: #8a8c94;
+  text-decoration: none;
+}
+
+.ligne-liens a:hover {
+  color: #1656d6;
+  text-decoration: underline;
+}
+
+/* ---------- Simulateur d'acquisition (maquette 1c plus-value) ---------- */
 .voile {
   position: fixed;
   inset: 0;
@@ -491,6 +530,14 @@
   margin-right: 4px;
 }
 
+.sim-regime .chip {
+  border: 1px solid #dcdcdc;
+}
+
+.sim-regime .chip-actif {
+  border-color: #1c2a4a;
+}
+
 .sim-alerte {
   margin: 0;
   font-size: 12.5px;
@@ -635,54 +682,79 @@
   background: #000;
 }
 
+
 /* ---------- Messages et pied de page ---------- */
 .message {
-  padding: 48px 40px;
+  padding: 48px 36px;
   font-size: 14px;
-  color: #767676;
-  border-top: 1px solid #e8e8e8;
+  color: #8a8c94;
   margin: 0;
 }
 
 .pied {
   display: flex;
   justify-content: center;
-  padding: 28px;
-  font-size: 13px;
-  color: #767676;
+  padding: 20px 36px 28px;
+  font-size: 12.5px;
+  color: #8a8c94;
+  margin-top: auto;
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 1000px) {
-  .grille {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 980px) {
+  .page {
+    flex-direction: column;
   }
-}
 
-@media (max-width: 680px) {
+  .lateral {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 8px;
+  }
+
+  .logo {
+    padding: 0 10px;
+  }
+
+  .menu {
+    flex-direction: row;
+  }
+
+  .menu-compte {
+    margin-top: 0;
+    margin-left: auto;
+  }
+
   .entete,
-  .bandeau,
-  .filtres {
+  .liste {
     padding-left: 20px;
     padding-right: 20px;
   }
 
-  .nav {
-    gap: 14px;
-    font-size: 13px;
+  .ligne {
+    flex-wrap: wrap;
   }
 
-  .bandeau-titre {
-    font-size: 26px;
+  .ligne-infos {
+    flex-basis: calc(100% - 152px);
+  }
+}
+
+@media (max-width: 680px) {
+  .menu {
+    display: none;
   }
 
-  .stats {
-    gap: 20px;
+  .ligne-statut,
+  .ligne-prix,
+  .ligne-audience,
+  .ligne-actions {
+    width: auto;
     text-align: left;
-  }
-
-  .grille {
-    grid-template-columns: 1fr;
   }
 
   .sim-champs {

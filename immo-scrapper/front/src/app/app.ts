@@ -7,7 +7,7 @@ const LIBELLES: Record<string, string> = {
   Tout: 'Tout',
   Appartement: 'Appartements',
   Maison: 'Maisons',
-  'Local commercial': 'Locaux commerciaux',
+  'Local commercial': 'Locaux',
   Parking: 'Parkings',
 };
 
