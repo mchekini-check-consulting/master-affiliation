@@ -478,6 +478,19 @@
   padding-bottom: 6px;
 }
 
+.sim-regime {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+}
+
+.sim-regime-libelle {
+  color: #767676;
+  margin-right: 4px;
+}
+
 .sim-alerte {
   margin: 0;
   font-size: 12.5px;

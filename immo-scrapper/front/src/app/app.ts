@@ -58,8 +58,13 @@ export class App {
     () => (520 + 346.5 + 286 + this.emolTranche4Ht()) * 1.2
   );
 
-  /** Droit d'enregistrement : 5,80 % TTC de l'adjudication. */
-  protected readonly droitEnregistrement = computed(() => this.simAdjudication() * 0.058);
+  /** Achat via une société de marchand de biens : droits d'enregistrement réduits. */
+  protected readonly simSociete = signal(false);
+
+  /** Droit d'enregistrement : 5,80 % TTC, ou 0,715 % en société de marchand de biens (engagement de revente). */
+  protected readonly droitEnregistrement = computed(
+    () => this.simAdjudication() * (this.simSociete() ? 0.00715 : 0.058)
+  );
 
   /** Frais de publication : 0,10 % TTC + 270 €. */
   protected readonly fraisPublication = computed(() => this.simAdjudication() * 0.001 + 270);
@@ -140,6 +145,7 @@ export class App {
     this.simFraisPrealables.set(11_000);
     this.simHonoraires.set(1_800);
     this.simDivers.set(120);
+    this.simSociete.set(false);
     this.detailEmoluments.set(false);
     this.simulation.set(annonce);
   }

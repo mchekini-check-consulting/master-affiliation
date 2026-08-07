@@ -93,9 +93,9 @@
             <span>Audience {{ dateAudience(annonce.audience) }}</span>
             <span class="carte-liens">
               @if (annonce.carte_url) {
-                <a [href]="annonce.carte_url" target="_blank" rel="noopener">Plan ↗</a>
+                <a [href]="annonce.carte_url" target="_blank" rel="noopener">Voir sur Maps ↗</a>
               }
-              <a [href]="annonce.url" target="_blank" rel="noopener">Licitor ↗</a>
+              <a [href]="annonce.url" target="_blank" rel="noopener">Voir sur Licitor ↗</a>
             </span>
           </div>
         </article>
@@ -188,6 +188,26 @@
             </label>
           </div>
 
+          <div class="sim-regime">
+            <span class="sim-regime-libelle">Acquéreur</span>
+            <button
+              type="button"
+              class="chip"
+              [class.chip-actif]="!simSociete()"
+              (click)="simSociete.set(false)"
+            >
+              Particulier · 5,80 %
+            </button>
+            <button
+              type="button"
+              class="chip"
+              [class.chip-actif]="simSociete()"
+              (click)="simSociete.set(true)"
+            >
+              Marchand de biens · 0,715 %
+            </button>
+          </div>
+
           @if (simAdjudication() < 30000) {
             <p class="sim-alerte">
               Attention, la formule ne marche pas avec une adjudication inférieure à 30 k€.
@@ -247,7 +267,10 @@
               </table>
             }
             <div class="sim-ligne">
-              <span>Droit d'enregistrement <span class="sim-ligne-detail">5,80 % TTC</span></span>
+              <span>
+                Droit d'enregistrement
+                <span class="sim-ligne-detail">{{ simSociete() ? '0,715 % TTC · marchand de biens' : '5,80 % TTC' }}</span>
+              </span>
               <span class="sim-ligne-valeur">{{ eurosRond(droitEnregistrement()) }}</span>
             </div>
             <div class="sim-ligne">
