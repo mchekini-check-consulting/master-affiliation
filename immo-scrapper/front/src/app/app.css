@@ -262,7 +262,7 @@
   text-decoration: underline;
 }
 
-/* ---------- Simulateur d'acquisition ---------- */
+/* ---------- Simulateur d'acquisition (maquette 1c plus-value) ---------- */
 .carte-simuler {
   background: none;
   border: none;
@@ -283,7 +283,7 @@
 .voile {
   position: fixed;
   inset: 0;
-  background: rgb(20 20 20 / 45%);
+  background: rgb(10 11 14 / 55%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,17 +293,21 @@
 
 .simulateur {
   background: #fff;
-  border-radius: 4px;
-  width: min(560px, 100%);
+  border-radius: 14px;
+  overflow: hidden;
+  width: min(620px, 100%);
   max-height: calc(100vh - 48px);
   overflow-y: auto;
-  padding: 28px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
 }
 
-.sim-entete {
+/* --- Bloc sombre : résultat + barre de répartition --- */
+.sim-haut {
+  background: #15161b;
+  color: #fff;
+  padding: 26px 30px 22px;
+}
+
+.sim-haut-entete {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -311,66 +315,167 @@
 }
 
 .sim-titre {
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 19px;
+  font-weight: 600;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
 }
 
 .sim-bien {
   font-size: 13px;
+  color: #9aa0ab;
   margin-top: 4px;
 }
 
 .sim-fermer {
   background: none;
-  border: 1px solid #dcdcdc;
-  border-radius: 99px;
-  width: 30px;
-  height: 30px;
+  border: none;
+  padding: 0;
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
-  color: #767676;
-  flex-shrink: 0;
+  font-size: 16px;
+  color: #9aa0ab;
 }
 
 .sim-fermer:hover {
-  border-color: #141414;
-  color: #141414;
+  color: #fff;
+}
+
+.sim-resultat {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.sim-etiquette {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #8b909c;
+  margin-bottom: 6px;
+}
+
+.sim-montant {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: #f2545e;
+}
+
+.sim-rendement {
+  text-align: right;
+}
+
+.sim-rendement-valeur {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+  color: #f2545e;
+}
+
+.sim-positif {
+  color: #43d495;
+}
+
+.sim-barre {
+  display: flex;
+  gap: 6px;
+  height: 6px;
+  margin-top: 22px;
+}
+
+.sim-segment {
+  border-radius: 99px;
+  min-width: 4px;
+}
+
+.sim-segment-1 {
+  background: #3f4550;
+}
+
+.sim-segment-2 {
+  background: #4a505f;
+}
+
+.sim-segment-3 {
+  background: #59617a;
+}
+
+.sim-barre-libelles {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #8b909c;
+}
+
+/* --- Corps blanc : saisies + synthèse --- */
+.sim-corps {
+  padding: 26px 30px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .sim-champs {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 28px;
 }
 
 .sim-champ {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+  gap: 8px;
+  font-size: 12.5px;
   color: #767676;
 }
 
-.sim-champ input {
+.sim-saisie {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  border-bottom: 1px solid #dcdcdc;
+  padding-bottom: 7px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   color: #141414;
-  border: 1px solid #dcdcdc;
-  border-radius: 2px;
-  padding: 8px 10px;
 }
 
-.sim-champ input:focus {
+.sim-saisie input {
+  border: none;
   outline: none;
-  border-color: #141414;
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  background: none;
 }
 
-.sim-champ input.sim-jaune {
-  background: #fff8dc;
-  border-color: #e0c95e;
+/* Le € suit directement le nombre, comme sur la maquette */
+@supports (field-sizing: content) {
+  .sim-saisie input {
+    field-sizing: content;
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+.sim-champ-principal > span:first-child {
+  color: #141414;
+  font-weight: 600;
+}
+
+.sim-champ-principal .sim-saisie {
+  border-bottom: 2px solid #141414;
+  padding-bottom: 6px;
 }
 
 .sim-alerte {
@@ -378,24 +483,89 @@
   font-size: 12.5px;
   color: #b3620b;
   background: #fdf3e7;
-  border-radius: 2px;
+  border-radius: 6px;
   padding: 10px 12px;
+}
+
+.sim-lignes {
+  display: flex;
+  flex-direction: column;
+}
+
+.sim-ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 0;
+  border-top: 1px solid #ececec;
+  font-size: 14px;
+}
+
+.sim-ligne-cliquable {
+  background: none;
+  border-right: none;
+  border-bottom: none;
+  border-left: none;
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.sim-ligne-cliquable:hover {
+  color: #000;
+}
+
+.sim-ligne-cliquable:hover .sim-chevron {
+  color: #141414;
+}
+
+.sim-chevron {
+  display: inline-block;
+  color: #9a9a9a;
+  font-size: 11px;
+  margin-right: 2px;
+  transition: transform 0.15s ease;
+}
+
+.sim-chevron-ouvert {
+  transform: rotate(90deg);
+}
+
+.sim-ligne-detail {
+  color: #9a9a9a;
+}
+
+.sim-ligne-valeur {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+
+.sim-total {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.sim-total .sim-ligne-valeur {
+  font-weight: 600;
+}
+
+.sim-total-detail {
+  font-size: 12px;
+  color: #9a9a9a;
+  padding-bottom: 2px;
 }
 
 .sim-emoluments {
   width: 100%;
   border-collapse: collapse;
   font-size: 12.5px;
-}
-
-.sim-emoluments caption {
-  text-align: left;
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #767676;
-  padding-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .sim-emoluments th {
@@ -412,7 +582,7 @@
 }
 
 .sim-emoluments td {
-  padding: 6px 0;
+  padding: 7px 0;
   text-align: right;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
@@ -428,85 +598,28 @@
 .sim-emoluments tfoot td {
   font-weight: 600;
   border-bottom: none;
-  padding-top: 8px;
+  padding-top: 9px;
 }
 
 .sim-emoluments tfoot td:first-child {
   font-family: inherit;
 }
 
-.sim-lignes {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.sim-ligne {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-}
-
-.sim-ligne > span:last-child {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12.5px;
-  white-space: nowrap;
-}
-
-.sim-total {
-  border-top: 1px solid #e8e8e8;
-  padding-top: 8px;
-  font-weight: 600;
-}
-
-.sim-benefice {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  background: #eef6f1;
-  border-radius: 2px;
-  padding: 14px 16px;
-}
-
-.sim-benefice.sim-negatif {
-  background: #fbeeee;
-}
-
-.sim-benefice-libelle {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.sim-benefice-libelle .estompe {
-  display: block;
-  font-size: 11px;
-  font-weight: 400;
-  margin-top: 2px;
-}
-
-.sim-benefice-valeurs {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.sim-benefice-montant {
-  display: block;
-  font-size: 20px;
+.sim-detail {
+  background: #141414;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: -0.01em;
-  color: #0a7d4f;
 }
 
-.sim-negatif .sim-benefice-montant {
-  color: #c22f2f;
-}
-
-.sim-benefice-marge {
-  font-size: 12.5px;
-  color: #767676;
+.sim-detail:hover {
+  background: #000;
 }
 
 /* ---------- Messages et pied de page ---------- */
@@ -560,10 +673,16 @@
   }
 
   .sim-champs {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .simulateur {
-    padding: 20px;
+  .sim-haut,
+  .sim-corps {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .sim-montant {
+    font-size: 30px;
   }
 }

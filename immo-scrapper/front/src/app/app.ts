@@ -40,6 +40,7 @@ export class App {
 
   // --- Simulation d'acquisition (règles du fichier Plus-value.xlsx, partie revente) ---
   protected readonly simulation = signal<Annonce | null>(null);
+  protected readonly detailEmoluments = signal(false);
   protected readonly simRevente = signal(0);
   protected readonly simTravaux = signal(0);
   protected readonly simAdjudication = signal(0);
@@ -62,6 +63,16 @@ export class App {
 
   /** Frais de publication : 0,10 % TTC + 270 €. */
   protected readonly fraisPublication = computed(() => this.simAdjudication() * 0.001 + 270);
+
+  /** Honoraires & taxes de la barre de répartition : avocat + divers + émoluments + enregistrement + publication. */
+  protected readonly honorairesTaxes = computed(
+    () =>
+      this.simHonoraires() +
+      this.simDivers() +
+      this.emolumentsTtc() +
+      this.droitEnregistrement() +
+      this.fraisPublication()
+  );
 
   protected readonly coutRevientHorsTravaux = computed(
     () =>
@@ -129,6 +140,7 @@ export class App {
     this.simFraisPrealables.set(11_000);
     this.simHonoraires.set(1_800);
     this.simDivers.set(120);
+    this.detailEmoluments.set(false);
     this.simulation.set(annonce);
   }
 
@@ -136,8 +148,23 @@ export class App {
     this.simulation.set(null);
   }
 
+  protected basculerDetailEmoluments(): void {
+    this.detailEmoluments.update((v) => !v);
+  }
+
+  /** "30 000" ou "30000" → 30000 (saisie dans les champs formatés). */
   protected lireNombre(event: Event): number {
-    return Number((event.target as HTMLInputElement).value) || 0;
+    const brut = (event.target as HTMLInputElement).value.replace(/[^\d-]/g, '');
+    return Number(brut) || 0;
+  }
+
+  /** Valeur affichée dans un champ : "30 000" (sans le €, en suffixe dans le gabarit). */
+  protected montant(valeur: number): string {
+    return valeur.toLocaleString('fr-FR');
+  }
+
+  protected eurosRond(valeur: number): string {
+    return Math.round(valeur).toLocaleString('fr-FR') + ' €';
   }
 
   protected eurosPrecis(valeur: number): string {

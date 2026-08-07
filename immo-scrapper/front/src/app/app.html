@@ -106,128 +106,167 @@
   @if (simulation(); as annonce) {
     <div class="voile" (click)="fermerSimulation()">
       <div class="simulateur" (click)="$event.stopPropagation()">
-        <div class="sim-entete">
-          <div>
-            <div class="sim-titre">Calcul de plus-value</div>
-            <div class="sim-bien estompe">{{ annonce.adresse }} · {{ annonce.ville }}</div>
+        <div class="sim-haut">
+          <div class="sim-haut-entete">
+            <div>
+              <div class="sim-titre">Calcul de plus-value</div>
+              <div class="sim-bien">{{ annonce.adresse }} · {{ annonce.ville }}</div>
+            </div>
+            <button type="button" class="sim-fermer" (click)="fermerSimulation()">✕</button>
           </div>
-          <button type="button" class="sim-fermer" (click)="fermerSimulation()">✕</button>
-        </div>
 
-        <div class="sim-champs">
-          <label class="sim-champ">
-            <span>Valeur exacte à la revente</span>
-            <input type="number" min="0" [value]="simRevente()" (input)="simRevente.set(lireNombre($event))" />
-          </label>
-          <label class="sim-champ">
-            <span>Montant des travaux</span>
-            <input type="number" min="0" [value]="simTravaux()" (input)="simTravaux.set(lireNombre($event))" />
-          </label>
-          <label class="sim-champ">
-            <span>Adjudication brut</span>
-            <input
-              type="number"
-              min="0"
-              class="sim-jaune"
-              [value]="simAdjudication()"
-              (input)="simAdjudication.set(lireNombre($event))"
-            />
-          </label>
-          <label class="sim-champ">
-            <span>Frais préalables</span>
-            <input type="number" min="0" [value]="simFraisPrealables()" (input)="simFraisPrealables.set(lireNombre($event))" />
-          </label>
-          <label class="sim-champ">
-            <span>Honoraires avocat</span>
-            <input type="number" min="0" [value]="simHonoraires()" (input)="simHonoraires.set(lireNombre($event))" />
-          </label>
-          <label class="sim-champ">
-            <span>Copie jugement + déboursés + droit plaidoirie + notif. syndic + extrait cadastre</span>
-            <input type="number" min="0" [value]="simDivers()" (input)="simDivers.set(lireNombre($event))" />
-          </label>
-        </div>
-
-        @if (simAdjudication() < 30000) {
-          <p class="sim-alerte">
-            Attention, la formule ne marche pas avec une adjudication inférieure à 30 k€.
-          </p>
-        }
-
-        <table class="sim-emoluments">
-          <caption>Émoluments</caption>
-          <thead>
-            <tr>
-              <th>Tranches</th>
-              <th>Taux HT</th>
-              <th>Montant HT</th>
-              <th>Montant TTC</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0 à 6 500 €</td>
-              <td>8 %</td>
-              <td>{{ eurosPrecis(520) }}</td>
-              <td>{{ eurosPrecis(624) }}</td>
-            </tr>
-            <tr>
-              <td>6 500 € à 17 000 €</td>
-              <td>3,3 %</td>
-              <td>{{ eurosPrecis(346.5) }}</td>
-              <td>{{ eurosPrecis(415.8) }}</td>
-            </tr>
-            <tr>
-              <td>17 000 € à 30 000 €</td>
-              <td>2,2 %</td>
-              <td>{{ eurosPrecis(286) }}</td>
-              <td>{{ eurosPrecis(343.2) }}</td>
-            </tr>
-            <tr>
-              <td>&gt; 30 000 €</td>
-              <td>1,65 %</td>
-              <td>{{ eurosPrecis(emolTranche4Ht()) }}</td>
-              <td>{{ eurosPrecis(emolTranche4Ht() * 1.2) }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="3">Sous-total</td>
-              <td>{{ eurosPrecis(emolumentsTtc()) }}</td>
-            </tr>
-          </tfoot>
-        </table>
-
-        <div class="sim-lignes">
-          <div class="sim-ligne">
-            <span>Droit d'enregistrement <span class="estompe">5,80 % TTC</span></span>
-            <span>{{ eurosPrecis(droitEnregistrement()) }}</span>
+          <div class="sim-resultat">
+            <div>
+              <div class="sim-etiquette">Bénéfice potentiel</div>
+              <div class="sim-montant" [class.sim-positif]="beneficePotentiel() >= 0">
+                {{ eurosRond(beneficePotentiel()) }}
+              </div>
+            </div>
+            <div class="sim-rendement">
+              <div class="sim-etiquette">Rendement</div>
+              <div class="sim-rendement-valeur" [class.sim-positif]="beneficePotentiel() >= 0">
+                {{ pourcent(margePct()) }}
+              </div>
+            </div>
           </div>
-          <div class="sim-ligne">
-            <span>Frais de publication <span class="estompe">0,10 % TTC + 270 €</span></span>
-            <span>{{ eurosPrecis(fraisPublication()) }}</span>
+
+          <div class="sim-barre">
+            <span class="sim-segment sim-segment-1" [style.flexGrow]="simAdjudication()"></span>
+            <span class="sim-segment sim-segment-2" [style.flexGrow]="simFraisPrealables()"></span>
+            <span class="sim-segment sim-segment-3" [style.flexGrow]="honorairesTaxes()"></span>
           </div>
-          <div class="sim-ligne sim-total">
-            <span>Coût de revient total hors travaux</span>
-            <span>{{ eurosPrecis(coutRevientHorsTravaux()) }}</span>
-          </div>
-          <div class="sim-ligne sim-total">
-            <span>Coût de revient total avec travaux</span>
-            <span>{{ eurosPrecis(coutRevientAvecTravaux()) }}</span>
+          <div class="sim-barre-libelles">
+            <span>Adjudication {{ eurosRond(simAdjudication()) }}</span>
+            <span>Frais {{ eurosRond(simFraisPrealables()) }}</span>
+            <span>Honoraires &amp; taxes {{ eurosRond(honorairesTaxes()) }}</span>
           </div>
         </div>
 
-        <div class="sim-benefice" [class.sim-negatif]="beneficePotentiel() < 0">
-          <div class="sim-benefice-libelle">
-            Bénéfice potentiel
-            <span class="estompe">
-              valeur exacte − travaux − adjudication − frais − honoraires − émoluments −
-              enregistrement − publication
-            </span>
+        <div class="sim-corps">
+          <div class="sim-champs">
+            <label class="sim-champ">
+              <span>Valeur à la revente</span>
+              <span class="sim-saisie">
+                <input type="text" inputmode="numeric" [value]="montant(simRevente())" (input)="simRevente.set(lireNombre($event))" />
+                <span>€</span>
+              </span>
+            </label>
+            <label class="sim-champ">
+              <span>Travaux</span>
+              <span class="sim-saisie">
+                <input type="text" inputmode="numeric" [value]="montant(simTravaux())" (input)="simTravaux.set(lireNombre($event))" />
+                <span>€</span>
+              </span>
+            </label>
+            <label class="sim-champ sim-champ-principal">
+              <span>Adjudication brut</span>
+              <span class="sim-saisie">
+                <input type="text" inputmode="numeric" [value]="montant(simAdjudication())" (input)="simAdjudication.set(lireNombre($event))" />
+                <span>€</span>
+              </span>
+            </label>
+            <label class="sim-champ">
+              <span>Frais préalables</span>
+              <span class="sim-saisie">
+                <input type="text" inputmode="numeric" [value]="montant(simFraisPrealables())" (input)="simFraisPrealables.set(lireNombre($event))" />
+                <span>€</span>
+              </span>
+            </label>
+            <label class="sim-champ">
+              <span>Honoraires avocat</span>
+              <span class="sim-saisie">
+                <input type="text" inputmode="numeric" [value]="montant(simHonoraires())" (input)="simHonoraires.set(lireNombre($event))" />
+                <span>€</span>
+              </span>
+            </label>
+            <label class="sim-champ">
+              <span>Copie jugement &amp; divers</span>
+              <span class="sim-saisie">
+                <input type="text" inputmode="numeric" [value]="montant(simDivers())" (input)="simDivers.set(lireNombre($event))" />
+                <span>€</span>
+              </span>
+            </label>
           </div>
-          <div class="sim-benefice-valeurs">
-            <span class="sim-benefice-montant">{{ eurosPrecis(beneficePotentiel()) }}</span>
-            <span class="sim-benefice-marge">{{ pourcent(margePct()) }}</span>
+
+          @if (simAdjudication() < 30000) {
+            <p class="sim-alerte">
+              Attention, la formule ne marche pas avec une adjudication inférieure à 30 k€.
+            </p>
+          }
+
+          <div class="sim-lignes">
+            <button type="button" class="sim-ligne sim-ligne-cliquable" (click)="basculerDetailEmoluments()">
+              <span>
+                <span class="sim-chevron" [class.sim-chevron-ouvert]="detailEmoluments()">▸</span>
+                Émoluments <span class="sim-ligne-detail">4 tranches · 8 % → 1,65 %</span>
+              </span>
+              <span class="sim-ligne-valeur">{{ eurosRond(emolumentsTtc()) }}</span>
+            </button>
+            @if (detailEmoluments()) {
+              <table class="sim-emoluments">
+                <thead>
+                  <tr>
+                    <th>Tranches</th>
+                    <th>Taux HT</th>
+                    <th>Montant HT</th>
+                    <th>Montant TTC</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0 à 6 500 €</td>
+                    <td>8 %</td>
+                    <td>{{ eurosPrecis(520) }}</td>
+                    <td>{{ eurosPrecis(624) }}</td>
+                  </tr>
+                  <tr>
+                    <td>6 500 € à 17 000 €</td>
+                    <td>3,3 %</td>
+                    <td>{{ eurosPrecis(346.5) }}</td>
+                    <td>{{ eurosPrecis(415.8) }}</td>
+                  </tr>
+                  <tr>
+                    <td>17 000 € à 30 000 €</td>
+                    <td>2,2 %</td>
+                    <td>{{ eurosPrecis(286) }}</td>
+                    <td>{{ eurosPrecis(343.2) }}</td>
+                  </tr>
+                  <tr>
+                    <td>&gt; 30 000 €</td>
+                    <td>1,65 %</td>
+                    <td>{{ eurosPrecis(emolTranche4Ht()) }}</td>
+                    <td>{{ eurosPrecis(emolTranche4Ht() * 1.2) }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3">Sous-total</td>
+                    <td>{{ eurosPrecis(emolumentsTtc()) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            }
+            <div class="sim-ligne">
+              <span>Droit d'enregistrement <span class="sim-ligne-detail">5,80 % TTC</span></span>
+              <span class="sim-ligne-valeur">{{ eurosRond(droitEnregistrement()) }}</span>
+            </div>
+            <div class="sim-ligne">
+              <span>Frais de publication <span class="sim-ligne-detail">0,10 % TTC + 270 €</span></span>
+              <span class="sim-ligne-valeur">{{ eurosRond(fraisPublication()) }}</span>
+            </div>
+            <div class="sim-ligne sim-total">
+              <span>Coût de revient total</span>
+              <span class="sim-ligne-valeur">{{ eurosRond(coutRevientAvecTravaux()) }}</span>
+            </div>
+            <div class="sim-total-detail">
+              hors travaux {{ eurosRond(coutRevientHorsTravaux()) }} · avec travaux
+              {{ eurosRond(coutRevientAvecTravaux()) }}
+            </div>
           </div>
+
+          <button type="button" class="sim-detail" (click)="basculerDetailEmoluments()">
+            {{ detailEmoluments() ? 'Masquer le détail des émoluments' : 'Voir le détail des émoluments' }}
+          </button>
         </div>
       </div>
     </div>
