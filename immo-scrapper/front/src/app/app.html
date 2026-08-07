@@ -86,6 +86,9 @@
             </span>
             <span class="prix-detail">{{ euros(annonce.prix_m2) }}/m² · {{ surface(annonce.surface_m2) }}</span>
           </div>
+          <button type="button" class="carte-simuler" (click)="ouvrirSimulation(annonce)">
+            Simuler une acquisition →
+          </button>
           <div class="carte-pied">
             <span>Audience {{ dateAudience(annonce.audience) }}</span>
             <span class="carte-liens">
@@ -98,6 +101,136 @@
         </article>
       }
     </section>
+  }
+
+  @if (simulation(); as annonce) {
+    <div class="voile" (click)="fermerSimulation()">
+      <div class="simulateur" (click)="$event.stopPropagation()">
+        <div class="sim-entete">
+          <div>
+            <div class="sim-titre">Calcul de plus-value</div>
+            <div class="sim-bien estompe">{{ annonce.adresse }} · {{ annonce.ville }}</div>
+          </div>
+          <button type="button" class="sim-fermer" (click)="fermerSimulation()">✕</button>
+        </div>
+
+        <div class="sim-champs">
+          <label class="sim-champ">
+            <span>Valeur exacte à la revente</span>
+            <input type="number" min="0" [value]="simRevente()" (input)="simRevente.set(lireNombre($event))" />
+          </label>
+          <label class="sim-champ">
+            <span>Montant des travaux</span>
+            <input type="number" min="0" [value]="simTravaux()" (input)="simTravaux.set(lireNombre($event))" />
+          </label>
+          <label class="sim-champ">
+            <span>Adjudication brut</span>
+            <input
+              type="number"
+              min="0"
+              class="sim-jaune"
+              [value]="simAdjudication()"
+              (input)="simAdjudication.set(lireNombre($event))"
+            />
+          </label>
+          <label class="sim-champ">
+            <span>Frais préalables</span>
+            <input type="number" min="0" [value]="simFraisPrealables()" (input)="simFraisPrealables.set(lireNombre($event))" />
+          </label>
+          <label class="sim-champ">
+            <span>Honoraires avocat</span>
+            <input type="number" min="0" [value]="simHonoraires()" (input)="simHonoraires.set(lireNombre($event))" />
+          </label>
+          <label class="sim-champ">
+            <span>Copie jugement + déboursés + droit plaidoirie + notif. syndic + extrait cadastre</span>
+            <input type="number" min="0" [value]="simDivers()" (input)="simDivers.set(lireNombre($event))" />
+          </label>
+        </div>
+
+        @if (simAdjudication() < 30000) {
+          <p class="sim-alerte">
+            Attention, la formule ne marche pas avec une adjudication inférieure à 30 k€.
+          </p>
+        }
+
+        <table class="sim-emoluments">
+          <caption>Émoluments</caption>
+          <thead>
+            <tr>
+              <th>Tranches</th>
+              <th>Taux HT</th>
+              <th>Montant HT</th>
+              <th>Montant TTC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0 à 6 500 €</td>
+              <td>8 %</td>
+              <td>{{ eurosPrecis(520) }}</td>
+              <td>{{ eurosPrecis(624) }}</td>
+            </tr>
+            <tr>
+              <td>6 500 € à 17 000 €</td>
+              <td>3,3 %</td>
+              <td>{{ eurosPrecis(346.5) }}</td>
+              <td>{{ eurosPrecis(415.8) }}</td>
+            </tr>
+            <tr>
+              <td>17 000 € à 30 000 €</td>
+              <td>2,2 %</td>
+              <td>{{ eurosPrecis(286) }}</td>
+              <td>{{ eurosPrecis(343.2) }}</td>
+            </tr>
+            <tr>
+              <td>&gt; 30 000 €</td>
+              <td>1,65 %</td>
+              <td>{{ eurosPrecis(emolTranche4Ht()) }}</td>
+              <td>{{ eurosPrecis(emolTranche4Ht() * 1.2) }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">Sous-total</td>
+              <td>{{ eurosPrecis(emolumentsTtc()) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="sim-lignes">
+          <div class="sim-ligne">
+            <span>Droit d'enregistrement <span class="estompe">5,80 % TTC</span></span>
+            <span>{{ eurosPrecis(droitEnregistrement()) }}</span>
+          </div>
+          <div class="sim-ligne">
+            <span>Frais de publication <span class="estompe">0,10 % TTC + 270 €</span></span>
+            <span>{{ eurosPrecis(fraisPublication()) }}</span>
+          </div>
+          <div class="sim-ligne sim-total">
+            <span>Coût de revient total hors travaux</span>
+            <span>{{ eurosPrecis(coutRevientHorsTravaux()) }}</span>
+          </div>
+          <div class="sim-ligne sim-total">
+            <span>Coût de revient total avec travaux</span>
+            <span>{{ eurosPrecis(coutRevientAvecTravaux()) }}</span>
+          </div>
+        </div>
+
+        <div class="sim-benefice" [class.sim-negatif]="beneficePotentiel() < 0">
+          <div class="sim-benefice-libelle">
+            Bénéfice potentiel
+            <span class="estompe">
+              valeur exacte − travaux − adjudication − frais − honoraires − émoluments −
+              enregistrement − publication
+            </span>
+          </div>
+          <div class="sim-benefice-valeurs">
+            <span class="sim-benefice-montant">{{ eurosPrecis(beneficePotentiel()) }}</span>
+            <span class="sim-benefice-marge">{{ pourcent(margePct()) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   }
 
   <footer class="pied">Données scrappées depuis Licitor · photos © Google Street View · mise à jour quotidienne</footer>

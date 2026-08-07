@@ -262,6 +262,253 @@
   text-decoration: underline;
 }
 
+/* ---------- Simulateur d'acquisition ---------- */
+.carte-simuler {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: oklch(0.55 0.19 255);
+  cursor: pointer;
+  text-align: left;
+}
+
+.carte-simuler:hover {
+  color: oklch(0.45 0.19 255);
+  text-decoration: underline;
+}
+
+.voile {
+  position: fixed;
+  inset: 0;
+  background: rgb(20 20 20 / 45%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 10;
+}
+
+.simulateur {
+  background: #fff;
+  border-radius: 4px;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sim-entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sim-titre {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.sim-bien {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.sim-fermer {
+  background: none;
+  border: 1px solid #dcdcdc;
+  border-radius: 99px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: #767676;
+  flex-shrink: 0;
+}
+
+.sim-fermer:hover {
+  border-color: #141414;
+  color: #141414;
+}
+
+.sim-champs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 16px;
+}
+
+.sim-champ {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #767676;
+}
+
+.sim-champ input {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  color: #141414;
+  border: 1px solid #dcdcdc;
+  border-radius: 2px;
+  padding: 8px 10px;
+}
+
+.sim-champ input:focus {
+  outline: none;
+  border-color: #141414;
+}
+
+.sim-champ input.sim-jaune {
+  background: #fff8dc;
+  border-color: #e0c95e;
+}
+
+.sim-alerte {
+  margin: 0;
+  font-size: 12.5px;
+  color: #b3620b;
+  background: #fdf3e7;
+  border-radius: 2px;
+  padding: 10px 12px;
+}
+
+.sim-emoluments {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.sim-emoluments caption {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #767676;
+  padding-bottom: 8px;
+}
+
+.sim-emoluments th {
+  font-size: 11px;
+  font-weight: 500;
+  color: #767676;
+  text-align: right;
+  padding: 6px 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.sim-emoluments th:first-child {
+  text-align: left;
+}
+
+.sim-emoluments td {
+  padding: 6px 0;
+  text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.sim-emoluments td:first-child {
+  text-align: left;
+  font-family: inherit;
+  font-size: 12.5px;
+}
+
+.sim-emoluments tfoot td {
+  font-weight: 600;
+  border-bottom: none;
+  padding-top: 8px;
+}
+
+.sim-emoluments tfoot td:first-child {
+  font-family: inherit;
+}
+
+.sim-lignes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.sim-ligne {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.sim-ligne > span:last-child {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.sim-total {
+  border-top: 1px solid #e8e8e8;
+  padding-top: 8px;
+  font-weight: 600;
+}
+
+.sim-benefice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  background: #eef6f1;
+  border-radius: 2px;
+  padding: 14px 16px;
+}
+
+.sim-benefice.sim-negatif {
+  background: #fbeeee;
+}
+
+.sim-benefice-libelle {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sim-benefice-libelle .estompe {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.sim-benefice-valeurs {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.sim-benefice-montant {
+  display: block;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #0a7d4f;
+}
+
+.sim-negatif .sim-benefice-montant {
+  color: #c22f2f;
+}
+
+.sim-benefice-marge {
+  font-size: 12.5px;
+  color: #767676;
+}
+
 /* ---------- Messages et pied de page ---------- */
 .message {
   padding: 48px 40px;
@@ -310,5 +557,13 @@
 
   .grille {
     grid-template-columns: 1fr;
+  }
+
+  .sim-champs {
+    grid-template-columns: 1fr;
+  }
+
+  .simulateur {
+    padding: 20px;
   }
 }

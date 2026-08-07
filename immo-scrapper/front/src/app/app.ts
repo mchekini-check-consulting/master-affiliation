@@ -38,6 +38,57 @@ export class App {
     )
   );
 
+  // --- Simulation d'acquisition (règles du fichier Plus-value.xlsx, partie revente) ---
+  protected readonly simulation = signal<Annonce | null>(null);
+  protected readonly simRevente = signal(0);
+  protected readonly simTravaux = signal(0);
+  protected readonly simAdjudication = signal(0);
+  protected readonly simFraisPrealables = signal(11_000);
+  protected readonly simHonoraires = signal(1_800);
+  protected readonly simDivers = signal(120);
+
+  /** Émoluments HT de la tranche > 30 000 € : (adjudication − 30 000) × 1,65 %. */
+  protected readonly emolTranche4Ht = computed(
+    () => (this.simAdjudication() - 30_000) * 0.0165
+  );
+
+  /** Sous-total des émoluments TTC : tranches fixes (520 + 346,5 + 286 HT) + tranche 4, × 1,2. */
+  protected readonly emolumentsTtc = computed(
+    () => (520 + 346.5 + 286 + this.emolTranche4Ht()) * 1.2
+  );
+
+  /** Droit d'enregistrement : 5,80 % TTC de l'adjudication. */
+  protected readonly droitEnregistrement = computed(() => this.simAdjudication() * 0.058);
+
+  /** Frais de publication : 0,10 % TTC + 270 €. */
+  protected readonly fraisPublication = computed(() => this.simAdjudication() * 0.001 + 270);
+
+  protected readonly coutRevientHorsTravaux = computed(
+    () =>
+      this.simAdjudication() +
+      this.simFraisPrealables() +
+      this.simHonoraires() +
+      this.emolumentsTtc() +
+      this.droitEnregistrement() +
+      this.fraisPublication() +
+      this.simDivers()
+  );
+
+  protected readonly coutRevientAvecTravaux = computed(
+    () => this.coutRevientHorsTravaux() + this.simTravaux()
+  );
+
+  /** Valeur exacte − travaux − adjudication − frais − honoraires − émoluments − enregistrement − publication. */
+  protected readonly beneficePotentiel = computed(
+    () => this.simRevente() - this.simTravaux() - this.coutRevientHorsTravaux()
+  );
+
+  protected readonly margePct = computed(() =>
+    this.coutRevientAvecTravaux() > 0
+      ? (this.beneficePotentiel() / this.coutRevientAvecTravaux()) * 100
+      : 0
+  );
+
   protected readonly prixMoyen = computed(() => this.moyenne((a) => a.prix));
   protected readonly prixM2Moyen = computed(() => this.moyenne((a) => a.prix_m2));
   protected readonly nbLibres = computed(
@@ -69,6 +120,34 @@ export class App {
 
   protected basculerLibre(): void {
     this.libreUniquement.update((v) => !v);
+  }
+
+  protected ouvrirSimulation(annonce: Annonce): void {
+    this.simRevente.set(0);
+    this.simTravaux.set(0);
+    this.simAdjudication.set(annonce.prix);
+    this.simFraisPrealables.set(11_000);
+    this.simHonoraires.set(1_800);
+    this.simDivers.set(120);
+    this.simulation.set(annonce);
+  }
+
+  protected fermerSimulation(): void {
+    this.simulation.set(null);
+  }
+
+  protected lireNombre(event: Event): number {
+    return Number((event.target as HTMLInputElement).value) || 0;
+  }
+
+  protected eurosPrecis(valeur: number): string {
+    return (
+      valeur.toLocaleString('fr-FR', { maximumFractionDigits: 2, minimumFractionDigits: 0 }) + ' €'
+    );
+  }
+
+  protected pourcent(valeur: number): string {
+    return valeur.toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' %';
   }
 
   protected euros(valeur: number): string {
