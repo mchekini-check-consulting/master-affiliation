@@ -46,6 +46,7 @@ services:
       - qualiopilote-front
       - natura-prep
       - immo-scrapper-front
+      - n8n
 
   # ==========================================================
   # Certbot — émission et renouvellement des certificats TLS
@@ -470,6 +471,29 @@ services:
     depends_on:
       - immo-scrapper-back
 
+  # ==========================================================
+  # n8n — automatisation de workflows
+  #   reverse-proxy -> n8n:5678
+  #   Persistance : SQLite + credentials chiffrés sur le volume n8n-data
+  # ==========================================================
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      N8N_HOST: n8n.check-consulting.net
+      N8N_PROTOCOL: https
+      # URL publique utilisée pour générer les URLs de webhooks
+      WEBHOOK_URL: https://n8n.check-consulting.net/
+      # Derrière le reverse proxy : fait confiance au X-Forwarded-For du proxy
+      N8N_PROXY_HOPS: "1"
+      GENERIC_TIMEZONE: Europe/Paris
+      TZ: Europe/Paris
+    volumes:
+      - n8n-data:/home/node/.n8n
+    networks:
+      - proxy   # joignable par le reverse proxy
+
 # ==========================================================
 # Réseaux
 #   default      : reverse proxy <-> sites de ce projet
@@ -516,4 +540,6 @@ volumes:
   natura-prep-db-data:
   # Données PostgreSQL d'Immo Scrapper
   immo-scrapper-db-data:
+  # Données n8n (workflows, credentials chiffrés, clé de chiffrement)
+  n8n-data:
 #   fidexil-db-data:                          # persistance : à activer plus tard
