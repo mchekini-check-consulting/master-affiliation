@@ -1,7 +1,116 @@
 import React, { useRef, useState } from 'react';
+import JSZip from 'jszip';
 import { CloudDownload, CloudUpload, TriangleAlert } from 'lucide-react';
-import { adminExportBackup, adminImportBackup } from '@/api/backend';
+import {
+  adminExportBackup, adminGetRegistration, adminImportBackup, adminListCertificates,
+  adminListRegistrations,
+} from '@/api/backend';
+import { certificatePdfBase64 } from '@/lib/certificatePdf';
+import {
+  buildFinalEvaluationPdfBase64, buildNeedsAnalysisPdfBase64,
+  buildPositioningTestPdfBase64, buildSponsorSurveyPdfBase64,
+} from '@/lib/surveyPdf';
 import { Card, ViewHeader, bodyFont, headingFont } from '@/pages/admin/common';
+
+// --- Arborescence du ZIP : mêmes règles de nommage que le backend -------
+// (BackupService : dossier par formation, sous-dossiers par type de document)
+
+const stripAccents = (s) => (s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+const sanitize = (s, space) =>
+  stripAccents(s).replace(/[^A-Za-z0-9 _.-]/g, ' ').trim().replace(/\s+/g, space) || 'Sans nom';
+const folderName = (s) => sanitize(s, ' ');
+const personName = (first, last) => sanitize(`${first ?? ''} ${last ?? ''}`, '_');
+const shortId = (id) => String(id).slice(0, 8);
+
+/**
+ * Complète l'archive du backend avec les PDF des questionnaires (analyse du
+ * besoin, commanditaire, tests de positionnement, évaluations finales) et
+ * les certificats jamais archivés, rangés par formation puis type de
+ * document. Un document illisible est ignoré (compté) : l'export des
+ * données ne doit pas échouer pour un PDF.
+ */
+async function enrichZipWithDocuments(zip, auth) {
+  let failures = 0;
+  const add = (path, build) => {
+    try {
+      zip.file(path, build(), { base64: true });
+    } catch {
+      failures += 1;
+    }
+  };
+
+  // Certificats déjà archivés (tels qu'envoyés) par le backend : ne pas
+  // les remplacer par une version régénérée
+  const manifest = JSON.parse(await zip.file('backup.json').async('string'));
+  const archivedCertIds = new Set(
+    (manifest.pdfs ?? []).filter((p) => p.kind === 'CERTIFICATE').map((p) => p.owner_id),
+  );
+
+  const registrations = await adminListRegistrations(auth);
+  for (const item of registrations) {
+    const d = await adminGetRegistration(auth, item.id);
+    const dir = folderName(d.formation_title);
+    const name = personName(d.first_name, d.last_name);
+    const fullName = `${d.first_name} ${d.last_name}`;
+    const rid = shortId(d.id);
+
+    if (d.needs_analysis) {
+      add(`${dir}/Analyse du besoin/${name}_${rid}.pdf`, () => buildNeedsAnalysisPdfBase64(
+        d.needs_analysis,
+        { name: fullName, context: d.company_name, formationTitle: d.formation_title },
+      ));
+    }
+    if (d.sponsor_survey) {
+      add(`${dir}/Analyse du besoin/Commanditaire_${sanitize(d.company_name, '_')}_${rid}.pdf`,
+        () => buildSponsorSurveyPdfBase64(
+          d.sponsor_survey,
+          { company: d.company_name, formationTitle: d.formation_title },
+        ));
+    }
+    if (d.positioning_test) {
+      add(`${dir}/Test de positionnement/${name}_${rid}.pdf`, () => buildPositioningTestPdfBase64(
+        d.positioning_test,
+        { name: fullName, context: d.company_name, formationTitle: d.formation_title },
+      ));
+    }
+    if (d.final_evaluation?.submitted_at) {
+      add(`${dir}/Evaluation finale/${name}_${rid}.pdf`, () => buildFinalEvaluationPdfBase64(
+        d.final_evaluation,
+        { name: fullName, formationTitle: d.formation_title },
+      ));
+    }
+
+    for (const t of d.trainees ?? []) {
+      const tName = personName(t.first_name, t.last_name);
+      const tFullName = `${t.first_name} ${t.last_name}`;
+      const tid = shortId(t.id);
+      const context = `Salarié de ${d.company_name}`;
+      add(`${dir}/Analyse du besoin/${tName}_${tid}.pdf`, () => buildNeedsAnalysisPdfBase64(
+        t, { name: tFullName, context, formationTitle: d.formation_title },
+      ));
+      if (t.positioning_test) {
+        add(`${dir}/Test de positionnement/${tName}_${tid}.pdf`, () => buildPositioningTestPdfBase64(
+          t.positioning_test, { name: tFullName, context, formationTitle: d.formation_title },
+        ));
+      }
+      if (t.final_evaluation?.submitted_at) {
+        add(`${dir}/Evaluation finale/${tName}_${tid}.pdf`, () => buildFinalEvaluationPdfBase64(
+          t.final_evaluation, { name: tFullName, formationTitle: d.formation_title },
+        ));
+      }
+    }
+  }
+
+  // Certificats sans copie archivée : régénérés avec le template actuel
+  const certificates = await adminListCertificates(auth);
+  for (const c of certificates) {
+    if (archivedCertIds.has(c.id)) continue;
+    add(`${folderName(c.formation_title)}/Certificats/${personName(c.first_name, c.last_name)}_${shortId(c.id)}.pdf`,
+      () => certificatePdfBase64(c));
+  }
+
+  return failures;
+}
 
 // Libellés du rapport d'import renvoyé par le backend
 const REPORT_LABELS = [
@@ -26,7 +135,13 @@ export default function BackupView({ auth }) {
     setError(null);
     try {
       const { blob, filename } = await adminExportBackup(auth);
-      const url = URL.createObjectURL(blob);
+      const zip = await JSZip.loadAsync(blob);
+      const failures = await enrichZipWithDocuments(zip, auth);
+      if (failures > 0) {
+        setError(`${failures} document(s) PDF n'ont pas pu être générés — l'archive les omet mais contient toutes les données.`);
+      }
+      const enriched = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(enriched);
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
@@ -78,10 +193,11 @@ export default function BackupView({ auth }) {
       <div className="grid gap-5 lg:grid-cols-2 items-start">
         <Card title="Exporter une sauvegarde">
           <p className="text-sm mb-4" style={{ color: '#6b7a9b', ...bodyFont }}>
-            Télécharge une archive ZIP contenant toutes les données : demandes d'inscription,
-            apprenants, questionnaires (analyse du besoin, commanditaire), tests de positionnement,
-            évaluations finales, certificats de réalisation, réclamations, veille — ainsi que les
-            PDF (certificats, corrigés) tels qu'ils ont été envoyés aux apprenants.
+            Télécharge une archive ZIP contenant toutes les données (demandes d'inscription,
+            apprenants, questionnaires, réclamations, veille…) ainsi que tous les documents en
+            PDF, rangés par formation puis par type : Analyse du besoin, Test de positionnement,
+            Evaluation finale et Certificats. Les certificats et corrigés déjà envoyés aux
+            apprenants y figurent tels qu'ils ont été émis.
           </p>
           <p className="text-xs mb-5" style={{ color: '#8a5a00', background: '#fdf3e2', borderRadius: 12, padding: '10px 14px', ...bodyFont }}>
             L'archive contient des données personnelles : conservez-la en lieu sûr.

@@ -210,6 +210,15 @@ const LEVEL_LABELS = [
  * (demandeur) ou l'objet trainee (salarié — mêmes champs de réponses).
  */
 export function exportNeedsAnalysisPdf(na, subject) {
+  writeNeedsAnalysis(na, subject).finish(safeFileName(['Analyse_du_besoin', subject.name]));
+}
+
+/** Même document, rendu en base64 (export groupé des sauvegardes). */
+export function buildNeedsAnalysisPdfBase64(na, subject) {
+  return writeNeedsAnalysis(na, subject).toBase64();
+}
+
+function writeNeedsAnalysis(na, subject) {
   const w = new PdfWriter('ANALYSE DU BESOIN', subject.formationTitle);
   w.meta(`Bénéficiaire : ${subject.name}${subject.context ? ` — ${subject.context}` : ''}`);
   w.meta(`Répondu le : ${formatDateFr(na.submitted_at)}`);
@@ -242,7 +251,7 @@ export function exportNeedsAnalysisPdf(na, subject) {
   w.section('5. Contraintes');
   w.qa('Contraintes de planning', na.planning_constraints);
 
-  w.finish(safeFileName(['Analyse_du_besoin', subject.name]));
+  return w;
 }
 
 /**
@@ -251,6 +260,15 @@ export function exportNeedsAnalysisPdf(na, subject) {
  * sponsor_survey de l'API ; `subject` : { company, formationTitle }.
  */
 export function exportSponsorSurveyPdf(s, subject) {
+  writeSponsorSurvey(s, subject).finish(safeFileName(['Analyse_du_besoin_commanditaire', subject.company]));
+}
+
+/** Même document, rendu en base64 (export groupé des sauvegardes). */
+export function buildSponsorSurveyPdfBase64(s, subject) {
+  return writeSponsorSurvey(s, subject).toBase64();
+}
+
+function writeSponsorSurvey(s, subject) {
   const w = new PdfWriter("ANALYSE DU BESOIN — COMMANDITAIRE", subject.formationTitle);
   w.meta(`Entreprise : ${subject.company}`);
   w.meta(`Répondu le : ${formatDateFr(s.submitted_at)}`);
@@ -275,11 +293,20 @@ export function exportSponsorSurveyPdf(s, subject) {
   }
   w.qa('Autres remarques ou attentes', s.comments);
 
-  w.finish(safeFileName(['Analyse_du_besoin_commanditaire', subject.company]));
+  return w;
 }
 
 /** Exporte un test de positionnement passé (vue positioning_test de l'API). */
 export function exportPositioningTestPdf(test, subject) {
+  writePositioningTest(test, subject).finish(safeFileName(['Test_de_positionnement', subject.name]));
+}
+
+/** Même document, rendu en base64 (export groupé des sauvegardes). */
+export function buildPositioningTestPdfBase64(test, subject) {
+  return writePositioningTest(test, subject).toBase64();
+}
+
+function writePositioningTest(test, subject) {
   const w = new PdfWriter('TEST DE POSITIONNEMENT', subject.formationTitle);
   w.meta(`Apprenant : ${subject.name}${subject.context ? ` — ${subject.context}` : ''}`);
   w.meta(`Passé le : ${formatDateFr(test.submitted_at)}`);
@@ -309,7 +336,7 @@ export function exportPositioningTestPdf(test, subject) {
   w.section('E. Attentes');
   w.qa("Cas d'usage ou objectif précis pour cette formation", test.expectations);
 
-  w.finish(safeFileName(['Test_de_positionnement', subject.name]));
+  return w;
 }
 
 /**
@@ -317,6 +344,15 @@ export function exportPositioningTestPdf(test, subject) {
  * `subject` : { name, formationTitle }.
  */
 export function exportFinalEvaluationPdf(evaluation, subject) {
+  writeFinalEvaluation(evaluation, subject).finish(safeFileName(['Evaluation_finale', subject.name]));
+}
+
+/** Même document, rendu en base64 (export groupé des sauvegardes). */
+export function buildFinalEvaluationPdfBase64(evaluation, subject) {
+  return writeFinalEvaluation(evaluation, subject).toBase64();
+}
+
+function writeFinalEvaluation(evaluation, subject) {
   const w = new PdfWriter('ÉVALUATION FINALE', subject.formationTitle);
   w.meta(`Apprenant : ${subject.name}`);
   w.meta(`Passée le : ${formatDateFr(evaluation.submitted_at)}`);
@@ -332,7 +368,7 @@ export function exportFinalEvaluationPdf(evaluation, subject) {
     + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
   );
 
-  w.finish(safeFileName(['Evaluation_finale', subject.name]));
+  return w;
 }
 
 /**

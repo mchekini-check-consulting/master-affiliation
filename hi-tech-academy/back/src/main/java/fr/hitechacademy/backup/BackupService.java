@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,18 +124,53 @@ public class BackupService {
 
     @Transactional(readOnly = true)
     public byte[] export() {
+        List<RegistrationRequest> regs = registrations.findAll();
+
+        // Rangement humain des PDF archivés : un dossier par formation, puis
+        // par type de document (le front complète l'archive avec les PDF des
+        // questionnaires selon la même arborescence).
+        Map<UUID, String> certificatePaths = new HashMap<>();
+        Map<UUID, String> correctionPaths = new HashMap<>();
+        for (RegistrationRequest r : regs) {
+            String dir = folderName(r.getFormationTitle());
+            if (r.getCertificate() != null) {
+                UUID id = r.getCertificate().getId();
+                certificatePaths.put(id, dir + "/Certificats/"
+                        + personName(r.getFirstName(), r.getLastName()) + "_" + shortId(id) + ".pdf");
+            }
+            if (r.getFinalEvaluation() != null) {
+                UUID id = r.getFinalEvaluation().getId();
+                correctionPaths.put(id, dir + "/Evaluation finale/Corrige_"
+                        + personName(r.getFirstName(), r.getLastName()) + "_" + shortId(id) + ".pdf");
+            }
+            for (Trainee t : r.getTrainees()) {
+                if (t.getFinalEvaluation() != null) {
+                    UUID id = t.getFinalEvaluation().getId();
+                    correctionPaths.put(id, dir + "/Evaluation finale/Corrige_"
+                            + personName(t.getFirstName(), t.getLastName()) + "_" + shortId(id) + ".pdf");
+                }
+            }
+        }
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (ZipOutputStream zip = new ZipOutputStream(out)) {
             List<PdfEntry> pdfEntries = new ArrayList<>();
             for (ArchivedPdf pdf : archivedPdfs.findAll()) {
-                String file = "pdfs/" + pdf.getKind().name().toLowerCase() + "/" + pdf.getOwnerId() + ".pdf";
+                String file = switch (pdf.getKind()) {
+                    case CERTIFICATE -> certificatePaths.get(pdf.getOwnerId());
+                    case FINAL_EVALUATION_CORRECTION -> correctionPaths.get(pdf.getOwnerId());
+                };
+                if (file == null) {
+                    // Objet métier disparu : chemin technique de repli
+                    file = "pdfs/" + pdf.getKind().name().toLowerCase() + "/" + pdf.getOwnerId() + ".pdf";
+                }
                 zip.putNextEntry(new ZipEntry(file));
                 zip.write(pdf.getContent());
                 zip.closeEntry();
                 pdfEntries.add(new PdfEntry(pdf.getKind(), pdf.getOwnerId(), pdf.getArchivedAt(), file));
             }
             Manifest manifest = new Manifest(FORMAT_VERSION, Instant.now(),
-                    registrations.findAll(), complaints.findAll(), veille.findAll(), pdfEntries);
+                    regs, complaints.findAll(), veille.findAll(), pdfEntries);
             zip.putNextEntry(new ZipEntry("backup.json"));
             zip.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(manifest));
             zip.closeEntry();
@@ -142,6 +178,31 @@ public class BackupService {
             throw new UncheckedIOException(e);
         }
         return out.toByteArray();
+    }
+
+    // --- Noms de dossiers / fichiers lisibles et sûrs -------------------
+    // Mêmes règles côté front (BackupView) pour que les PDF générés par le
+    // navigateur rejoignent les mêmes dossiers.
+
+    static String folderName(String s) {
+        return sanitize(s, " ");
+    }
+
+    static String personName(String firstName, String lastName) {
+        return sanitize((firstName == null ? "" : firstName) + " " + (lastName == null ? "" : lastName), "_");
+    }
+
+    static String shortId(UUID id) {
+        return id == null ? "x" : id.toString().substring(0, 8);
+    }
+
+    /** Retire les accents et tout caractère risqué dans un chemin de ZIP. */
+    private static String sanitize(String s, String spaceReplacement) {
+        String noAccents = Normalizer.normalize(s == null ? "" : s, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        String cleaned = noAccents.replaceAll("[^A-Za-z0-9 _.-]", " ")
+                .trim().replaceAll("\\s+", spaceReplacement);
+        return cleaned.isEmpty() ? "Sans nom" : cleaned;
     }
 
     // --- Import --------------------------------------------------------
