@@ -1,5 +1,7 @@
 package fr.hitechacademy.registration;
 
+import fr.hitechacademy.archive.ArchivedPdfKind;
+import fr.hitechacademy.archive.ArchivedPdfService;
 import fr.hitechacademy.mail.MailService;
 import fr.hitechacademy.registration.RegistrationDtos.AdminDetail;
 import fr.hitechacademy.registration.RegistrationDtos.AdminListItem;
@@ -36,12 +38,14 @@ public class RegistrationAdminController {
     private final RegistrationRepository repository;
     private final CertificateRepository certificateRepository;
     private final MailService mailService;
+    private final ArchivedPdfService archivedPdfService;
 
     public RegistrationAdminController(RegistrationRepository repository, CertificateRepository certificateRepository,
-                                       MailService mailService) {
+                                       MailService mailService, ArchivedPdfService archivedPdfService) {
         this.repository = repository;
         this.certificateRepository = certificateRepository;
         this.mailService = mailService;
+        this.archivedPdfService = archivedPdfService;
     }
 
     // Permet au front de vérifier les identifiants saisis sur l'écran de connexion
@@ -150,18 +154,20 @@ public class RegistrationAdminController {
     // --- Corrigé du QCM : envoi en un clic à l'apprenant -------------
 
     @PostMapping("/registrations/{id}/final-evaluation/send-correction")
-    @Transactional(readOnly = true)
+    @Transactional
     public void sendFinalEvaluationCorrection(@PathVariable UUID id,
                                               @Valid @RequestBody SendPdfRequest body) {
         RegistrationRequest r = find(id);
         requireSubmitted(r.getFinalEvaluation());
+        byte[] pdf = decodePdf(body.pdfBase64());
+        archivedPdfService.archive(ArchivedPdfKind.FINAL_EVALUATION_CORRECTION, r.getFinalEvaluation().getId(), pdf);
         mailService.sendFinalEvaluationCorrection(
                 r.getEmail(), r.getFirstName(), r.getLastName(), r.getFormationTitle(),
-                decodePdf(body.pdfBase64()), "Corrige_evaluation_finale.pdf");
+                pdf, "Corrige_evaluation_finale.pdf");
     }
 
     @PostMapping("/registrations/{id}/trainees/{traineeId}/final-evaluation/send-correction")
-    @Transactional(readOnly = true)
+    @Transactional
     public void sendTraineeFinalEvaluationCorrection(@PathVariable UUID id, @PathVariable UUID traineeId,
                                                      @Valid @RequestBody SendPdfRequest body) {
         RegistrationRequest r = find(id);
@@ -170,9 +176,11 @@ public class RegistrationAdminController {
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Apprenant introuvable"));
         requireSubmitted(t.getFinalEvaluation());
+        byte[] pdf = decodePdf(body.pdfBase64());
+        archivedPdfService.archive(ArchivedPdfKind.FINAL_EVALUATION_CORRECTION, t.getFinalEvaluation().getId(), pdf);
         mailService.sendFinalEvaluationCorrection(
                 t.getEmail(), t.getFirstName(), t.getLastName(), r.getFormationTitle(),
-                decodePdf(body.pdfBase64()), "Corrige_evaluation_finale.pdf");
+                pdf, "Corrige_evaluation_finale.pdf");
     }
 
     private static void requireSubmitted(FinalEvaluation fe) {
@@ -260,16 +268,19 @@ public class RegistrationAdminController {
         return CertificateView.from(r.getCertificate());
     }
 
-    // Envoi du certificat (PDF généré côté front) à l'apprenant par email
+    // Envoi du certificat (PDF généré côté front) à l'apprenant par email.
+    // Le PDF est archivé tel qu'émis (traçabilité + inclus dans les sauvegardes).
     @PostMapping("/certificates/{certificateId}/send")
-    @Transactional(readOnly = true)
+    @Transactional
     public void sendCertificate(@PathVariable UUID certificateId, @Valid @RequestBody SendPdfRequest body) {
         Certificate c = certificateRepository.findById(certificateId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificat introuvable"));
         RegistrationRequest r = c.getRegistration();
+        byte[] pdf = decodePdf(body.pdfBase64());
+        archivedPdfService.archive(ArchivedPdfKind.CERTIFICATE, c.getId(), pdf);
         mailService.sendCertificate(
                 r.getEmail(), r.getFirstName(), r.getLastName(), r.getFormationTitle(),
-                decodePdf(body.pdfBase64()), "Certificat_de_realisation.pdf");
+                pdf, "Certificat_de_realisation.pdf");
     }
 
     private RegistrationRequest find(UUID id) {

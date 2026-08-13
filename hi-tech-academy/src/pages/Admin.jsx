@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, FolderOpen, GraduationCap, Inbox, LogOut, MessageSquareWarning, Rss, ShieldCheck, UsersRound } from 'lucide-react';
+import { Award, DatabaseBackup, FolderOpen, GraduationCap, Inbox, LogOut, MessageSquareWarning, Rss, ShieldCheck, UsersRound } from 'lucide-react';
 import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
 import { bodyFont, headingFont } from '@/pages/admin/common';
 import RequestsView from '@/pages/admin/RequestsView';
@@ -10,6 +10,7 @@ import DocumentsView from '@/pages/admin/DocumentsView';
 import ComplaintsView from '@/pages/admin/ComplaintsView';
 import AuditQualiopiView from '@/pages/admin/AuditQualiopiView';
 import VeilleView from '@/pages/admin/VeilleView';
+import BackupView from '@/pages/admin/BackupView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
 function LoginScreen({ onLoggedIn }) {
@@ -101,6 +102,7 @@ const NAV_ITEMS = [
   { key: 'veille', label: 'Veille', icon: Rss },
   { key: 'documents', label: 'Documents Qualiopi', icon: FolderOpen },
   { key: 'audit', label: 'Audit Qualiopi', icon: ShieldCheck },
+  { key: 'backup', label: 'Sauvegardes', icon: DatabaseBackup },
 ];
 
 // --- Page /admin ------------------------------------------------------
@@ -227,6 +229,9 @@ export default function Admin() {
           )}
           {view === 'audit' && (
             <AuditQualiopiView />
+          )}
+          {view === 'backup' && (
+            <BackupView auth={auth} />
           )}
         </div>
       </main>

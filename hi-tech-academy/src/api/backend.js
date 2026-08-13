@@ -181,3 +181,38 @@ export function adminListCertificates(auth) {
 export function adminIssueCertificate(auth, registrationId, payload) {
   return request(`/admin/registrations/${registrationId}/certificate`, { method: 'POST', body: payload, auth });
 }
+
+// --- Sauvegardes (export / import de toutes les données) --------------
+
+function authHeader(auth) {
+  return { Authorization: `Basic ${btoa(`${auth.email}:${auth.password}`)}` };
+}
+
+// Télécharge l'archive de sauvegarde. Renvoie { blob, filename }.
+export async function adminExportBackup(auth) {
+  const response = await fetch(`${API_BASE}/admin/backup`, { headers: authHeader(auth) });
+  if (!response.ok) throw new Error(`Erreur ${response.status}`);
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const filename = /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? 'hi-tech-academy-backup.zip';
+  return { blob: await response.blob(), filename };
+}
+
+// Restaure une sauvegarde (remplace toutes les données). Renvoie le rapport d'import.
+export async function adminImportBackup(auth, file) {
+  const form = new FormData();
+  form.append('file', file);
+  const response = await fetch(`${API_BASE}/admin/backup/import`, {
+    method: 'POST',
+    headers: authHeader(auth),
+    body: form,
+  });
+  if (!response.ok) {
+    let message = `Erreur ${response.status}`;
+    try {
+      const data = await response.json();
+      if (data.message) message = data.message;
+    } catch { /* réponse sans corps JSON */ }
+    throw new Error(message);
+  }
+  return response.json();
+}
