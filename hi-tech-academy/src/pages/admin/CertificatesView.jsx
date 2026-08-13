@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Award, CheckCircle2, Download, Eye, RefreshCw, Send, X } from 'lucide-react';
 import {
-  adminIssueCertificate, adminListCertificates, adminListRegistrations, adminSendCertificate,
+  adminArchiveCertificatePdf, adminIssueCertificate, adminListCertificates, adminListRegistrations,
+  adminSendCertificate,
 } from '@/api/backend';
 import { certificatePdfBase64, certificatePdfBlobUrl, downloadCertificatePdf } from '@/lib/certificatePdf';
 import PdfViewer from './PdfViewer';
@@ -9,6 +10,13 @@ import {
   APPLICANT_LABELS, Badge, Card, EmptyState, ViewHeader,
   bodyFont, formatDate, formatDay, headingFont,
 } from './common';
+
+// Archive la copie du PDF côté serveur (sans email) pour qu'elle parte dans
+// les sauvegardes — silencieux : la visualisation ne doit pas échouer si
+// l'archivage rate (il se refera à la prochaine ouverture).
+function archiveCertificatePdf(auth, certificate) {
+  adminArchiveCertificatePdf(auth, certificate.id, certificatePdfBase64(certificate)).catch(() => {});
+}
 
 // Formulaire d'émission (dates de session + durée) pour une demande validée.
 function IssueForm({ auth, registration, onClose, onIssued }) {
@@ -42,6 +50,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
         practical_score: Number(practicalScore),
       });
       downloadCertificatePdf(certificate);
+      archiveCertificatePdf(auth, certificate);
       onIssued();
     } catch (err) {
       setError(err.message);
@@ -332,7 +341,10 @@ export default function CertificatesView({ auth }) {
                     <span className="inline-flex items-center gap-4">
                       <button
                         type="button"
-                        onClick={() => setViewerCert(c)}
+                        onClick={() => {
+                          setViewerCert(c);
+                          archiveCertificatePdf(auth, c);
+                        }}
                         className="inline-flex items-center gap-1.5 text-sm font-semibold"
                         style={{ color: '#005064', ...headingFont }}>
                         <Eye className="w-4 h-4" />
@@ -340,7 +352,10 @@ export default function CertificatesView({ auth }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => downloadCertificatePdf(c)}
+                        onClick={() => {
+                          downloadCertificatePdf(c);
+                          archiveCertificatePdf(auth, c);
+                        }}
                         className="inline-flex items-center gap-1.5 text-sm font-semibold"
                         style={{ color: '#005064', ...headingFont }}>
                         <Download className="w-4 h-4" />

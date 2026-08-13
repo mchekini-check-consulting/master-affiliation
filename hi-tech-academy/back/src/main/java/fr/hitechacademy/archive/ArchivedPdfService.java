@@ -15,6 +15,18 @@ public class ArchivedPdfService {
         this.repository = repository;
     }
 
+    /**
+     * Archive le PDF seulement si aucune copie n'existe encore : utilisé à la
+     * visualisation d'un document régénéré, pour ne jamais remplacer la copie
+     * « telle qu'émise » conservée lors d'un envoi.
+     */
+    @Transactional
+    public void archiveIfAbsent(ArchivedPdfKind kind, UUID ownerId, byte[] content) {
+        if (repository.findByKindAndOwnerId(kind, ownerId).isEmpty()) {
+            archive(kind, ownerId, content);
+        }
+    }
+
     /** Archive le PDF envoyé (un renvoi remplace la copie précédente). */
     @Transactional
     public void archive(ArchivedPdfKind kind, UUID ownerId, byte[] content) {

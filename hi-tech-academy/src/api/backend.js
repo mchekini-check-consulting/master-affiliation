@@ -103,6 +103,14 @@ export function adminSendCertificate(auth, certificateId, pdfBase64) {
   });
 }
 
+// Archive la copie du certificat sans envoi d'email (le backend ignore
+// l'appel si une copie « telle qu'envoyée » existe déjà)
+export function adminArchiveCertificatePdf(auth, certificateId, pdfBase64) {
+  return request(`/admin/certificates/${certificateId}/archive`, {
+    method: 'POST', auth, body: { pdf_base64: pdfBase64 },
+  });
+}
+
 // --- Kanban de veille -------------------------------------------------
 export function adminListVeille(auth) {
   return request('/admin/veille', { auth });

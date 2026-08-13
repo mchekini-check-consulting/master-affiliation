@@ -268,6 +268,17 @@ public class RegistrationAdminController {
         return CertificateView.from(r.getCertificate());
     }
 
+    // Archivage du certificat sans envoi (à la visualisation / au
+    // téléchargement dans l'admin). N'écrase jamais une copie existante :
+    // un PDF archivé lors d'un envoi reste la référence « telle qu'émise ».
+    @PostMapping("/certificates/{certificateId}/archive")
+    @Transactional
+    public void archiveCertificate(@PathVariable UUID certificateId, @Valid @RequestBody SendPdfRequest body) {
+        Certificate c = certificateRepository.findById(certificateId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificat introuvable"));
+        archivedPdfService.archiveIfAbsent(ArchivedPdfKind.CERTIFICATE, c.getId(), decodePdf(body.pdfBase64()));
+    }
+
     // Envoi du certificat (PDF généré côté front) à l'apprenant par email.
     // Le PDF est archivé tel qu'émis (traçabilité + inclus dans les sauvegardes).
     @PostMapping("/certificates/{certificateId}/send")
