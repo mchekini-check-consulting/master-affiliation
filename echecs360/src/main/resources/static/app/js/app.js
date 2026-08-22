@@ -73,7 +73,8 @@
   let settings = Object.assign({
     sons: true, aides: true, moteur: 'stockfish',
     plateau: 'classique', fond: 'sombre', fleche: 'vert',
-    botElo: 800, botTemps: 0
+    botElo: 800, botTemps: 0,
+    musique: false, musiqueVolume: 0.4
   }, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
   function saveSettings() {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
@@ -146,6 +147,150 @@
 
   const squares = [];             // 64 éléments .sq (ordre index moteur)
   const pieceEls = new Map();     // index case → élément .piece
+
+  // ------------------------------------------------------ musique d'ambiance --
+  // Playlist importée par l'utilisateur (fichiers audio, stockés dans le
+  // navigateur via IndexedDB, persistants) jouée en boucle dans toute l'app.
+  // Sans playlist : « Fjord Moonlight », ambiance générative intégrée
+  // (nappe grave + notes pentatoniques éparses, WebAudio).
+
+  let musicPlaying = false;
+  let musicAudio = null;   // <audio> pour les pistes importées
+  let musicQueue = [];     // [{ id, name, blob }]
+  let musicIndex = 0;
+  let fjord = null;        // { master, timers } — graphe de l'ambiance intégrée
+
+  function musicDb() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open('echecs360-musique', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('pistes', { keyPath: 'id', autoIncrement: true });
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function musicLoadAll() {
+    const db = await musicDb();
+    return new Promise((resolve, reject) => {
+      const req = db.transaction('pistes').objectStore('pistes').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function musicAdd(file) {
+    const db = await musicDb();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('pistes', 'readwrite');
+      tx.objectStore('pistes').add({ name: file.name.replace(/\.[^.]+$/, ''), blob: file });
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function musicDelete(id) {
+    const db = await musicDb();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('pistes', 'readwrite');
+      tx.objectStore('pistes').delete(id);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  /** « Fjord Moonlight » : nappe mineure au filtre lentement modulé + notes
+      de la pentatonique de la mineur, espacées, avec écho — libre de droits
+      puisque générée ici. */
+  function fjordStart() {
+    fjordStop();
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = audioCtx;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    const master = ctx.createGain();
+    master.gain.value = (settings.musiqueVolume || 0.4) * 0.55;
+    master.connect(ctx.destination);
+    // Écho discret pour l'espace
+    const delay = ctx.createDelay(1.2);
+    delay.delayTime.value = 0.55;
+    const feedback = ctx.createGain();
+    feedback.gain.value = 0.35;
+    delay.connect(feedback); feedback.connect(delay); delay.connect(master);
+    // Nappe : la mineur (A2, E3, C4), oscillateurs doux filtrés
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = 420; filter.Q.value = 0.6;
+    const padGain = ctx.createGain(); padGain.gain.value = 0.16;
+    filter.connect(padGain); padGain.connect(master);
+    const pads = [110, 164.81, 261.63].map((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = i === 2 ? 'sine' : 'triangle';
+      osc.frequency.value = freq;
+      osc.detune.value = (i - 1) * 4;
+      osc.connect(filter);
+      osc.start();
+      return osc;
+    });
+    // Respiration lente du filtre
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
+    const lfoGain = ctx.createGain(); lfoGain.gain.value = 180;
+    lfo.connect(lfoGain); lfoGain.connect(filter.frequency); lfo.start();
+    // Notes éparses : pentatonique de la mineur, une toutes les 2,5 à 6 s
+    const NOTES = [220, 261.63, 293.66, 329.63, 392, 440, 523.25];
+    const timers = [];
+    const pluck = () => {
+      if (!fjord) return;
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = NOTES[Math.floor(Math.random() * NOTES.length)];
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0.0001, ctx.currentTime);
+      env.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 0.06);
+      env.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.4);
+      osc.connect(env); env.connect(master); env.connect(delay);
+      osc.start(); osc.stop(ctx.currentTime + 2.6);
+      timers.push(setTimeout(pluck, 2500 + Math.random() * 3500));
+    };
+    timers.push(setTimeout(pluck, 800));
+    fjord = { master, timers, nodes: [lfo, ...pads] };
+  }
+  function fjordStop() {
+    if (!fjord) return;
+    for (const t of fjord.timers) clearTimeout(t);
+    for (const n of fjord.nodes) { try { n.stop(); } catch (e) { /* déjà arrêté */ } }
+    try { fjord.master.disconnect(); } catch (e) { /* détaché */ }
+    fjord = null;
+  }
+
+  function musicPlayTrack(index) {
+    if (musicQueue.length === 0) return;
+    musicIndex = ((index % musicQueue.length) + musicQueue.length) % musicQueue.length;
+    if (musicAudio) { musicAudio.pause(); URL.revokeObjectURL(musicAudio.src); }
+    musicAudio = new Audio(URL.createObjectURL(musicQueue[musicIndex].blob));
+    musicAudio.volume = settings.musiqueVolume || 0.4;
+    musicAudio.addEventListener('ended', () => { if (musicPlaying) musicPlayTrack(musicIndex + 1); });
+    musicAudio.play().catch(() => { /* autoplay bloqué : relancé au 1er geste */ });
+  }
+
+  /** Démarre la musique (playlist importée, sinon Fjord Moonlight). */
+  async function musicStart() {
+    if (!settings.musique || musicPlaying) return;
+    musicPlaying = true;
+    try { musicQueue = await musicLoadAll(); } catch (e) { musicQueue = []; }
+    if (!musicPlaying) return; // coupée entre-temps
+    if (musicQueue.length > 0) musicPlayTrack(musicIndex);
+    else fjordStart();
+  }
+  function musicStop() {
+    musicPlaying = false;
+    if (musicAudio) { musicAudio.pause(); musicAudio = null; }
+    fjordStop();
+  }
+  function musicApplyVolume() {
+    if (musicAudio) musicAudio.volume = settings.musiqueVolume || 0.4;
+    if (fjord) fjord.master.gain.value = (settings.musiqueVolume || 0.4) * 0.55;
+  }
+  // Autoplay bloqué avant le premier geste : on relance à la première
+  // interaction (l'AudioContext suspendu reprend aussi)
+  document.addEventListener('pointerdown', () => {
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    if (musicPlaying && musicAudio && musicAudio.paused) musicAudio.play().catch(() => {});
+  }, { capture: true });
 
   // ------------------------------------------------------------------ sons --
 
@@ -1085,6 +1230,7 @@
     legalTargets = [];
     gameOver = false;
     clearAnnotations();
+    musicStart(); // musique d'ambiance (si activée) dès le début de la partie
     botThinking = false;
     searchToken++;
     thinkingEl.classList.remove('on');
@@ -1252,6 +1398,7 @@
     movesEl.style.display = '';
     replayNav.style.display = 'flex';
     btnAnalyze.style.display = '';
+    btnAnalyze.textContent = 'Analyser la partie';
     analysisSummary.textContent = '';
     graphWrap.style.display = 'none';
     gotoPly(0);
@@ -1360,7 +1507,12 @@
   }
 
   function startAnalysis() {
-    if (!replay || replay.evals) return;
+    if (!replay) return;
+    if (replay.evals) {
+      // Partie déjà analysée : le bouton ré-ouvre le bilan
+      showAnalysisSummary();
+      return;
+    }
     btnAnalyze.disabled = true;
     analysisProgress.style.display = 'block';
     const token = ++analysisToken;
@@ -1504,19 +1656,14 @@
     replay.cls = cls;
     replay.mistakes = mistakes;
     replay.weak = weak;
-    analysisSummary.innerHTML =
-      'Blancs : ' + counts.w.blunder + ' gaffe' + plural(counts.w.blunder)
-      + ' · ' + counts.w.mistake + ' erreur' + plural(counts.w.mistake)
-      + ' · ' + counts.w.inaccuracy + ' imprécision' + plural(counts.w.inaccuracy) + '<br>'
-      + 'Noirs : ' + counts.b.blunder + ' gaffe' + plural(counts.b.blunder)
-      + ' · ' + counts.b.mistake + ' erreur' + plural(counts.b.mistake)
-      + ' · ' + counts.b.inaccuracy + ' imprécision' + plural(counts.b.inaccuracy)
-      + '<br><span style="color:var(--green);font-weight:700">Analyse Stockfish 18 · MultiPV 5</span>';
+    replay.sfDone = true;
     graphWrap.style.display = 'block';
     renderMoves(replay.sans, replayPly, cls);
     drawEvalGraph();
     updateEvalBar();
     gotoPly(replayPly);
+    btnAnalyze.textContent = 'Bilan de la partie';
+    showAnalysisSummary();
   }
 
   function onAnalysisDone(evals) {
@@ -1535,20 +1682,81 @@
       else if (loss >= 80) { cls[i] = { kind: 'inaccuracy', symbol: '?!' }; counts[mover].inaccuracy++; }
     }
     replay.cls = cls;
-    analysisSummary.innerHTML =
-      'Blancs : ' + counts.w.blunder + ' gaffe' + plural(counts.w.blunder)
-      + ' · ' + counts.w.mistake + ' erreur' + plural(counts.w.mistake)
-      + ' · ' + counts.w.inaccuracy + ' imprécision' + plural(counts.w.inaccuracy) + '<br>'
-      + 'Noirs : ' + counts.b.blunder + ' gaffe' + plural(counts.b.blunder)
-      + ' · ' + counts.b.mistake + ' erreur' + plural(counts.b.mistake)
-      + ' · ' + counts.b.inaccuracy + ' imprécision' + plural(counts.b.inaccuracy);
     graphWrap.style.display = 'block';
     renderMoves(replay.sans, replayPly, cls);
     drawEvalGraph();
     updateEvalBar();
+    btnAnalyze.textContent = 'Bilan de la partie';
+    showAnalysisSummary();
   }
 
   function plural(n) { return n > 1 ? 's' : ''; }
+
+  // ------------------------------------------- bilan de la partie (résumé) --
+
+  /** % de victoire estimé depuis l'éval (perspective Blancs), façon lichess. */
+  function winPct(cp) {
+    return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
+  }
+
+  /** Précision d'un camp (0-100) : moyenne de la précision de chaque coup,
+      calculée sur la perte de % de victoire (formule lichess). */
+  function accuracyFor(color) {
+    if (!replay || !replay.evals) return null;
+    const evals = replay.evals;
+    const accs = [];
+    for (let i = 0; i + 1 < evals.length && i < replay.sans.length; i++) {
+      if ((i % 2 === 0 ? 'w' : 'b') !== color) continue;
+      const before = color === 'w' ? winPct(evals[i]) : 100 - winPct(evals[i]);
+      const after = color === 'w' ? winPct(evals[i + 1]) : 100 - winPct(evals[i + 1]);
+      const drop = Math.max(0, before - after);
+      accs.push(Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * drop) - 3.1669)));
+    }
+    if (accs.length === 0) return null;
+    return accs.reduce((sum, a) => sum + a, 0) / accs.length;
+  }
+
+  /** Bilan façon chess.com : précision des deux camps + décompte des coups
+      par catégorie, présenté AVANT de naviguer dans l'analyse. */
+  function showAnalysisSummary() {
+    if (!replay || !replay.cls) return;
+    const counts = {
+      w: { best: 0, excellent: 0, good: 0, inaccuracy: 0, mistake: 0, blunder: 0 },
+      b: { best: 0, excellent: 0, good: 0, inaccuracy: 0, mistake: 0, blunder: 0 }
+    };
+    for (let i = 0; i < replay.cls.length; i++) {
+      const c = replay.cls[i];
+      if (!c) continue;
+      const mover = i % 2 === 0 ? 'w' : 'b';
+      if (counts[mover][c.kind] !== undefined) counts[mover][c.kind]++;
+    }
+    const accW = accuracyFor('w');
+    const accB = accuracyFor('b');
+    const names = playerNames(); // { w, b }
+    // Moteur maison : pas de catégories positives fiables (perte seule)
+    const rows = replay.sfDone
+      ? [['best', '★', 'Meilleurs'], ['excellent', '!!', 'Excellents'], ['good', '!', 'Bons coups'],
+         ['inaccuracy', '?!', 'Imprécisions'], ['mistake', '?', 'Erreurs'], ['blunder', '??', 'Gaffes']]
+      : [['inaccuracy', '?!', 'Imprécisions'], ['mistake', '?', 'Erreurs'], ['blunder', '??', 'Gaffes']];
+    let html = '<h2>Bilan de la partie</h2>'
+      + '<p class="sub">' + escapeHtml(names.w) + ' contre ' + escapeHtml(names.b) + '</p>'
+      + '<div class="sum-acc">'
+      + '<div class="sum-acc-side"><span class="sum-acc-label">Blancs</span>'
+      + '<b>' + (accW === null ? '—' : accW.toFixed(1) + ' %') + '</b><small>précision</small></div>'
+      + '<div class="sum-acc-side dark"><span class="sum-acc-label">Noirs</span>'
+      + '<b>' + (accB === null ? '—' : accB.toFixed(1) + ' %') + '</b><small>précision</small></div>'
+      + '</div>'
+      + '<table class="sum-table"><thead><tr><th></th><th>Blancs</th><th>Noirs</th></tr></thead><tbody>';
+    for (const [kind, symbol, label] of rows) {
+      html += '<tr><td><span class="sum-sym sum-' + kind + '">' + symbol + '</span> ' + label + '</td>'
+        + '<td>' + counts.w[kind] + '</td><td>' + counts.b[kind] + '</td></tr>';
+    }
+    html += '</tbody></table>'
+      + '<p class="sum-engine">' + (replay.sfDone ? 'Analyse Stockfish 18 · MultiPV 5' : 'Analyse rapide (moteur maison)') + '</p>'
+      + '<div class="actions"><button type="button" class="btn btn-primary" id="sum-go">Passer à l\'analyse</button></div>';
+    const modal = openModal(html);
+    modal.querySelector('#sum-go').addEventListener('click', closeModal);
+  }
 
   /** Barre d'évaluation verticale : proportion blanche selon l'éval moteur
       (matériel + position), courbe douce façon lichess. */
@@ -1837,6 +2045,18 @@
           + '<span style="background:' + color + '"></span>'
           + '</button>').join('')
       + '</div>'
+      + '</div>'
+      + '<div class="tr-card"><h3>🎵 Musique</h3>'
+      + '<label class="cfg-toggle"><input type="checkbox" id="cfg-musique"' + (settings.musique ? ' checked' : '') + '>'
+      + '<span>Musique d\'ambiance<small>Jouée dans toute l\'application, lancée au début '
+      + 'de la partie. Sans playlist : « Fjord Moonlight », l\'ambiance intégrée.</small></span></label>'
+      + '<label class="cfg-sublabel">Volume</label>'
+      + '<input type="range" id="cfg-mus-vol" min="0" max="100" value="'
+      + Math.round((settings.musiqueVolume || 0.4) * 100) + '">'
+      + '<label class="cfg-sublabel">Playlist</label>'
+      + '<div id="cfg-mus-list" class="mus-list"></div>'
+      + '<input type="file" id="cfg-mus-files" accept="audio/*" multiple style="display:none">'
+      + '<button type="button" class="btn btn-secondary" id="cfg-mus-import">Importer des musiques…</button>'
       + '</div>';
     const input = configPanel.querySelector('#cfg-user');
     configPanel.querySelector('#cfg-load').addEventListener('click', () => loadGamesFromConfig(input.value.trim()));
@@ -1869,6 +2089,56 @@
         group.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s === btn));
       });
     });
+    configPanel.querySelector('#cfg-musique').addEventListener('change', (e) => {
+      settings.musique = e.target.checked;
+      saveSettings();
+      if (settings.musique) musicStart(); else musicStop();
+    });
+    configPanel.querySelector('#cfg-mus-vol').addEventListener('input', (e) => {
+      settings.musiqueVolume = +e.target.value / 100;
+      saveSettings();
+      musicApplyVolume();
+    });
+    const musFiles = configPanel.querySelector('#cfg-mus-files');
+    configPanel.querySelector('#cfg-mus-import').addEventListener('click', () => musFiles.click());
+    musFiles.addEventListener('change', async () => {
+      for (const file of musFiles.files) {
+        await musicAdd(file).catch(() => {});
+      }
+      musFiles.value = '';
+      // La playlist a changé : bascule dessus si la musique joue déjà
+      if (musicPlaying) {
+        musicStop();
+        if (settings.musique) musicStart();
+      }
+      renderMusicList();
+    });
+    renderMusicList();
+  }
+
+  /** Liste des pistes de la playlist dans la configuration. */
+  async function renderMusicList() {
+    const list = configPanel.querySelector('#cfg-mus-list');
+    if (!list) return;
+    let tracks = [];
+    try { tracks = await musicLoadAll(); } catch (e) { tracks = []; }
+    let html = '<div class="mus-item builtin"><span>🌙 Fjord Moonlight</span>'
+      + '<small>' + (tracks.length === 0 ? 'ambiance intégrée · par défaut' : 'jouée si la playlist est vide') + '</small></div>';
+    for (const t of tracks) {
+      html += '<div class="mus-item"><span>' + escapeHtml(t.name) + '</span>'
+        + '<button type="button" class="mus-del" data-id="' + t.id + '" title="Retirer">✕</button></div>';
+    }
+    list.innerHTML = html;
+    for (const btn of list.querySelectorAll('.mus-del')) {
+      btn.addEventListener('click', async () => {
+        await musicDelete(+btn.dataset.id).catch(() => {});
+        if (musicPlaying) {
+          musicStop();
+          if (settings.musique) musicStart();
+        }
+        renderMusicList();
+      });
+    }
   }
 
   async function loadGamesFromConfig(username) {
@@ -1968,6 +2238,7 @@
   function hideSignalsPanel() {
     signalsPanel.style.display = 'none';
     clearSignalOverlays();
+    if (typeof sigTourClose === 'function') sigTourClose();
   }
 
   function updateSignalsButton() {
@@ -1975,6 +2246,7 @@
         || (mode === 'trainer' && trainer && (trainer.state === 'guess' || trainer.state === 'feedback'))
         || (mode === 'misspuzzles' && missP && (missP.state === 'guess' || missP.state === 'feedback'));
     btnSignals.style.display = available ? '' : 'none';
+    document.getElementById('btn-signals-visual').style.display = available ? '' : 'none';
     if (!available) hideSignalsPanel();
   }
 
@@ -2025,6 +2297,90 @@
   btnSignals.addEventListener('click', () => {
     if (signalsPanel.style.display === 'flex') hideSignalsPanel();
     else showSignalsPanel();
+  });
+
+  // ---------------------------- visite guidée des signaux (bulle visuelle) --
+
+  const btnSignalsVisual = document.getElementById('btn-signals-visual');
+  let sigTour = null; // { items, index }
+
+  function sigTourClose() {
+    if (!sigTour) return;
+    sigTour = null;
+    clearSignalOverlays();
+    const bubble = document.getElementById('signal-bubble');
+    if (bubble) bubble.remove();
+  }
+
+  /** Parcourt les signaux un à un : cases surlignées + bulle explicative sur
+      l'échiquier (façon analyse chess.com), navigation ‹ › dans la bulle. */
+  function sigTourStart() {
+    sigTourClose();
+    hideSignalsPanel();
+    const state = currentDisplayedState();
+    if (!state) return;
+    const result = Signals.detectSignals(Chess, state);
+    const items = result.tactiques.concat(result.positionnels);
+    if (items.length === 0) {
+      sigTour = { items: [{ titre: 'Rien de notable', detail: 'Aucun signal tactique ou positionnel dans cette position.', cases: [] }], index: 0 };
+    } else {
+      sigTour = { items, index: 0 };
+    }
+    sigTourShow();
+  }
+
+  function sigTourShow() {
+    if (!sigTour) return;
+    const item = sigTour.items[sigTour.index];
+    clearSignalOverlays();
+    for (const sq of item.cases || []) {
+      const ov = document.createElement('div');
+      ov.className = 'ov ov-signal';
+      squares[sq].appendChild(ov);
+    }
+    let bubble = document.getElementById('signal-bubble');
+    if (!bubble) {
+      bubble = document.createElement('div');
+      bubble.id = 'signal-bubble';
+      bubble.className = 'signal-bubble';
+      boardEl.appendChild(bubble);
+    }
+    const campLabel = item.camp
+      ? '<span class="sb-camp ' + item.camp + '">' + (item.camp === 'w' ? 'Blancs' : 'Noirs') + '</span> '
+      : '';
+    bubble.innerHTML =
+      '<div class="sb-title">' + campLabel + escapeHtml(item.titre) + '</div>'
+      + '<div class="sb-detail">' + escapeHtml(item.detail) + '</div>'
+      + '<div class="sb-nav">'
+      + '<button type="button" id="sb-prev"' + (sigTour.index === 0 ? ' disabled' : '') + '>‹</button>'
+      + '<span>' + (sigTour.index + 1) + ' / ' + sigTour.items.length + '</span>'
+      + '<button type="button" id="sb-next"' + (sigTour.index >= sigTour.items.length - 1 ? ' disabled' : '') + '>›</button>'
+      + '<button type="button" id="sb-close">✕</button>'
+      + '</div>';
+    // Position : près de la première case concernée, côté libre de l'échiquier
+    const anchor = (item.cases && item.cases.length > 0) ? item.cases[0] : 27;
+    const col = viewCol(anchor);
+    const row = viewRow(anchor);
+    bubble.style.left = Math.max(2, Math.min(58, col * 12.5 - 15)) + '%';
+    if (row <= 3) {
+      bubble.style.top = ((row + 1) * 12.5 + 1) + '%';
+      bubble.style.bottom = 'auto';
+    } else {
+      bubble.style.bottom = ((8 - row) * 12.5 + 1) + '%';
+      bubble.style.top = 'auto';
+    }
+    bubble.querySelector('#sb-prev').addEventListener('click', () => {
+      if (sigTour && sigTour.index > 0) { sigTour.index--; sigTourShow(); }
+    });
+    bubble.querySelector('#sb-next').addEventListener('click', () => {
+      if (sigTour && sigTour.index < sigTour.items.length - 1) { sigTour.index++; sigTourShow(); }
+    });
+    bubble.querySelector('#sb-close').addEventListener('click', sigTourClose);
+  }
+
+  btnSignalsVisual.addEventListener('click', () => {
+    if (sigTour) sigTourClose();
+    else sigTourStart();
   });
 
   // ------------------------------------------------------- blunder trainer --
@@ -3863,7 +4219,7 @@
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
     graphWrap.style.display = inGames && replay && replay.evals ? 'block' : 'none';
-    analysisSummary.textContent = inGames && replay && replay.evals ? analysisSummary.textContent : '';
+    analysisSummary.textContent = '';
     btnNew.textContent = inGames ? 'Importer' : 'Nouvelle partie';
     // Panneaux des exercices, du trainer et de la configuration
     document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
@@ -3899,44 +4255,25 @@
       }
       renderStatus();
     } else if (next === 'trainer') {
-      if (trainer && trainer.state === 'guess') {
-        trainerShowPuzzle();
-      } else if (trainer && trainer.state === 'feedback') {
-        trainerNext();
-      } else {
-        if (!trainer || (trainer.state !== 'done' && trainer.state !== 'empty' && trainer.state !== 'error')) {
-          trainer = { state: 'intro' };
-        }
-        startGame('w');
-        renderTrainerPanel();
-        renderStatus();
-      }
+      // Arriver sur le mode démarre toujours une nouvelle session : l'état
+      // précédent (quiz en cours ou terminé) est abandonné
+      trainer = { state: 'intro' };
+      trainerRequestId++;
+      startGame('w');
+      renderTrainerPanel();
+      renderStatus();
     } else if (next === 'misspuzzles') {
-      if (missP && missP.state === 'guess') {
-        missPShowPuzzle();
-      } else if (missP && missP.state === 'feedback') {
-        missPNext();
-      } else {
-        if (!missP || (missP.state !== 'done' && missP.state !== 'empty' && missP.state !== 'error')) {
-          missP = { state: 'intro' };
-        }
-        startGame('w');
-        renderMissPPanel();
-        renderStatus();
-      }
+      missP = { state: 'intro' };
+      trainerRequestId++;
+      startGame('w');
+      renderMissPPanel();
+      renderStatus();
     } else if (next === 'missmates') {
-      if (missM && missM.state === 'guess') {
-        missMShowPuzzle();
-      } else if (missM && missM.state === 'feedback') {
-        missMNext();
-      } else {
-        if (!missM || (missM.state !== 'done' && missM.state !== 'empty' && missM.state !== 'error')) {
-          missM = { state: 'intro' };
-        }
-        startGame('w');
-        renderMissMPanel();
-        renderStatus();
-      }
+      missM = { state: 'intro' };
+      missMToken++;
+      startGame('w');
+      renderMissMPanel();
+      renderStatus();
     } else if (next === 'exercises') {
       if (exCurrent) {
         // Réoriente côté joueur : un autre mode a pu retourner l'échiquier

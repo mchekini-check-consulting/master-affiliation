@@ -373,6 +373,66 @@ button { font-family: inherit; }
 .modal .result-big { font-size: 1.6rem; font-weight: 800; text-align: center; margin: 8px 0 2px; }
 .modal .reason { text-align: center; color: var(--muted); margin: 0 0 6px; }
 
+/* Playlist musique (onglet Configuration) */
+.mus-list { margin: 4px 0 10px; }
+.mus-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border: 1px solid var(--line); border-radius: 10px;
+  margin-bottom: 6px; font-size: 13px;
+}
+.mus-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mus-item small { color: var(--gray-text); font-size: 11px; }
+.mus-item.builtin { background: var(--chip); }
+.mus-del {
+  border: none; background: none; cursor: pointer; color: #a12626;
+  font-weight: 800; font-size: 13px; padding: 2px 6px;
+}
+#cfg-mus-vol { width: 100%; accent-color: var(--green); margin: 2px 0 8px; }
+
+/* Bulle explicative de la visite des signaux (façon analyse chess.com) */
+.signal-bubble {
+  position: absolute; z-index: 8; width: min(270px, 44%);
+  background: #fff; color: #22302a; border-radius: 12px;
+  padding: 10px 12px 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  font-family: 'Sora', sans-serif; font-size: 13px; line-height: 1.35;
+}
+.signal-bubble .sb-title { font-weight: 800; margin-bottom: 3px; }
+.signal-bubble .sb-camp { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 99px; }
+.signal-bubble .sb-camp.w { background: #f2f0e9; border: 1px solid #ccc; }
+.signal-bubble .sb-camp.b { background: #22302a; color: #fff; }
+.signal-bubble .sb-detail { color: #55645c; font-size: 12.5px; }
+.signal-bubble .sb-nav {
+  display: flex; align-items: center; gap: 8px; margin-top: 8px;
+  border-top: 1px solid #eee; padding-top: 6px;
+}
+.signal-bubble .sb-nav span { font-size: 12px; color: #7a877f; font-weight: 700; }
+.signal-bubble .sb-nav button {
+  border: 1.5px solid #dcd8ce; background: #fff; border-radius: 8px;
+  min-width: 30px; padding: 2px 8px; font-size: 15px; font-weight: 800;
+  cursor: pointer; color: #22302a;
+}
+.signal-bubble .sb-nav button:disabled { opacity: .35; cursor: default; }
+.signal-bubble .sb-nav #sb-close { margin-left: auto; font-size: 12px; }
+
+/* Bilan de la partie (modale après analyse) */
+.sum-acc { display: flex; gap: 10px; margin: 14px 0; }
+.sum-acc-side {
+  flex: 1; border-radius: 12px; padding: 10px 12px; text-align: center;
+  background: #f2f0e9; color: #22302a;
+}
+.sum-acc-side.dark { background: #22302a; color: #fff; }
+.sum-acc-side .sum-acc-label { display: block; font-size: 11px; font-weight: 800; opacity: .7; }
+.sum-acc-side b { display: block; font-size: 1.5rem; font-weight: 800; }
+.sum-acc-side small { font-size: 11px; opacity: .7; }
+.sum-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.sum-table th { text-align: center; font-size: 11px; opacity: .7; padding: 4px; }
+.sum-table td { padding: 5px 4px; border-top: 1px solid var(--border); }
+.sum-table td:nth-child(2), .sum-table td:nth-child(3) { text-align: center; font-weight: 700; }
+.sum-sym { display: inline-block; min-width: 26px; text-align: center; font-weight: 800; border-radius: 6px; padding: 0 4px; }
+.sum-best { color: #81b64c; } .sum-excellent { color: #26c2a3; } .sum-good { color: #95b776; }
+.sum-inaccuracy { color: #f0c15c; } .sum-mistake { color: #e58f2a; } .sum-blunder { color: #fa412d; }
+.sum-engine { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+
 /* Calque des flèches et cercles (clic droit), au-dessus des pièces */
 .draw-layer {
   position: absolute; inset: 0; width: 100%; height: 100%;
