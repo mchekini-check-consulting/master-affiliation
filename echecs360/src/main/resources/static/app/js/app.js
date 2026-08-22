@@ -66,16 +66,83 @@
   let missP = null;               // Miss Puzzles { state, puzzles, index, score, ... }
   let missM = null;               // Miss Mates { state, puzzles, index, score, matesLeft, ... }
 
-  // Réglages persistés : sons, aides (badges, alertes, explications)
-  // et moteur d'analyse ('stockfish' | 'maison')
+  // Réglages persistés : sons, aides (badges, alertes, explications),
+  // moteur d'analyse ('stockfish' | 'maison'), apparence (échiquier, fond,
+  // couleur des flèches) et bot (Elo, temps de réflexion maxi en ms)
   const SETTINGS_KEY = 'echecs360-reglages';
-  let settings = Object.assign({ sons: true, aides: true, moteur: 'stockfish' },
-      JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+  let settings = Object.assign({
+    sons: true, aides: true, moteur: 'stockfish',
+    plateau: 'classique', fond: 'sombre', fleche: 'vert',
+    botElo: 800, botTemps: 0
+  }, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
   function saveSettings() {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   }
+  botElo = settings.botElo || 800;
+
+  // ------------------------------------------------------------ apparence --
+
+  // Palettes d'échiquier (surbrillances accordées aux cases)
+  const PLATEAUX = {
+    classique: { light: '#ebecd0', dark: '#739552', hlStrong: '#f5f682', hlSoft: '#b9ca43' },
+    bois:      { light: '#f0d9b5', dark: '#b58863', hlStrong: '#f6eb72', hlSoft: '#dcc34b' },
+    bleu:      { light: '#dee3e6', dark: '#788a94', hlStrong: '#f5f682', hlSoft: '#b9ca43' },
+    gris:      { light: '#e9e9e9', dark: '#8b959e', hlStrong: '#f5f682', hlSoft: '#c6cf5e' }
+  };
+  // Fonds de la zone échiquier (panneaux et bordures accordés)
+  const FONDS = {
+    sombre:  { bg: '#262421', panel: '#21201d', panel2: '#2b2926', border: '#3d3a36' },
+    ardoise: { bg: '#20242e', panel: '#1b1f27', panel2: '#272c38', border: '#363c4a' },
+    foret:   { bg: '#1c2622', panel: '#171f1c', panel2: '#24302b', border: '#32403a' },
+    prune:   { bg: '#271f27', panel: '#211a21', panel2: '#2e252e', border: '#3e323e' }
+  };
+  const FLECHES = { vert: '#15781b', rouge: '#a02222', bleu: '#1a4b8f', orange: '#e68f00' };
+
+  function applyAppearance() {
+    const p = PLATEAUX[settings.plateau] || PLATEAUX.classique;
+    const f = FONDS[settings.fond] || FONDS.sombre;
+    const rs = document.documentElement.style;
+    rs.setProperty('--light-sq', p.light);
+    rs.setProperty('--dark-sq', p.dark);
+    rs.setProperty('--hl-strong', p.hlStrong);
+    rs.setProperty('--hl-soft', p.hlSoft);
+    rs.setProperty('--bg', f.bg);
+    rs.setProperty('--panel', f.panel);
+    rs.setProperty('--panel-2', f.panel2);
+    rs.setProperty('--border', f.border);
+  }
   const EX_STORAGE_KEY = 'echecs360-exercices-faits';
   let exDone = new Set(JSON.parse(localStorage.getItem(EX_STORAGE_KEY) || '[]'));
+
+  // Cache des analyses de parties : une partie terminée ne change plus, son
+  // analyse non plus. Les résultats par partie (gaffes détectées, mats ratés)
+  // sont conservés — les sessions suivantes du Blunder Trainer, de Miss
+  // Puzzles et de Miss Mates se préparent quasi instantanément. Les résultats
+  // vides comptent aussi : ne pas ré-analyser une partie sans puzzle est
+  // l'essentiel du gain.
+  const SCAN_CACHE_KEY = 'echecs360-scan-cache-v1';
+  let scanCache;
+  try { scanCache = JSON.parse(localStorage.getItem(SCAN_CACHE_KEY) || '{}'); }
+  catch (e) { scanCache = {}; }
+  const scanPending = {}; // requestId → clé de cache (analyses worker en vol)
+
+  function scanCacheKey(kind, g, color) {
+    return kind + '|' + color + '|' + (g.url || g.end_time || '');
+  }
+  function scanCacheGet(kind, g, color) {
+    const entry = scanCache[scanCacheKey(kind, g, color)];
+    return entry ? entry.items : null;
+  }
+  function scanCachePut(key, items) {
+    scanCache[key] = { t: Date.now(), items };
+    const keys = Object.keys(scanCache);
+    if (keys.length > 400) { // borne la taille du cache (par ancienneté)
+      keys.sort((a, b) => (scanCache[a].t || 0) - (scanCache[b].t || 0));
+      for (const k of keys.slice(0, keys.length - 400)) delete scanCache[k];
+    }
+    try { localStorage.setItem(SCAN_CACHE_KEY, JSON.stringify(scanCache)); }
+    catch (e) { /* quota plein : le cache mémoire suffit pour la session */ }
+  }
 
   const squares = [];             // 64 éléments .sq (ordre index moteur)
   const pieceEls = new Map();     // index case → élément .piece
@@ -626,6 +693,83 @@
     if (existing) existing.remove();
   }
 
+  // ------------------------------------- flèches et cercles (clic droit) --
+
+  let drawSvg = null;      // calque SVG au-dessus des pièces
+  let drawings = [];       // { from, to } — from === to : cercle
+  let drawStart = null;    // case du pointerdown droit en cours
+  let drawPointerId = null;
+
+  function ensureDrawLayer() {
+    if (drawSvg && drawSvg.parentNode === boardEl) return drawSvg;
+    drawSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    drawSvg.setAttribute('viewBox', '0 0 80 80');
+    drawSvg.classList.add('draw-layer');
+    boardEl.appendChild(drawSvg);
+    return drawSvg;
+  }
+
+  function centerOf(sq) {
+    return { x: viewCol(sq) * 10 + 5, y: viewRow(sq) * 10 + 5 };
+  }
+
+  /** Redessine toutes les annotations (+ aperçu de la flèche en cours). */
+  function redrawAnnotations(previewTo) {
+    const svg = ensureDrawLayer();
+    svg.innerHTML = '';
+    const color = FLECHES[settings.fleche] || FLECHES.vert;
+    const items = drawings.slice();
+    if (drawStart !== null && previewTo !== undefined && previewTo >= 0) {
+      items.push({ from: drawStart, to: previewTo, preview: true });
+    }
+    for (const d of items) {
+      const a = centerOf(d.from);
+      if (d.from === d.to) {
+        const c = document.createElementNS(svg.namespaceURI, 'circle');
+        c.setAttribute('cx', a.x); c.setAttribute('cy', a.y); c.setAttribute('r', 4.2);
+        c.setAttribute('fill', 'none');
+        c.setAttribute('stroke', color);
+        c.setAttribute('stroke-width', '0.9');
+        c.setAttribute('opacity', d.preview ? '0.5' : '0.8');
+        svg.appendChild(c);
+      } else {
+        const b = centerOf(d.to);
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const len = Math.hypot(dx, dy);
+        const ux = dx / len, uy = dy / len;
+        const headLen = 3.4, headW = 2.4;
+        const sx = a.x + ux * 1.6, sy = a.y + uy * 1.6;       // léger retrait du départ
+        const ex = b.x - ux * headLen, ey = b.y - uy * headLen; // base de la pointe
+        const g = document.createElementNS(svg.namespaceURI, 'g');
+        g.setAttribute('opacity', d.preview ? '0.5' : '0.8');
+        const line = document.createElementNS(svg.namespaceURI, 'line');
+        line.setAttribute('x1', sx); line.setAttribute('y1', sy);
+        line.setAttribute('x2', ex); line.setAttribute('y2', ey);
+        line.setAttribute('stroke', color);
+        line.setAttribute('stroke-width', '2.1');
+        line.setAttribute('stroke-linecap', 'round');
+        g.appendChild(line);
+        const head = document.createElementNS(svg.namespaceURI, 'polygon');
+        head.setAttribute('points',
+          b.x + ',' + b.y + ' '
+          + (ex - uy * headW) + ',' + (ey + ux * headW) + ' '
+          + (ex + uy * headW) + ',' + (ey - ux * headW));
+        head.setAttribute('fill', color);
+        g.appendChild(head);
+        svg.appendChild(g);
+      }
+    }
+  }
+
+  function clearAnnotations() {
+    if (drawings.length === 0 && drawStart === null) return;
+    drawings = [];
+    drawStart = null;
+    redrawAnnotations();
+  }
+
+  boardEl.addEventListener('contextmenu', (e) => e.preventDefault());
+
   // -------------------------------------------------- interactions (clic + drag) --
 
   let dragging = null; // { el, from, moved, startX, startY }
@@ -644,8 +788,20 @@
   }
 
   boardEl.addEventListener('pointerdown', (event) => {
+    // Clic droit : début d'une flèche / d'un cercle
+    if (event.button === 2) {
+      const start = squareFromEvent(event);
+      if (start >= 0) {
+        drawStart = start;
+        drawPointerId = event.pointerId;
+        try { boardEl.setPointerCapture(event.pointerId); } catch (e) { /* pointeur synthétique */ }
+        redrawAnnotations(start);
+      }
+      return;
+    }
     if (event.button !== 0) return;
     if (event.target.closest && event.target.closest('.promo-picker')) return;
+    clearAnnotations();   // clic gauche : efface flèches et cercles (comme Lichess)
     closePromotionPicker();
     const sq = squareFromEvent(event);
     if (sq < 0) return;
@@ -673,6 +829,10 @@
   });
 
   boardEl.addEventListener('pointermove', (event) => {
+    if (drawStart !== null && event.pointerId === drawPointerId) {
+      redrawAnnotations(squareFromEvent(event));
+      return;
+    }
     if (!dragging) return;
     const dx = event.clientX - dragging.startX;
     const dy = event.clientY - dragging.startY;
@@ -693,6 +853,20 @@
   });
 
   boardEl.addEventListener('pointerup', (event) => {
+    if (drawStart !== null && event.pointerId === drawPointerId) {
+      const from = drawStart;
+      const to = squareFromEvent(event);
+      drawStart = null;
+      drawPointerId = null;
+      if (to >= 0) {
+        // Redessiner une annotation identique la retire (toggle)
+        const idx = drawings.findIndex(d => d.from === from && d.to === to);
+        if (idx >= 0) drawings.splice(idx, 1);
+        else drawings.push({ from, to });
+      }
+      redrawAnnotations();
+      return;
+    }
     if (!dragging) return;
     const drag = dragging;
     dragging = null;
@@ -711,6 +885,11 @@
   // Drag interrompu par le navigateur (scroll système, appui long, appel…) :
   // sans remise à zéro, la pièce reste flottante et l'échiquier semble cassé.
   function cancelDrag() {
+    if (drawStart !== null) {
+      drawStart = null;
+      drawPointerId = null;
+      redrawAnnotations();
+    }
     if (!dragging) return;
     const drag = dragging;
     dragging = null;
@@ -785,6 +964,13 @@
       + '<div class="elo-label"><span id="elo-name">' + eloLabel(botElo) + '</span><strong id="elo-value">' + botElo + ' Elo</strong></div>'
       + '</div>'
       + '<div class="field">'
+      + '<label>Temps de réflexion maxi du bot</label>'
+      + '<div class="time-choice">'
+      + [[0, 'Instantané'], [1000, '1 s'], [3000, '3 s'], [10000, '10 s'], [60000, '1 min']].map(([ms, label]) =>
+          '<button type="button" data-time="' + ms + '"'
+          + ((settings.botTemps || 0) === ms ? ' class="selected"' : '') + '>' + label + '</button>').join('')
+      + '</div></div>'
+      + '<div class="field">'
       + '<label>Votre couleur</label>'
       + '<div class="color-choice">'
       + '<button type="button" data-color="w" class="selected">Blancs</button>'
@@ -794,6 +980,14 @@
       + '<div class="actions">'
       + '<button type="button" class="btn btn-primary" id="bot-start">Commencer</button>'
       + '</div>');
+    let chosenTime = settings.botTemps || 0;
+    for (const btn of modal.querySelectorAll('.time-choice button')) {
+      btn.addEventListener('click', () => {
+        modal.querySelectorAll('.time-choice button').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        chosenTime = Number(btn.dataset.time);
+      });
+    }
     const slider = modal.querySelector('#elo-slider');
     slider.addEventListener('input', () => {
       modal.querySelector('#elo-value').textContent = slider.value + ' Elo';
@@ -808,6 +1002,9 @@
     }
     modal.querySelector('#bot-start').addEventListener('click', () => {
       botElo = Number(slider.value);
+      settings.botElo = botElo;
+      settings.botTemps = chosenTime;
+      saveSettings();
       const playerColor = chosenColor === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : chosenColor;
       botColor = playerColor === 'w' ? 'b' : 'w';
       closeModal();
@@ -836,7 +1033,8 @@
         board: game.board, turn: game.turn, castling: game.castling,
         ep: game.ep, halfmove: game.halfmove, fullmove: game.fullmove
       },
-      elo: botElo
+      elo: botElo,
+      timeMs: mode === 'bot' ? (settings.botTemps || 0) : 0
     });
     worker._pending = { token, startedAt };
   }
@@ -868,6 +1066,10 @@
     } else if (msg.type === 'analysis') {
       onAnalysisDone(msg.evals);
     } else if (msg.type === 'blunders') {
+      if (scanPending[msg.requestId]) {
+        scanCachePut(scanPending[msg.requestId], msg.items);
+        delete scanPending[msg.requestId];
+      }
       onBlundersFound(msg);       // Blunder Trainer
       onMissPBlunders(msg);       // Miss Puzzles (filtre différent)
     }
@@ -882,6 +1084,7 @@
     selected = -1;
     legalTargets = [];
     gameOver = false;
+    clearAnnotations();
     botThinking = false;
     searchToken++;
     thinkingEl.classList.remove('on');
@@ -1042,6 +1245,7 @@
     };
     replayPly = 0;
     lastAnnotatedPly = -1;
+    clearAnnotations();
     orientation = replay.userColor; // échiquier orienté du côté de l'utilisateur
     placeSquares();
     gamesPanel.style.display = 'none';
@@ -1606,6 +1810,33 @@
       + (settings.moteur === 'maison' ? ' checked' : '') + '>'
       + '<span>Moteur maison<small>Analyse rapide et légère (profondeur 3), moins précise. '
       + 'Sans annotation détaillée des coups.</small></span></label>'
+      + '</div>'
+      + '<div class="tr-card"><h3>Apparence</h3>'
+      + '<label class="cfg-sublabel">Échiquier</label>'
+      + '<div class="swatches" data-setting="plateau">'
+      + Object.entries(PLATEAUX).map(([key, p]) =>
+          '<button type="button" class="swatch' + (settings.plateau === key ? ' selected' : '')
+          + '" data-value="' + key + '" title="' + key + '">'
+          + '<span style="background:' + p.light + '"></span><span style="background:' + p.dark + '"></span>'
+          + '</button>').join('')
+      + '</div>'
+      + '<label class="cfg-sublabel">Fond de l\'application</label>'
+      + '<div class="swatches" data-setting="fond">'
+      + Object.entries(FONDS).map(([key, f]) =>
+          '<button type="button" class="swatch' + (settings.fond === key ? ' selected' : '')
+          + '" data-value="' + key + '" title="' + key + '">'
+          + '<span style="background:' + f.bg + '"></span>'
+          + '</button>').join('')
+      + '</div>'
+      + '<label class="cfg-sublabel">Couleur des flèches <small>(clic droit sur l\'échiquier : '
+      + 'glisser = flèche, clic = cercle)</small></label>'
+      + '<div class="swatches" data-setting="fleche">'
+      + Object.entries(FLECHES).map(([key, color]) =>
+          '<button type="button" class="swatch' + (settings.fleche === key ? ' selected' : '')
+          + '" data-value="' + key + '" title="' + key + '">'
+          + '<span style="background:' + color + '"></span>'
+          + '</button>').join('')
+      + '</div>'
       + '</div>';
     const input = configPanel.querySelector('#cfg-user');
     configPanel.querySelector('#cfg-load').addEventListener('click', () => loadGamesFromConfig(input.value.trim()));
@@ -1625,6 +1856,17 @@
         if (!e.target.checked) return;
         settings.moteur = e.target.value;
         saveSettings();
+      });
+    });
+    configPanel.querySelectorAll('.swatches').forEach((group) => {
+      group.addEventListener('click', (e) => {
+        const btn = e.target.closest('.swatch');
+        if (!btn) return;
+        settings[group.dataset.setting] = btn.dataset.value;
+        saveSettings();
+        applyAppearance();
+        redrawAnnotations();
+        group.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s === btn));
       });
     });
   }
@@ -1833,12 +2075,9 @@
       }
       if (!trainer || trainer.state !== 'prep') return;
     }
-    // Ordre aléatoire des parties : les positions varient à chaque session
-    trainer.order = [...Array(gamesList.length).keys()];
-    for (let i = trainer.order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [trainer.order[i], trainer.order[j]] = [trainer.order[j], trainer.order[i]];
-    }
+    // Parties en cache d'abord (préparation quasi instantanée), mélangées
+    // pour que les positions varient à chaque session
+    trainer.order = scanAwareOrder('blunders');
     trainerScanNext();
   }
 
@@ -1860,8 +2099,15 @@
       userColor: meIsWhite ? 'w' : 'b',
       opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
     };
+    // Partie déjà analysée lors d'une session précédente : résultat immédiat
+    const cached = scanCacheGet('blunders', g, trainer.currentGame.userColor);
+    if (cached) {
+      trainerAccept(cached);
+      return;
+    }
     const requestId = ++trainerRequestId;
     trainer.requestId = requestId;
+    scanPending[requestId] = scanCacheKey('blunders', g, trainer.currentGame.userColor);
     ensureWorker().postMessage({
       type: 'blunders', sans: parsed.sans,
       userColor: trainer.currentGame.userColor, requestId
@@ -1871,7 +2117,11 @@
 
   function onBlundersFound(msg) {
     if (!trainer || trainer.state !== 'prep' || msg.requestId !== trainer.requestId) return;
-    const found = msg.items.slice();
+    trainerAccept(msg.items);
+  }
+
+  function trainerAccept(items) {
+    const found = items.slice();
     // Au plus 2 positions par partie, pour varier les contextes
     while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
     for (const item of found) {
@@ -1906,6 +2156,7 @@
   /** Affiche la position du puzzle courant (juste avant la gaffe). */
   function trainerShowPuzzle() {
     const p = trainer.puzzles[trainer.index];
+    clearAnnotations();
     replayPuzzlePrefix(p);
     selected = -1;
     legalTargets = [];
@@ -1954,6 +2205,29 @@
       p.evalBest = Math.round(sign * (lines[0].cp !== null && lines[0].cp !== undefined ? lines[0].cp : 0));
       p.sfVerified = true;
     }
+  }
+
+  /** Après une bonne réponse : rejoue visuellement le coup réellement joué
+      dans la partie (la gaffe) — flèche rouge et badge sur l'échiquier, pas
+      seulement du texte — avant de passer à la position suivante. */
+  function showActualPlayedMove(p, arrowId, stillActive) {
+    setTimeout(() => {
+      if (!stillActive()) return;
+      clearMoveBadge();
+      replayPuzzlePrefix(p);
+      for (const el of pieceEls.values()) el.remove();
+      pieceEls.clear();
+      syncPieces(game.board);
+      const played = Pgn.sanToMove(Chess, game, p.played);
+      if (!played) return;
+      Chess.play(game, played);
+      sanHistory.push(p.played);
+      lastMove = { from: played.from, to: played.to };
+      soundMove();
+      renderGame({ animate: true });
+      showMoveBadge(played.to, MoveClassifier.KINDS.blunder);
+      drawArrow(played.from, played.to, 'rgba(196, 64, 48, .85)', arrowId);
+    }, 1200);
   }
 
   /** Position d'un puzzle (trainer, Miss Puzzles, Miss Mates) rejouée dans
@@ -2018,6 +2292,10 @@
         squares[best.to].classList.add('hint-move');
         drawArrow(best.from, best.to, 'rgba(46, 125, 91, .85)', 'trainer-arrow');
       }, 1100);
+    } else {
+      // Trouvé : montrer sur l'échiquier la gaffe réellement jouée en partie
+      showActualPlayedMove(p, 'trainer-arrow',
+          () => trainer && trainer.state === 'feedback' && mode === 'trainer');
     }
     renderTrainerPanel();
     updateSignalsButton();
@@ -2191,6 +2469,27 @@
     return order;
   }
 
+  /** Ordre de scan : les parties déjà analysées (cache) d'abord — la session
+      démarre alors quasi instantanément — puis les autres. Chaque groupe est
+      mélangé pour garder des positions variées d'une session à l'autre. */
+  function scanAwareOrder(kind) {
+    const cachedIdx = [];
+    const freshIdx = [];
+    for (let i = 0; i < gamesList.length; i++) {
+      const g = gamesList[i];
+      const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
+      const color = meIsWhite ? 'w' : 'b';
+      (scanCacheGet(kind, g, color) ? cachedIdx : freshIdx).push(i);
+    }
+    for (const arr of [cachedIdx, freshIdx]) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    return cachedIdx.concat(freshIdx);
+  }
+
   /** Statistiques persistées d'un quiz (Miss Puzzles / Miss Mates). */
   function quizStats(key) {
     try {
@@ -2226,7 +2525,7 @@
       }
       if (!missP || missP.state !== 'prep') return;
     }
-    missP.order = shuffledIndexes(gamesList.length);
+    missP.order = scanAwareOrder('blunders');
     missPScanNext();
   }
 
@@ -2248,8 +2547,15 @@
       userColor: meIsWhite ? 'w' : 'b',
       opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
     };
+    // Partie déjà analysée lors d'une session précédente : résultat immédiat
+    const cached = scanCacheGet('blunders', g, missP.currentGame.userColor);
+    if (cached) {
+      missPAccept(cached);
+      return;
+    }
     const requestId = ++trainerRequestId;
     missP.requestId = requestId;
+    scanPending[requestId] = scanCacheKey('blunders', g, missP.currentGame.userColor);
     ensureWorker().postMessage({
       type: 'blunders', sans: parsed.sans,
       userColor: missP.currentGame.userColor, requestId
@@ -2261,7 +2567,11 @@
       égalité (ou pire) après. */
   function onMissPBlunders(msg) {
     if (!missP || missP.state !== 'prep' || msg.requestId !== missP.requestId) return;
-    const found = msg.items.filter(item => item.before >= 200 && item.after <= 100);
+    missPAccept(msg.items);
+  }
+
+  function missPAccept(items) {
+    const found = items.filter(item => item.before >= 200 && item.after <= 100);
     // Au plus 2 positions par partie, pour varier les contextes
     while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
     for (const item of found) {
@@ -2296,6 +2606,7 @@
   /** Affiche la position du puzzle courant (juste avant l'avantage gâché). */
   function missPShowPuzzle() {
     const p = missP.puzzles[missP.index];
+    clearAnnotations();
     clearMoveBadge();
     replayPuzzlePrefix(p);
     selected = -1;
@@ -2363,6 +2674,10 @@
         squares[best.to].classList.add('hint-move');
         drawArrow(best.from, best.to, 'rgba(46, 125, 91, .85)', 'missp-arrow');
       }, 1100);
+    } else {
+      // Trouvé : montrer sur l'échiquier le coup réellement joué en partie
+      showActualPlayedMove(p, 'missp-arrow',
+          () => missP && missP.state === 'feedback' && mode === 'misspuzzles');
     }
     renderMissPPanel();
     updateSignalsButton();
@@ -2555,7 +2870,7 @@
       renderMissMPanel();
       return;
     }
-    missM.order = shuffledIndexes(gamesList.length);
+    missM.order = scanAwareOrder('mates');
     missMScanLoop(token);
   }
 
@@ -2571,19 +2886,37 @@
       const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
       const parsed = Pgn.parsePgn(g.pgn || '');
       if (parsed.sans.length < 12) continue;
-      await missMScanGame(token, {
+      const meta = {
         sans: parsed.sans,
         userColor: meIsWhite ? 'w' : 'b',
         opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
-      });
+      };
+      // Partie déjà passée au crible lors d'une session précédente
+      const cached = scanCacheGet('mates', g, meta.userColor);
+      if (cached) {
+        for (const item of cached) {
+          if (missM.puzzles.length >= MISSM_SIZE) break;
+          missM.puzzles.push({ ...item, userColor: meta.userColor, opponent: meta.opponent });
+        }
+        missM.gamesScanned++;
+        renderMissMPanel();
+        continue;
+      }
+      const foundItems = await missMScanGame(token, meta);
       if (!missM || missM.token !== token || missM.state !== 'prep') return;
+      // Scan complet (non interrompu) : mémorisé, même vide
+      if (foundItems !== null) {
+        scanCachePut(scanCacheKey('mates', g, meta.userColor), foundItems);
+      }
       missM.gamesScanned++;
       renderMissMPanel();
     }
   }
 
   /** Cherche dans une partie les mats en 1 à 3 du joueur que son coup a
-      laissés s'échapper (Stockfish, ~100 ms par position). Au plus 2 par partie. */
+      laissés s'échapper (Stockfish, ~100 ms par position). Au plus 2 par
+      partie. Renvoie les puzzles trouvés, ou null si le scan a été interrompu
+      (résultat partiel : à ne pas mettre en cache). */
   async function missMScanGame(token, meta) {
     const s = Chess.newGame();
     const fens = [Chess.toFen(s)];
@@ -2596,14 +2929,14 @@
       fens.push(Chess.toFen(s));
     }
     const sign = meta.userColor === 'w' ? 1 : -1;
-    let found = 0;
+    const foundItems = [];
     // Les mats n'apparaissent presque jamais dans l'ouverture : départ au ply 8
-    for (let i = 8; i < sans.length && found < 2; i++) {
+    for (let i = 8; i < sans.length && foundItems.length < 2; i++) {
       if ((i % 2 === 0 ? 'w' : 'b') !== meta.userColor) continue;
       if (!missM || missM.token !== token || missM.state !== 'prep'
-          || missM.puzzles.length >= MISSM_SIZE) return;
+          || missM.puzzles.length >= MISSM_SIZE) return null;
       const lines = await SfEngine.analyze(fens[i], { multipv: 1, movetime: 110, depth: 12 });
-      if (!missM || missM.token !== token || missM.state !== 'prep') return;
+      if (!missM || missM.token !== token || missM.state !== 'prep') return null;
       const top = lines && lines[0];
       if (!top || top.mate === null || top.mate === undefined
           || !top.pv || top.pv.length === 0) continue;
@@ -2614,19 +2947,20 @@
       const afterState = Chess.fromFen(fens[i + 1]);
       if (Chess.statusOf(afterState).over) continue; // le coup joué concluait déjà
       const alines = await SfEngine.analyze(fens[i + 1], { multipv: 1, movetime: 140, depth: 12 });
-      if (!missM || missM.token !== token || missM.state !== 'prep') return;
+      if (!missM || missM.token !== token || missM.state !== 'prep') return null;
       const atop = alines && alines[0];
       if (atop && atop.mate !== null && atop.mate !== undefined
           && sign * atop.mate > 0 && sign * atop.mate < mateIn) continue;
-      missM.puzzles.push({
-        ply: i, sans, userColor: meta.userColor, opponent: meta.opponent,
-        mateIn, played: sans[i],
+      const item = {
+        ply: i, sans, mateIn, played: sans[i],
         pv: top.pv.slice(0, mateIn * 2 - 1)
-      });
-      found++;
+      };
+      foundItems.push(item);
+      missM.puzzles.push({ ...item, userColor: meta.userColor, opponent: meta.opponent });
       renderMissMPanel();
       i += 6; // le même mat traîne souvent plusieurs coups : on saute plus loin
     }
+    return foundItems;
   }
 
   function missMBegin() {
@@ -2649,6 +2983,7 @@
   function missMShowPuzzle() {
     const p = missM.puzzles[missM.index];
     missM.seq = (missM.seq || 0) + 1; // invalide les vérifications en attente
+    clearAnnotations();
     clearMoveBadge();
     replayPuzzlePrefix(p);
     selected = -1;
@@ -2694,6 +3029,10 @@
       soundEnd();
       renderMissMPanel();
       renderStatus();
+      // Mat trouvé : montrer sur l'échiquier le coup réellement joué en partie
+      const seqDone = missM.seq;
+      showActualPlayedMove(p, 'missm-arrow',
+          () => missM && missM.seq === seqDone && missM.state === 'feedback' && mode === 'missmates');
       return true;
     }
     if (status.over) {
@@ -2975,6 +3314,7 @@
     const type = exFilter === 'mats' ? 'mat' : 'finale';
     exCurrent = { type, data };
     exSteps = null;
+    clearAnnotations();
     exStepsPanelEl.style.display = 'none';
     clearStepsOverlays();
     exStepsBtn.style.display = exStepsLineOf(data) ? '' : 'none';
@@ -3477,6 +3817,7 @@
     }
     closeModal();
     closePromotionPicker();
+    clearAnnotations();
     searchToken++; // invalide toute recherche bot en cours
     botThinking = false;
     thinkingEl.classList.remove('on');
@@ -3667,6 +4008,7 @@
     pieceEls.clear();
     if (mode === 'games' && replay) gotoPly(replayPly);
     else renderGame({});
+    redrawAnnotations(); // les centres des flèches dépendent de l'orientation
   });
 
   btnAnalyze.addEventListener('click', startAnalysis);
@@ -3676,6 +4018,7 @@
   // ---------------------------------------------------------------- départ --
 
   document.getElementById('user-avatar').textContent = (PSEUDO[0] || '?');
+  applyAppearance();
   updateExProgress();
   buildBoard();
   fitBoard();

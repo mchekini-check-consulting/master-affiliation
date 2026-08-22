@@ -358,15 +358,37 @@ button { font-family: inherit; }
 .elo-label { display: flex; justify-content: space-between; font-size: .95rem; margin-top: 6px; }
 .elo-label strong { color: var(--accent); font-size: 1.1rem; }
 .color-choice { display: flex; gap: 8px; }
-.color-choice button {
+/* Boutons de temps de réflexion : même style que le choix de couleur, mais
+   classe distincte — le gestionnaire de couleur cible .color-choice button */
+.time-choice { display: flex; gap: 8px; flex-wrap: wrap; }
+.time-choice button { flex: 1 1 30%; }
+.color-choice button, .time-choice button {
   flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 700;
   background: var(--panel); color: var(--text); border: 1.5px solid var(--border);
 }
-.color-choice button.selected { border-color: var(--accent); color: var(--accent); }
+.time-choice button { flex: 1 1 30%; }
+.color-choice button.selected, .time-choice button.selected { border-color: var(--accent); color: var(--accent); }
 .modal .actions { display: flex; gap: 10px; margin-top: 20px; }
 .modal .error { color: #e07470; font-size: .88rem; margin-top: 10px; }
 .modal .result-big { font-size: 1.6rem; font-weight: 800; text-align: center; margin: 8px 0 2px; }
 .modal .reason { text-align: center; color: var(--muted); margin: 0 0 6px; }
+
+/* Calque des flèches et cercles (clic droit), au-dessus des pièces */
+.draw-layer {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 6; pointer-events: none;
+}
+
+/* Nuanciers de l'onglet Configuration (échiquier, fond, flèches) */
+.cfg-sublabel { display: block; font-size: 12px; font-weight: 700; margin: 10px 0 4px; }
+.cfg-sublabel small { font-weight: 400; color: var(--gray-text); }
+.swatches { display: flex; gap: 8px; margin: 2px 0 6px; }
+.swatch {
+  width: 36px; height: 30px; border-radius: 8px; padding: 0; cursor: pointer;
+  border: 2px solid var(--line); overflow: hidden; display: flex;
+}
+.swatch.selected { border-color: var(--green); box-shadow: 0 0 0 2px rgba(46, 125, 91, .25); }
+.swatch span { flex: 1; }
 
 /* Sélecteur de promotion superposé à la case d'arrivée */
 .promo-picker {

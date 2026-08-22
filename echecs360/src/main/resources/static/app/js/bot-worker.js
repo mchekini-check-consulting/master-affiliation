@@ -246,7 +246,20 @@ self.onmessage = function (event) {
 
   if (msg.type === 'search') {
     const s = restoreState(msg.position);
-    const scored = searchRoot(s, depthForElo(msg.elo));
+    // Temps de réflexion maxi (option du bot) : approfondissement itératif
+    // au-delà de la profondeur liée à l'Elo, tant que le budget le permet.
+    // Chaque profondeur coûte grossièrement 5 à 10 fois la précédente : on
+    // ne relance que si le temps déjà écoulé laisse une vraie marge.
+    let depth = depthForElo(msg.elo);
+    let scored = searchRoot(s, depth);
+    const budget = msg.timeMs || 0;
+    if (budget > 0) {
+      const start = Date.now();
+      while (depth < 6 && scored.length > 1 && (Date.now() - start) * 5 < budget) {
+        depth++;
+        scored = searchRoot(s, depth);
+      }
+    }
     if (scored.length === 0) { self.postMessage({ type: 'move', move: null }); return; }
     const move = pickMove(scored, msg.elo);
     self.postMessage({ type: 'move', move });
