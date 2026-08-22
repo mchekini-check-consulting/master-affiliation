@@ -151,14 +151,14 @@
   // ------------------------------------------------------ musique d'ambiance --
   // Playlist importée par l'utilisateur (fichiers audio, stockés dans le
   // navigateur via IndexedDB, persistants) jouée en boucle dans toute l'app.
-  // Sans playlist : « Fjord Moonlight », ambiance générative intégrée
-  // (nappe grave + notes pentatoniques éparses, WebAudio).
+  // Sans playlist : « Fjord Moonlight » (Draugr Beatz), piste embarquée par
+  // défaut, jouée en boucle.
 
+  const MUSIC_DEFAULT_URL = '/app/music/fjord-moonlight.mp3';
   let musicPlaying = false;
-  let musicAudio = null;   // <audio> pour les pistes importées
+  let musicAudio = null;   // <audio> (piste par défaut ou importée)
   let musicQueue = [];     // [{ id, name, blob }]
   let musicIndex = 0;
-  let fjord = null;        // { master, timers } — graphe de l'ambiance intégrée
 
   function musicDb() {
     return new Promise((resolve, reject) => {
@@ -195,72 +195,26 @@
     });
   }
 
-  /** « Fjord Moonlight » : nappe mineure au filtre lentement modulé + notes
-      de la pentatonique de la mineur, espacées, avec écho — libre de droits
-      puisque générée ici. */
-  function fjordStart() {
-    fjordStop();
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const ctx = audioCtx;
-    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-    const master = ctx.createGain();
-    master.gain.value = (settings.musiqueVolume || 0.4) * 0.55;
-    master.connect(ctx.destination);
-    // Écho discret pour l'espace
-    const delay = ctx.createDelay(1.2);
-    delay.delayTime.value = 0.55;
-    const feedback = ctx.createGain();
-    feedback.gain.value = 0.35;
-    delay.connect(feedback); feedback.connect(delay); delay.connect(master);
-    // Nappe : la mineur (A2, E3, C4), oscillateurs doux filtrés
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass'; filter.frequency.value = 420; filter.Q.value = 0.6;
-    const padGain = ctx.createGain(); padGain.gain.value = 0.16;
-    filter.connect(padGain); padGain.connect(master);
-    const pads = [110, 164.81, 261.63].map((freq, i) => {
-      const osc = ctx.createOscillator();
-      osc.type = i === 2 ? 'sine' : 'triangle';
-      osc.frequency.value = freq;
-      osc.detune.value = (i - 1) * 4;
-      osc.connect(filter);
-      osc.start();
-      return osc;
-    });
-    // Respiration lente du filtre
-    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05;
-    const lfoGain = ctx.createGain(); lfoGain.gain.value = 180;
-    lfo.connect(lfoGain); lfoGain.connect(filter.frequency); lfo.start();
-    // Notes éparses : pentatonique de la mineur, une toutes les 2,5 à 6 s
-    const NOTES = [220, 261.63, 293.66, 329.63, 392, 440, 523.25];
-    const timers = [];
-    const pluck = () => {
-      if (!fjord) return;
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = NOTES[Math.floor(Math.random() * NOTES.length)];
-      const env = ctx.createGain();
-      env.gain.setValueAtTime(0.0001, ctx.currentTime);
-      env.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + 0.06);
-      env.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.4);
-      osc.connect(env); env.connect(master); env.connect(delay);
-      osc.start(); osc.stop(ctx.currentTime + 2.6);
-      timers.push(setTimeout(pluck, 2500 + Math.random() * 3500));
-    };
-    timers.push(setTimeout(pluck, 800));
-    fjord = { master, timers, nodes: [lfo, ...pads] };
+  function musicStopAudio() {
+    if (!musicAudio) return;
+    musicAudio.pause();
+    if (musicAudio.src.startsWith('blob:')) URL.revokeObjectURL(musicAudio.src);
+    musicAudio = null;
   }
-  function fjordStop() {
-    if (!fjord) return;
-    for (const t of fjord.timers) clearTimeout(t);
-    for (const n of fjord.nodes) { try { n.stop(); } catch (e) { /* déjà arrêté */ } }
-    try { fjord.master.disconnect(); } catch (e) { /* détaché */ }
-    fjord = null;
+
+  /** Piste par défaut embarquée : « Fjord Moonlight » (Draugr Beatz), en boucle. */
+  function musicPlayDefault() {
+    musicStopAudio();
+    musicAudio = new Audio(MUSIC_DEFAULT_URL);
+    musicAudio.loop = true;
+    musicAudio.volume = settings.musiqueVolume || 0.4;
+    musicAudio.play().catch(() => { /* autoplay bloqué : relancé au 1er geste */ });
   }
 
   function musicPlayTrack(index) {
     if (musicQueue.length === 0) return;
     musicIndex = ((index % musicQueue.length) + musicQueue.length) % musicQueue.length;
-    if (musicAudio) { musicAudio.pause(); URL.revokeObjectURL(musicAudio.src); }
+    musicStopAudio();
     musicAudio = new Audio(URL.createObjectURL(musicQueue[musicIndex].blob));
     musicAudio.volume = settings.musiqueVolume || 0.4;
     musicAudio.addEventListener('ended', () => { if (musicPlaying) musicPlayTrack(musicIndex + 1); });
@@ -274,16 +228,14 @@
     try { musicQueue = await musicLoadAll(); } catch (e) { musicQueue = []; }
     if (!musicPlaying) return; // coupée entre-temps
     if (musicQueue.length > 0) musicPlayTrack(musicIndex);
-    else fjordStart();
+    else musicPlayDefault();
   }
   function musicStop() {
     musicPlaying = false;
-    if (musicAudio) { musicAudio.pause(); musicAudio = null; }
-    fjordStop();
+    musicStopAudio();
   }
   function musicApplyVolume() {
     if (musicAudio) musicAudio.volume = settings.musiqueVolume || 0.4;
-    if (fjord) fjord.master.gain.value = (settings.musiqueVolume || 0.4) * 0.55;
   }
   // Autoplay bloqué avant le premier geste : on relance à la première
   // interaction (l'AudioContext suspendu reprend aussi)
@@ -2049,7 +2001,7 @@
       + '<div class="tr-card"><h3>🎵 Musique</h3>'
       + '<label class="cfg-toggle"><input type="checkbox" id="cfg-musique"' + (settings.musique ? ' checked' : '') + '>'
       + '<span>Musique d\'ambiance<small>Jouée dans toute l\'application, lancée au début '
-      + 'de la partie. Sans playlist : « Fjord Moonlight », l\'ambiance intégrée.</small></span></label>'
+      + 'de la partie. Sans playlist : « Fjord Moonlight » (Draugr Beatz).</small></span></label>'
       + '<label class="cfg-sublabel">Volume</label>'
       + '<input type="range" id="cfg-mus-vol" min="0" max="100" value="'
       + Math.round((settings.musiqueVolume || 0.4) * 100) + '">'
@@ -2122,8 +2074,8 @@
     if (!list) return;
     let tracks = [];
     try { tracks = await musicLoadAll(); } catch (e) { tracks = []; }
-    let html = '<div class="mus-item builtin"><span>🌙 Fjord Moonlight</span>'
-      + '<small>' + (tracks.length === 0 ? 'ambiance intégrée · par défaut' : 'jouée si la playlist est vide') + '</small></div>';
+    let html = '<div class="mus-item builtin"><span>🌙 Fjord Moonlight — Draugr Beatz</span>'
+      + '<small>' + (tracks.length === 0 ? 'par défaut' : 'jouée si la playlist est vide') + '</small></div>';
     for (const t of tracks) {
       html += '<div class="mus-item"><span>' + escapeHtml(t.name) + '</span>'
         + '<button type="button" class="mus-del" data-id="' + t.id + '" title="Retirer">✕</button></div>';
