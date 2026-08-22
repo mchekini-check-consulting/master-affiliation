@@ -274,12 +274,9 @@
             cases: [sq].concat(att)
           });
         } else if (def.length === 1) {
-          tactiques.push({
-            camp, titre: 'défenseur unique ' + (FEM[t] ? 'de la ' : 'du ') + NOM[t] + ' ' + sqName(sq),
-            detail: LeNom(typeOf(board[def[0]])) + ' ' + sqName(def[0])
-              + ' est l\'unique défenseur : capturez, clouez ou chassez cette pièce.',
-            cases: [sq, def[0]]
-          });
+          // Pas de signal « défenseur unique » par pièce (trop fréquent pour
+          // être utile) — on ne le garde que pour détecter la surcharge :
+          // un défenseur seul sur PLUSIEURS cibles, lui, est exploitable.
           (unique[def[0]] = unique[def[0]] || []).push(sq);
         }
       }

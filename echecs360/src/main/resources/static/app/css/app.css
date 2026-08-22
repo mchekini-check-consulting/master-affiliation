@@ -44,8 +44,8 @@
   --line: #e6e2d8;
   --gray-text: #7a877f;
   --chip: #f2f0e9;
-  --rail-w: 240px;
-  --side-w: 330px;
+  --rail-w: 264px;
+  --side-w: 340px;
 }
 
 * { box-sizing: border-box; }

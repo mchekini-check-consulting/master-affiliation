@@ -390,8 +390,8 @@
       return;
     }
     const zone = document.querySelector('.board-zone');
-    // Réserve verticale : les deux barres de joueurs (30 px) + respiration
-    const size = Math.max(320, Math.min(zone.clientHeight - 72, zone.clientWidth - 12));
+    // Réserve verticale : juste les deux barres de joueurs (30 px chacune)
+    const size = Math.max(320, Math.min(zone.clientHeight - 64, zone.clientWidth - 8));
     document.documentElement.style.setProperty('--board-size', size + 'px');
   }
 
