@@ -11,8 +11,11 @@
  *           mover, stateAfter (état moteur après le coup joué),
  *           refutation { uci, san } | null }
  *
- * Seuils (en pions) : gaffe ≥ 2.0, erreur ≥ 1.0, imprécision ≥ 0.5,
- * bon ≤ 0.5, excellent ≤ 0.2, meilleur = premier choix du moteur.
+ * Classification par perte de « % de victoire » (échelle lichess) : une
+ * gaffe est un coup qui fait vraiment basculer la partie. Perdre 3 pions
+ * dans une position déjà gagnée (+8) ou déjà perdue (−8) ne change presque
+ * rien au résultat attendu : ce n'est plus compté comme une gaffe.
+ * Seuils : gaffe ≥ 30 pts de victoire, erreur ≥ 20, imprécision ≥ 10.
  */
 (function (global) {
   'use strict';
@@ -35,26 +38,26 @@
     return cp === null || cp === undefined ? 0 : cp;
   }
 
+  /** % de victoire estimé depuis l'éval (perspective du camp positif),
+      formule lichess. */
+  function winPctOf(cp) {
+    return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
+  }
+
   function classify(entry) {
     const sign = entry.mover === 'w' ? 1 : -1;
-    const before = sign * effective(entry.cpBefore, entry.mateBefore);
-    const after = sign * effective(entry.cpAfter, entry.mateAfter);
-    const loss = Math.max(0, before - after);
+    const before = winPctOf(sign * effective(entry.cpBefore, entry.mateBefore));
+    const after = winPctOf(sign * effective(entry.cpAfter, entry.mateAfter));
+    const drop = Math.max(0, before - after);
 
     if (entry.isBest) return KINDS.best;
-    // Rater un mat forcé, ou en permettre un : gaffe d'office
-    const hadMate = entry.mateBefore !== null && entry.mateBefore !== undefined
-        && (entry.mover === 'w' ? entry.mateBefore > 0 : entry.mateBefore < 0);
-    const givesMate = entry.mateAfter !== null && entry.mateAfter !== undefined
-        && (entry.mover === 'w' ? entry.mateAfter < 0 : entry.mateAfter > 0);
-    if ((hadMate && after < 500) || givesMate) return KINDS.blunder;
-
-    // Position déjà totalement perdue : on ne « gaffe » plus vraiment
-    const alreadyLost = before < -800;
-    if (loss >= 200) return alreadyLost ? KINDS.mistake : KINDS.blunder;
-    if (loss >= 100) return KINDS.mistake;
-    if (loss >= 50) return KINDS.inaccuracy;
-    if (loss <= 20) return KINDS.excellent;
+    // La sanction dépend de ce que le coup change au résultat attendu :
+    // dans une position déjà pliée (gagnée ou perdue), le % de victoire ne
+    // bouge presque plus — plus de « gaffes » dans les fins de partie mortes.
+    if (drop >= 30) return KINDS.blunder;
+    if (drop >= 20) return KINDS.mistake;
+    if (drop >= 10) return KINDS.inaccuracy;
+    if (drop <= 2) return KINDS.excellent;
     return KINDS.good;
   }
 

@@ -390,7 +390,8 @@
       return;
     }
     const zone = document.querySelector('.board-zone');
-    const size = Math.max(320, Math.min(zone.clientHeight - 96, zone.clientWidth - 24));
+    // Réserve verticale : les deux barres de joueurs (30 px) + respiration
+    const size = Math.max(320, Math.min(zone.clientHeight - 72, zone.clientWidth - 12));
     document.documentElement.style.setProperty('--board-size', size + 'px');
   }
 
@@ -1498,21 +1499,50 @@
       Chess.play(state, move);
       fens.push(Chess.toFen(state));
     }
-    // Analyse de chaque position : MultiPV 5, profondeur 18 bornée en temps
-    const infos = [];
-    for (let i = 0; i < fens.length; i++) {
-      if (token !== analysisToken || !replay) return;
-      const pos = Chess.fromFen(fens[i]);
-      const status = Chess.statusOf(pos);
-      if (status.over) {
-        infos.push({ over: true, result: status.result, lines: [] });
-      } else {
-        const lines = await SfEngine.analyze(fens[i], { multipv: 5, movetime: 450, depth: 18 });
-        if (token !== analysisToken || !replay) return;
-        infos.push({ over: false, lines: lines || [] });
-      }
-      analysisProgress.textContent = 'Analyse Stockfish… ' + Math.round(((i + 1) / fens.length) * 100) + ' %';
+
+    // Pool de moteurs : les positions sont indépendantes, on en analyse
+    // plusieurs en parallèle (un moteur mono-thread par cœur disponible,
+    // borné pour laisser la machine respirer)
+    const cores = navigator.hardwareConcurrency || 4;
+    const poolSize = Math.max(1, Math.min(6, cores - 2, fens.length));
+    const engines = (await Promise.all(Array.from({ length: poolSize }, () => {
+      const engine = SfEngine.createEngine(16);
+      return engine.ready().then(ok => ok ? engine : (engine.terminate(), null));
+    }))).filter(Boolean);
+    if (engines.length === 0) {
+      // Stockfish indisponible : moteur maison
+      analysisProgress.textContent = 'Analyse en cours… 0 %';
+      ensureWorker().postMessage({ type: 'analyze', sans: replay.sans });
+      return;
     }
+
+    const infos = new Array(fens.length);
+    let nextIndex = 0;
+    let doneCount = 0;
+    try {
+      await Promise.all(engines.map(async (engine) => {
+        for (;;) {
+          const i = nextIndex++;
+          if (i >= fens.length) return;
+          if (token !== analysisToken || !replay) return;
+          const pos = Chess.fromFen(fens[i]);
+          const status = Chess.statusOf(pos);
+          if (status.over) {
+            infos[i] = { over: true, result: status.result, lines: [] };
+          } else {
+            const lines = await engine.analyze(fens[i], { multipv: 5, movetime: 450, depth: 18 });
+            if (token !== analysisToken || !replay) return;
+            infos[i] = { over: false, lines: lines || [] };
+          }
+          doneCount++;
+          analysisProgress.textContent = 'Analyse Stockfish (' + engines.length + ' moteurs)… '
+            + Math.round((doneCount / fens.length) * 100) + ' %';
+        }
+      }));
+    } finally {
+      for (const engine of engines) engine.terminate();
+    }
+    if (token !== analysisToken || !replay || doneCount < fens.length) return;
     onSfAnalysisDone(infos, played);
   }
 
@@ -1651,21 +1681,41 @@
     return 50 + 50 * (2 / (1 + Math.exp(-0.00368208 * cp)) - 1);
   }
 
-  /** Précision d'un camp (0-100) : moyenne de la précision de chaque coup,
-      calculée sur la perte de % de victoire (formule lichess). */
+  /** Précision d'un camp (0-100), algorithme lichess complet : précision de
+      chaque coup depuis la perte de % de victoire, puis moyenne PONDÉRÉE par
+      la volatilité de la position (un coup en position critique pèse plus
+      lourd) combinée à la moyenne HARMONIQUE (une gaffe isolée ne se dilue
+      pas). Nettement plus sévère qu'une moyenne simple. */
   function accuracyFor(color) {
     if (!replay || !replay.evals) return null;
     const evals = replay.evals;
+    // % de victoire à chaque position, du point de vue du joueur
+    const wps = evals.map(cp => color === 'w' ? winPct(cp) : 100 - winPct(cp));
     const accs = [];
+    const weights = [];
+    const windowSize = Math.max(2, Math.min(8, Math.floor(replay.sans.length / 10)));
     for (let i = 0; i + 1 < evals.length && i < replay.sans.length; i++) {
       if ((i % 2 === 0 ? 'w' : 'b') !== color) continue;
-      const before = color === 'w' ? winPct(evals[i]) : 100 - winPct(evals[i]);
-      const after = color === 'w' ? winPct(evals[i + 1]) : 100 - winPct(evals[i + 1]);
-      const drop = Math.max(0, before - after);
+      const drop = Math.max(0, wps[i] - wps[i + 1]);
       accs.push(Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * drop) - 3.1669)));
+      // Volatilité : écart-type des % de victoire autour du coup
+      const slice = wps.slice(Math.max(0, i - windowSize + 1), i + 2);
+      const mean = slice.reduce((s, w) => s + w, 0) / slice.length;
+      const stdev = Math.sqrt(slice.reduce((s, w) => s + (w - mean) * (w - mean), 0) / slice.length);
+      weights.push(Math.max(0.5, Math.min(12, stdev)));
     }
     if (accs.length === 0) return null;
-    return accs.reduce((sum, a) => sum + a, 0) / accs.length;
+    let weightedSum = 0;
+    let weightTotal = 0;
+    let harmonicDen = 0;
+    for (let i = 0; i < accs.length; i++) {
+      weightedSum += accs[i] * weights[i];
+      weightTotal += weights[i];
+      harmonicDen += 1 / Math.max(accs[i], 1);
+    }
+    const weighted = weightedSum / weightTotal;
+    const harmonic = accs.length / harmonicDen;
+    return (weighted + harmonic) / 2;
   }
 
   /** Bilan façon chess.com : précision des deux camps + décompte des coups
