@@ -51,6 +51,10 @@
 * { box-sizing: border-box; }
 
 html, body { height: 100%; }
+/* Mobile : supprime le zoom double-tap (le click-to-move enchaîne deux taps
+   rapprochés qui faisaient zoomer/bouger toute la page) tout en gardant le
+   défilement normal des panneaux. */
+html, body { touch-action: manipulation; }
 
 body {
   margin: 0;
@@ -199,6 +203,8 @@ button { font-family: inherit; }
   touch-action: none;             /* Pointer Events gèrent le drag */
   position: relative;
   user-select: none;
+  -webkit-user-select: none;      /* iOS < 15.4 */
+  -webkit-touch-callout: none;    /* iOS : pas de menu contextuel à l'appui long */
 }
 .sq { position: relative; background: var(--light-sq); }
 .sq.dark { background: var(--dark-sq); }
@@ -238,7 +244,7 @@ button { font-family: inherit; }
   position: absolute; width: 12.5%; height: 12.5%;
   left: 0; top: 0; z-index: 2;
   cursor: grab;
-  transition: transform .18s ease;   /* animation de déplacement ~180 ms */
+  transition: transform .1s ease;    /* animation de déplacement ~100 ms */
 }
 .piece.no-anim { transition: none; }
 .piece.dragging { z-index: 5; cursor: grabbing; transition: none; pointer-events: none; }

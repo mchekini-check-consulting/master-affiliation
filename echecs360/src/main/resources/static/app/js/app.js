@@ -247,6 +247,13 @@
         const hint = document.createElement('div');
         hint.className = 'hint' + ((board[move.to] !== null || move.ep) ? ' capture' : '');
         squares[move.to].appendChild(hint);
+        if (move.castle) {
+          // Le roi peut aussi être déposé sur la tour : anneau sur sa case
+          const rookSq = move.castle === 'K' ? move.to + 1 : move.to - 2;
+          const ring = document.createElement('div');
+          ring.className = 'hint capture';
+          squares[rookSq].appendChild(ring);
+        }
       }
     }
     if (check) {
@@ -496,7 +503,7 @@
     if (opts.animate && lastMove) {
       animateMove(lastMove.from, lastMove.to);
       // Resynchronise après l'animation (roque, e.p., promotion)
-      setTimeout(() => syncPieces(game.board), 190);
+      setTimeout(() => syncPieces(game.board), 110);
     } else {
       syncPieces(game.board);
     }
@@ -538,9 +545,27 @@
     }
   }
 
+  /**
+   * Roque intuitif : le roi déposé (ou cliqué) sur sa propre tour joue le
+   * roque de ce côté, comme sur Lichess/chess.com.
+   */
+  function castleMoveViaRook(from, to) {
+    const piece = game.board[from];
+    const target = game.board[to];
+    if (piece === null || target === null) return null;
+    if (piece.toLowerCase() !== 'k' || target.toLowerCase() !== 'r') return null;
+    if (Chess.colorOf(target) !== Chess.colorOf(piece)) return null;
+    const side = to > from ? 'K' : 'Q';
+    return legalTargets.find(m => m.from === from && m.castle === side) || null;
+  }
+
   /** Tente de jouer de `from` vers `to` (gère le choix de promotion). */
   function tryMove(from, to) {
-    const candidates = legalTargets.filter(m => m.from === from && m.to === to);
+    let candidates = legalTargets.filter(m => m.from === from && m.to === to);
+    if (candidates.length === 0) {
+      const castle = castleMoveViaRook(from, to);
+      if (castle) candidates = [castle];
+    }
     if (candidates.length === 0) return false;
     // Blunder Trainer : le coup est une réponse au quiz, pas une partie
     if (mode === 'trainer') {
@@ -576,6 +601,9 @@
     const picker = document.createElement('div');
     picker.className = 'promo-picker';
     picker.id = 'promo-picker';
+    // Enfant de #board : sans ceci, le pointerdown de l'échiquier fermerait
+    // le sélecteur avant que le click des boutons ne se déclenche
+    picker.addEventListener('pointerdown', (e) => e.stopPropagation());
     picker.style.left = (viewCol(to) * 12.5) + '%';
     const onTop = viewRow(to) === 0;
     picker.style.top = onTop ? '0' : 'auto';
@@ -617,6 +645,7 @@
 
   boardEl.addEventListener('pointerdown', (event) => {
     if (event.button !== 0) return;
+    if (event.target.closest && event.target.closest('.promo-picker')) return;
     closePromotionPicker();
     const sq = squareFromEvent(event);
     if (sq < 0) return;
@@ -658,7 +687,7 @@
     // Surbrillance de la case survolée
     for (const el of squares) el.classList.remove('drag-over');
     const over = squareFromEvent(event);
-    if (over >= 0 && legalTargets.some(m => m.to === over)) {
+    if (over >= 0 && (legalTargets.some(m => m.to === over) || castleMoveViaRook(dragging.from, over))) {
       squares[over].classList.add('drag-over');
     }
   });
@@ -678,6 +707,19 @@
     }
     // Sans déplacement : simple sélection au clic (déjà gérée au pointerdown)
   });
+
+  // Drag interrompu par le navigateur (scroll système, appui long, appel…) :
+  // sans remise à zéro, la pièce reste flottante et l'échiquier semble cassé.
+  function cancelDrag() {
+    if (!dragging) return;
+    const drag = dragging;
+    dragging = null;
+    drag.el.classList.remove('dragging');
+    for (const el of squares) el.classList.remove('drag-over');
+    positionPiece(drag.el, drag.from);
+  }
+  boardEl.addEventListener('pointercancel', cancelDrag);
+  boardEl.addEventListener('lostpointercapture', () => { if (dragging && dragging.moved) cancelDrag(); });
 
   function squareFromEvent(event) {
     const rect = boardEl.getBoundingClientRect();
@@ -804,8 +846,8 @@
     if (msg.type === 'move') {
       const pending = worker._pending || { token: -1, startedAt: 0 };
       if (pending.token !== searchToken) return; // recherche annulée
-      // Rythme naturel : réponse jamais avant 500 ms
-      const wait = Math.max(0, 500 - (Date.now() - pending.startedAt));
+      // Rythme naturel : réponse jamais avant 250 ms (le temps de « voir » le coup)
+      const wait = Math.max(0, 250 - (Date.now() - pending.startedAt));
       setTimeout(() => {
         if (pending.token !== searchToken) return;
         botThinking = false;
@@ -3638,4 +3680,12 @@
   buildBoard();
   fitBoard();
   startGame('w');
+
+  // Précharge Stockfish (wasm ~7 Mo) en tâche de fond une fois l'app posée :
+  // la première analyse démarre alors instantanément (fichier en cache + worker prêt).
+  setTimeout(() => {
+    const warm = () => { if (window.SfEngine) SfEngine.ready(); };
+    if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 10000 });
+    else warm();
+  }, 2500);
 })();
