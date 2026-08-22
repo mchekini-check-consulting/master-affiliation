@@ -125,8 +125,6 @@
   let scanCache;
   try { scanCache = JSON.parse(localStorage.getItem(SCAN_CACHE_KEY) || '{}'); }
   catch (e) { scanCache = {}; }
-  const scanPending = {}; // requestId → clé de cache (analyses worker en vol)
-
   function scanCacheKey(kind, g, color) {
     return kind + '|' + color + '|' + (g.url || g.end_time || '');
   }
@@ -1163,14 +1161,9 @@
       analysisProgress.textContent = 'Analyse en cours… ' + msg.percent + ' %';
     } else if (msg.type === 'analysis') {
       onAnalysisDone(msg.evals);
-    } else if (msg.type === 'blunders') {
-      if (scanPending[msg.requestId]) {
-        scanCachePut(scanPending[msg.requestId], msg.items);
-        delete scanPending[msg.requestId];
-      }
-      onBlundersFound(msg);       // Blunder Trainer
-      onMissPBlunders(msg);       // Miss Puzzles (filtre différent)
     }
+    // (les scans de gaffes passent désormais par le pool de workers dédié,
+    // avec leurs propres gestionnaires de messages — voir scanBlundersPool)
   }
 
   // -------------------------------------------------- démarrage de partie --
@@ -2435,64 +2428,184 @@
     }
     // Parties en cache d'abord (préparation quasi instantanée), mélangées
     // pour que les positions varient à chaque session
-    trainer.order = scanAwareOrder('blunders');
-    trainerScanNext();
+    trainer.order = scanAwareOrder(BLUNDERS_KIND);
+    trainerRunScan();
   }
 
-  /** Analyse la partie suivante (dans le worker) jusqu'à avoir 10 positions. */
-  function trainerScanNext() {
-    if (!trainer || trainer.state !== 'prep') return;
-    // Au plus 40 parties analysées par session : la préparation reste courte
-    if (trainer.puzzles.length >= TRAINER_SIZE || trainer.oi >= trainer.order.length
-        || trainer.gamesScanned >= 40) {
-      trainerBegin();
-      return;
+  // Clé de cache des scans de gaffes. Le suffixe -sf invalide les anciennes
+  // analyses du moteur maison : elles seront refaites en qualité Stockfish.
+  const BLUNDERS_KIND = 'blunders-sf';
+
+  /** Scanne UNE partie avec Stockfish : éval de chaque position (rapide),
+      puis, sur les coups fautifs du joueur (perte >= 150 cp hors positions
+      déjà pliées), calcul des coups acceptés en MultiPV. Mêmes seuils que
+      l'ancien scan maison, mais avec des évals fiables — et le meilleur coup
+      est juste dès le scan (plus besoin de re-vérification à l'affichage).
+      Renvoie null si interrompu (résultat partiel : pas de cache). */
+  async function scanGameBlundersSf(engine, meta, alive) {
+    const s = Chess.newGame();
+    const fens = [Chess.toFen(s)];
+    const played = [];
+    for (const san of meta.sans) {
+      const move = Pgn.sanToMove(Chess, s, san);
+      if (!move) break;
+      played.push(san);
+      Chess.play(s, move);
+      fens.push(Chess.toFen(s));
     }
-    const g = gamesList[trainer.order[trainer.oi++]];
-    const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
-    const parsed = Pgn.parsePgn(g.pgn || '');
-    if (parsed.sans.length < 10) { trainerScanNext(); return; }
-    trainer.currentGame = {
-      sans: parsed.sans,
-      userColor: meIsWhite ? 'w' : 'b',
-      opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
-    };
-    // Partie déjà analysée lors d'une session précédente : résultat immédiat
-    const cached = scanCacheGet('blunders', g, trainer.currentGame.userColor);
-    if (cached) {
-      trainerAccept(cached);
-      return;
+    // Passe 1 : éval de chaque position (perspective Blancs, bornée ±1200)
+    const evals = [];
+    for (let i = 0; i < fens.length; i++) {
+      if (!alive()) return null;
+      const pos = Chess.fromFen(fens[i]);
+      const status = Chess.statusOf(pos);
+      if (status.over) {
+        evals.push(status.result === '1-0' ? 1200 : status.result === '0-1' ? -1200 : 0);
+        continue;
+      }
+      const lines = await engine.analyze(fens[i], { multipv: 1, movetime: 90, depth: 12 });
+      if (!alive()) return null;
+      const top = lines && lines[0];
+      const eff = !top ? 0
+        : (top.mate !== null && top.mate !== undefined ? (top.mate > 0 ? 1200 : -1200)
+           : Math.max(-1200, Math.min(1200, top.cp || 0)));
+      evals.push(eff);
     }
-    const requestId = ++trainerRequestId;
-    trainer.requestId = requestId;
-    scanPending[requestId] = scanCacheKey('blunders', g, trainer.currentGame.userColor);
-    ensureWorker().postMessage({
-      type: 'blunders', sans: parsed.sans,
-      userColor: trainer.currentGame.userColor, requestId
-    });
-    renderTrainerPanel();
-  }
-
-  function onBlundersFound(msg) {
-    if (!trainer || trainer.state !== 'prep' || msg.requestId !== trainer.requestId) return;
-    trainerAccept(msg.items);
-  }
-
-  function trainerAccept(items) {
-    const found = items.slice();
-    // Au plus 2 positions par partie, pour varier les contextes
-    while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
-    for (const item of found) {
-      if (trainer.puzzles.length >= TRAINER_SIZE) break;
-      trainer.puzzles.push({
-        ...item,
-        sans: trainer.currentGame.sans,
-        userColor: trainer.currentGame.userColor,
-        opponent: trainer.currentGame.opponent
+    // Passe 2 : détection + meilleurs coups sur les positions fautives
+    const items = [];
+    for (let i = 0; i < played.length && i + 1 < evals.length; i++) {
+      const mover = i % 2 === 0 ? 'w' : 'b';
+      if (mover !== meta.userColor) continue;
+      if (i < 4) continue;                                  // bruit d'ouverture
+      const before = mover === 'w' ? evals[i] : -evals[i];  // perspective joueur
+      if (before <= -1100 || before >= 1100) continue;      // partie déjà pliée
+      const loss = mover === 'w' ? evals[i] - evals[i + 1] : evals[i + 1] - evals[i];
+      if (loss < 150) continue;
+      if (!alive()) return null;
+      const lines = await engine.analyze(fens[i], { multipv: 4, movetime: 600, depth: 18 });
+      if (!alive()) return null;
+      if (!lines || lines.length === 0) continue;
+      const state = Chess.fromFen(fens[i]);
+      const sign = state.turn === 'w' ? 1 : -1;
+      const eff = l => sign * (l.mate !== null && l.mate !== undefined ? (l.mate > 0 ? 3000 : -3000) : (l.cp || 0));
+      const best = eff(lines[0]);
+      const acceptable = [];
+      for (const line of lines) {
+        if (best - eff(line) > 30) continue;
+        const move = uciToMove(state, line.uci);
+        if (move) {
+          acceptable.push({ from: move.from, to: move.to, promo: move.promo || null, san: Chess.sanOf(state, move) });
+        }
+      }
+      // Tous les choix se valent : position molle, mauvais quiz
+      if (acceptable.length === 0 || acceptable.length >= 4) continue;
+      items.push({
+        ply: i,
+        played: played[i],
+        loss,
+        before,
+        after: mover === 'w' ? evals[i + 1] : -evals[i + 1],
+        bestSan: acceptable[0].san,
+        evalBest: Math.round(best),
+        acceptable,
+        sfDone: true, sfVerified: true // déjà en qualité Stockfish
       });
     }
-    trainer.gamesScanned++;
-    trainerScanNext();
+    return items;
+  }
+
+  /** Scanne les parties à la recherche de gaffes, en PARALLÈLE : un pool
+      d'instances Stockfish (une par cœur, borné à 4) se répartit les
+      parties ; repli automatique sur le moteur maison si le wasm est
+      indisponible. Les parties en cache sont consommées sans moteur : une
+      session entièrement cachée ne lance rien. */
+  async function scanBlundersPool(cfg) {
+    // cfg : { order, alive(), done(), accept(meta, items), progress(), finish() }
+    const poolSize = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) - 2));
+    let cursor = 0;
+    const takeJob = () => {
+      while (cursor < cfg.order.length) {
+        const g = gamesList[cfg.order[cursor++]];
+        const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
+        const parsed = Pgn.parsePgn(g.pgn || '');
+        if (parsed.sans.length < 10) continue;
+        return {
+          g,
+          meta: {
+            sans: parsed.sans,
+            userColor: meIsWhite ? 'w' : 'b',
+            opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
+          }
+        };
+      }
+      return null;
+    };
+    const sfOk = await SfEngine.ready();
+    if (!cfg.alive()) return;
+    const engines = [];
+    const workers = [];
+    await Promise.all(Array.from({ length: poolSize }, async () => {
+      let engine = null;
+      let w = null; // worker moteur maison (repli)
+      while (cfg.alive() && !cfg.done()) {
+        const job = takeJob();
+        if (!job) break;
+        let items = scanCacheGet(BLUNDERS_KIND, job.g, job.meta.userColor);
+        if (!items) {
+          if (sfOk && !engine && !w) {
+            engine = SfEngine.createEngine(16);
+            const ok = await engine.ready();
+            if (!ok) { engine.terminate(); engine = null; }
+            else engines.push(engine);
+          }
+          if (engine) {
+            items = await scanGameBlundersSf(engine, job.meta, cfg.alive);
+            if (items === null) break; // scan interrompu
+          } else {
+            if (!w) { w = new Worker('/app/js/bot-worker.js'); workers.push(w); }
+            items = await new Promise((resolve) => {
+              const requestId = ++trainerRequestId;
+              w.onmessage = (e) => {
+                if (e.data && e.data.type === 'blunders' && e.data.requestId === requestId) resolve(e.data.items);
+              };
+              w.postMessage({ type: 'blunders', sans: job.meta.sans, userColor: job.meta.userColor, requestId });
+            });
+            if (!cfg.alive()) break;
+          }
+          scanCachePut(scanCacheKey(BLUNDERS_KIND, job.g, job.meta.userColor), items);
+        }
+        if (!cfg.alive() || cfg.done()) break;
+        cfg.accept(job.meta, items);
+        cfg.progress();
+      }
+    }));
+    for (const engine of engines) engine.terminate();
+    for (const w of workers) w.terminate();
+    if (cfg.alive()) cfg.finish();
+  }
+
+  function trainerRunScan() {
+    const session = trainer;
+    scanBlundersPool({
+      order: session.order,
+      alive: () => trainer === session && session.state === 'prep',
+      // Au plus 40 parties analysées par session : la préparation reste courte
+      done: () => session.puzzles.length >= TRAINER_SIZE || session.gamesScanned >= 40,
+      accept: (meta, items) => {
+        const found = items.slice();
+        // Au plus 2 positions par partie, pour varier les contextes
+        while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
+        for (const item of found) {
+          if (session.puzzles.length >= TRAINER_SIZE) break;
+          session.puzzles.push({
+            ...item, sans: meta.sans, userColor: meta.userColor, opponent: meta.opponent
+          });
+        }
+        session.gamesScanned++;
+      },
+      progress: () => renderTrainerPanel(),
+      finish: () => trainerBegin()
+    });
   }
 
   function trainerBegin() {
@@ -2883,66 +2996,36 @@
       }
       if (!missP || missP.state !== 'prep') return;
     }
-    missP.order = scanAwareOrder('blunders');
-    missPScanNext();
+    missP.order = scanAwareOrder(BLUNDERS_KIND);
+    missPRunScan();
   }
 
   /** Analyse la partie suivante (dans le worker) jusqu'à avoir 10 positions. */
-  function missPScanNext() {
-    if (!missP || missP.state !== 'prep') return;
-    // Au plus 40 parties analysées par session : la préparation reste courte
-    if (missP.puzzles.length >= MISSP_SIZE || missP.oi >= missP.order.length
-        || missP.gamesScanned >= 40) {
-      missPBegin();
-      return;
-    }
-    const g = gamesList[missP.order[missP.oi++]];
-    const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
-    const parsed = Pgn.parsePgn(g.pgn || '');
-    if (parsed.sans.length < 10) { missPScanNext(); return; }
-    missP.currentGame = {
-      sans: parsed.sans,
-      userColor: meIsWhite ? 'w' : 'b',
-      opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
-    };
-    // Partie déjà analysée lors d'une session précédente : résultat immédiat
-    const cached = scanCacheGet('blunders', g, missP.currentGame.userColor);
-    if (cached) {
-      missPAccept(cached);
-      return;
-    }
-    const requestId = ++trainerRequestId;
-    missP.requestId = requestId;
-    scanPending[requestId] = scanCacheKey('blunders', g, missP.currentGame.userColor);
-    ensureWorker().postMessage({
-      type: 'blunders', sans: parsed.sans,
-      userColor: missP.currentGame.userColor, requestId
+  /** Scan parallèle (pool partagé avec le Blunder Trainer). Ne retient que
+      les avantages gâchés : au moins +2 avant le coup, égalité (ou pire)
+      après. */
+  function missPRunScan() {
+    const session = missP;
+    scanBlundersPool({
+      order: session.order,
+      alive: () => missP === session && session.state === 'prep',
+      // Au plus 40 parties analysées par session : la préparation reste courte
+      done: () => session.puzzles.length >= MISSP_SIZE || session.gamesScanned >= 40,
+      accept: (meta, items) => {
+        const found = items.filter(item => item.before >= 200 && item.after <= 100);
+        // Au plus 2 positions par partie, pour varier les contextes
+        while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
+        for (const item of found) {
+          if (session.puzzles.length >= MISSP_SIZE) break;
+          session.puzzles.push({
+            ...item, sans: meta.sans, userColor: meta.userColor, opponent: meta.opponent
+          });
+        }
+        session.gamesScanned++;
+      },
+      progress: () => renderMissPPanel(),
+      finish: () => missPBegin()
     });
-    renderMissPPanel();
-  }
-
-  /** Ne retient que les avantages gâchés : au moins +2 avant le coup,
-      égalité (ou pire) après. */
-  function onMissPBlunders(msg) {
-    if (!missP || missP.state !== 'prep' || msg.requestId !== missP.requestId) return;
-    missPAccept(msg.items);
-  }
-
-  function missPAccept(items) {
-    const found = items.filter(item => item.before >= 200 && item.after <= 100);
-    // Au plus 2 positions par partie, pour varier les contextes
-    while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
-    for (const item of found) {
-      if (missP.puzzles.length >= MISSP_SIZE) break;
-      missP.puzzles.push({
-        ...item,
-        sans: missP.currentGame.sans,
-        userColor: missP.currentGame.userColor,
-        opponent: missP.currentGame.opponent
-      });
-    }
-    missP.gamesScanned++;
-    missPScanNext();
   }
 
   function missPBegin() {
@@ -3232,50 +3315,74 @@
     missMScanLoop(token);
   }
 
-  /** Passe les parties au crible (en ordre aléatoire) jusqu'à 10 mats ratés. */
+  /** Passe les parties au crible (en ordre aléatoire) jusqu'à 10 mats ratés.
+      PARALLÈLE : un pool d'instances Stockfish (une par cœur, borné à 4) se
+      répartit les parties ; les parties en cache ne coûtent aucun moteur. */
   async function missMScanLoop(token) {
-    while (missM && missM.token === token && missM.state === 'prep') {
-      if (missM.puzzles.length >= MISSM_SIZE || missM.oi >= missM.order.length
-          || missM.gamesScanned >= MISSM_MAX_GAMES) {
-        missMBegin();
-        return;
+    const alive = () => missM && missM.token === token && missM.state === 'prep';
+    const done = () => missM.puzzles.length >= MISSM_SIZE || missM.gamesScanned >= MISSM_MAX_GAMES;
+    const takeJob = () => {
+      while (missM.oi < missM.order.length) {
+        const g = gamesList[missM.order[missM.oi++]];
+        const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
+        const parsed = Pgn.parsePgn(g.pgn || '');
+        if (parsed.sans.length < 12) continue;
+        return {
+          g,
+          meta: {
+            sans: parsed.sans,
+            userColor: meIsWhite ? 'w' : 'b',
+            opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
+          }
+        };
       }
-      const g = gamesList[missM.order[missM.oi++]];
-      const meIsWhite = (g.white.username || '').toLowerCase() === chesscomUsername.toLowerCase();
-      const parsed = Pgn.parsePgn(g.pgn || '');
-      if (parsed.sans.length < 12) continue;
-      const meta = {
-        sans: parsed.sans,
-        userColor: meIsWhite ? 'w' : 'b',
-        opponent: (meIsWhite ? g.black.username : g.white.username) || 'Adversaire'
-      };
-      // Partie déjà passée au crible lors d'une session précédente
-      const cached = scanCacheGet('mates', g, meta.userColor);
-      if (cached) {
-        for (const item of cached) {
-          if (missM.puzzles.length >= MISSM_SIZE) break;
-          missM.puzzles.push({ ...item, userColor: meta.userColor, opponent: meta.opponent });
+      return null;
+    };
+    const poolSize = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) - 2));
+    const engines = [];
+    await Promise.all(Array.from({ length: poolSize }, async () => {
+      let engine = null;
+      while (alive() && !done()) {
+        const job = takeJob();
+        if (!job) break;
+        // Partie déjà passée au crible lors d'une session précédente
+        const cached = scanCacheGet('mates', job.g, job.meta.userColor);
+        if (cached) {
+          for (const item of cached) {
+            if (missM.puzzles.length >= MISSM_SIZE) break;
+            missM.puzzles.push({ ...item, userColor: job.meta.userColor, opponent: job.meta.opponent });
+          }
+          missM.gamesScanned++;
+          renderMissMPanel();
+          continue;
+        }
+        if (!engine) {
+          engine = SfEngine.createEngine(16);
+          const ok = await engine.ready();
+          if (!ok) { engine.terminate(); engine = null; return; }
+          engines.push(engine);
+        }
+        const foundItems = await missMScanGame(token, job.meta, engine);
+        if (!alive()) return;
+        // Scan complet (non interrompu) : mémorisé, même vide
+        if (foundItems !== null) {
+          scanCachePut(scanCacheKey('mates', job.g, job.meta.userColor), foundItems);
         }
         missM.gamesScanned++;
         renderMissMPanel();
-        continue;
       }
-      const foundItems = await missMScanGame(token, meta);
-      if (!missM || missM.token !== token || missM.state !== 'prep') return;
-      // Scan complet (non interrompu) : mémorisé, même vide
-      if (foundItems !== null) {
-        scanCachePut(scanCacheKey('mates', g, meta.userColor), foundItems);
-      }
-      missM.gamesScanned++;
-      renderMissMPanel();
-    }
+    }));
+    for (const engine of engines) engine.terminate();
+    if (alive()) missMBegin();
   }
 
   /** Cherche dans une partie les mats en 1 à 3 du joueur que son coup a
       laissés s'échapper (Stockfish, ~100 ms par position). Au plus 2 par
       partie. Renvoie les puzzles trouvés, ou null si le scan a été interrompu
-      (résultat partiel : à ne pas mettre en cache). */
-  async function missMScanGame(token, meta) {
+      (résultat partiel : à ne pas mettre en cache). `engine` : instance
+      Stockfish dédiée du pool (les analyses des autres moteurs continuent
+      en parallèle). */
+  async function missMScanGame(token, meta, engine) {
     const s = Chess.newGame();
     const fens = [Chess.toFen(s)];
     const sans = [];
@@ -3293,7 +3400,7 @@
       if ((i % 2 === 0 ? 'w' : 'b') !== meta.userColor) continue;
       if (!missM || missM.token !== token || missM.state !== 'prep'
           || missM.puzzles.length >= MISSM_SIZE) return null;
-      const lines = await SfEngine.analyze(fens[i], { multipv: 1, movetime: 110, depth: 12 });
+      const lines = await engine.analyze(fens[i], { multipv: 1, movetime: 110, depth: 12 });
       if (!missM || missM.token !== token || missM.state !== 'prep') return null;
       const top = lines && lines[0];
       if (!top || top.mate === null || top.mate === undefined
@@ -3304,7 +3411,7 @@
       // s'est échappé, ou il reste aussi long qu'avant — coup non matant)
       const afterState = Chess.fromFen(fens[i + 1]);
       if (Chess.statusOf(afterState).over) continue; // le coup joué concluait déjà
-      const alines = await SfEngine.analyze(fens[i + 1], { multipv: 1, movetime: 140, depth: 12 });
+      const alines = await engine.analyze(fens[i + 1], { multipv: 1, movetime: 140, depth: 12 });
       if (!missM || missM.token !== token || missM.state !== 'prep') return null;
       const atop = alines && alines[0];
       if (atop && atop.mate !== null && atop.mate !== undefined
