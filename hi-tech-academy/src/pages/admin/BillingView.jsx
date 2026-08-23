@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  BadgeEuro, CheckCircle2, Download, Eye, FilePlus2, Plus, ReceiptText, RefreshCw, Send, Trash2, X,
+  CheckCircle2, Download, Eye, FilePlus2, Plus, ReceiptText, RefreshCw, Send, Trash2, X,
 } from 'lucide-react';
 import {
   adminArchiveBillingPdf, adminConvertQuoteToInvoice, adminCreateBillingDocument, adminGetRegistration,
@@ -8,7 +8,7 @@ import {
 } from '@/api/backend';
 import { billingPdfBase64, billingPdfBlobUrl, downloadBillingPdf } from '@/lib/billingPdf';
 import PdfViewer from './PdfViewer';
-import { Badge, Card, EmptyState, ViewHeader, bodyFont, formatDay, headingFont } from './common';
+import { Card, EmptyState, ViewHeader, bodyFont, formatDay, headingFont } from './common';
 
 const TYPE_META = {
   QUOTE: { label: 'Devis', background: '#f0f3fa', color: '#002d74' },
@@ -21,6 +21,14 @@ const STATUS_META = {
   ACCEPTED: { label: 'Accepté', background: '#e5f6ec', color: '#116632' },
   REFUSED: { label: 'Refusé', background: '#fdecec', color: '#a12626' },
   PAID: { label: 'Payée', background: '#e5f6ec', color: '#116632' },
+};
+
+// Statuts sélectionnables par type (le statut se change librement, y compris
+// en arrière — une facture repassée de « payée » à un autre statut perd sa
+// date de paiement et la mention « acquittée » sur le PDF).
+const STATUS_OPTIONS = {
+  QUOTE: [['ISSUED', 'Émis'], ['SENT', 'Envoyé'], ['ACCEPTED', 'Accepté'], ['REFUSED', 'Refusé']],
+  INVOICE: [['ISSUED', 'Émise'], ['SENT', 'Envoyée'], ['PAID', 'Payée']],
 };
 
 function money(n) {
@@ -551,11 +559,23 @@ export default function BillingView({ auth }) {
                       {money(d.total_ttc)}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span
-                        className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-                        style={{ background: status.background, color: status.color, ...headingFont }}>
-                        {status.label}
-                      </span>
+                      <select
+                        value={d.status}
+                        disabled={busy}
+                        onChange={(e) => setStatus(d, e.target.value)}
+                        title="Changer le statut"
+                        className="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap cursor-pointer disabled:opacity-50"
+                        style={{
+                          background: status.background,
+                          color: status.color,
+                          border: 'none',
+                          appearance: 'auto',
+                          ...headingFont,
+                        }}>
+                        {STATUS_OPTIONS[d.type].map(([value, label]) => (
+                          <option key={value} value={value}>{label}</option>
+                        ))}
+                      </select>
                       {d.status === 'PAID' && d.paid_at && (
                         <span className="block text-[11px] mt-0.5" style={{ color: '#6b7a9b', ...bodyFont }}>
                           le {formatDay(d.paid_at)}
@@ -614,28 +634,6 @@ export default function BillingView({ auth }) {
                             style={{ color: '#002d74', ...headingFont }}>
                             <ReceiptText className="w-4 h-4" />
                             Facturer
-                          </button>
-                        )}
-                        {d.type === 'INVOICE' && d.status !== 'PAID' && (
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => setStatus(d, 'PAID')}
-                            className="inline-flex items-center gap-1.5 text-sm font-semibold disabled:opacity-50"
-                            style={{ color: '#116632', ...headingFont }}>
-                            <BadgeEuro className="w-4 h-4" />
-                            Payée
-                          </button>
-                        )}
-                        {d.type === 'QUOTE' && (d.status === 'ISSUED' || d.status === 'SENT') && (
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => setStatus(d, 'REFUSED')}
-                            className="inline-flex items-center gap-1.5 text-sm font-semibold disabled:opacity-50"
-                            style={{ color: '#a12626', ...headingFont }}>
-                            <X className="w-4 h-4" />
-                            Refusé
                           </button>
                         )}
                       </span>

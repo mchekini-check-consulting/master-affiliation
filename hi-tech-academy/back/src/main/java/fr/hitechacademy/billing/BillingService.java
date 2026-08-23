@@ -119,6 +119,11 @@ public class BillingService {
         return repository.save(invoice);
     }
 
+    /**
+     * Change librement le statut (y compris en arrière : une facture marquée
+     * payée par erreur peut revenir à émise / envoyée, la date de paiement
+     * est alors effacée pour que le PDF ne porte plus la mention acquittée).
+     */
     @Transactional
     public BillingDocument updateStatus(UUID id, BillingDocumentStatus status) {
         BillingDocument d = get(id);
@@ -131,6 +136,8 @@ public class BillingService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Seule une facture peut être marquée payée");
             }
             d.setPaidAt(LocalDate.now());
+        } else {
+            d.setPaidAt(null);
         }
         d.setStatus(status);
         return repository.save(d);
