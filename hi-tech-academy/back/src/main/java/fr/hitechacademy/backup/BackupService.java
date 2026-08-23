@@ -10,6 +10,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fr.hitechacademy.archive.ArchivedPdf;
 import fr.hitechacademy.archive.ArchivedPdfKind;
 import fr.hitechacademy.archive.ArchivedPdfRepository;
+import fr.hitechacademy.billing.BillingDocument;
+import fr.hitechacademy.billing.BillingDocumentRepository;
 import fr.hitechacademy.complaint.Complaint;
 import fr.hitechacademy.complaint.ComplaintRepository;
 import fr.hitechacademy.registration.Certificate;
@@ -67,17 +69,20 @@ public class BackupService {
     private final ComplaintRepository complaints;
     private final VeilleRepository veille;
     private final ArchivedPdfRepository archivedPdfs;
+    private final BillingDocumentRepository billingDocuments;
     private final ObjectMapper mapper = createMapper();
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public BackupService(RegistrationRepository registrations, ComplaintRepository complaints,
-                         VeilleRepository veille, ArchivedPdfRepository archivedPdfs) {
+                         VeilleRepository veille, ArchivedPdfRepository archivedPdfs,
+                         BillingDocumentRepository billingDocuments) {
         this.registrations = registrations;
         this.complaints = complaints;
         this.veille = veille;
         this.archivedPdfs = archivedPdfs;
+        this.billingDocuments = billingDocuments;
     }
 
     // --- Format du fichier backup.json --------------------------------
@@ -86,6 +91,7 @@ public class BackupService {
                     List<RegistrationRequest> registrations,
                     List<Complaint> complaints,
                     List<VeilleItem> veilleItems,
+                    List<BillingDocument> billingDocuments,
                     List<PdfEntry> pdfs) {
     }
 
@@ -93,7 +99,7 @@ public class BackupService {
     }
 
     public record ImportReport(int registrations, int trainees, int certificates,
-                               int complaints, int veilleItems, int pdfs) {
+                               int complaints, int veilleItems, int billingDocuments, int pdfs) {
     }
 
     /** Ignore les références enfant → parent (recâblées à l'import). */
@@ -152,6 +158,15 @@ public class BackupService {
             }
         }
 
+        // Devis / factures : rangés par numéro dans un dossier Facturation
+        List<BillingDocument> billingDocs = billingDocuments.findAll();
+        Map<UUID, String> billingPaths = new HashMap<>();
+        for (BillingDocument d : billingDocs) {
+            String subDir = d.getNumber().startsWith("FA-") ? "Factures" : "Devis";
+            billingPaths.put(d.getId(), "Facturation/" + subDir + "/"
+                    + sanitize(d.getNumber() + " " + d.getClientName(), "_") + ".pdf");
+        }
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (ZipOutputStream zip = new ZipOutputStream(out)) {
             List<PdfEntry> pdfEntries = new ArrayList<>();
@@ -159,6 +174,7 @@ public class BackupService {
                 String file = switch (pdf.getKind()) {
                     case CERTIFICATE -> certificatePaths.get(pdf.getOwnerId());
                     case FINAL_EVALUATION_CORRECTION -> correctionPaths.get(pdf.getOwnerId());
+                    case QUOTE, INVOICE -> billingPaths.get(pdf.getOwnerId());
                 };
                 if (file == null) {
                     // Objet métier disparu : chemin technique de repli
@@ -170,7 +186,7 @@ public class BackupService {
                 pdfEntries.add(new PdfEntry(pdf.getKind(), pdf.getOwnerId(), pdf.getArchivedAt(), file));
             }
             Manifest manifest = new Manifest(FORMAT_VERSION, Instant.now(),
-                    regs, complaints.findAll(), veille.findAll(), pdfEntries);
+                    regs, complaints.findAll(), veille.findAll(), billingDocs, pdfEntries);
             zip.putNextEntry(new ZipEntry("backup.json"));
             zip.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(manifest));
             zip.closeEntry();
@@ -237,6 +253,7 @@ public class BackupService {
         registrations.deleteAll();
         complaints.deleteAll();
         veille.deleteAll();
+        billingDocuments.deleteAll();
         entityManager.flush();
         entityManager.clear();
 
@@ -261,6 +278,9 @@ public class BackupService {
         }
         for (VeilleItem v : orEmpty(manifest.veilleItems())) {
             session.replicate(v, ReplicationMode.EXCEPTION);
+        }
+        for (BillingDocument d : orEmpty(manifest.billingDocuments())) {
+            session.replicate(d, ReplicationMode.EXCEPTION);
         }
         int pdfs = 0;
         for (PdfEntry entry : orEmpty(manifest.pdfs())) {
@@ -290,7 +310,8 @@ public class BackupService {
         }
 
         return new ImportReport(persisted.size(), trainees, certificates,
-                orEmpty(manifest.complaints()).size(), orEmpty(manifest.veilleItems()).size(), pdfs);
+                orEmpty(manifest.complaints()).size(), orEmpty(manifest.veilleItems()).size(),
+                orEmpty(manifest.billingDocuments()).size(), pdfs);
     }
 
     /** Recâble les références enfant → parent ignorées à la sérialisation. */

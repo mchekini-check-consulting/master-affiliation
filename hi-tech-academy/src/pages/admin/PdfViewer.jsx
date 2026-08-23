@@ -7,8 +7,10 @@ const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
  * Visionneuse PDF intégrée : affiche le document dans l'application
  * (iframe plein écran) avec téléchargement et fermeture — utilisée pour
  * les documents Qualiopi statiques comme pour les certificats générés.
+ * `actions` permet d'ajouter des boutons dans la barre (ex. confirmer
+ * l'envoi d'une facture après vérification visuelle).
  */
-export default function PdfViewer({ title, url, onDownload, onClose }) {
+export default function PdfViewer({ title, url, onDownload, onClose, actions }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -27,6 +29,7 @@ export default function PdfViewer({ title, url, onDownload, onClose }) {
           {title}
         </p>
         <div className="flex items-center gap-2 shrink-0">
+          {actions}
           {onDownload && (
             <button
               type="button"

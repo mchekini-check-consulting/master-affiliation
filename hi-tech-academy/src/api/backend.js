@@ -111,6 +111,38 @@ export function adminArchiveCertificatePdf(auth, certificateId, pdfBase64) {
   });
 }
 
+// --- Devis & factures --------------------------------------------------
+export function adminListBillingDocuments(auth) {
+  return request('/admin/billing/documents', { auth });
+}
+
+export function adminCreateBillingDocument(auth, payload) {
+  return request('/admin/billing/documents', { method: 'POST', body: payload, auth });
+}
+
+export function adminUpdateBillingStatus(auth, id, status) {
+  return request(`/admin/billing/documents/${id}/status`, { method: 'POST', body: { status }, auth });
+}
+
+// Convertit un devis en facture (nouveau numéro FA, devis marqué accepté)
+export function adminConvertQuoteToInvoice(auth, id) {
+  return request(`/admin/billing/documents/${id}/invoice`, { method: 'POST', auth });
+}
+
+export function adminSendBillingDocument(auth, id, pdfBase64, recipientEmail) {
+  return request(`/admin/billing/documents/${id}/send`, {
+    method: 'POST', auth, body: { pdf_base64: pdfBase64, recipient_email: recipientEmail || undefined },
+  });
+}
+
+// Archive la copie du document sans envoi d'email (le backend ignore
+// l'appel si une copie « telle qu'envoyée » existe déjà)
+export function adminArchiveBillingPdf(auth, id, pdfBase64) {
+  return request(`/admin/billing/documents/${id}/archive`, {
+    method: 'POST', auth, body: { pdf_base64: pdfBase64 },
+  });
+}
+
 // --- Kanban de veille -------------------------------------------------
 export function adminListVeille(auth) {
   return request('/admin/veille', { auth });

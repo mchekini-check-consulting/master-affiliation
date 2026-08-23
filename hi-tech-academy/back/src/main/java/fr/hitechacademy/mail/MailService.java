@@ -1,5 +1,7 @@
 package fr.hitechacademy.mail;
 
+import fr.hitechacademy.billing.BillingDocument;
+import fr.hitechacademy.billing.BillingDocumentType;
 import fr.hitechacademy.registration.ApplicantType;
 import fr.hitechacademy.registration.RegistrationRequest;
 import fr.hitechacademy.registration.RegistrationStatus;
@@ -200,6 +202,61 @@ public class MailService {
                 "Votre certificat de réalisation — " + formationTitle,
                 body.formatted(firstName, lastName, formationTitle),
                 pdf, filename);
+    }
+
+    /**
+     * Envoie au client un devis ou une facture en pièce jointe PDF.
+     * Déclenché en un clic depuis l'espace admin « Devis & Factures ».
+     */
+    @Async
+    public void sendBillingDocument(String to, BillingDocument d, byte[] pdf, String filename) {
+        var dateFormat = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String amount = String.format(java.util.Locale.FRANCE, "%,.2f", d.getTotalTtc()) + " € TTC";
+        String greetingName = d.getClientContactName() != null ? d.getClientContactName() : d.getClientName();
+
+        if (d.getType() == BillingDocumentType.INVOICE) {
+            String body = """
+                    Bonjour %s,
+
+                    Veuillez trouver en pièce jointe la facture n° %s d'un montant de
+                    %s, établie au nom de %s.
+
+                    Elle est payable par virement bancaire au plus tard le %s
+                    (coordonnées bancaires indiquées sur la facture).
+
+                    Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                    Nous vous remercions de votre confiance,
+                    Mahdi CHEKINI
+                    HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+            sendWithAttachment(to,
+                    "Votre facture " + d.getNumber() + " — Hi-Tech Academy",
+                    body.formatted(greetingName, d.getNumber(), amount, d.getClientName(),
+                            d.getDueDate().format(dateFormat)),
+                    pdf, filename);
+        } else {
+            String body = """
+                    Bonjour %s,
+
+                    Veuillez trouver en pièce jointe le devis n° %s d'un montant de
+                    %s, établi au nom de %s.
+
+                    Ce devis est valable jusqu'au %s. Pour l'accepter, retournez-le
+                    daté et signé avec la mention « Bon pour accord » à
+                    contact@hi-techacademy.fr.
+
+                    Nous restons à votre disposition pour toute question ou ajustement :
+                    contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                    Bien cordialement,
+                    Mahdi CHEKINI
+                    HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+            sendWithAttachment(to,
+                    "Votre devis " + d.getNumber() + " — Hi-Tech Academy",
+                    body.formatted(greetingName, d.getNumber(), amount, d.getClientName(),
+                            d.getValidUntil().format(dateFormat)),
+                    pdf, filename);
+        }
     }
 
     /** Nouvelle réclamation déposée sur le site : notifie l'organisme. */
