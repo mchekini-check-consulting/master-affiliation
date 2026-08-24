@@ -155,7 +155,21 @@
         <span id="ex-steps-count">Étape 0/0</span>
         <button type="button" class="ex-steps-quit" id="ex-steps-quit">✕ Quitter</button>
       </div>
-      <div class="ex-steps-caption" id="ex-steps-caption"></div>
+      <!-- Contrôles au-dessus du texte : ils ne bougent pas quand le
+           commentaire change de longueur -->
+      <div class="ex-steps-nav">
+        <button type="button" class="btn btn-secondary" id="ex-steps-prev">◀ Précédente</button>
+        <button type="button" class="btn btn-primary" id="ex-steps-next">Suivante ▶</button>
+      </div>
+      <div class="anim-row">
+        <button type="button" class="btn btn-primary" id="ex-steps-lecture">▶ Lecture auto</button>
+        <select class="anim-duree" id="ex-steps-duree" title="Cadence de la lecture automatique">
+          <option value="1">1 s / coup</option>
+          <option value="2" selected>2 s / coup</option>
+          <option value="3">3 s / coup</option>
+          <option value="5">5 s / coup</option>
+        </select>
+      </div>
       <div class="ex-steps-legend">
         <span class="lg"><i class="lg-swatch lg-free"></i>Cases où le roi peut encore aller</span>
         <span class="lg"><i class="lg-swatch lg-move"></i>Coup joué · la flèche montre le prochain coup</span>
@@ -164,10 +178,7 @@
           <i class="lg-swatch lg-covered"></i>Afficher les cases contrôlées (interdites au roi)
         </label>
       </div>
-      <div class="ex-steps-nav">
-        <button type="button" class="btn btn-secondary" id="ex-steps-prev">◀ Précédente</button>
-        <button type="button" class="btn btn-primary" id="ex-steps-next">Suivante ▶</button>
-      </div>
+      <div class="ex-steps-caption" id="ex-steps-caption"></div>
     </div>
 
     <div class="moves" id="moves" aria-label="Liste des coups"></div>

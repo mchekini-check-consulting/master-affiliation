@@ -1850,6 +1850,62 @@
     gotoPly(Math.round(ratio * (replay.evals.length - 1)));
   });
 
+  // --------------------------------------- lecture auto des visionneuses --
+  // Toutes les visionneuses pas à pas (ouvertures, structure de pions,
+  // étapes de résolution) partagent un mode dynamique : lecture automatique
+  // des coups à une cadence réglable (2 s par coup par défaut, mémorisée).
+
+  const ANIM_DUREE_CLE = 'echecs360-anim-duree';
+
+  function animDuree() {
+    const v = parseFloat(localStorage.getItem(ANIM_DUREE_CLE));
+    return v > 0 ? v : 2;
+  }
+
+  function animDureeHtml(dataAttr) {
+    const cur = animDuree();
+    return '<select class="anim-duree" ' + dataAttr + ' title="Cadence de la lecture automatique">'
+      + [1, 2, 3, 5].map(s =>
+        '<option value="' + s + '"' + (s === cur ? ' selected' : '') + '>' + s + ' s / coup</option>').join('')
+      + '</select>';
+  }
+
+  /** Fabrique un lecteur automatique : avancer() est appelé toutes les
+      animDuree() secondes jusqu'à estFinie() ; surChangement() rafraîchit
+      l'interface (état du bouton Lecture/Pause). */
+  function creerLecteur(avancer, estFinie, surChangement) {
+    const lecteur = {
+      actif: false,
+      timer: null,
+      demarrer() {
+        if (estFinie()) return;
+        clearInterval(lecteur.timer);
+        lecteur.actif = true;
+        lecteur.timer = setInterval(() => {
+          avancer();
+          if (estFinie()) lecteur.arreter();
+        }, animDuree() * 1000);
+        surChangement();
+      },
+      arreter() {
+        if (!lecteur.actif) return;
+        clearInterval(lecteur.timer);
+        lecteur.timer = null;
+        lecteur.actif = false;
+        surChangement();
+      },
+      basculer() { lecteur.actif ? lecteur.arreter() : lecteur.demarrer(); },
+      // Appliquer une nouvelle cadence sans interrompre la lecture
+      changerCadence() { if (lecteur.actif) lecteur.demarrer(); }
+    };
+    return lecteur;
+  }
+
+  function animBoutonHtml(lecteur, dataAttr) {
+    return '<button type="button" class="btn ' + (lecteur.actif ? 'btn-secondary' : 'btn-primary')
+      + '" ' + dataAttr + '>' + (lecteur.actif ? '⏸ Pause' : '▶ Lecture auto') + '</button>';
+  }
+
   // ------------------------------------------------------------ ouvertures --
   // Répertoire d'ouvertures Blancs / Noirs : chaque ligne se rejoue coup par
   // coup sur l'échiquier avec un commentaire pédagogique et la flèche du
@@ -1907,6 +1963,8 @@
       caption = '<b>' + escapeHtml(san) + '</b> — '
         + (commentaire ? escapeHtml(commentaire) : mover.replace(' jouent', '') + ' développent leur plan.');
     }
+    // Les contrôles restent AU-DESSUS du commentaire : quelle que soit la
+    // longueur du texte, les boutons ne bougent pas d'un pixel.
     openingsPanel.innerHTML =
       '<button type="button" class="op-back" data-op-quit="1">⬅ ' + escapeHtml(opState.opening.nom) + '</button>'
       + '<div class="op-viewer tr-card">'
@@ -1914,11 +1972,15 @@
       + (ligne.type === 'piege' ? 'Piège' : 'Ligne') + '</span> ' + escapeHtml(ligne.titre)
       + ' · coup ' + i + ' / ' + total + '</span>'
       + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + Math.round((i / total) * 100) + '%"></div></div>'
-      + '<div class="op-caption">' + caption + '</div>'
       + '<div class="op-nav">'
       + '<button type="button" class="btn btn-secondary" data-op-prev="1"' + (i === 0 ? ' disabled' : '') + '>◀ Précédent</button>'
       + '<button type="button" class="btn btn-primary" data-op-next="1"' + (i === total ? ' disabled' : '') + '>Suivant ▶</button>'
       + '</div>'
+      + '<div class="anim-row">'
+      + animBoutonHtml(opLecteur, 'data-op-lecture="1"')
+      + animDureeHtml('data-op-duree="1"')
+      + '</div>'
+      + '<div class="op-caption">' + caption + '</div>'
       + '</div>';
   }
 
@@ -1958,6 +2020,7 @@
   }
 
   function opQuitViewer() {
+    opLecteur.arreter();
     opState.ligne = null;
     const arrow = document.getElementById('op-arrow');
     if (arrow) arrow.remove();
@@ -1966,8 +2029,14 @@
     renderStatus();
   }
 
+  const opLecteur = creerLecteur(
+    () => { if (opState.ligne) opGoto(opState.ply + 1); },
+    () => !opState.ligne || opState.ply >= opState.ligne.coups.length,
+    () => { if (mode === 'openings') renderOpeningsPanel(); }
+  );
+
   openingsPanel.addEventListener('click', (event) => {
-    const target = event.target.closest('[data-op-couleur],[data-op-id],[data-op-ligne],[data-op-back],[data-op-quit],[data-op-prev],[data-op-next]');
+    const target = event.target.closest('[data-op-couleur],[data-op-id],[data-op-ligne],[data-op-back],[data-op-quit],[data-op-prev],[data-op-next],[data-op-lecture]');
     if (!target) return;
     if (target.dataset.opCouleur) {
       opState.couleur = target.dataset.opCouleur;
@@ -1984,17 +2053,29 @@
     } else if (target.dataset.opQuit) {
       opQuitViewer();
     } else if (target.dataset.opPrev) {
+      opLecteur.arreter();
       opGoto(opState.ply - 1);
     } else if (target.dataset.opNext) {
+      opLecteur.arreter();
       opGoto(opState.ply + 1);
+    } else if (target.dataset.opLecture) {
+      opLecteur.basculer();
     }
+  });
+
+  // Cadence de la lecture automatique (partagée entre toutes les visionneuses)
+  openingsPanel.addEventListener('change', (event) => {
+    const select = event.target.closest('[data-op-duree]');
+    if (!select) return;
+    localStorage.setItem(ANIM_DUREE_CLE, select.value);
+    opLecteur.changerCadence();
   });
 
   // Navigation clavier dans la visionneuse d'ouvertures
   document.addEventListener('keydown', (event) => {
     if (mode !== 'openings' || !opState.ligne) return;
-    if (event.key === 'ArrowRight') { opGoto(opState.ply + 1); event.preventDefault(); }
-    else if (event.key === 'ArrowLeft') { opGoto(opState.ply - 1); event.preventDefault(); }
+    if (event.key === 'ArrowRight') { opLecteur.arreter(); opGoto(opState.ply + 1); event.preventDefault(); }
+    else if (event.key === 'ArrowLeft') { opLecteur.arreter(); opGoto(opState.ply - 1); event.preventDefault(); }
     else if (event.key === 'Escape') { opQuitViewer(); }
   });
 
@@ -2118,6 +2199,7 @@
   }
 
   function pwSuiteQuit() {
+    pwLecteur.arreter();
     pwState.suiteSrc = null;
     pwState.suitePly = -1;
     pwRefreshBoard();
@@ -2170,26 +2252,36 @@
     return html;
   }
 
-  /** Visionneuse d'une séquence rejouable (partagée fiches / exercices). */
+  /** Visionneuse d'une séquence rejouable (partagée fiches / exercices).
+      Les contrôles sont AU-DESSUS du commentaire : les boutons ne bougent
+      pas, quelle que soit la longueur du texte. */
   function pwSuiteHtml() {
     const src = pwState.suiteSrc;
     const total = src.coups.length;
     const i = pwState.suitePly;
     const caption = i === 0
-      ? escapeHtml(src.intro) + ' Avancez avec « Suivant » — la flèche montre chaque coup.'
+      ? escapeHtml(src.intro) + ' Avancez avec « Suivant », ou lancez la lecture automatique — la flèche montre chaque coup.'
       : '<b>' + escapeHtml(src.coups[i - 1][0]) + '</b> — ' + escapeHtml(src.coups[i - 1][1]);
     return '<div class="op-viewer tr-card">'
       + '<span class="op-count">🎬 ' + escapeHtml(src.titre) + ' · coup ' + i + ' / ' + total + '</span>'
       + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + Math.round((i / total) * 100) + '%"></div></div>'
-      + '<div class="op-caption">' + caption + '</div>'
       + '<div class="op-nav">'
       + '<button type="button" class="btn btn-secondary" data-pw-suite="-1"' + (i === 0 ? ' disabled' : '') + '>◀ Précédent</button>'
       + '<button type="button" class="btn btn-primary" data-pw-suite="1"' + (i === total ? ' disabled' : '') + '>Suivant ▶</button>'
       + '</div>'
-      + '<button type="button" class="btn btn-secondary" data-pw-suite-quit="1">↩ '
-      + (src.retour === 'exo' ? 'Revenir à l\'exercice' : 'Revenir à la fiche') + '</button>'
+      + '<div class="anim-row">'
+      + animBoutonHtml(pwLecteur, 'data-pw-lecture="1"')
+      + animDureeHtml('data-pw-duree="1"')
+      + '</div>'
+      + '<div class="op-caption">' + caption + '</div>'
       + '</div>';
   }
+
+  const pwLecteur = creerLecteur(
+    () => { if (pwState.suiteSrc) pwSuiteGoto(pwState.suitePly + 1); },
+    () => !pwState.suiteSrc || pwState.suitePly >= pwState.suiteSrc.coups.length,
+    () => { if (mode === 'pawns') renderPawnsPanel(); }
+  );
 
   function renderPawnsPanel() {
     let html = '<div class="op-tabs">'
@@ -2292,6 +2384,7 @@
   }
 
   function pwOuvreExo(exo) {
+    pwLecteur.arreter();
     pwState.exo = exo;
     pwState.repondu = -1;
     pwState.suiteSrc = null;
@@ -2302,9 +2395,10 @@
   }
 
   pawnsPanel.addEventListener('click', (event) => {
-    const target = event.target.closest('[data-pw-onglet],[data-pw-item],[data-pw-back],[data-pw-vue],[data-pw-exo],[data-pw-choix],[data-pw-suite-start],[data-pw-suite],[data-pw-suite-quit]');
+    const target = event.target.closest('[data-pw-onglet],[data-pw-item],[data-pw-back],[data-pw-vue],[data-pw-exo],[data-pw-choix],[data-pw-suite-start],[data-pw-suite],[data-pw-suite-quit],[data-pw-lecture]');
     if (!target) return;
     if (target.dataset.pwOnglet) {
+      pwLecteur.arreter();
       pwState.onglet = target.dataset.pwOnglet;
       pwState.item = null;
       pwState.vue = 0;
@@ -2323,6 +2417,7 @@
       renderPawnsPanel();
       renderStatus();
     } else if (target.dataset.pwBack) {
+      pwLecteur.arreter();
       pwState.item = null;
       pwState.vue = 0;
       pwState.exo = null;
@@ -2358,18 +2453,28 @@
         pwSuiteStart(vue.fen, vue.suite, vue.titre, 'fiche');
       }
     } else if (target.dataset.pwSuite) {
+      pwLecteur.arreter();
       pwSuiteGoto(pwState.suitePly + Number(target.dataset.pwSuite));
     } else if (target.dataset.pwSuiteQuit) {
       pwSuiteQuit();
+    } else if (target.dataset.pwLecture) {
+      pwLecteur.basculer();
     }
+  });
+
+  pawnsPanel.addEventListener('change', (event) => {
+    const select = event.target.closest('[data-pw-duree]');
+    if (!select) return;
+    localStorage.setItem(ANIM_DUREE_CLE, select.value);
+    pwLecteur.changerCadence();
   });
 
   // Navigation clavier : séquence en cours, sinon vues d'une fiche
   document.addEventListener('keydown', (event) => {
     if (mode !== 'pawns') return;
     if (pwState.suiteSrc && pwState.suitePly >= 0) {
-      if (event.key === 'ArrowRight') { pwSuiteGoto(pwState.suitePly + 1); event.preventDefault(); }
-      else if (event.key === 'ArrowLeft') { pwSuiteGoto(pwState.suitePly - 1); event.preventDefault(); }
+      if (event.key === 'ArrowRight') { pwLecteur.arreter(); pwSuiteGoto(pwState.suitePly + 1); event.preventDefault(); }
+      else if (event.key === 'ArrowLeft') { pwLecteur.arreter(); pwSuiteGoto(pwState.suitePly - 1); event.preventDefault(); }
       else if (event.key === 'Escape') { pwSuiteQuit(); }
     } else if (pwState.item && pwState.item.vues.length > 1) {
       const move = (d) => {
@@ -4659,6 +4764,7 @@
   }
 
   function quitExSteps(restart) {
+    exStepsLecteur.arreter();
     exSteps = null;
     exStepsPanelEl.style.display = 'none';
     clearStepsOverlays();
@@ -4827,9 +4933,38 @@
     return txt;
   }
 
-  exStepsBtn.addEventListener('click', enterExSteps);
-  document.getElementById('ex-steps-prev').addEventListener('click', () => exSteps && exStepsGoto(exSteps.ply - 1));
-  document.getElementById('ex-steps-next').addEventListener('click', () => exSteps && exStepsGoto(exSteps.ply + 1));
+  // Lecture automatique de la visionneuse d'étapes
+  const exStepsLecteur = creerLecteur(
+    () => { if (exSteps) exStepsGoto(exSteps.ply + 1); },
+    () => !exSteps || exSteps.ply >= exSteps.line.length,
+    majExStepsLecture
+  );
+
+  function majExStepsLecture() {
+    const bouton = document.getElementById('ex-steps-lecture');
+    bouton.textContent = exStepsLecteur.actif ? '⏸ Pause' : '▶ Lecture auto';
+    bouton.classList.toggle('btn-primary', !exStepsLecteur.actif);
+    bouton.classList.toggle('btn-secondary', exStepsLecteur.actif);
+  }
+
+  exStepsBtn.addEventListener('click', () => {
+    enterExSteps();
+    document.getElementById('ex-steps-duree').value = String(animDuree());
+    majExStepsLecture();
+  });
+  document.getElementById('ex-steps-prev').addEventListener('click', () => {
+    exStepsLecteur.arreter();
+    if (exSteps) exStepsGoto(exSteps.ply - 1);
+  });
+  document.getElementById('ex-steps-next').addEventListener('click', () => {
+    exStepsLecteur.arreter();
+    if (exSteps) exStepsGoto(exSteps.ply + 1);
+  });
+  document.getElementById('ex-steps-lecture').addEventListener('click', () => exStepsLecteur.basculer());
+  document.getElementById('ex-steps-duree').addEventListener('change', (event) => {
+    localStorage.setItem(ANIM_DUREE_CLE, event.target.value);
+    exStepsLecteur.changerCadence();
+  });
   document.getElementById('ex-steps-quit').addEventListener('click', () => quitExSteps(true));
   document.getElementById('ex-steps-covered').addEventListener('change', (event) => {
     if (!exSteps) return;
@@ -4840,8 +4975,8 @@
   // Navigation au clavier dans la visionneuse
   document.addEventListener('keydown', (event) => {
     if (!exSteps) return;
-    if (event.key === 'ArrowRight') { exStepsGoto(exSteps.ply + 1); event.preventDefault(); }
-    else if (event.key === 'ArrowLeft') { exStepsGoto(exSteps.ply - 1); event.preventDefault(); }
+    if (event.key === 'ArrowRight') { exStepsLecteur.arreter(); exStepsGoto(exSteps.ply + 1); event.preventDefault(); }
+    else if (event.key === 'ArrowLeft') { exStepsLecteur.arreter(); exStepsGoto(exSteps.ply - 1); event.preventDefault(); }
     else if (event.key === 'Escape') { quitExSteps(true); }
   });
 
@@ -4872,6 +5007,9 @@
 
   function switchMode(next) {
     if (exSteps) quitExSteps(false);
+    // Aucune lecture automatique ne survit à un changement de mode
+    opLecteur.arreter();
+    pwLecteur.arreter();
     // Re-cliquer « Mes parties » depuis une relecture ramène à la liste
     if (next === 'games' && mode === 'games' && replay) {
       replay = null;

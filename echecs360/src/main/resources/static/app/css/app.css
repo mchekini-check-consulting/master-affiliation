@@ -829,6 +829,17 @@ button { font-family: inherit; }
    (le .btn global a flex: 1) — sauf les paires Précédent/Suivant */
 #pawns-panel .btn { flex: none; }
 #pawns-panel .op-nav .btn { flex: 1; }
+#pawns-panel .anim-row .btn { flex: 1; }
+
+/* Lecture automatique des visionneuses : bouton Lecture/Pause + cadence.
+   Placés au-dessus du commentaire pour que rien ne bouge à l'écran. */
+.anim-row { display: flex; gap: 8px; align-items: stretch; }
+.anim-row .btn { flex: 1; }
+.anim-duree {
+  flex: none; padding: 0 10px; border-radius: 10px;
+  border: 1.5px solid var(--line); background: #fff; color: var(--ink);
+  font-family: inherit; font-size: .84rem; font-weight: 700; cursor: pointer;
+}
 
 /* Surlignages des cases sur l'échiquier (vues des notions et structures) */
 .ov-pw-vert { background: rgba(46, 125, 91, .42); }
