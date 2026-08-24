@@ -1,0 +1,434 @@
+---
+// Onglet Quiz DevOps — QCM sur toutes les thématiques. On choisit un thème
+// (ou tout mélanger), les questions s'enchaînent avec explication à chaque
+// réponse, score final et meilleur score conservé en localStorage.
+import donnees from '../../data/devops/quiz.json';
+
+const themes = donnees.themes;
+const totalQuestions = themes.reduce((n, t) => n + t.questions.length, 0);
+---
+
+<div class="quiz" data-quiz={JSON.stringify(themes)}>
+  <div class="accueil-quiz" id="qz-accueil">
+    <p class="intro">
+      {totalQuestions} questions réparties sur {themes.length} thématiques.
+      Choisissez un thème — ou affrontez le mélange complet. Chaque réponse est
+      corrigée et expliquée immédiatement.
+    </p>
+    <div class="choix-themes">
+      <button class="carte-theme carte-theme--tout" data-theme="tout">
+        <strong>🎲 Tout mélanger</strong>
+        <span>{totalQuestions} questions, ordre aléatoire</span>
+        <span class="meilleur" data-meilleur="tout"></span>
+      </button>
+      {
+        themes.map((t) => (
+          <button class="carte-theme" data-theme={t.id}>
+            <strong>{t.titre}</strong>
+            <span>{t.questions.length} questions</span>
+            <span class="meilleur" data-meilleur={t.id} />
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="session" id="qz-session" hidden>
+    <div class="entete-session">
+      <button class="btn" id="qz-quitter">← Thèmes</button>
+      <p class="avancement" id="qz-avancement"></p>
+      <p class="score-session" id="qz-score"></p>
+    </div>
+    <div class="carte-question">
+      <p class="theme-question" id="qz-theme"></p>
+      <p class="question" id="qz-question"></p>
+      <div class="options" id="qz-options"></div>
+      <div class="explication" id="qz-explication" hidden></div>
+      <button class="btn btn--principal" id="qz-suivant" hidden>Question suivante →</button>
+    </div>
+  </div>
+
+  <div class="fin" id="qz-fin" hidden>
+    <p class="fin-titre" id="qz-fin-titre"></p>
+    <p class="fin-detail" id="qz-fin-detail"></p>
+    <div class="fin-actions">
+      <button class="btn btn--principal" id="qz-rejouer">↺ Rejouer</button>
+      <button class="btn" id="qz-retour">← Choisir un autre thème</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface QuestionQuiz {
+    question: string;
+    options: string[];
+    reponse: number;
+    explication: string;
+    theme: string;
+  }
+
+  const racine = document.querySelector<HTMLElement>('.quiz')!;
+  const themes: any[] = JSON.parse(racine.dataset.quiz!);
+  const CLE_SCORES = 'devops-quiz-meilleurs';
+
+  let file: QuestionQuiz[] = [];
+  let index = 0;
+  let score = 0;
+  let themeCourant = 'tout';
+
+  function lireScores(): Record<string, number> {
+    try {
+      return JSON.parse(localStorage.getItem(CLE_SCORES) || '{}');
+    } catch {
+      return {};
+    }
+  }
+
+  function majMeilleurs() {
+    const scores = lireScores();
+    document.querySelectorAll<HTMLElement>('.meilleur').forEach((e) => {
+      const cle = e.dataset.meilleur!;
+      e.textContent =
+        scores[cle] !== undefined ? `🏆 meilleur : ${scores[cle]} %` : '';
+    });
+  }
+
+  function melanger<T>(tab: T[]): T[] {
+    const c = [...tab];
+    for (let i = c.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [c[i], c[j]] = [c[j], c[i]];
+    }
+    return c;
+  }
+
+  function demarrer(themeId: string) {
+    themeCourant = themeId;
+    const source =
+      themeId === 'tout' ? themes : themes.filter((t) => t.id === themeId);
+    file = melanger(
+      source.flatMap((t: any) =>
+        t.questions.map((q: any) => ({ ...q, theme: t.titre }))
+      )
+    );
+    index = 0;
+    score = 0;
+    document.getElementById('qz-accueil')!.hidden = true;
+    document.getElementById('qz-fin')!.hidden = true;
+    document.getElementById('qz-session')!.hidden = false;
+    afficher();
+  }
+
+  function afficher() {
+    const q = file[index];
+    document.getElementById('qz-avancement')!.textContent =
+      `Question ${index + 1} / ${file.length}`;
+    document.getElementById('qz-theme')!.textContent = q.theme;
+    document.getElementById('qz-question')!.textContent = q.question;
+    document.getElementById('qz-score')!.textContent = `Score : ${score}`;
+    document.getElementById('qz-explication')!.hidden = true;
+    document.getElementById('qz-suivant')!.hidden = true;
+    const conteneur = document.getElementById('qz-options')!;
+    conteneur.innerHTML = '';
+    // Les options sont mélangées à l'affichage, on suit l'index d'origine
+    melanger(q.options.map((texte, i) => ({ texte, i }))).forEach((o) => {
+      const b = document.createElement('button');
+      b.className = 'option';
+      b.textContent = o.texte;
+      b.addEventListener('click', () => repondre(o.i, b));
+      conteneur.appendChild(b);
+    });
+  }
+
+  function repondre(choix: number, bouton: HTMLButtonElement) {
+    const q = file[index];
+    const ok = choix === q.reponse;
+    if (ok) score++;
+    document
+      .querySelectorAll<HTMLButtonElement>('.option')
+      .forEach((b) => {
+        b.disabled = true;
+        if (b.textContent === q.options[q.reponse])
+          b.classList.add('option--bonne');
+      });
+    if (!ok) bouton.classList.add('option--mauvaise');
+    const exp = document.getElementById('qz-explication')!;
+    exp.hidden = false;
+    exp.classList.toggle('explication--ok', ok);
+    exp.classList.toggle('explication--ko', !ok);
+    exp.innerHTML = `${ok ? '✅ Exact.' : '❌ Raté.'} ${q.explication}`;
+    document.getElementById('qz-score')!.textContent = `Score : ${score}`;
+    document.getElementById('qz-suivant')!.hidden = false;
+  }
+
+  function suivant() {
+    index++;
+    if (index < file.length) {
+      afficher();
+    } else {
+      terminer();
+    }
+  }
+
+  function terminer() {
+    document.getElementById('qz-session')!.hidden = true;
+    const fin = document.getElementById('qz-fin')!;
+    fin.hidden = false;
+    const pct = Math.round((score / file.length) * 100);
+    document.getElementById('qz-fin-titre')!.textContent =
+      `🏁 ${score} / ${file.length} — ${pct} %`;
+    document.getElementById('qz-fin-detail')!.textContent =
+      pct === 100
+        ? 'Sans faute. Prêt pour l’entretien.'
+        : pct >= 80
+          ? 'Solide ! Relisez les explications des questions ratées.'
+          : pct >= 50
+            ? 'Les bases sont là — repassez par l’onglet Thématiques sur les sujets faibles.'
+            : 'Revoyez les fiches de l’onglet Thématiques avant de retenter.';
+    const scores = lireScores();
+    if (pct > (scores[themeCourant] ?? -1)) {
+      scores[themeCourant] = pct;
+      localStorage.setItem(CLE_SCORES, JSON.stringify(scores));
+    }
+    majMeilleurs();
+  }
+
+  document
+    .querySelectorAll<HTMLButtonElement>('.carte-theme')
+    .forEach((b) => b.addEventListener('click', () => demarrer(b.dataset.theme!)));
+  document.getElementById('qz-suivant')!.addEventListener('click', suivant);
+  document.getElementById('qz-rejouer')!.addEventListener('click', () => demarrer(themeCourant));
+  document.getElementById('qz-retour')!.addEventListener('click', () => {
+    document.getElementById('qz-fin')!.hidden = true;
+    document.getElementById('qz-accueil')!.hidden = false;
+  });
+  document.getElementById('qz-quitter')!.addEventListener('click', () => {
+    document.getElementById('qz-session')!.hidden = true;
+    document.getElementById('qz-accueil')!.hidden = false;
+  });
+
+  majMeilleurs();
+</script>
+
+<style>
+  .intro {
+    max-width: 52rem;
+    color: var(--estompe);
+    margin: 0 0 1.25rem;
+  }
+
+  .choix-themes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .carte-theme {
+    display: grid;
+    gap: 0.25rem;
+    text-align: left;
+    padding: 0.9rem 1rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--f-display);
+    color: var(--encre);
+    transition:
+      border-color 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .carte-theme:hover {
+    border-color: var(--bic);
+    transform: translateY(-1px);
+  }
+
+  .carte-theme strong {
+    font-size: 0.9375rem;
+    font-weight: 750;
+  }
+
+  .carte-theme span {
+    font-size: 0.75rem;
+    color: var(--estompe);
+  }
+
+  .carte-theme--tout {
+    border-style: dashed;
+    border-color: var(--bic);
+  }
+
+  .meilleur {
+    color: var(--vert) !important;
+    font-weight: 700;
+  }
+
+  .entete-session {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .avancement {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--bic);
+    margin: 0;
+  }
+
+  .score-session {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--estompe);
+    margin: 0 0 0 auto;
+  }
+
+  .carte-question {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 1.25rem 1.4rem;
+    max-width: 46rem;
+  }
+
+  .theme-question {
+    font-family: var(--f-display);
+    font-size: 0.6875rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--estompe);
+    margin: 0 0 0.4rem;
+  }
+
+  .question {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    font-family: var(--f-display);
+    margin: 0 0 1rem;
+  }
+
+  .options {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  :global(.option) {
+    text-align: left;
+    font-family: var(--f-display);
+    font-size: 0.9063rem;
+    padding: 0.65rem 0.9rem;
+    border: 1.5px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    cursor: pointer;
+    transition: border-color 0.12s ease;
+  }
+
+  :global(.option:hover:not(:disabled)) {
+    border-color: var(--bic);
+  }
+
+  :global(.option:disabled) {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  :global(.option--bonne) {
+    background: var(--vert-doux) !important;
+    border-color: var(--vert) !important;
+    opacity: 1 !important;
+  }
+
+  :global(.option--mauvaise) {
+    background: var(--rouge-doux) !important;
+    border-color: var(--rouge) !important;
+    opacity: 1 !important;
+  }
+
+  .explication {
+    font-family: var(--f-display);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    border-radius: 8px;
+    padding: 0.7rem 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .explication--ok {
+    background: var(--vert-doux);
+    border: 1px solid color-mix(in srgb, var(--vert) 35%, transparent);
+  }
+
+  .explication--ko {
+    background: var(--rouge-doux);
+    border: 1px solid color-mix(in srgb, var(--rouge) 35%, transparent);
+  }
+
+  .btn {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 650;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    border-color: var(--bic);
+    color: var(--bic);
+  }
+
+  .btn--principal {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  .btn--principal:hover {
+    filter: brightness(1.12);
+    color: var(--blanc);
+  }
+
+  .fin {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 1.5rem 1.6rem;
+    max-width: 32rem;
+  }
+
+  .fin-titre {
+    font-family: var(--f-display);
+    font-size: 1.4rem;
+    font-weight: 780;
+    margin: 0 0 0.4rem;
+  }
+
+  .fin-detail {
+    color: var(--estompe);
+    margin: 0 0 1rem;
+  }
+
+  .fin-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 860px) {
+    .choix-themes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

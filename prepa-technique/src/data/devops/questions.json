@@ -1,0 +1,347 @@
+{
+  "source": "Questions d'entretien DevOps — par thématique, plus une section situationnelle tirée de cas réels.",
+  "sections": [
+    {
+      "id": "terraform",
+      "titre": "Terraform & IaC",
+      "questions": [
+        {
+          "q": "Qu'est-ce que l'Infrastructure as Code et pourquoi Terraform ?",
+          "r": "L'IaC décrit l'infrastructure dans des fichiers versionnés plutôt que par des clics dans une console : reproductible, revuable en merge request, auditables via l'historique Git. Terraform est déclaratif — je décris l'état cible, l'outil calcule le chemin — et multi-cloud via ses providers (AWS, Azure, Kubernetes, Datadog…). Le cycle : write → plan (diff entre l'état cible et le réel) → apply. Le bénéfice concret : un environnement complet se recrée à l'identique en minutes, et la revue du plan remplace le « ça devrait marcher »."
+        },
+        {
+          "q": "À quoi sert le state Terraform et comment le gérez-vous en équipe ?",
+          "r": "Le state est la cartographie entre le code et les ressources réelles (identifiants, attributs) : sans lui, Terraform ne sait pas ce qu'il gère déjà. En équipe, il va dans un backend distant — S3 avec verrouillage DynamoDB côté AWS, Azure Storage avec lease côté Azure — pour le partager et empêcher deux apply simultanés. Règles d'or : ne jamais l'éditer à la main (terraform state mv/rm pour les cas particuliers), le chiffrer au repos car il peut contenir des secrets, et un state par environnement pour qu'un incident de dev ne touche jamais la prod."
+        },
+        {
+          "q": "Le plan montre la destruction d'une ressource que vous n'attendiez pas. Que faites-vous ?",
+          "r": "Je n'applique pas — un plan se lit avant de s'appliquer, surtout les lignes destroy. Causes classiques : un renommage de ressource (Terraform voit delete + create → se corrige avec un bloc moved), un changement d'attribut immuable (force replacement), ou un drift créé à la main dans la console. Selon le cas : moved block, terraform import pour raccrocher l'existant, ou correction du code. En prévention : lifecycle prevent_destroy sur les ressources critiques (bases de données), et un pipeline où le plan est posté en merge request et validé par un humain avant apply."
+        },
+        {
+          "q": "Modules Terraform : pourquoi et quelles bonnes pratiques ?",
+          "r": "Un module encapsule un ensemble cohérent (un VPC, un cluster AKS, une base RDS) derrière des variables d'entrée et des outputs : on factorise les standards de l'équipe au lieu de copier-coller. Bonnes pratiques : les versionner (tags Git ou registry privé) et épingler la version chez les consommateurs, des interfaces petites et explicites, pas de sur-abstraction — un module qui expose 40 variables est une usine à gaz. Et documenter par l'exemple : chaque module a un répertoire examples/ qui sert aussi de test."
+        },
+        {
+          "q": "Comment gérez-vous plusieurs environnements (dev, recette, prod) ?",
+          "r": "Mon choix : un répertoire (ou une composition) par environnement avec son propre backend et un tfvars dédié, plutôt que les workspaces — l'isolement est physique, le blast radius limité, et les différences entre environnements sont visibles dans le code. Les modules partagés portent la logique commune ; les tfvars ne portent que les différences (tailles, réplicas, domaines). Le pipeline promeut la même version de module de dev vers prod — on ne teste pas un code différent de celui qu'on déploie."
+        },
+        {
+          "q": "Qu'est-ce que le drift et comment le traitez-vous ?",
+          "r": "Le drift, c'est quand la réalité diverge du code : quelqu'un a modifié une ressource à la console, un service a changé un attribut. Détection : un terraform plan planifié en CI (quotidien) qui alerte si le diff n'est pas vide. Traitement : soit la modification manuelle était légitime et je la rapatrie dans le code, soit elle ne l'était pas et l'apply la réconcilie. Le fond du sujet est organisationnel : si les gens modifient à la console, c'est que le passage par le code est trop lent — il faut fluidifier le pipeline, pas seulement corriger le drift."
+        }
+      ]
+    },
+    {
+      "id": "cicd",
+      "titre": "Pipelines CI/CD",
+      "questions": [
+        {
+          "q": "Décrivez un pipeline CI/CD complet pour un microservice conteneurisé.",
+          "r": "Côté CI, sur chaque merge request : compilation, tests unitaires, analyse statique (SonarQube), scan des dépendances, build de l'image Docker multi-stage, scan de l'image (Trivy), push vers le registry avec un tag immuable (SHA du commit). Côté CD : déploiement automatique en recette, tests d'intégration et e2e, puis promotion en prod — soit sur validation manuelle (continuous delivery), soit automatique si la confiance le permet (continuous deployment). En GitOps, le pipeline ne déploie pas directement : il met à jour le tag d'image dans le repo de manifestes, et ArgoCD synchronise."
+        },
+        {
+          "q": "Quelle différence entre continuous integration, delivery et deployment ?",
+          "r": "L'intégration continue : chaque commit est construit et testé automatiquement — le code est intégré en permanence, les conflits détectés tôt. La livraison continue : chaque version validée est déployable en prod à tout moment, mais le déclenchement reste une décision humaine. Le déploiement continu : la mise en prod elle-même est automatique dès que le pipeline est vert. Le passage de l'un à l'autre est une question de maturité des tests et de capacité de rollback, pas d'outillage."
+        },
+        {
+          "q": "Rolling update, blue/green, canary : comparez les stratégies de déploiement.",
+          "r": "Rolling : on remplace les instances progressivement — simple, natif Kubernetes, mais deux versions coexistent et le rollback prend du temps. Blue/green : deux environnements complets, on bascule le trafic d'un coup — rollback instantané (on rebascule), mais coût double et attention aux migrations de schéma qui doivent rester compatibles avec les deux versions. Canary : on envoie un petit pourcentage du trafic à la nouvelle version et on compare les métriques (erreurs, latence) avant d'élargir — le plus sûr pour détecter les régressions réelles, mais exige une bonne observabilité et un routage pondéré (Istio, ALB). Mon choix par défaut : rolling pour l'interne, canary pour ce qui porte du trafic client."
+        },
+        {
+          "q": "Comment sécurisez-vous un pipeline CI/CD ?",
+          "r": "Le pipeline est une cible de choix : il a les clés de la prod. Mes règles : jamais de secrets dans le repo ni dans les variables en clair — un gestionnaire (Vault, secrets du CI chiffrés) et de préférence de l'OIDC vers le cloud pour des jetons éphémères au lieu de clés longue durée ; moindre privilège des runners (celui qui build ne déploie pas en prod) ; scan systématique des dépendances et des images ; environnements protégés avec approbation pour la prod ; et signature des images (cosign) vérifiée à l'admission pour garantir que ce qui tourne vient bien du pipeline."
+        },
+        {
+          "q": "Le pipeline prend 40 minutes et l'équipe ne le supporte plus. Comment l'optimiser ?",
+          "r": "D'abord mesurer : la plupart des CI donnent le temps par étape — on attaque le plus long, pas ce qu'on suppose. Les leviers classiques : cache des dépendances et des layers Docker (build multi-stage bien ordonné), parallélisation des jobs indépendants (lint, tests, scan en même temps), tests ciblés sur le périmètre modifié avec la suite complète en nightly, runners plus costauds ou autoscalés, et images de base légères. Objectif raisonnable : moins de 10 minutes pour le retour sur une merge request — au-delà, les développeurs empilent les commits sans attendre le verdict et la CI perd son rôle."
+        }
+      ]
+    },
+    {
+      "id": "kubernetes",
+      "titre": "Kubernetes",
+      "questions": [
+        {
+          "q": "Décrivez l'architecture d'un cluster Kubernetes.",
+          "r": "Le control plane : l'API server (porte d'entrée unique, tout passe par lui), etcd (la base clé-valeur qui stocke tout l'état du cluster), le scheduler (choisit le nœud de chaque pod selon ressources et contraintes) et les controller managers (les boucles de réconciliation qui rapprochent l'état réel de l'état désiré). Sur chaque worker : le kubelet (démarre et surveille les conteneurs du nœud), kube-proxy (règles réseau des Services) et le container runtime (containerd). Le principe fondateur : tout est déclaratif — je poste un état désiré à l'API, les controllers convergent vers lui en continu."
+        },
+        {
+          "q": "Deployment, StatefulSet, DaemonSet : quand utiliser quoi ?",
+          "r": "Deployment : le cas général — des réplicas interchangeables et sans état (API, front), rolling update natif. StatefulSet : quand les pods ont une identité stable — nom prévisible (db-0, db-1), volume persistant attaché à chaque réplique, démarrage ordonné — typiquement bases de données, Kafka, Elasticsearch. DaemonSet : exactement un pod par nœud — agents de logs (Fluent Bit), node exporter, CNI. La question à se poser : si je tue ce pod et qu'un autre repart ailleurs avec un autre nom et un volume vide, est-ce grave ? Non → Deployment. Oui → StatefulSet."
+        },
+        {
+          "q": "Expliquez les types de Service et le rôle de l'Ingress.",
+          "r": "ClusterIP : une IP virtuelle stable joignable uniquement dans le cluster — le défaut pour le trafic interne. NodePort : expose un port sur chaque nœud — rarement utilisé seul. LoadBalancer : provisionne un load balancer du cloud (ALB, Azure LB) — une IP publique par service, ça coûte vite cher. L'Ingress mutualise : un seul point d'entrée L7 (nginx, traefik ou l'ALB controller) qui route par host et par chemin vers les Services, avec la terminaison TLS. En pratique : ClusterIP partout, un Ingress devant, et cert-manager pour les certificats."
+        },
+        {
+          "q": "Liveness, readiness, startup probes : quelle différence et quels effets ?",
+          "r": "La readiness dit « je peux recevoir du trafic » : si elle échoue, le pod est retiré des endpoints du Service — il n'est pas redémarré. La liveness dit « je suis vivant » : si elle échoue, le kubelet redémarre le conteneur. La startup couvre les démarrages lents : tant qu'elle n'a pas réussi, les deux autres sont suspendues. Erreur classique : une liveness qui teste une dépendance externe (la base de données) — la base tombe et Kubernetes redémarre toute la flotte en boucle, aggravant l'incident. La liveness ne doit tester que le processus lui-même."
+        },
+        {
+          "q": "Requests, limits, QoS : comment dimensionner et que se passe-t-il en cas de dépassement ?",
+          "r": "Les requests servent au scheduler (réservation pour le placement) ; les limits plafonnent la consommation réelle. Dépasser la limite mémoire → OOMKilled, net et immédiat. Le CPU au-delà de la limite → throttling, pas de kill, mais des latences dégradées sournoises. Les combinaisons donnent la classe QoS (Guaranteed, Burstable, BestEffort) qui décide qui est évincé en premier quand un nœud manque de ressources. Ma pratique : requests basées sur l'usage réel observé (VPA en mode recommandation), limite mémoire toujours posée, limite CPU discutée — beaucoup l'omettent pour éviter le throttling."
+        },
+        {
+          "q": "Un pod est en CrashLoopBackOff en production. Déroulez votre diagnostic.",
+          "r": "CrashLoopBackOff = le conteneur démarre, meurt, et Kubernetes espace les redémarrages. Ma séquence : kubectl describe pod pour l'exit code et les events (137 = OOMKilled, 1 = erreur applicative) ; kubectl logs --previous — le réflexe clé, ce sont les logs du conteneur mort, pas du courant ; puis selon la piste : liveness trop agressive au démarrage (→ startup probe), config ou secret manquant, migration de schéma qui échoue, image cassée. Je regarde aussi ce qui a changé : dernier déploiement, ConfigMap modifiée. Si c'est lié à une mise en prod récente, rollback d'abord, analyse ensuite."
+        },
+        {
+          "q": "Comment fonctionnent RBAC et les ServiceAccounts ?",
+          "r": "RBAC lie des identités à des permissions : un Role (dans un namespace) ou ClusterRole (global) définit des verbes sur des ressources (get pods, create deployments), et un RoleBinding l'attache à un utilisateur, un groupe ou un ServiceAccount. Les ServiceAccounts sont les identités des pods : chaque workload qui parle à l'API en a un, avec le strict nécessaire. Principe : moindre privilège partout — pas de cluster-admin pour les humains au quotidien, pas de ServiceAccount default avec des droits, et les identités cloud (IRSA sur EKS, Workload Identity sur AKS) plutôt que des clés en Secret."
+        },
+        {
+          "q": "Comment fonctionne l'autoscaling dans Kubernetes ?",
+          "r": "Trois niveaux. Le HPA ajuste le nombre de réplicas d'un Deployment selon des métriques — CPU/mémoire nativement, ou métriques métier via Prometheus Adapter, ou événements avec KEDA (taille d'une file, lag Kafka). Le VPA ajuste requests/limits d'un pod — je l'utilise surtout en mode recommandation. Le Cluster Autoscaler (ou Karpenter sur AWS) ajoute des nœuds quand des pods restent Pending faute de ressources, et en retire quand c'est vide. Les trois se combinent : HPA crée des pods, le Cluster Autoscaler crée les nœuds pour les héberger. Attention aux HPA sur des métriques instables : le yo-yo de réplicas est pire que le sur-provisionnement."
+        }
+      ]
+    },
+    {
+      "id": "argocd",
+      "titre": "Argo CD & GitOps",
+      "questions": [
+        {
+          "q": "Qu'est-ce que le GitOps et qu'apporte-t-il par rapport à un déploiement par pipeline classique ?",
+          "r": "En GitOps, Git est l'unique source de vérité de l'état désiré du cluster, et un agent dans le cluster (ArgoCD, Flux) tire les changements et converge — au lieu qu'un pipeline pousse avec des credentials de prod. Les bénéfices : plus de kubectl apply à la main donc plus de « qui a changé ça ? » — tout est tracé, revu en merge request ; le rollback est un git revert ; le drift est détecté et corrigeable automatiquement ; et la sécurité s'améliore — le cluster tire, personne n'a besoin d'un kubeconfig de prod dans la CI."
+        },
+        {
+          "q": "Comment fonctionne ArgoCD concrètement ?",
+          "r": "Une ressource Application pointe vers une source (repo Git, chart Helm, Kustomize) et une destination (cluster + namespace). ArgoCD compare en continu le rendu des manifestes avec l'état du cluster : Synced ou OutOfSync, plus un health status par ressource (un Deployment dont les réplicas ne sont pas prêts est Progressing ou Degraded). Options clés : automated sync (applique sans intervention), self-heal (réécrase toute modification manuelle du cluster), prune (supprime ce qui a disparu de Git — à activer en connaissance de cause). Les sync waves et hooks ordonnent les déploiements complexes (la migration avant l'application)."
+        },
+        {
+          "q": "App of apps, ApplicationSet : comment structurer ArgoCD à l'échelle ?",
+          "r": "L'app of apps : une Application racine qui déploie d'autres Applications — on bootstrap tout un cluster depuis un seul repo, et la liste des applications est elle-même du GitOps. L'ApplicationSet généralise avec des générateurs : un template d'Application décliné automatiquement par cluster, par environnement ou par répertoire du repo — indispensable en multi-cluster pour ne pas maintenir n copies. Structure type : un repo d'infra par cluster (opérateurs, ingress, monitoring) et les applications métier déclinées par environnement via ApplicationSet, avec des overlays Kustomize pour les différences."
+        },
+        {
+          "q": "Comment gérez-vous les secrets en GitOps, puisqu'on ne commite pas de secrets dans Git ?",
+          "r": "Trois approches. Sealed Secrets : le secret est chiffré avec la clé publique du cluster et committé chiffré — simple mais le déchiffrement est lié à un cluster. External Secrets Operator : Git ne contient qu'une référence (ExternalSecret) vers un coffre (Vault, AWS Secrets Manager, Azure Key Vault) et l'opérateur crée le Secret Kubernetes — ma préférence : rotation centralisée, audit, rien de sensible dans Git. SOPS : fichiers chiffrés par clé KMS, déchiffrés au rendu. Dans tous les cas la règle est la même : Git ne porte jamais un secret en clair, même dans l'historique."
+        }
+      ]
+    },
+    {
+      "id": "operateurs",
+      "titre": "Opérateurs Kubernetes",
+      "questions": [
+        {
+          "q": "Qu'est-ce qu'un opérateur Kubernetes ?",
+          "r": "Un opérateur = des CRD (Custom Resource Definitions) qui étendent l'API Kubernetes avec de nouveaux types métier, plus un controller qui exécute une boucle de réconciliation sur ces ressources : observer l'état réel, le comparer à l'état désiré déclaré dans la CR, agir pour converger. C'est la façon d'encoder du savoir-faire opérationnel dans le cluster : au lieu d'un runbook « comment opérer PostgreSQL », une ressource Cluster de CloudNativePG que l'opérateur sait créer, sauvegarder, basculer et mettre à jour. On pilote alors la base comme un Deployment : en YAML, via GitOps."
+        },
+        {
+          "q": "Donnez des exemples d'opérateurs que vous utilisez et ce qu'ils apportent.",
+          "r": "Prometheus Operator : les CRD ServiceMonitor et PrometheusRule permettent à chaque équipe de déclarer ses cibles de scrape et ses alertes à côté de son application — la configuration du monitoring devient du GitOps distribué. cert-manager : la CR Certificate obtient et renouvelle automatiquement les certificats (Let's Encrypt via ACME) — fini les certificats expirés. External Secrets Operator pour la synchronisation des coffres de secrets. Et les opérateurs de bases de données (CloudNativePG, Strimzi pour Kafka) qui gèrent réplication, sauvegardes et failover. Le point commun : de l'expertise opérationnelle industrialisée et déclarative."
+        },
+        {
+          "q": "Quand écrire son propre opérateur, et quand s'en passer ?",
+          "r": "Un opérateur se justifie quand il y a une vraie logique de réconciliation continue : réagir à l'état observé, orchestrer un cycle de vie complexe (failover, sauvegardes, montées de version d'un système stateful). Si le besoin est juste de templatiser du YAML avec des variantes, un chart Helm ou Kustomize suffit — beaucoup plus simple à maintenir. Écrire un opérateur (Kubebuilder, Operator SDK en Go) est un investissement de développement logiciel avec tests, versions et compatibilité d'API : à réserver aux cas où l'on opère la même chose complexe de nombreuses fois. Ma règle : chercher d'abord un opérateur communautaire mûr, écrire le sien en dernier recours."
+        }
+      ]
+    },
+    {
+      "id": "kyverno",
+      "titre": "Kyverno & policies",
+      "questions": [
+        {
+          "q": "À quoi sert Kyverno et comment fonctionne-t-il ?",
+          "r": "Kyverno est un moteur de policies pour Kubernetes : il s'enregistre comme admission webhook et intercepte les créations/modifications de ressources pour les valider, les muter ou générer des ressources associées. Sa force face à OPA/Gatekeeper : les policies s'écrivent en YAML avec la logique de match/exclude familière de Kubernetes, pas dans un langage dédié comme Rego — l'équipe plateforme et les développeurs peuvent les lire. Il fait aussi du scan en continu de l'existant (background scan) et produit des PolicyReports exploitables."
+        },
+        {
+          "q": "Quelles policies mettez-vous en place en priorité sur un cluster ?",
+          "r": "Le socle : interdire le tag :latest et exiger un tag immuable ; imposer requests/limits sur tout conteneur ; restreindre les registres d'images aux registres approuvés ; bloquer les conteneurs privilégiés et le root (en complément des Pod Security Standards) ; imposer les labels d'ownership (équipe, application) pour la facturation et l'alerting. En mutation : injecter automatiquement des defaults raisonnables. En génération : créer dans chaque nouveau namespace une NetworkPolicy default-deny et les quotas. C'est le contrat de la plateforme, appliqué mécaniquement plutôt que par la revue humaine."
+        },
+        {
+          "q": "Comment déployez-vous une nouvelle policy sans casser la production ?",
+          "r": "Jamais en enforce directement. D'abord en mode audit : la policy loggue les violations dans les PolicyReports sans rien bloquer — on mesure l'étendue réelle du non-conformisme. Ensuite on traite le stock avec les équipes concernées, on documente les exceptions légitimes (PolicyException ciblées, jamais des exclusions globales), et seulement quand le taux de violation est proche de zéro, on passe en enforce. L'enforce ne s'applique alors qu'aux nouvelles ressources — l'existant qui tourne n'est pas expulsé. Une policy qui bloque brutalement un déploiement d'urgence un vendredi soir détruit la confiance dans la plateforme."
+        }
+      ]
+    },
+    {
+      "id": "istio",
+      "titre": "Istio & service mesh",
+      "questions": [
+        {
+          "q": "Qu'est-ce qu'un service mesh et quels problèmes résout-il ?",
+          "r": "Un service mesh déplace les préoccupations réseau inter-services hors du code applicatif, dans une couche d'infrastructure : mTLS automatique entre tous les services (chiffrement + identité mutuelle), résilience (timeouts, retries, circuit breaking), routage fin (canary, mirroring, injection de fautes) et observabilité uniforme (métriques L7, traces) — sans modifier une ligne des applications. Avant le mesh, chaque équipe réimplémentait ça dans sa stack ; avec le mesh, c'est homogène et piloté par la plateforme. Le prix : de la complexité opérationnelle et un peu de latence par hop."
+        },
+        {
+          "q": "Décrivez l'architecture d'Istio, sidecar et ambient.",
+          "r": "Le plan de contrôle, istiod, distribue la configuration et les certificats. En mode sidecar, un proxy Envoy est injecté dans chaque pod et intercepte tout le trafic entrant/sortant — c'est lui qui applique mTLS, routage et télémétrie. Le mode ambient supprime les sidecars : un agent par nœud (ztunnel) porte le mTLS L4, et des waypoint proxies optionnels ajoutent les fonctions L7 par namespace — moins de ressources consommées, plus d'injection dans les pods, adoption progressive. Pour un nouveau cluster aujourd'hui, ambient simplifie beaucoup l'exploitation ; le sidecar reste le mode le plus éprouvé."
+        },
+        {
+          "q": "VirtualService, DestinationRule : comment faire un canary avec Istio ?",
+          "r": "La DestinationRule déclare les subsets (v1, v2, basés sur les labels des pods) et les politiques par destination : load balancing, pool de connexions, outlier detection (le circuit breaking). Le VirtualService définit le routage : je pondère 95 % vers v1 et 5 % vers v2, ou je route par header (les testeurs internes vers v2). Le canary : déployer v2, envoyer 5 % du trafic, comparer erreurs et latence p99 entre subsets dans Grafana/Kiali, puis augmenter progressivement — et automatisable avec Argo Rollouts ou Flagger qui pilotent la pondération selon les métriques et rollbackent seuls en cas de dégradation."
+        },
+        {
+          "q": "Quand déconseilleriez-vous Istio ?",
+          "r": "Quand le problème qu'il résout n'existe pas encore : une dizaine de microservices d'une seule équipe, pas d'exigence mTLS forte, pas de besoin de routage fin — le coût opérationnel (montées de version du mesh, debugging à travers les proxies, formation) dépasse le bénéfice. Des alternatives plus légères couvrent souvent le besoin réel : NetworkPolicies pour la segmentation, un ingress capable de canary, cert-manager pour le TLS. Le mesh se justifie à l'échelle : dizaines de services, plusieurs équipes, conformité exigeant le chiffrement partout. Commencer par le besoin, pas par l'outil."
+        }
+      ]
+    },
+    {
+      "id": "observabilite",
+      "titre": "Supervision, monitoring & alerting",
+      "questions": [
+        {
+          "q": "Monitoring et observabilité : quelle différence, et quels sont les trois piliers ?",
+          "r": "Le monitoring répond à des questions qu'on a prévues : des dashboards et des alertes sur des indicateurs connus. L'observabilité est la capacité à répondre aux questions qu'on n'avait pas prévues — comprendre un état interne inédit à partir des signaux émis. Les trois piliers : les métriques (séries temporelles agrégées — le quoi et le combien), les logs (le détail événementiel — le pourquoi), les traces (le parcours d'une requête à travers les services — le où). L'efficacité vient de leur corrélation : je vois le pic sur la métrique, je saute sur les traces lentes, j'ouvre les logs du span fautif — idéalement lié par les mêmes identifiants (OpenTelemetry)."
+        },
+        {
+          "q": "Comment fonctionne la stack Prometheus / Alertmanager / Grafana ?",
+          "r": "Prometheus fonctionne en pull : il scrape à intervalle régulier les endpoints /metrics des cibles, découvertes dynamiquement dans Kubernetes (via les ServiceMonitors du Prometheus Operator). Les métriques sont des séries temporelles avec des labels, interrogées en PromQL — rate() sur les counters, histogram_quantile() pour les percentiles. Les règles d'alerte évaluées en continu envoient à Alertmanager, qui déduplique, groupe, route vers les bons canaux (l'astreinte sur PagerDuty, le reste sur Slack), gère les silences et l'inhibition (le nœud est down → inutile d'alerter sur chacun de ses pods). Grafana visualise. Pour la longue rétention ou le multi-cluster : remote write vers Thanos ou Mimir."
+        },
+        {
+          "q": "SLI, SLO, error budget : expliquez et donnez un exemple concret.",
+          "r": "Le SLI est la mesure : « proportion de requêtes servies en moins de 300 ms avec un code non-5xx ». Le SLO est l'objectif sur cette mesure : 99,9 % sur 30 jours. L'error budget est le complément : 0,1 % d'échecs autorisés — environ 43 minutes par mois. Sa force est de rendre l'arbitrage explicite : tant qu'il reste du budget, on déploie et on prend des risques ; budget consommé, on gèle les features et on travaille la fiabilité — la dispute vitesse vs stabilité devient une règle chiffrée acceptée des deux côtés. Et on alerte sur la vitesse de consommation du budget (burn rate), pas sur chaque erreur isolée."
+        },
+        {
+          "q": "Comment concevez-vous un bon alerting ? L'équipe se plaint d'alertes incessantes.",
+          "r": "Une alerte qui réveille doit être actionnable, urgente et symptomatique : elle mesure la douleur utilisateur (taux d'erreur, latence — les golden signals), pas les causes internes (CPU à 80 % n'est pas un incident si personne ne souffre). Face à la fatigue d'alerte : inventaire des alertes du mois — chaque alerte qui n'a déclenché aucune action est supprimée ou reléguée en ticket ; les seuils passent sur des fenêtres et du burn rate plutôt que des valeurs instantanées ; chaque alerte restante porte un lien vers son runbook ; et une revue régulière en rétro. Une équipe qui ignore ses alertes n'a plus d'alerting du tout — le silence des alertes inutiles est ce qui rend audibles les vraies."
+        },
+        {
+          "q": "Quels dashboards construisez-vous, et pour qui ?",
+          "r": "Par audience, du haut vers le bas. Pour l'astreinte : un dashboard par service centré sur les golden signals (trafic, erreurs, latence p50/p99, saturation) avec les mêmes conventions partout — en incident, on ne doit pas apprendre à lire le dashboard. Pour l'équipe : les métriques métier et techniques détaillées (files, pools de connexions, GC). Pour le management : SLO et disponibilité, en langage résultat. Anti-patterns : le dashboard-musée de 60 panels que personne ne regarde, et les métriques sans propriétaire. Chaque dashboard doit répondre à une question précise ; sinon il meurt."
+        }
+      ]
+    },
+    {
+      "id": "logs",
+      "titre": "Centralisation des logs",
+      "questions": [
+        {
+          "q": "Pourquoi centraliser les logs et quelle architecture mettez-vous en place sur Kubernetes ?",
+          "r": "Parce que les pods sont éphémères : quand un conteneur meurt, ses logs meurent avec lui, et personne ne va faire kubectl logs sur 40 nœuds. L'architecture standard : les applications loggent sur stdout/stderr (jamais dans des fichiers), un agent en DaemonSet sur chaque nœud (Fluent Bit, Promtail, Vector) collecte, enrichit des métadonnées Kubernetes (namespace, pod, labels) et expédie vers le stockage central — Elasticsearch/OpenSearch pour la recherche full-text, ou Loki, plus économe, qui n'indexe que les labels et grep le contenu. Devant : Kibana ou Grafana, des durées de rétention par criticité, et l'archivage froid en S3."
+        },
+        {
+          "q": "Quelles bonnes pratiques imposez-vous sur les logs applicatifs ?",
+          "r": "Des logs structurés en JSON — un champ par information, parsables mécaniquement, plutôt que des phrases à regexer. Des niveaux utilisés avec discipline : ERROR = quelque chose à corriger, pas un warning décoratif. Un identifiant de corrélation propagé de bout en bout pour reconstituer le parcours d'une requête à travers les services — le même que celui des traces. Jamais de données personnelles ni de secrets dans les logs (RGPD : un email dans un log, c'est une donnée personnelle avec une obligation de rétention et d'effacement). Et un volume maîtrisé : le log de debug en boucle sur le chemin chaud coûte cher en ingestion et noie le signal."
+        },
+        {
+          "q": "Elasticsearch ou Loki : comment choisir ?",
+          "r": "Elasticsearch indexe tout le contenu : recherche full-text riche, agrégations puissantes — mais l'indexation coûte cher en CPU, RAM et stockage, et le cluster ES est lui-même un système distribué exigeant à opérer. Loki ne stocke qu'un index minimal de labels (namespace, app, niveau) et compresse le contenu en chunks sur du stockage objet : dix fois moins cher, trivial à opérer, requêtes LogQL dans Grafana à côté des métriques — mais le grep sur de très gros volumes sans bon label est lent. Mon défaut : Loki pour l'observabilité opérationnelle des équipes ; Elasticsearch quand il y a un vrai besoin de recherche analytique complexe ou du SIEM."
+        }
+      ]
+    },
+    {
+      "id": "cloud",
+      "titre": "Cloud AWS & Azure",
+      "questions": [
+        {
+          "q": "IaaS, PaaS, SaaS et responsabilité partagée : expliquez avec des exemples AWS et Azure.",
+          "r": "IaaS : le fournisseur gère le matériel, je gère l'OS et tout au-dessus — EC2, Azure Virtual Machines. PaaS : je ne gère que mon code et sa config — Elastic Beanstalk ou ECS Fargate, Azure App Service. SaaS : je consomme le logiciel — Microsoft 365. Le managé Kubernetes (EKS, AKS) est entre les deux : le control plane est géré, les nœuds restent souvent ma responsabilité. La responsabilité partagée : le cloud est responsable DE le cloud (datacenters, hyperviseurs), je suis responsable DANS le cloud — mes données, mes IAM, mes configurations. La plupart des incidents cloud ne sont pas des pannes du fournisseur mais des erreurs de configuration client : un bucket S3 public, un NSG trop ouvert."
+        },
+        {
+          "q": "Comment concevez-vous une architecture hautement disponible ? Donnez les mécanismes AWS et Azure.",
+          "r": "Le socle : une région contient plusieurs zones de disponibilité — des datacenters isolés (alimentation, réseau) à faible latence entre eux. La HA de base = étaler sur plusieurs AZ : sur AWS, un ALB devant un Auto Scaling Group multi-AZ et RDS Multi-AZ avec failover automatique ; sur Azure, un Load Balancer ou Application Gateway zone-redundant devant un VM Scale Set réparti sur les zones, et Azure SQL zone-redondant. Le multi-région est un cran au-dessus — pour le DR ou les exigences extrêmes — avec bascule DNS (Route 53 / Traffic Manager) et réplication des données. Les chiffres qui cadrent tout : RTO (durée d'interruption admissible) et RPO (perte de données admissible) — c'est le métier qui les fixe, et ils déterminent le coût."
+        },
+        {
+          "q": "Citez les équivalences de services entre AWS et Azure.",
+          "r": "Compute : EC2 ↔ Virtual Machines ; Lambda ↔ Azure Functions ; EKS ↔ AKS ; ECS/Fargate ↔ Container Apps. Stockage : S3 ↔ Blob Storage ; EBS ↔ Managed Disks ; EFS ↔ Azure Files. Données : RDS ↔ Azure SQL / Database for PostgreSQL ; DynamoDB ↔ Cosmos DB ; ElastiCache ↔ Azure Cache for Redis. Réseau : VPC ↔ VNet ; Security Group ↔ NSG ; Route 53 ↔ Azure DNS ; CloudFront ↔ Front Door/CDN. Identité et gouvernance : IAM ↔ Entra ID + Azure RBAC ; CloudTrail ↔ Activity Log ; CloudWatch ↔ Azure Monitor ; Secrets Manager ↔ Key Vault ; SQS/SNS ↔ Service Bus / Event Grid. La logique se transpose bien — les pièges sont dans les détails : le modèle IAM d'AWS (policies JSON sur ressources) diffère du RBAC hiérarchique d'Azure (management groups → subscriptions → resource groups)."
+        },
+        {
+          "q": "Comment sécurisez-vous l'accès des workloads au cloud, sans clés statiques ?",
+          "r": "Le principe : des identités de workload et des jetons éphémères plutôt que des access keys stockées quelque part. Sur AWS : IRSA (IAM Roles for Service Accounts) sur EKS — le pod assume un rôle IAM via OIDC, permissions au pod près. Sur Azure : Workload Identity sur AKS avec les Managed Identities. Même logique pour la CI : GitHub Actions ou GitLab CI fédérés en OIDC vers le cloud — plus aucune clé longue durée dans les variables du CI. Ce qui reste : moindre privilège sur chaque rôle, rotation automatique de ce qui doit rester statique (via Secrets Manager / Key Vault), et l'audit (CloudTrail, Activity Log) branché sur l'alerting."
+        },
+        {
+          "q": "La facture cloud a triplé en trois mois. Quelle démarche FinOps ?",
+          "r": "D'abord la visibilité : Cost Explorer / Azure Cost Management, ventilation par service et par tag — si le tagging (équipe, application, environnement) n'existe pas, c'est le premier chantier, imposé par policy. Ensuite les quick wins classiques : environnements de dev qui tournent la nuit et le week-end (scheduling), instances sur-dimensionnées (rightsizing sur l'usage réel), volumes et IP orphelins, NAT Gateway et egress inter-AZ mal placés, logs ingérés en masse, snapshots éternels. Puis l'engagement : Savings Plans / Reserved Instances sur la base stable, spot pour le tolérant aux interruptions. Et pour durer : budgets avec alertes, coût par équipe visible, revue mensuelle — le FinOps est un process, pas un one-shot."
+        }
+      ]
+    },
+    {
+      "id": "ansible",
+      "titre": "Ansible",
+      "questions": [
+        {
+          "q": "Qu'est-ce qu'Ansible et comment fonctionne-t-il ?",
+          "r": "Ansible est un outil de gestion de configuration agentless : pas de démon à installer sur les cibles, il se connecte en SSH (WinRM pour Windows) et exécute des modules Python. L'inventaire liste les hôtes et leurs groupes (statique en INI/YAML, ou dynamique depuis le cloud) ; les playbooks YAML décrivent les tâches à appliquer ; les variables se superposent par groupe, hôte et environnement ; les handlers réagissent aux changements (redémarrer nginx seulement si la conf a changé) ; les templates Jinja2 génèrent les fichiers de configuration. Les rôles structurent le tout en unités réutilisables, partageables via Galaxy, et Ansible Vault chiffre les secrets dans le repo."
+        },
+        {
+          "q": "Pourquoi l'idempotence est-elle centrale dans Ansible ?",
+          "r": "Un playbook idempotent peut être rejoué sans risque : chaque module vérifie l'état avant d'agir et ne rapporte changed que s'il a réellement modifié quelque chose — le paquet est déjà installé, la ligne déjà présente, rien ne bouge. C'est ce qui permet d'exécuter la configuration en continu ou après chaque changement sans craindre les effets de bord. L'ennemi : les modules shell et command, qui exécutent aveuglément à chaque passage — quand ils sont inévitables, on les encadre (creates:, changed_when, when) pour restaurer l'idempotence. Un run entièrement vert avec zéro changed est la preuve que l'infrastructure est conforme à la configuration."
+        },
+        {
+          "q": "Ansible ou Terraform ? Comment les articulez-vous ?",
+          "r": "Ce ne sont pas des concurrents : Terraform provisionne l'infrastructure (créer la VM, le réseau, le load balancer — il excelle sur le cycle de vie via son state), Ansible configure ce qui tourne dessus (paquets, fichiers, services, durcissement — sans state, en convergence). Le pattern classique : Terraform crée les machines et alimente un inventaire dynamique, Ansible les configure derrière. Sur un monde 100 % Kubernetes, Ansible recule — l'image Docker et les manifestes prennent le rôle de la configuration — mais il reste précieux pour le legacy VM, le réseau, et tout ce qui n'est pas conteneurisable."
+        },
+        {
+          "q": "Comment testez-vous et fiabilisez-vous vos playbooks ?",
+          "r": "Plusieurs niveaux : ansible-lint en CI pour les mauvaises pratiques, la syntaxe et les dépréciations ; --check --diff (dry-run) pour prévisualiser sur un environnement réel ; Molecule pour tester les rôles dans des conteneurs éphémères — on vérifie la convergence et surtout l'idempotence (le deuxième run doit être zéro changed). Côté organisation : les rôles versionnés, un environnement de recette configuré avant la prod par le même code, et l'exécution par la CI (ou AWX/Ansible Automation Platform) plutôt que depuis le poste d'un admin — pour la traçabilité et la reproductibilité."
+        }
+      ]
+    },
+    {
+      "id": "ia",
+      "titre": "IA, LLM & MLOps",
+      "questions": [
+        {
+          "q": "Tokens, fenêtre de contexte : expliquez et donnez les impacts pratiques.",
+          "r": "Un LLM ne lit pas des mots mais des tokens — des fragments de texte (~4 caractères en moyenne, un mot français fait souvent 2-3 tokens). La fenêtre de contexte est le nombre maximal de tokens que le modèle peut traiter en une fois : prompt système + historique + documents + réponse, tout compte. Impacts concrets : la facturation est au token (entrée et sortie, l'entrée cachée coûtant moins cher avec le prompt caching), la latence croît avec la taille du contexte, et ce qui dépasse est tronqué — d'où les stratégies de résumé d'historique et de sélection des documents pertinents plutôt que « tout mettre dans le prompt »."
+        },
+        {
+          "q": "Qu'est-ce que le RAG et pourquoi le préférer au fine-tuning pour la connaissance métier ?",
+          "r": "Le RAG (Retrieval-Augmented Generation) : au lieu d'espérer que le modèle connaisse nos données, on les lui fournit au moment de la question. Pipeline : les documents sont découpés en chunks, transformés en embeddings (vecteurs sémantiques), stockés dans une base vectorielle (pgvector, Qdrant, Pinecone) ; à chaque question, on récupère les passages les plus proches sémantiquement et on les injecte dans le prompt avec l'instruction de répondre à partir d'eux. Avantages sur le fine-tuning pour la connaissance : données à jour en réindexant (pas de réentraînement), réponses sourçables (on cite les passages), gestion des droits d'accès au retrieval, et coût bien moindre. Les points durs : la qualité du chunking et du retrieval — un RAG qui récupère mal hallucine avec assurance."
+        },
+        {
+          "q": "Quand le fine-tuning se justifie-t-il, et quelles alternatives d'abord ?",
+          "r": "L'escalade raisonnable : d'abord le prompt engineering (instructions, exemples few-shot) — couvre énormément de cas pour un coût nul ; puis le RAG si le problème est l'accès à des connaissances ; le fine-tuning en dernier, quand il s'agit de comportement plutôt que de connaissance — imposer un style ou un format de sortie très spécifique, spécialiser sur une tâche étroite répétitive, distiller vers un petit modèle moins cher. Ses contraintes : un jeu de données d'entraînement de qualité (le vrai coût), le réentraînement à chaque évolution, le risque d'oubli catastrophique, et l'évaluation à outiller. En pratique, LoRA/QLoRA — n'entraîner que de petites matrices adaptatrices — a rendu ça abordable, mais la question « ai-je vraiment épuisé prompt + RAG ? » reste le bon filtre."
+        },
+        {
+          "q": "Qu'est-ce que le MCP (Model Context Protocol) ?",
+          "r": "Le MCP est un protocole ouvert (initié par Anthropic) qui standardise la façon dont une application LLM accède à des capacités externes : un serveur MCP expose des tools (actions appelables), des resources (données lisibles) et des prompts, et n'importe quel client compatible (Claude, IDE, agent maison) peut les consommer — c'est l'équivalent de ce qu'a été le connecteur standard pour les intégrations : au lieu d'écrire une intégration par couple outil×application, on écrit un serveur MCP par outil, réutilisable partout. Concrètement : un serveur MCP GitHub, un pour la base PostgreSQL, un pour le monitoring — et l'agent les découvre et les appelle de manière uniforme. Pour un DevOps, c'est aussi un nouveau composant à déployer, authentifier et superviser."
+        },
+        {
+          "q": "LangChain vs LangGraph : que font-ils, et quand passer de l'un à l'autre ?",
+          "r": "LangChain est la boîte à outils d'intégration LLM : abstractions communes sur les modèles, loaders de documents, text splitters, bases vectorielles, chaînes prédéfinies (le pipeline RAG standard en quelques lignes). Sa limite : les chaînes sont des enchaînements essentiellement linéaires. LangGraph modélise l'application comme un graphe à état : des nœuds (appels LLM, outils, fonctions), des arêtes conditionnelles, des boucles — l'agent peut réessayer, choisir une branche, revenir en arrière — plus des checkpoints qui persistent l'état (reprise, time travel) et des points d'interruption human-in-the-loop pour valider une action sensible avant exécution. En pratique : LangChain pour un RAG ou une chaîne simple ; LangGraph dès qu'il y a un vrai workflow agentique — multi-étapes, décisions, validation humaine."
+        },
+        {
+          "q": "Qu'est-ce que le MLOps, et qu'est-ce qui change par rapport au DevOps classique ?",
+          "r": "Le MLOps applique les principes DevOps au cycle de vie des modèles : versionner, tester, déployer, superviser — mais avec une différence de fond : le comportement ne dépend pas que du code, il dépend des données. Il faut donc versionner aussi les datasets et les features, tracer les expériences (MLflow), promouvoir les modèles via un registry avec évaluation avant déploiement, et surtout monitorer en production le drift : les données réelles s'éloignent des données d'entraînement et la performance se dégrade silencieusement — sans erreur 500, le service répond, juste de plus en plus mal. D'où des métriques de qualité prédictive en prod, des seuils de réentraînement, et des pipelines de réentraînement automatisés. Pour les LLM s'ajoutent l'évaluation (LLM-as-judge, jeux de tests de prompts), le suivi des coûts par token et les garde-fous (prompt injection, fuite de données)."
+        }
+      ]
+    },
+    {
+      "id": "situationnel",
+      "titre": "Situationnel — cas réels",
+      "questions": [
+        {
+          "q": "Vendredi 17 h, un déploiement passe et la prod tombe. Que faites-vous, dans quel ordre ?",
+          "r": "Un : rollback immédiat — en GitOps, revert du commit et sync ; on ne débogue pas à chaud une prod down quand une version saine existe. Deux : vérifier le retour à la normale sur les golden signals, pas seulement « le pod est Running ». Trois : communiquer — statut aux parties prenantes, heure de début, impact estimé, même bref. Quatre : figer les éléments pour l'analyse (logs, métriques, diff du déploiement) tant qu'ils sont chauds. Cinq : le post-mortem la semaine suivante, sans blâme, centré sur les causes systémiques — pourquoi le pipeline a laissé passer, quel test ou quelle métrique canary aurait détecté — avec des actions concrètes. Et la question d'hygiène : fallait-il déployer un vendredi 17 h sans nécessité ?"
+        },
+        {
+          "q": "Astreinte, 3 h du matin : le disque de Prometheus est plein et la supervision est aveugle. Réaction ?",
+          "r": "D'abord restaurer la vue : augmenter le volume si le stockage le permet (PVC extensible), sinon réduire temporairement la rétention et redémarrer — perdre quelques jours d'historique est acceptable, être aveugle sur le présent ne l'est pas. Le lendemain, la vraie cause : presque toujours une explosion de cardinalité — une métrique avec un label à forte variabilité (un ID de requête, un pod name dans une métrique custom) qui démultiplie les séries. Diagnostic via les métriques internes de Prometheus (topk sur le nombre de séries par métrique), correction à la source ou relabeling pour dropper le label fautif. En prévention : une alerte sur la croissance du nombre de séries et sur la prévision de remplissage du disque (predict_linear) — l'ironie d'un Prometheus qui ne se surveille pas lui-même."
+        },
+        {
+          "q": "terraform plan en prod affiche « destroy » sur la base de données. L'apply est prévu dans le pipeline. Que faites-vous ?",
+          "r": "Je bloque l'apply — un destroy sur une ressource stateful ne s'applique jamais sans comprendre. Analyse du plan : si c'est un renommage de ressource dans le code, Terraform voit une suppression plus une création — le bloc moved règle ça proprement sans toucher à la ressource ; si c'est un changement d'attribut immuable qui force le remplacement, on cherche le chemin sans interruption (souvent : nouvelle ressource, migration des données, bascule) ; si la ressource a été modifiée hors Terraform, un import ou une correction du code réconcilie. Ensuite, les protections qui auraient dû exister : lifecycle prevent_destroy sur toutes les données persistantes, et la revue humaine du plan obligatoire avant apply en prod — le plan posté dans la merge request, pas appliqué en aveugle."
+        },
+        {
+          "q": "Une access key AWS se retrouve dans un repo Git public. Déroulez la réponse à incident.",
+          "r": "La minute zéro : révoquer la clé immédiatement — désactiver puis supprimer dans IAM ; toute autre action attend. Ensuite l'évaluation : CloudTrail sur la période d'exposition — la clé a-t-elle été utilisée, depuis quelles IP, quelles actions ? Les bots scannent GitHub en continu : une clé publique est compromise en minutes. Si usage malveillant : périmètre étendu (ressources créées — le minage de crypto est le classique —, données accédées), rotation de tout ce que la clé permettait d'atteindre, déclaration selon la politique de sécurité. Nettoyer l'historique Git (BFG) sans se faire d'illusion — c'est déjà copié. En prévention : scan de secrets en pre-commit et dans la CI (gitleaks), et surtout supprimer le besoin de clés statiques — OIDC pour la CI, rôles et identités de workload partout où c'est possible."
+        },
+        {
+          "q": "La latence p99 se dégrade après la montée de version d'un microservice, mais tous les pods sont verts. Comment investiguez-vous ?",
+          "r": "« Pods verts » veut juste dire que les probes passent — la santé réelle se lit dans les golden signals. D'abord confirmer et cadrer : la dégradation coïncide-t-elle exactement avec le déploiement, touche-t-elle tous les endpoints ou un seul ? Puis les traces : comparer le p99 par span entre les deux versions — le temps part-il dans l'appel base de données, un appel externe, le service lui-même ? Les suspects récurrents : une requête N+1 introduite par la nouvelle version, un pool de connexions réduit, un cache qui ne prend plus, du throttling CPU (limites trop justes pour le nouveau profil de charge), un changement de sérialisation. Si l'impact client est réel, rollback pendant l'analyse — et la leçon : un canary comparant les latences par version aurait bloqué la promotion automatiquement."
+        },
+        {
+          "q": "Dimanche : le certificat TLS du site principal a expiré. Personne ne l'a vu venir. Actions ?",
+          "r": "Court terme : renouveler et redéployer — avec Let's Encrypt/ACME c'est l'affaire de minutes ; vérifier ensuite toute la chaîne (le certificat servi, pas seulement le secret mis à jour — les ingress peuvent cacher l'ancien). Puis la question de fond : pourquoi un renouvellement manuel existait-il encore ? La réponse durable : cert-manager qui renouvelle automatiquement (à deux tiers de vie) toutes les ressources Certificate, et pour ce qui reste hors cluster, de l'automatisation ACME équivalente. Et le filet : une métrique d'expiration exposée (cert-manager l'expose nativement, ou un blackbox exporter qui sonde les endpoints publics) avec alerte à 15 jours — l'expiration d'un certificat est l'incident le plus évitable qui existe."
+        },
+        {
+          "q": "Des pods restent en Pending, les développeurs disent « le cluster est plein ». Vraiment plein ?",
+          "r": "Vérifier d'abord pourquoi Pending : kubectl describe pod donne la raison exacte — insufficient CPU/memory, mais parfois un nodeSelector qui ne matche rien, un taint sans toleration, un PVC non provisionnable ou un quota de namespace atteint. Si c'est bien les ressources : le cluster est souvent plein de réservations, pas d'usage — comparer les requests allouées à la consommation réelle ; des requests à 2 CPU pour un usage de 200m gaspillent 90 % du cluster. Actions : rightsizing des requests sur l'usage observé (recommandations VPA), quotas par namespace pour responsabiliser, et le Cluster Autoscaler (ou Karpenter) pour absorber les vrais pics. Ajouter des nœuds à un cluster mal dimensionné, c'est payer le gaspillage au lieu de le corriger."
+        },
+        {
+          "q": "On vous demande de migrer une application legacy sur VM vers Kubernetes. Comment abordez-vous le sujet ?",
+          "r": "D'abord challenger l'objectif : Kubernetes n'est pas une fin en soi — si l'application est un monolithe stable qui ne déploie que quatre fois par an, une VM bien automatisée (Terraform + Ansible) est peut-être la bonne réponse, et je le dis. Si la migration a du sens (fréquence de déploiement, scalabilité, mutualisation), l'audit d'éligibilité : état local (sessions, fichiers) à externaliser, arrêt propre sur SIGTERM, configuration par variables d'environnement, logs sur stdout, licences liées à la machine. Puis le chemin progressif : conteneuriser et faire tourner l'image en local/CI d'abord, déployer en recette avec la même charge, migrer le trafic progressivement (DNS pondéré ou reverse proxy), garder la VM en secours le temps de valider. Le piège classique : le lift-and-shift d'une application non préparée — on hérite des inconvénients des deux mondes."
+        },
+        {
+          "q": "L'astreinte reçoit 40 alertes par nuit et a cessé de les lire. Comment reprenez-vous la situation en main ?",
+          "r": "C'est l'incident le plus grave de la liste : un alerting ignoré équivaut à pas d'alerting. La démarche : extraire l'historique d'un mois et classer chaque alerte — a-t-elle déclenché une action ? Celles qui n'en déclenchent jamais sont supprimées ou déclassées en ticket asynchrone ; les alertes de cause (CPU élevé, pod restarté) sont remplacées par des alertes de symptôme (taux d'erreur, latence, burn rate du SLO) ; les seuils passent sur des fenêtres de temps ; les alertes redondantes sont regroupées et inhibées (Alertmanager). Chaque alerte survivante gagne un runbook et un propriétaire. Puis la discipline : toute nouvelle alerte justifie son caractère actionnable, et la revue mensuelle élague. L'objectif chiffrable : moins de cinq réveils par semaine, et chacun légitime."
+        },
+        {
+          "q": "Le métier veut « mettre de l'IA » dans le produit. On vous demande l'architecture d'un assistant qui répond sur la documentation interne. Que proposez-vous ?",
+          "r": "Un RAG, pas un fine-tuning : la documentation évolue et il faut des réponses sourcées. Architecture : ingestion des documents (chunking par section, métadonnées de droits d'accès), embeddings dans une base vectorielle (pgvector si on a déjà PostgreSQL — un composant de moins), API de retrieval qui filtre selon les droits de l'utilisateur avant la recherche, appel au LLM avec les passages récupérés et l'instruction de citer ses sources, et le front. Côté DevOps, ce qui fait la différence en prod : l'évaluation continue (un jeu de questions-réponses de référence rejoué à chaque changement de prompt ou de modèle), l'observabilité (latence, coût par requête en tokens, taux de « je ne sais pas »), les garde-fous (prompt injection via les documents, fuite de données entre utilisateurs), et le versionnage des prompts comme du code — revus, testés, rollbackables. Commencer par un périmètre de documentation restreint, mesurer, élargir."
+        }
+      ]
+    }
+  ]
+}

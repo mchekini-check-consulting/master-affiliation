@@ -1,0 +1,916 @@
+---
+// Onglet Thématiques — les fiches DevOps par sujet, avec un sélecteur de
+// thème. Chaque thème : concepts clés, tableaux de synthèse et exemples.
+const themes = [
+  { id: 'terraform', label: 'Terraform' },
+  { id: 'cicd', label: 'CI/CD' },
+  { id: 'kubernetes', label: 'Kubernetes' },
+  { id: 'argocd', label: 'Argo CD' },
+  { id: 'operateurs', label: 'Opérateurs' },
+  { id: 'kyverno', label: 'Kyverno' },
+  { id: 'istio', label: 'Istio' },
+  { id: 'observabilite', label: 'Observabilité' },
+  { id: 'logs', label: 'Logs' },
+  { id: 'cloud', label: 'Cloud AWS / Azure' },
+  { id: 'ansible', label: 'Ansible' },
+  { id: 'ia', label: 'IA & MLOps' },
+];
+
+const equivalences = [
+  ['Machines virtuelles', 'EC2', 'Virtual Machines'],
+  ['Kubernetes managé', 'EKS', 'AKS'],
+  ['Conteneurs serverless', 'ECS Fargate', 'Container Apps'],
+  ['Fonctions serverless', 'Lambda', 'Azure Functions'],
+  ['Stockage objet', 'S3', 'Blob Storage'],
+  ['Disques (blocs)', 'EBS', 'Managed Disks'],
+  ['Fichiers partagés', 'EFS', 'Azure Files'],
+  ['Base relationnelle managée', 'RDS / Aurora', 'Azure SQL, DB for PostgreSQL'],
+  ['NoSQL managé', 'DynamoDB', 'Cosmos DB'],
+  ['Cache mémoire', 'ElastiCache', 'Azure Cache for Redis'],
+  ['Réseau privé', 'VPC', 'VNet'],
+  ['Pare-feu de niveau instance', 'Security Group', 'NSG'],
+  ['DNS', 'Route 53', 'Azure DNS + Traffic Manager'],
+  ['CDN / entrée globale', 'CloudFront', 'Front Door / CDN'],
+  ['Identité & accès', 'IAM', 'Entra ID + Azure RBAC'],
+  ['Secrets', 'Secrets Manager', 'Key Vault'],
+  ['Files & événements', 'SQS / SNS / EventBridge', 'Service Bus / Event Grid'],
+  ['Monitoring natif', 'CloudWatch', 'Azure Monitor'],
+  ['Audit des actions', 'CloudTrail', 'Activity Log'],
+  ['Coûts', 'Cost Explorer', 'Cost Management'],
+];
+
+const ressourcesKube = [
+  ['Pod', "L'unité de base : un ou plusieurs conteneurs qui partagent réseau et stockage", 'Rarement créé seul'],
+  ['Deployment', 'Réplicas sans état + rolling update', 'API, front, workers'],
+  ['StatefulSet', 'Identité stable : nom, volume dédié, ordre de démarrage', 'Bases de données, Kafka'],
+  ['DaemonSet', 'Un pod par nœud', 'Agents de logs, node exporter'],
+  ['Job / CronJob', 'Tâche à exécution unique / planifiée', 'Migrations, batchs, sauvegardes'],
+  ['Service', 'IP stable + load balancing vers des pods (ClusterIP, NodePort, LoadBalancer)', 'Tout trafic interne'],
+  ['Ingress', 'Routage HTTP L7 (host, chemin) + TLS, mutualisé', "Point d'entrée du cluster"],
+  ['ConfigMap / Secret', 'Configuration / données sensibles injectées en env ou fichiers', 'Config applicative'],
+  ['PV / PVC', 'Stockage persistant : le volume et la demande de volume', 'Données des StatefulSets'],
+  ['HPA', 'Autoscaling horizontal des réplicas sur métriques', 'Absorber la charge'],
+  ['NetworkPolicy', 'Pare-feu L3/L4 entre pods (default-deny recommandé)', 'Segmentation'],
+  ['Namespace + RBAC', 'Isolation logique + permissions (Role, RoleBinding, ServiceAccount)', 'Multi-équipes'],
+];
+
+const strategiesDeploiement = [
+  ['Rolling update', 'Remplacement progressif des instances', 'Simple, natif K8s, sans surcoût', 'Deux versions coexistent, rollback lent'],
+  ['Blue / green', 'Deux environnements complets, bascule du trafic', 'Rollback instantané, test du green à froid', 'Coût double, schémas BDD compatibles requis'],
+  ['Canary', 'Petit % du trafic sur la nouvelle version, comparaison des métriques', 'Détecte les régressions réelles, extension progressive', 'Exige observabilité et routage pondéré'],
+];
+---
+
+<div class="themes">
+  <nav class="selecteur" aria-label="Choisir une thématique">
+    {
+      themes.map((t, i) => (
+        <button
+          class={`theme-chip${i === 0 ? ' theme-chip--actif' : ''}`}
+          data-theme={t.id}
+        >
+          {t.label}
+        </button>
+      ))
+    }
+  </nav>
+
+  <!-- ================= TERRAFORM ================= -->
+  <section class="theme" data-theme="terraform">
+    <h2>Terraform & Infrastructure as Code</h2>
+    <div class="carte">
+      <h3>Le principe</h3>
+      <p>
+        L'infrastructure est décrite dans des fichiers <strong>déclaratifs</strong>
+        (HCL) versionnés dans Git : on décrit l'état cible, Terraform calcule le
+        chemin. Multi-cloud via les <strong>providers</strong> (AWS, Azure,
+        Kubernetes, Datadog…). Le cycle :
+      </p>
+      <div class="frise">
+        <span>write<br /><em>code HCL revu en MR</em></span>
+        <span>plan<br /><em>diff cible vs réel — aucune modification</em></span>
+        <span>apply<br /><em>convergence vers l'état cible</em></span>
+      </div>
+      <pre><code>resource "aws_s3_bucket" "sauvegardes" &#123;
+  bucket = "backups-prod"
+  tags   = &#123; equipe = "plateforme", env = "prod" &#125;
+
+  lifecycle &#123; prevent_destroy = true &#125;   # filet de sécurité
+&#125;</code></pre>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Le state — le concept n° 1</h3>
+        <ul>
+          <li>Cartographie entre le code et les ressources réelles (IDs, attributs)</li>
+          <li><strong>Backend distant</strong> en équipe : S3 + lock DynamoDB, ou Azure Storage + lease — partage et verrouillage des apply concurrents</li>
+          <li>Peut contenir des secrets → chiffré au repos, accès restreint</li>
+          <li>Jamais édité à la main — <code>terraform state mv/rm</code>, <code>import</code>, blocs <code>moved</code></li>
+          <li>Un state <strong>par environnement</strong> : le blast radius de dev ne touche pas la prod</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>Drift, modules, environnements</h3>
+        <ul>
+          <li><strong>Drift</strong> : la réalité diverge du code (modif console). Détection : plan planifié en CI ; correction : rapatrier dans le code ou réappliquer</li>
+          <li><strong>Modules</strong> : encapsuler un ensemble cohérent (VPC, cluster) derrière des variables — versionnés, interfaces petites, un répertoire <code>examples/</code></li>
+          <li><strong>Environnements</strong> : un répertoire + backend + tfvars par env, modules partagés — plutôt que les workspaces</li>
+          <li>Le plan est posté en merge request et <strong>validé par un humain</strong> avant apply en prod</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CI/CD ================= -->
+  <section class="theme" data-theme="cicd" hidden>
+    <h2>Pipelines CI/CD</h2>
+    <div class="carte">
+      <h3>Le pipeline type d'un microservice</h3>
+      <div class="frise">
+        <span>Build + tests<br /><em>unitaires, lint</em></span>
+        <span>Analyse<br /><em>Sonar, scan dépendances</em></span>
+        <span>Image Docker<br /><em>multi-stage, tag = SHA</em></span>
+        <span>Scan image<br /><em>Trivy</em></span>
+        <span>Recette<br /><em>déploiement auto + e2e</em></span>
+        <span>Prod<br /><em>promotion (manuelle ou auto)</em></span>
+      </div>
+      <p class="note">
+        CI = intégrer et tester chaque commit. Continuous <strong>delivery</strong> :
+        chaque version validée est déployable, un humain déclenche.
+        Continuous <strong>deployment</strong> : pipeline vert → prod automatique.
+        En GitOps, le pipeline ne déploie pas : il met à jour le tag d'image dans
+        le repo de manifestes, ArgoCD fait le reste.
+      </p>
+    </div>
+    <div class="carte">
+      <h3>Stratégies de déploiement</h3>
+      <table>
+        <thead><tr><th>Stratégie</th><th>Principe</th><th>Forces</th><th>Limites</th></tr></thead>
+        <tbody>
+          {strategiesDeploiement.map(([s, p, f, l]) => (
+            <tr><td><strong>{s}</strong></td><td>{p}</td><td>{f}</td><td>{l}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Sécuriser le pipeline</h3>
+        <ul>
+          <li>Secrets hors du repo : coffre, et de préférence <strong>OIDC</strong> vers le cloud (jetons éphémères, zéro clé longue durée)</li>
+          <li>Moindre privilège des runners — celui qui build ne déploie pas en prod</li>
+          <li>Scan des dépendances et des images à chaque build</li>
+          <li>Environnements protégés + approbation pour la prod</li>
+          <li>Signature des images (cosign) vérifiée à l'admission</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>Un pipeline rapide</h3>
+        <ul>
+          <li>Mesurer étape par étape avant d'optimiser</li>
+          <li>Cache des dépendances et des layers Docker (ordre du Dockerfile !)</li>
+          <li>Jobs indépendants en parallèle (lint, tests, scan)</li>
+          <li>Tests ciblés en MR, suite complète en nightly</li>
+          <li>Objectif : <strong>&lt; 10 minutes</strong> de retour sur une merge request</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KUBERNETES ================= -->
+  <section class="theme" data-theme="kubernetes" hidden>
+    <h2>Kubernetes</h2>
+    <div class="carte">
+      <h3>Architecture</h3>
+      <div class="grille-2">
+        <div class="acteur">
+          <strong>Control plane</strong>
+          <span><strong>API server</strong> (porte d'entrée unique) · <strong>etcd</strong> (l'état du cluster) · <strong>scheduler</strong> (place les pods) · <strong>controller managers</strong> (boucles de réconciliation)</span>
+        </div>
+        <div class="acteur">
+          <strong>Chaque worker</strong>
+          <span><strong>kubelet</strong> (démarre/surveille les conteneurs) · <strong>kube-proxy</strong> (réseau des Services) · <strong>runtime</strong> (containerd)</span>
+        </div>
+      </div>
+      <p class="note">
+        Le principe fondateur : tout est <strong>déclaratif</strong> — on poste un
+        état désiré à l'API, les controllers convergent vers lui en continu.
+      </p>
+    </div>
+    <div class="carte">
+      <h3>Les ressources à connaître</h3>
+      <table>
+        <thead><tr><th>Ressource</th><th>Rôle</th><th>Cas d'usage</th></tr></thead>
+        <tbody>
+          {ressourcesKube.map(([r, role, cas]) => (
+            <tr><td><strong>{r}</strong></td><td>{role}</td><td>{cas}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Probes</h3>
+        <ul>
+          <li><strong>Readiness</strong> : « je peux recevoir du trafic » — en échec, retiré des endpoints, <em>pas redémarré</em></li>
+          <li><strong>Liveness</strong> : « je suis vivant » — en échec, le conteneur est redémarré. Ne jamais y tester une dépendance externe !</li>
+          <li><strong>Startup</strong> : couvre les démarrages lents, suspend les deux autres</li>
+        </ul>
+        <h3>Ressources & QoS</h3>
+        <ul>
+          <li><strong>Requests</strong> : réservation pour le scheduler · <strong>limits</strong> : plafond réel</li>
+          <li>Mémoire &gt; limite → <strong>OOMKilled</strong> (exit 137) · CPU &gt; limite → throttling (latences sournoises)</li>
+          <li>QoS Guaranteed / Burstable / BestEffort : l'ordre d'éviction sous pression</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>Autoscaling — 3 niveaux</h3>
+        <ul>
+          <li><strong>HPA</strong> : nombre de réplicas selon CPU/métriques custom/événements (KEDA)</li>
+          <li><strong>VPA</strong> : recommande (ou ajuste) requests/limits</li>
+          <li><strong>Cluster Autoscaler / Karpenter</strong> : ajoute des nœuds quand des pods restent Pending</li>
+        </ul>
+        <h3>Diagnostic express</h3>
+        <pre><code>kubectl describe pod …    # events, exit codes
+kubectl logs --previous … # logs du conteneur MORT
+kubectl get events --sort-by=.lastTimestamp
+kubectl top pods          # usage réel vs requests</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ARGOCD ================= -->
+  <section class="theme" data-theme="argocd" hidden>
+    <h2>Argo CD & GitOps</h2>
+    <div class="carte">
+      <h3>Le principe GitOps</h3>
+      <p>
+        <strong>Git est la source de vérité</strong> de l'état désiré du cluster.
+        Un agent (ArgoCD) <em>tire</em> les changements et converge — au lieu
+        qu'un pipeline pousse avec des credentials de prod.
+      </p>
+      <div class="frise">
+        <span>Commit<br /><em>manifestes / Helm / Kustomize</em></span>
+        <span>ArgoCD détecte<br /><em>compare Git ↔ cluster</em></span>
+        <span>Sync<br /><em>converge vers Git</em></span>
+        <span>Drift ?<br /><em>self-heal réécrase</em></span>
+      </div>
+      <ul>
+        <li>Rollback = <code>git revert</code> — auditabilité totale</li>
+        <li>Plus de kubeconfig de prod dans la CI : le cluster tire</li>
+        <li>Fini les <code>kubectl apply</code> à la main et les « qui a changé ça ? »</li>
+      </ul>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Concepts ArgoCD</h3>
+        <ul>
+          <li><strong>Application</strong> : source (repo, chart) → destination (cluster + namespace)</li>
+          <li><strong>Synced / OutOfSync</strong> : conformité à Git · <strong>Healthy / Degraded</strong> : santé des ressources — deux axes distincts</li>
+          <li><strong>automated + self-heal + prune</strong> : sync sans intervention, anti-drift, suppression de ce qui a quitté Git</li>
+          <li><strong>Sync waves & hooks</strong> : ordonner (la migration avant l'app)</li>
+          <li><strong>App of apps / ApplicationSet</strong> : bootstraper un cluster entier, décliner par cluster/env via générateurs</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>Les secrets en GitOps</h3>
+        <ul>
+          <li><strong>External Secrets Operator</strong> (préférence) : Git ne contient qu'une référence vers le coffre (Vault, AWS SM, Key Vault) — rotation centralisée, rien de sensible dans Git</li>
+          <li><strong>Sealed Secrets</strong> : commité chiffré avec la clé du cluster — simple, mais lié au cluster</li>
+          <li><strong>SOPS</strong> : fichiers chiffrés par KMS, déchiffrés au rendu</li>
+          <li>Règle absolue : jamais un secret en clair dans Git, même dans l'historique</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OPERATEURS ================= -->
+  <section class="theme" data-theme="operateurs" hidden>
+    <h2>Opérateurs Kubernetes</h2>
+    <div class="carte">
+      <h3>CRD + controller + réconciliation</h3>
+      <p>
+        Un opérateur = des <strong>CRD</strong> qui ajoutent des types métier à
+        l'API Kubernetes, plus un <strong>controller</strong> qui boucle :
+        <em>observer l'état réel → comparer à l'état désiré → agir pour
+        converger</em>. C'est du savoir-faire opérationnel encodé : au lieu d'un
+        runbook « comment opérer PostgreSQL », une ressource
+        <code>Cluster</code> que l'opérateur sait créer, sauvegarder, basculer
+        et mettre à jour — pilotable en YAML, donc en GitOps.
+      </p>
+    </div>
+    <div class="carte">
+      <h3>Les opérateurs du quotidien</h3>
+      <table>
+        <thead><tr><th>Opérateur</th><th>CRD phares</th><th>Ce qu'il industrialise</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Prometheus Operator</strong></td><td>ServiceMonitor, PrometheusRule</td><td>Chaque équipe déclare ses cibles de scrape et ses alertes à côté de son app</td></tr>
+          <tr><td><strong>cert-manager</strong></td><td>Certificate, Issuer</td><td>Obtention et renouvellement automatiques des certificats (ACME/Let's Encrypt)</td></tr>
+          <tr><td><strong>External Secrets</strong></td><td>ExternalSecret, SecretStore</td><td>Synchronisation des coffres de secrets vers des Secrets K8s</td></tr>
+          <tr><td><strong>CloudNativePG / Strimzi</strong></td><td>Cluster, Kafka</td><td>Réplication, sauvegardes, failover de PostgreSQL / Kafka</td></tr>
+        </tbody>
+      </table>
+      <p class="note">
+        Écrire le sien (Kubebuilder, Operator SDK) : seulement s'il y a une vraie
+        logique de réconciliation continue. Pour templatiser du YAML, Helm ou
+        Kustomize suffisent — et chercher d'abord un opérateur communautaire mûr.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= KYVERNO ================= -->
+  <section class="theme" data-theme="kyverno" hidden>
+    <h2>Kyverno — policies as code</h2>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Fonctionnement</h3>
+        <ul>
+          <li><strong>Admission controller</strong> : intercepte les créations/modifications de ressources</li>
+          <li>Trois types de règles : <strong>validate</strong> (bloquer/signaler), <strong>mutate</strong> (modifier à la volée), <strong>generate</strong> (créer des ressources associées)</li>
+          <li>Policies en <strong>YAML</strong> — pas de langage dédié, contrairement au Rego d'OPA/Gatekeeper</li>
+          <li>Background scan de l'existant + PolicyReports</li>
+        </ul>
+        <h3>Déploiement sans casse</h3>
+        <ul>
+          <li>1. Mode <strong>audit</strong> : mesurer les violations sans bloquer</li>
+          <li>2. Assainir le stock, documenter les exceptions ciblées (PolicyException)</li>
+          <li>3. Passer en <strong>enforce</strong> quand le taux de violation ≈ 0</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>Le socle de policies d'un cluster</h3>
+        <ul>
+          <li>Interdire le tag <code>:latest</code>, exiger un tag immuable</li>
+          <li>Imposer requests/limits sur tout conteneur</li>
+          <li>Registres d'images approuvés uniquement</li>
+          <li>Pas de conteneur privilégié / root (avec les Pod Security Standards)</li>
+          <li>Labels d'ownership obligatoires (équipe, app)</li>
+          <li>Generate : NetworkPolicy default-deny + quotas par nouveau namespace</li>
+        </ul>
+        <pre><code>spec:
+  validationFailureAction: Audit   # puis Enforce
+  rules:
+    - name: interdire-latest
+      match: &#123; resources: &#123; kinds: [Pod] &#125; &#125;
+      validate:
+        message: "Tag :latest interdit"
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ISTIO ================= -->
+  <section class="theme" data-theme="istio" hidden>
+    <h2>Istio & service mesh</h2>
+    <div class="carte">
+      <h3>Ce qu'un mesh résout — sans toucher au code</h3>
+      <div class="grille-4">
+        <div class="acteur"><strong>🔐 mTLS partout</strong><span>Chiffrement + identité mutuelle entre tous les services — la base du zero-trust interne.</span></div>
+        <div class="acteur"><strong>🛡️ Résilience</strong><span>Timeouts, retries, circuit breaking (outlier detection) uniformes.</span></div>
+        <div class="acteur"><strong>🔀 Routage fin</strong><span>Canary pondéré, routage par header, mirroring, injection de fautes.</span></div>
+        <div class="acteur"><strong>👁️ Observabilité</strong><span>Métriques L7 et traces homogènes pour tous les services (Kiali).</span></div>
+      </div>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Architecture</h3>
+        <ul>
+          <li><strong>istiod</strong> : le control plane — distribue configuration et certificats</li>
+          <li>Mode <strong>sidecar</strong> : un proxy Envoy injecté dans chaque pod applique tout — éprouvé, mais coûteux en ressources</li>
+          <li>Mode <strong>ambient</strong> : ztunnel par nœud (mTLS L4) + waypoint proxies optionnels (L7) — plus léger, adoption progressive</li>
+        </ul>
+        <h3>Quand ne pas mettre Istio</h3>
+        <p class="note">
+          Une dizaine de services, une seule équipe, pas d'exigence mTLS forte :
+          NetworkPolicies + un ingress capable de canary + cert-manager couvrent
+          le besoin pour une fraction de la complexité. Le mesh se justifie à
+          l'échelle. Commencer par le besoin, pas par l'outil.
+        </p>
+      </div>
+      <div class="carte">
+        <h3>Canary avec VirtualService + DestinationRule</h3>
+        <pre><code># DestinationRule : les subsets v1 / v2
+subsets:
+  - name: v1
+    labels: &#123; version: v1 &#125;
+  - name: v2
+    labels: &#123; version: v2 &#125;
+---
+# VirtualService : la pondération
+http:
+  - route:
+      - destination: &#123; host: paiement, subset: v1 &#125;
+        weight: 95
+      - destination: &#123; host: paiement, subset: v2 &#125;
+        weight: 5</code></pre>
+        <p class="note">
+          On compare erreurs et latence p99 entre subsets, puis on élargit —
+          automatisable avec Argo Rollouts ou Flagger, qui rollbackent seuls en
+          cas de dégradation.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OBSERVABILITE ================= -->
+  <section class="theme" data-theme="observabilite" hidden>
+    <h2>Supervision, monitoring & alerting</h2>
+    <div class="carte">
+      <h3>Les trois piliers</h3>
+      <div class="grille-3">
+        <div class="acteur"><strong>📈 Métriques</strong><span>Séries temporelles agrégées — le quoi et le combien. Prometheus.</span></div>
+        <div class="acteur"><strong>📜 Logs</strong><span>Le détail événementiel — le pourquoi. Loki / ELK.</span></div>
+        <div class="acteur"><strong>🧵 Traces</strong><span>Le parcours d'une requête à travers les services — le où. Tempo / Jaeger, OpenTelemetry.</span></div>
+      </div>
+      <p class="note">
+        Monitoring = répondre aux questions prévues. Observabilité = pouvoir
+        répondre aux questions imprévues. La force vient de la
+        <strong>corrélation</strong> des trois signaux via les mêmes identifiants.
+      </p>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>La stack Prometheus</h3>
+        <ul>
+          <li>Modèle <strong>pull</strong> : scrape des endpoints <code>/metrics</code>, découverte dynamique via ServiceMonitors</li>
+          <li><strong>PromQL</strong> : <code>rate()</code> sur les counters, <code>histogram_quantile()</code> pour les percentiles</li>
+          <li><strong>Alertmanager</strong> : déduplication, groupement, routage (l'astreinte sur PagerDuty, le reste sur Slack), silences, inhibition</li>
+          <li>Longue rétention / multi-cluster : remote write vers <strong>Thanos / Mimir</strong></li>
+          <li><strong>Grafana</strong> : dashboards par audience — astreinte (golden signals), équipe (détail), management (SLO)</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>Golden signals, SLI/SLO, alerting</h3>
+        <table>
+          <thead><tr><th>Signal</th><th>Question</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Latence</strong></td><td>Combien de temps pour répondre (p50, p99) ?</td></tr>
+            <tr><td><strong>Trafic</strong></td><td>Quelle demande (req/s) ?</td></tr>
+            <tr><td><strong>Erreurs</strong></td><td>Quel taux d'échec ?</td></tr>
+            <tr><td><strong>Saturation</strong></td><td>À quel point suis-je « plein » ?</td></tr>
+          </tbody>
+        </table>
+        <ul>
+          <li><strong>SLI</strong> = la mesure · <strong>SLO</strong> = l'objectif (99,9 % / 30 j) · <strong>error budget</strong> = les 0,1 % restants (~43 min/mois)</li>
+          <li>Budget restant → on déploie ; budget consommé → on fiabilise</li>
+          <li>Alerter sur les <strong>symptômes</strong> (erreurs, latence, burn rate), pas les causes (CPU) ; chaque alerte : actionnable + runbook</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LOGS ================= -->
+  <section class="theme" data-theme="logs" hidden>
+    <h2>Centralisation des logs</h2>
+    <div class="carte">
+      <h3>L'architecture standard sur Kubernetes</h3>
+      <div class="frise">
+        <span>App<br /><em>logs JSON sur stdout</em></span>
+        <span>Agent par nœud<br /><em>Fluent Bit / Promtail (DaemonSet)</em></span>
+        <span>Enrichissement<br /><em>namespace, pod, labels</em></span>
+        <span>Stockage<br /><em>Loki ou Elasticsearch</em></span>
+        <span>Exploration<br /><em>Grafana / Kibana</em></span>
+      </div>
+      <p class="note">
+        Pourquoi centraliser : les pods sont éphémères — un conteneur mort
+        emporte ses logs, et personne ne fait <code>kubectl logs</code> sur 40
+        nœuds. Rétention par criticité, archivage froid en stockage objet.
+      </p>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Loki vs Elasticsearch</h3>
+        <table>
+          <thead><tr><th></th><th>Loki</th><th>Elasticsearch</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Indexation</strong></td><td>Labels seulement</td><td>Tout le contenu</td></tr>
+            <tr><td><strong>Coût / exploitation</strong></td><td>~10× moindre, trivial</td><td>Cluster exigeant</td></tr>
+            <tr><td><strong>Recherche</strong></td><td>LogQL, grep par label</td><td>Full-text riche, agrégations</td></tr>
+            <tr><td><strong>Quand</strong></td><td>Observabilité des équipes</td><td>Analytique complexe, SIEM</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="carte">
+        <h3>Bonnes pratiques</h3>
+        <ul>
+          <li>Logs <strong>structurés JSON</strong> — un champ par information</li>
+          <li>Niveaux disciplinés : ERROR = quelque chose à corriger</li>
+          <li><strong>Correlation ID</strong> propagé de bout en bout, partagé avec les traces</li>
+          <li>Jamais de données personnelles ni de secrets (RGPD)</li>
+          <li>Volume maîtrisé : le debug en boucle coûte cher et noie le signal</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CLOUD ================= -->
+  <section class="theme" data-theme="cloud" hidden>
+    <h2>Cloud — AWS & Azure</h2>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Les modèles de service</h3>
+        <ul>
+          <li><strong>IaaS</strong> : je gère l'OS et au-dessus — EC2, Azure VM</li>
+          <li><strong>PaaS</strong> : je ne gère que mon code — App Service, Fargate</li>
+          <li><strong>SaaS</strong> : je consomme — Microsoft 365</li>
+          <li>EKS/AKS : entre les deux — control plane géré, nœuds à ma charge</li>
+        </ul>
+        <h3>Responsabilité partagée</h3>
+        <p class="note">
+          Le fournisseur est responsable <strong>de</strong> le cloud
+          (datacenters, hyperviseurs) ; le client <strong>dans</strong> le cloud :
+          données, IAM, configuration. La plupart des incidents sont des erreurs
+          de configuration client — bucket public, NSG grand ouvert.
+        </p>
+      </div>
+      <div class="carte">
+        <h3>Haute disponibilité</h3>
+        <ul>
+          <li><strong>Région</strong> → plusieurs <strong>zones de disponibilité</strong> (datacenters isolés, faible latence entre eux)</li>
+          <li>HA de base = étaler sur plusieurs AZ : ALB + ASG multi-AZ + RDS Multi-AZ (AWS) ; LB zone-redundant + VMSS + Azure SQL zone-redondant (Azure)</li>
+          <li>Multi-région = DR : bascule DNS (Route 53 / Traffic Manager) + réplication</li>
+          <li><strong>RTO</strong> (durée d'interruption admissible) et <strong>RPO</strong> (perte de données admissible) : fixés par le métier, ils dimensionnent le coût</li>
+          <li>Scalabilité : horizontale (ASG / VMSS, la voie cloud) vs verticale (plus gros serveur, plafonne)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="carte">
+      <h3>Table d'équivalences AWS ↔ Azure</h3>
+      <table>
+        <thead><tr><th>Besoin</th><th>AWS</th><th>Azure</th></tr></thead>
+        <tbody>
+          {equivalences.map(([b, aws, az]) => (
+            <tr><td>{b}</td><td><strong>{aws}</strong></td><td><strong>{az}</strong></td></tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="note">
+        Le piège des équivalences : les modèles diffèrent en profondeur — IAM
+        AWS (policies JSON attachées à des rôles) vs RBAC hiérarchique Azure
+        (management groups → subscriptions → resource groups), VPC vs VNet sur
+        le peering et les private endpoints.
+      </p>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Identités sans clés statiques</h3>
+        <ul>
+          <li>Pods : <strong>IRSA</strong> (EKS) / <strong>Workload Identity</strong> + Managed Identities (AKS)</li>
+          <li>CI : fédération <strong>OIDC</strong> — plus de clés dans les variables</li>
+          <li>Moindre privilège par rôle, rotation via Secrets Manager / Key Vault</li>
+          <li>Audit branché sur l'alerting : CloudTrail / Activity Log</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>FinOps</h3>
+        <ul>
+          <li>Visibilité d'abord : Cost Explorer / Cost Management + <strong>tagging</strong> imposé par policy</li>
+          <li>Quick wins : dev éteint la nuit, rightsizing, orphelins (volumes, IP), NAT/egress, rétention des logs</li>
+          <li>Engagement : Savings Plans / Reserved sur la base stable, spot pour le tolérant</li>
+          <li>Durer : budgets + alertes, coût par équipe visible, revue mensuelle</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ANSIBLE ================= -->
+  <section class="theme" data-theme="ansible" hidden>
+    <h2>Ansible</h2>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Fonctionnement</h3>
+        <ul>
+          <li><strong>Agentless</strong> : connexion SSH (WinRM Windows), modules Python poussés et exécutés</li>
+          <li><strong>Inventaire</strong> : hôtes et groupes — statique ou dynamique (cloud)</li>
+          <li><strong>Playbooks</strong> YAML : les tâches à converger</li>
+          <li><strong>Rôles</strong> : unités réutilisables (Galaxy) · <strong>handlers</strong> : réagir aux changements · <strong>templates Jinja2</strong> : générer les configs</li>
+          <li><strong>Vault</strong> : secrets chiffrés dans le repo</li>
+        </ul>
+        <h3>Ansible ↔ Terraform</h3>
+        <p class="note">
+          Terraform <strong>provisionne</strong> (cycle de vie des ressources,
+          state) ; Ansible <strong>configure</strong> ce qui tourne dessus.
+          Pattern : Terraform crée les VMs et alimente l'inventaire dynamique,
+          Ansible configure derrière. Sur du 100 % Kubernetes, l'image et les
+          manifestes prennent le relais — Ansible reste précieux pour le legacy.
+        </p>
+      </div>
+      <div class="carte">
+        <h3>L'idempotence, la clé</h3>
+        <p>
+          Chaque module vérifie l'état avant d'agir : un second run sur une
+          machine conforme = <strong>zéro changed</strong> — la preuve de
+          conformité. Les modules <code>shell</code>/<code>command</code> cassent
+          la garantie : les encadrer (<code>creates:</code>,
+          <code>changed_when</code>, <code>when</code>).
+        </p>
+        <pre><code>- name: Nginx installé et démarré
+  hosts: web
+  become: true
+  tasks:
+    - ansible.builtin.package:
+        name: nginx
+        state: present
+    - ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: recharger nginx   # handler si changement
+  handlers:
+    - name: recharger nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded</code></pre>
+        <p class="note">
+          Fiabiliser : ansible-lint en CI, <code>--check --diff</code> (dry-run),
+          Molecule pour tester les rôles (dont l'idempotence), exécution par la
+          CI/AWX plutôt que depuis un poste.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= IA ================= -->
+  <section class="theme" data-theme="ia" hidden>
+    <h2>IA, LLM & MLOps</h2>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Tokens & fenêtre de contexte</h3>
+        <ul>
+          <li>Un <strong>token</strong> ≈ 4 caractères — un mot français fait souvent 2-3 tokens</li>
+          <li>La <strong>fenêtre de contexte</strong> : le maximum traitable en une fois (système + historique + documents + réponse)</li>
+          <li>Impacts : facturation au token (entrée/sortie, prompt caching), latence croissante, troncature au-delà</li>
+          <li>D'où : résumés d'historique, sélection des documents pertinents — pas « tout dans le prompt »</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>RAG — l'architecture</h3>
+        <div class="frise">
+          <span>Documents<br /><em>chunking par section</em></span>
+          <span>Embeddings<br /><em>vecteurs sémantiques</em></span>
+          <span>Base vectorielle<br /><em>pgvector, Qdrant</em></span>
+          <span>Retrieval<br /><em>+ filtre des droits</em></span>
+          <span>LLM<br /><em>répond en citant</em></span>
+        </div>
+        <p class="note">
+          Connaissance à jour (on réindexe), réponses sourcées, droits d'accès
+          au retrieval. Le point dur : la qualité du chunking et du retrieval —
+          un RAG qui récupère mal hallucine avec assurance.
+        </p>
+      </div>
+    </div>
+    <div class="grille-2">
+      <div class="carte">
+        <h3>L'escalade raisonnable</h3>
+        <ul>
+          <li>1. <strong>Prompt engineering</strong> (instructions, few-shot) — coût nul, couvre beaucoup</li>
+          <li>2. <strong>RAG</strong> — si le problème est l'accès à la connaissance</li>
+          <li>3. <strong>Fine-tuning</strong> (LoRA/QLoRA) — pour le <em>comportement</em> : style, format, tâche étroite, distillation vers un petit modèle</li>
+        </ul>
+        <p class="note">
+          Contraintes du fine-tuning : dataset de qualité (le vrai coût),
+          réentraînement à chaque évolution, oubli catastrophique, évaluation à
+          outiller.
+        </p>
+        <h3>MCP</h3>
+        <p>
+          Le <strong>Model Context Protocol</strong> standardise l'accès des
+          applications LLM aux capacités externes : un serveur MCP expose
+          <em>tools</em>, <em>resources</em> et <em>prompts</em>, consommables
+          par tout client compatible — une intégration par outil, réutilisable
+          partout. Pour le DevOps : un composant de plus à déployer,
+          authentifier et superviser.
+        </p>
+      </div>
+      <div class="carte">
+        <h3>LangChain vs LangGraph</h3>
+        <table>
+          <thead><tr><th></th><th>LangChain</th><th>LangGraph</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Modèle</strong></td><td>Chaînes ~linéaires</td><td>Graphe à état</td></tr>
+            <tr><td><strong>Forces</strong></td><td>Briques d'intégration, RAG rapide</td><td>Boucles, branches, checkpoints, human-in-the-loop</td></tr>
+            <tr><td><strong>Quand</strong></td><td>RAG, chaîne simple</td><td>Vrais agents multi-étapes</td></tr>
+          </tbody>
+        </table>
+        <h3>MLOps</h3>
+        <ul>
+          <li>Versionner code <em>et</em> données/features · tracer les expériences (MLflow) · registry de modèles avec évaluation avant promotion</li>
+          <li>Le risque n° 1 en prod : le <strong>drift</strong> — dégradation silencieuse quand les données réelles s'éloignent de l'entraînement → métriques de qualité prédictive + réentraînement déclenché</li>
+          <li>Spécifique LLM : évaluation (jeux de prompts, LLM-as-judge), coûts par token, garde-fous (prompt injection, fuite de données), prompts versionnés comme du code</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const chips = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('.theme-chip')
+  );
+  const sections = Array.from(
+    document.querySelectorAll<HTMLElement>('.theme')
+  );
+  chips.forEach((c) =>
+    c.addEventListener('click', () => {
+      chips.forEach((x) =>
+        x.classList.toggle('theme-chip--actif', x === c)
+      );
+      sections.forEach((s) => (s.hidden = s.dataset.theme !== c.dataset.theme));
+    })
+  );
+</script>
+
+<style>
+  .selecteur {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .theme-chip {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--trait);
+    background: var(--blanc);
+    color: var(--estompe);
+    cursor: pointer;
+  }
+
+  .theme-chip:hover {
+    border-color: var(--bic);
+    color: var(--bic);
+  }
+
+  .theme-chip--actif,
+  .theme-chip--actif:hover {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  .theme {
+    animation: apparait 0.25s ease;
+  }
+
+  @keyframes apparait {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .theme h2 {
+    font-size: 1.4rem;
+    font-weight: 750;
+    margin: 0 0 1rem;
+  }
+
+  .carte {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 1.15rem 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .carte h3 {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 0 0 0.6rem;
+  }
+
+  .carte h3:not(:first-child) {
+    margin-top: 1.1rem;
+  }
+
+  .carte p,
+  .carte ul {
+    margin: 0 0 0.5rem;
+    font-size: 0.9531rem;
+  }
+
+  .carte ul {
+    padding-left: 1.2rem;
+  }
+
+  .carte li {
+    margin: 0.28rem 0;
+  }
+
+  .carte li::marker {
+    color: var(--bic);
+  }
+
+  .carte pre {
+    margin: 0.6rem 0 0.4rem;
+    font-size: 0.7813rem;
+    background: var(--papier);
+  }
+
+  .note {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--estompe);
+  }
+
+  .grille-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .grille-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .grille-4 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .grille-2 > .carte {
+    margin-bottom: 0;
+  }
+
+  .acteur {
+    display: grid;
+    gap: 0.25rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.875rem;
+  }
+
+  .acteur span {
+    color: var(--estompe);
+    font-size: 0.8438rem;
+    line-height: 1.5;
+  }
+
+  .frise {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: stretch;
+    margin: 0.5rem 0;
+  }
+
+  .frise span {
+    flex: 1 1 8rem;
+    background: var(--bic-doux);
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem 0.55rem 0.9rem;
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.35;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+  }
+
+  .frise span em {
+    display: block;
+    font-style: normal;
+    font-weight: 450;
+    font-size: 0.71rem;
+    color: var(--estompe);
+    margin-top: 0.15rem;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    background: var(--blanc);
+  }
+
+  th {
+    text-align: left;
+    background: var(--bic-doux);
+    font-weight: 650;
+    padding: 0.5rem 0.75rem;
+  }
+
+  td {
+    padding: 0.45rem 0.75rem;
+    border-top: 1px solid var(--trait);
+    vertical-align: top;
+  }
+
+  @media (max-width: 860px) {
+    .grille-2,
+    .grille-3,
+    .grille-4 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

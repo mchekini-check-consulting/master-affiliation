@@ -1,0 +1,590 @@
+{
+  "themes": [
+    {
+      "id": "terraform",
+      "titre": "Terraform & IaC",
+      "questions": [
+        {
+          "question": "À quoi sert le state Terraform ?",
+          "options": [
+            "À faire le lien entre le code et les ressources réelles provisionnées",
+            "À stocker l'historique Git du projet",
+            "À sauvegarder les logs des apply",
+            "À définir les variables d'environnement"
+          ],
+          "reponse": 0,
+          "explication": "Le state est la cartographie entre les ressources déclarées dans le code et les ressources réelles (avec leurs identifiants). Sans lui, Terraform ne sait pas ce qu'il gère déjà."
+        },
+        {
+          "question": "Que fait exactement « terraform plan » ?",
+          "options": [
+            "Il applique les changements en environnement de test",
+            "Il calcule et affiche le diff entre l'état cible et l'existant, sans rien modifier",
+            "Il valide uniquement la syntaxe des fichiers",
+            "Il détruit puis recrée les ressources modifiées"
+          ],
+          "reponse": 1,
+          "explication": "plan est une simulation : il montre ce qu'un apply ferait (create, update, destroy) sans toucher à l'infrastructure. C'est le document à faire relire avant tout apply en prod."
+        },
+        {
+          "question": "Pourquoi utiliser un backend distant (S3 + DynamoDB, Azure Storage) pour le state ?",
+          "options": [
+            "Pour accélérer les apply",
+            "Pour partager le state en équipe et verrouiller contre les apply simultanés",
+            "C'est obligatoire depuis Terraform 1.0",
+            "Pour éviter d'écrire des modules"
+          ],
+          "reponse": 1,
+          "explication": "Le backend distant partage un état unique entre tous les membres et le pipeline, et le locking (DynamoDB, lease Azure) empêche deux apply concurrents de corrompre le state."
+        },
+        {
+          "question": "À quoi sert « lifecycle { prevent_destroy = true } » ?",
+          "options": [
+            "À empêcher la suppression accidentelle d'une ressource critique",
+            "À interdire les modifications manuelles dans la console",
+            "À empêcher terraform destroy de fonctionner sur tout le projet",
+            "À figer la version du provider"
+          ],
+          "reponse": 0,
+          "explication": "prevent_destroy fait échouer tout plan qui détruirait cette ressource — le filet de sécurité indispensable sur les bases de données et le stockage persistant."
+        }
+      ]
+    },
+    {
+      "id": "cicd",
+      "titre": "CI/CD",
+      "questions": [
+        {
+          "question": "Quelle est la différence entre continuous delivery et continuous deployment ?",
+          "options": [
+            "Aucune, ce sont des synonymes",
+            "Delivery : la mise en prod reste déclenchée par un humain ; deployment : elle est automatique",
+            "Delivery concerne le front, deployment le back",
+            "Deployment n'inclut pas les tests"
+          ],
+          "reponse": 1,
+          "explication": "En delivery, chaque version validée est déployable mais un humain déclenche ; en deployment, tout pipeline vert part en prod automatiquement."
+        },
+        {
+          "question": "Le déploiement blue/green consiste à…",
+          "options": [
+            "Déployer sur un petit pourcentage d'utilisateurs",
+            "Remplacer les instances une par une",
+            "Maintenir deux environnements complets et basculer le trafic d'un coup",
+            "Déployer la nuit pour limiter l'impact"
+          ],
+          "reponse": 2,
+          "explication": "Deux environnements identiques (blue = actuel, green = nouveau) : on bascule le trafic instantanément, et le rollback est une simple re-bascule."
+        },
+        {
+          "question": "Un déploiement canary, c'est…",
+          "options": [
+            "Un déploiement réservé aux environnements de test",
+            "Envoyer un petit pourcentage du trafic vers la nouvelle version et comparer les métriques avant d'élargir",
+            "Un déploiement sans tests automatisés",
+            "Un rollback automatique planifié"
+          ],
+          "reponse": 1,
+          "explication": "Le canary expose la nouvelle version à une fraction du trafic réel ; on compare erreurs et latence avec l'ancienne version avant de généraliser — ou de rollbacker."
+        },
+        {
+          "question": "Où doivent vivre les secrets utilisés par le pipeline ?",
+          "options": [
+            "Dans un fichier .env commité pour être versionnés",
+            "En clair dans les variables du pipeline",
+            "Dans un gestionnaire de secrets, ou mieux : remplacés par des jetons éphémères OIDC",
+            "Dans l'image Docker"
+          ],
+          "reponse": 2,
+          "explication": "Jamais de secrets dans le repo. Un coffre (Vault, secrets CI chiffrés) au minimum ; l'idéal est l'OIDC vers le cloud : plus aucune clé longue durée à voler."
+        }
+      ]
+    },
+    {
+      "id": "kubernetes",
+      "titre": "Kubernetes",
+      "questions": [
+        {
+          "question": "Quel composant stocke tout l'état du cluster ?",
+          "options": ["Le kubelet", "etcd", "Le scheduler", "kube-proxy"],
+          "reponse": 1,
+          "explication": "etcd est la base clé-valeur distribuée du control plane : tout objet Kubernetes (pods, configs, secrets) y est persisté. La perdre, c'est perdre le cluster."
+        },
+        {
+          "question": "Une readiness probe qui échoue provoque…",
+          "options": [
+            "Le redémarrage du conteneur",
+            "La suppression du pod",
+            "Le retrait du pod des endpoints du Service, sans redémarrage",
+            "Une alerte Prometheus automatique"
+          ],
+          "reponse": 2,
+          "explication": "Readiness = « puis-je recevoir du trafic ? ». En échec, le pod est sorti du load balancing mais continue de tourner. C'est la liveness qui déclenche un redémarrage."
+        },
+        {
+          "question": "Un conteneur est tué avec le statut OOMKilled. Que s'est-il passé ?",
+          "options": [
+            "Il a dépassé sa limite mémoire",
+            "Il a dépassé sa limite CPU",
+            "Sa liveness probe a échoué",
+            "Le nœud a redémarré"
+          ],
+          "reponse": 0,
+          "explication": "OOMKilled (exit code 137) = dépassement de la limite mémoire. Le CPU au-delà de la limite est throttlé, jamais tué."
+        },
+        {
+          "question": "Pour une base de données dans Kubernetes, quel objet est le plus adapté ?",
+          "options": ["Deployment", "DaemonSet", "StatefulSet", "Job"],
+          "reponse": 2,
+          "explication": "Le StatefulSet donne aux pods une identité stable (nom, volume persistant dédié, ordre de démarrage) — exactement ce qu'exige un système stateful."
+        },
+        {
+          "question": "Un Service de type ClusterIP est joignable…",
+          "options": [
+            "Depuis internet",
+            "Uniquement depuis l'intérieur du cluster",
+            "Uniquement depuis le nœud où tourne le pod",
+            "Uniquement via l'Ingress"
+          ],
+          "reponse": 1,
+          "explication": "ClusterIP crée une IP virtuelle interne au cluster. Pour exposer à l'extérieur : LoadBalancer, ou un Ingress qui route vers des ClusterIP."
+        }
+      ]
+    },
+    {
+      "id": "argocd",
+      "titre": "Argo CD & GitOps",
+      "questions": [
+        {
+          "question": "Le principe fondamental du GitOps est…",
+          "options": [
+            "Le pipeline pousse les changements avec kubectl apply",
+            "Git est la source de vérité et un agent dans le cluster converge vers cet état",
+            "Chaque développeur a un accès kubectl à la prod",
+            "Les manifestes sont générés à la volée sans être versionnés"
+          ],
+          "reponse": 1,
+          "explication": "En GitOps, l'état désiré vit dans Git ; ArgoCD/Flux tirent les changements et réconcilient le cluster. Le rollback devient un git revert, tout est audité."
+        },
+        {
+          "question": "Une Application ArgoCD « OutOfSync » signifie…",
+          "options": [
+            "L'application est en panne",
+            "L'état du cluster diffère de ce que décrit Git",
+            "Le repo Git est inaccessible",
+            "Les pods redémarrent en boucle"
+          ],
+          "reponse": 1,
+          "explication": "OutOfSync = drift entre les manifestes rendus depuis Git et l'état réel du cluster (changement manuel, ou nouveau commit pas encore appliqué). Le health status est un indicateur distinct."
+        },
+        {
+          "question": "L'option « self-heal » d'ArgoCD…",
+          "options": [
+            "Redémarre les pods en erreur",
+            "Réapplique automatiquement l'état de Git si quelqu'un modifie le cluster à la main",
+            "Corrige les manifestes YAML invalides",
+            "Répare les nœuds défaillants"
+          ],
+          "reponse": 1,
+          "explication": "self-heal écrase toute modification manuelle du cluster par l'état déclaré dans Git — la garantie anti-drift du GitOps."
+        },
+        {
+          "question": "Comment gérer un secret en GitOps sans le commiter en clair ?",
+          "options": [
+            "Le mettre dans un fichier values.yaml privé",
+            "Sealed Secrets, External Secrets Operator ou SOPS",
+            "Le passer en variable d'environnement du pipeline",
+            "Utiliser un namespace dédié aux secrets"
+          ],
+          "reponse": 1,
+          "explication": "Soit le secret est commité chiffré (Sealed Secrets, SOPS), soit Git ne contient qu'une référence vers un coffre et un opérateur crée le Secret (External Secrets)."
+        }
+      ]
+    },
+    {
+      "id": "operateurs",
+      "titre": "Opérateurs K8s",
+      "questions": [
+        {
+          "question": "Un opérateur Kubernetes, c'est…",
+          "options": [
+            "Un administrateur humain du cluster",
+            "Des CRD + un controller qui exécute une boucle de réconciliation",
+            "Un plugin kubectl",
+            "Un type de nœud spécialisé"
+          ],
+          "reponse": 1,
+          "explication": "L'opérateur étend l'API avec des Custom Resources et un controller qui converge en continu l'état réel vers l'état déclaré — du savoir-faire opérationnel encodé."
+        },
+        {
+          "question": "La boucle de réconciliation consiste à…",
+          "options": [
+            "Comparer en continu l'état observé à l'état désiré, et agir pour converger",
+            "Synchroniser les horloges des nœuds",
+            "Fusionner les branches Git",
+            "Rééquilibrer les pods entre nœuds"
+          ],
+          "reponse": 0,
+          "explication": "Observer → comparer → agir, en boucle. C'est le pattern fondamental de tout Kubernetes, que les opérateurs appliquent à des ressources métier."
+        },
+        {
+          "question": "La ressource « ServiceMonitor » est apportée par…",
+          "options": ["cert-manager", "Istio", "le Prometheus Operator", "Kyverno"],
+          "reponse": 2,
+          "explication": "Le Prometheus Operator fournit ServiceMonitor et PrometheusRule : chaque équipe déclare ses cibles de scrape et ses alertes en YAML, à côté de son application."
+        }
+      ]
+    },
+    {
+      "id": "kyverno",
+      "titre": "Kyverno",
+      "questions": [
+        {
+          "question": "Kyverno intervient principalement comme…",
+          "options": [
+            "Un scanner de vulnérabilités d'images",
+            "Un admission controller qui valide, mute ou génère des ressources",
+            "Un outil de sauvegarde du cluster",
+            "Un service mesh léger"
+          ],
+          "reponse": 1,
+          "explication": "Kyverno intercepte les requêtes à l'API (admission webhook) et applique des policies écrites en YAML : validation, mutation, génération — plus un scan en continu de l'existant."
+        },
+        {
+          "question": "Quels sont les trois types de règles Kyverno ?",
+          "options": [
+            "build, test, deploy",
+            "validate, mutate, generate",
+            "allow, deny, audit",
+            "scan, patch, report"
+          ],
+          "reponse": 1,
+          "explication": "validate (bloquer/signaler le non conforme), mutate (modifier à la volée, ex. injecter des defaults), generate (créer des ressources associées, ex. une NetworkPolicy par namespace)."
+        },
+        {
+          "question": "Comment introduire une nouvelle policy sans risque ?",
+          "options": [
+            "Directement en enforce, pour être sûr qu'elle est respectée",
+            "D'abord en mode audit, traiter les violations, puis passer en enforce",
+            "Uniquement sur le namespace kube-system",
+            "En désactivant les autres policies"
+          ],
+          "reponse": 1,
+          "explication": "Le mode audit mesure les violations sans bloquer. On assainit le stock, on documente les exceptions, puis on enforce — sans casser un déploiement d'urgence."
+        }
+      ]
+    },
+    {
+      "id": "istio",
+      "titre": "Istio",
+      "questions": [
+        {
+          "question": "Le mTLS automatique d'Istio apporte…",
+          "options": [
+            "Uniquement le chiffrement du trafic",
+            "Chiffrement + authentification mutuelle par identité entre services",
+            "Un pare-feu L3 entre namespaces",
+            "La rotation des mots de passe"
+          ],
+          "reponse": 1,
+          "explication": "Chaque service a une identité certifiée ; le trafic est chiffré ET les deux parties s'authentifient mutuellement — la base du zero-trust interne, sans toucher au code."
+        },
+        {
+          "question": "Le routage pondéré (95 % v1 / 5 % v2) se configure dans…",
+          "options": ["La DestinationRule", "Le VirtualService", "La Gateway", "Le Sidecar"],
+          "reponse": 1,
+          "explication": "Le VirtualService décrit le routage (poids, matchs par header, retries). La DestinationRule définit les subsets et les politiques par destination (load balancing, circuit breaking)."
+        },
+        {
+          "question": "En mode sidecar, qui applique concrètement les règles du mesh ?",
+          "options": [
+            "istiod, dans le control plane",
+            "Le proxy Envoy injecté dans chaque pod",
+            "kube-proxy",
+            "L'API server"
+          ],
+          "reponse": 1,
+          "explication": "istiod distribue la configuration, mais c'est le proxy Envoy à côté de chaque conteneur qui intercepte le trafic et applique mTLS, routage et télémétrie."
+        },
+        {
+          "question": "Le circuit breaking (outlier detection) sert à…",
+          "options": [
+            "Couper l'accès internet du cluster",
+            "Éjecter temporairement du load balancing les instances qui accumulent les erreurs",
+            "Limiter la bande passante par namespace",
+            "Bloquer les images non signées"
+          ],
+          "reponse": 1,
+          "explication": "L'outlier detection retire du pool les endpoints défaillants pour éviter la contagion — l'appelant cesse d'envoyer du trafic vers une instance malade."
+        }
+      ]
+    },
+    {
+      "id": "observabilite",
+      "titre": "Monitoring & alerting",
+      "questions": [
+        {
+          "question": "Prometheus collecte les métriques en…",
+          "options": [
+            "Push : les applications envoient leurs métriques",
+            "Pull : il scrape les endpoints /metrics des cibles",
+            "Streaming Kafka",
+            "Lecture des logs"
+          ],
+          "reponse": 1,
+          "explication": "Modèle pull : Prometheus interroge périodiquement les cibles (découvertes dynamiquement dans Kubernetes). Le push existe pour les cas courts via la Pushgateway."
+        },
+        {
+          "question": "Un SLO, c'est…",
+          "options": [
+            "Un contrat juridique avec pénalités",
+            "Un objectif chiffré sur un indicateur de service mesuré (SLI)",
+            "Le temps de réponse maximal théorique",
+            "Une alerte critique"
+          ],
+          "reponse": 1,
+          "explication": "SLI = la mesure (ex. taux de requêtes < 300 ms sans erreur), SLO = l'objectif (99,9 % sur 30 jours). Le SLA est le contrat, avec pénalités, généralement moins ambitieux que le SLO."
+        },
+        {
+          "question": "Les quatre golden signals sont…",
+          "options": [
+            "CPU, RAM, disque, réseau",
+            "Latence, trafic, erreurs, saturation",
+            "Uptime, downtime, MTTR, MTBF",
+            "Logs, métriques, traces, events"
+          ],
+          "reponse": 1,
+          "explication": "Latency, traffic, errors, saturation (SRE Google) : les quatre signaux qui mesurent la santé d'un service du point de vue de ses utilisateurs."
+        },
+        {
+          "question": "Une bonne alerte de nuit doit être…",
+          "options": [
+            "Exhaustive : toute anomalie mérite un réveil",
+            "Basée sur les causes : CPU, RAM, restarts",
+            "Actionnable, urgente, et basée sur les symptômes ressentis par l'utilisateur",
+            "Envoyée à toute l'équipe pour ne rien rater"
+          ],
+          "reponse": 2,
+          "explication": "On réveille pour la douleur utilisateur (erreurs, latence, burn rate du SLO), avec une action possible et un runbook. Le reste va en ticket. Sinon : fatigue d'alerte, et plus personne ne lit rien."
+        }
+      ]
+    },
+    {
+      "id": "logs",
+      "titre": "Logs",
+      "questions": [
+        {
+          "question": "Par rapport à Elasticsearch, Loki…",
+          "options": [
+            "Indexe tout le contenu des logs",
+            "N'indexe que les labels et stocke le contenu compressé — beaucoup moins cher",
+            "Ne fonctionne que sur AWS",
+            "Ne gère pas Kubernetes"
+          ],
+          "reponse": 1,
+          "explication": "Loki indexe uniquement les métadonnées (namespace, app…) et grep le contenu à la requête : coût et exploitation très réduits, au prix de recherches full-text moins puissantes."
+        },
+        {
+          "question": "Sur Kubernetes, une application doit écrire ses logs…",
+          "options": [
+            "Dans /var/log/app.log dans le conteneur",
+            "Sur stdout/stderr, collectés par un agent en DaemonSet",
+            "Directement dans Elasticsearch",
+            "Dans un volume partagé NFS"
+          ],
+          "reponse": 1,
+          "explication": "stdout/stderr est le contrat standard : le runtime capture, l'agent (Fluent Bit, Promtail) collecte sur chaque nœud, enrichit des métadonnées et expédie au stockage central."
+        },
+        {
+          "question": "L'identifiant de corrélation (correlation ID) sert à…",
+          "options": [
+            "Chiffrer les logs sensibles",
+            "Suivre une même requête à travers tous les services qu'elle traverse",
+            "Dédupliquer les logs identiques",
+            "Compresser les logs plus efficacement"
+          ],
+          "reponse": 1,
+          "explication": "Propagé de service en service (et partagé avec les traces), il permet de reconstituer le parcours complet d'une requête dans les logs de toute la chaîne."
+        }
+      ]
+    },
+    {
+      "id": "cloud",
+      "titre": "Cloud AWS & Azure",
+      "questions": [
+        {
+          "question": "Une zone de disponibilité (AZ), c'est…",
+          "options": [
+            "Un continent",
+            "Un ou plusieurs datacenters isolés (alimentation, réseau) au sein d'une région",
+            "Un rack de serveurs",
+            "Une zone DNS"
+          ],
+          "reponse": 1,
+          "explication": "Les AZ d'une région sont physiquement isolées mais reliées en faible latence : répartir sur plusieurs AZ protège de la panne d'un datacenter sans les contraintes du multi-région."
+        },
+        {
+          "question": "L'équivalent Azure de S3 est…",
+          "options": ["Azure Files", "Blob Storage", "Managed Disks", "Cosmos DB"],
+          "reponse": 1,
+          "explication": "S3 ↔ Blob Storage (stockage objet). Azure Files ↔ EFS (fichiers partagés), Managed Disks ↔ EBS (blocs)."
+        },
+        {
+          "question": "Le RPO (Recovery Point Objective) mesure…",
+          "options": [
+            "La durée maximale d'interruption admissible",
+            "La quantité maximale de données qu'on accepte de perdre",
+            "Le temps de redémarrage d'une VM",
+            "Le coût de la reprise d'activité"
+          ],
+          "reponse": 1,
+          "explication": "RPO = perte de données admissible (donc la fréquence de réplication/sauvegarde). RTO = durée d'interruption admissible. Les deux sont fixés par le métier et dimensionnent le coût du DR."
+        },
+        {
+          "question": "Dans le modèle de responsabilité partagée, le client reste toujours responsable…",
+          "options": [
+            "Des datacenters et de l'hyperviseur",
+            "De ses données, de ses identités/accès et de la configuration de ses services",
+            "Du matériel réseau du fournisseur",
+            "De rien : tout est managé"
+          ],
+          "reponse": 1,
+          "explication": "Le fournisseur est responsable DE le cloud, le client DANS le cloud. Le bucket S3 public et le NSG grand ouvert sont des erreurs client — la majorité des incidents réels."
+        },
+        {
+          "question": "Pour qu'un pod EKS appelle AWS sans access key statique, on utilise…",
+          "options": [
+            "Un fichier credentials dans l'image",
+            "IRSA : le pod assume un rôle IAM via OIDC",
+            "La clé du compte root",
+            "Un secret Kubernetes partagé par le namespace"
+          ],
+          "reponse": 1,
+          "explication": "IRSA (IAM Roles for Service Accounts) donne au pod des credentials éphémères pour un rôle précis. Équivalent Azure : Workload Identity + Managed Identities sur AKS."
+        }
+      ]
+    },
+    {
+      "id": "ansible",
+      "titre": "Ansible",
+      "questions": [
+        {
+          "question": "Ansible est dit « agentless » parce que…",
+          "options": [
+            "Il ne nécessite aucune installation locale",
+            "Il se connecte aux cibles en SSH sans démon à installer dessus",
+            "Il fonctionne sans inventaire",
+            "Il ne peut pas modifier les serveurs"
+          ],
+          "reponse": 1,
+          "explication": "Pas d'agent sur les machines gérées : Ansible pousse et exécute ses modules via SSH (WinRM pour Windows). Seul le contrôleur a besoin d'Ansible."
+        },
+        {
+          "question": "Un playbook idempotent…",
+          "options": [
+            "Ne peut être exécuté qu'une seule fois",
+            "Peut être rejoué sans risque : il ne change que ce qui doit l'être",
+            "S'exécute plus vite à chaque passage",
+            "Ne contient pas de variables"
+          ],
+          "reponse": 1,
+          "explication": "Chaque module vérifie l'état avant d'agir : un second run sur une machine conforme rapporte zéro « changed ». Les modules shell/command cassent cette garantie s'ils ne sont pas encadrés."
+        },
+        {
+          "question": "Ansible Vault sert à…",
+          "options": [
+            "Stocker le state comme Terraform",
+            "Chiffrer les secrets (mots de passe, clés) dans le repo",
+            "Sauvegarder les serveurs",
+            "Gérer les licences"
+          ],
+          "reponse": 1,
+          "explication": "ansible-vault chiffre fichiers ou variables sensibles pour pouvoir les versionner sans les exposer en clair dans Git."
+        },
+        {
+          "question": "L'articulation classique Terraform / Ansible :",
+          "options": [
+            "Terraform configure les serveurs, Ansible les provisionne",
+            "Terraform provisionne l'infrastructure, Ansible configure ce qui tourne dessus",
+            "Les deux font exactement la même chose",
+            "Ansible remplace Terraform depuis les modules"
+          ],
+          "reponse": 1,
+          "explication": "Terraform excelle sur le cycle de vie des ressources cloud (avec son state) ; Ansible sur la configuration des systèmes (paquets, fichiers, services). Ils se complètent."
+        }
+      ]
+    },
+    {
+      "id": "ia",
+      "titre": "IA & MLOps",
+      "questions": [
+        {
+          "question": "Un token, pour un LLM, c'est…",
+          "options": [
+            "Un jeton d'authentification API",
+            "Un fragment de texte (~quelques caractères) — l'unité de lecture, de génération et de facturation",
+            "Une requête complète",
+            "Un paramètre du modèle"
+          ],
+          "reponse": 1,
+          "explication": "Le texte est découpé en tokens (~4 caractères en moyenne). La fenêtre de contexte, la latence et la facturation se comptent en tokens."
+        },
+        {
+          "question": "Le RAG consiste à…",
+          "options": [
+            "Réentraîner le modèle sur les documents internes",
+            "Récupérer les passages pertinents (recherche vectorielle) et les injecter dans le prompt",
+            "Compresser le modèle pour le déployer",
+            "Générer automatiquement des rapports"
+          ],
+          "reponse": 1,
+          "explication": "Retrieval-Augmented Generation : embeddings + base vectorielle + injection des passages récupérés dans le prompt. Connaissance à jour, réponses sourçables, sans réentraînement."
+        },
+        {
+          "question": "Pour donner au modèle une connaissance métier qui change chaque semaine, le meilleur choix est…",
+          "options": [
+            "Le fine-tuning hebdomadaire",
+            "Le RAG : on réindexe les documents, pas le modèle",
+            "Augmenter la température",
+            "Un modèle plus gros"
+          ],
+          "reponse": 1,
+          "explication": "Le fine-tuning fige la connaissance au moment de l'entraînement et coûte cher à répéter. Le RAG suit les données en réindexant. Le fine-tuning vise le comportement (style, format), pas la connaissance."
+        },
+        {
+          "question": "Le MCP (Model Context Protocol) standardise…",
+          "options": [
+            "Le format des poids des modèles",
+            "La façon dont les applications LLM accèdent à des outils et des données externes",
+            "La taille des fenêtres de contexte",
+            "Le benchmark des modèles"
+          ],
+          "reponse": 1,
+          "explication": "Un serveur MCP expose tools, resources et prompts de manière uniforme ; tout client compatible peut les consommer — une intégration par outil, réutilisable partout."
+        },
+        {
+          "question": "LangGraph se distingue de LangChain par…",
+          "options": [
+            "Son support exclusif d'OpenAI",
+            "Des workflows en graphe avec état : branches conditionnelles, boucles, checkpoints, human-in-the-loop",
+            "Une interface graphique de prompt",
+            "Sa gratuité"
+          ],
+          "reponse": 1,
+          "explication": "LangChain fournit briques et chaînes plutôt linéaires ; LangGraph modélise de vrais workflows agentiques : graphe à état, boucles, persistance, interruptions pour validation humaine."
+        },
+        {
+          "question": "Le « drift » d'un modèle ML en production, c'est…",
+          "options": [
+            "Une fuite mémoire du serveur d'inférence",
+            "La dégradation silencieuse des performances quand les données réelles s'éloignent des données d'entraînement",
+            "La divergence entre Git et le cluster",
+            "Une attaque par prompt injection"
+          ],
+          "reponse": 1,
+          "explication": "Le service répond sans erreur, mais de plus en plus mal. D'où le monitoring de la qualité prédictive en prod et les pipelines de réentraînement — le cœur du MLOps."
+        }
+      ]
+    }
+  ]
+}

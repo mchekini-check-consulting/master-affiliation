@@ -39,8 +39,8 @@ export const preparations: Preparation[] = [
     slug: 'devops',
     label: 'DevOps',
     description:
-      'Conteneurs, orchestration, cloud, CI/CD et observabilité au quotidien.',
-    matieres: 'Programme en cours d’écriture',
-    disponible: false,
+      'De Terraform à l’IA : fiches par thématique, questions d’entretien avec cas situationnels réels, et quiz sur chaque sujet.',
+    matieres: 'Terraform · CI/CD · Kubernetes · ArgoCD · Istio · Cloud · IA',
+    disponible: true,
   },
 ];
