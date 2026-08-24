@@ -563,8 +563,8 @@
     }
     if (mode === 'pawns') {
       statusMain.textContent = 'Structure de pions';
-      if (pwState.exo && pwState.suitePly >= 0) {
-        statusSub.textContent = pwState.exo.titre + ' — la démonstration, coup par coup.';
+      if (pwState.suiteSrc && pwState.suitePly >= 0) {
+        statusSub.textContent = pwState.suiteSrc.titre + ' — la séquence, coup par coup.';
       } else if (pwState.exo) {
         statusSub.textContent = pwState.repondu < 0
           ? pwState.exo.titre + ' — observez la position puis répondez.'
@@ -2005,8 +2005,10 @@
 
   const pawnsPanel = document.getElementById('pawns-panel');
   // onglet : notions | structures | exercices ; item : notion/structure
-  // ouverte ; vue : diagramme courant ; exo + repondu + suitePly : état du QCM
-  let pwState = { onglet: 'notions', item: null, vue: 0, exo: null, repondu: -1, suitePly: -1 };
+  // ouverte ; vue : diagramme courant ; exo + repondu : état du QCM ;
+  // suiteSrc + suitePly : séquence rejouable en cours (démo d'exercice ou
+  // animation d'exploitation d'une fiche théorique)
+  let pwState = { onglet: 'notions', item: null, vue: 0, exo: null, repondu: -1, suiteSrc: null, suitePly: -1 };
 
   const PW_COULEURS = {
     vert: 'rgba(46, 125, 91, .85)',
@@ -2059,7 +2061,7 @@
 
   /** Position à afficher pour l'état courant (item/vue, exo, ou accueil). */
   function pwRefreshBoard() {
-    if (pwState.exo && pwState.suitePly >= 0) { pwSuiteApplique(); return; }
+    if (pwState.suiteSrc && pwState.suitePly >= 0) { pwSuiteApplique(); return; }
     if (pwState.exo) {
       const exo = pwState.exo;
       const ok = pwState.repondu === exo.bonne;
@@ -2084,16 +2086,17 @@
     pwClearBoardMarks();
   }
 
-  /** Rejoue la séquence de démonstration de l'exercice jusqu'à suitePly. */
+  /** Rejoue la séquence courante (démo d'exercice ou animation de fiche)
+      jusqu'à suitePly, avec la flèche du prochain coup. */
   function pwSuiteApplique() {
-    const exo = pwState.exo;
-    game = Chess.fromFen(exo.fen);
+    const src = pwState.suiteSrc;
+    game = Chess.fromFen(src.fen);
     sanHistory = [];
     lastMove = null;
     for (let i = 0; i < pwState.suitePly; i++) {
-      const mv = Pgn.sanToMove(Chess, game, exo.suite.coups[i][0]);
+      const mv = Pgn.sanToMove(Chess, game, src.coups[i][0]);
       Chess.play(game, mv);
-      sanHistory.push(exo.suite.coups[i][0]);
+      sanHistory.push(src.coups[i][0]);
       lastMove = { from: mv.from, to: mv.to };
     }
     selected = -1;
@@ -2102,14 +2105,28 @@
     pieceEls.clear();
     renderGame({});
     pwClearBoardMarks();
-    if (pwState.suitePly < exo.suite.coups.length) {
-      const next = Pgn.sanToMove(Chess, game, exo.suite.coups[pwState.suitePly][0]);
+    if (pwState.suitePly < src.coups.length) {
+      const next = Pgn.sanToMove(Chess, game, src.coups[pwState.suitePly][0]);
       if (next) drawArrow(next.from, next.to, PW_COULEURS.orange, 'pw-arrow-0');
     }
   }
 
+  /** Ouvre la visionneuse sur une séquence : titre + intro + coups depuis fen. */
+  function pwSuiteStart(fen, suite, titre, retour) {
+    pwState.suiteSrc = { fen, coups: suite.coups, intro: suite.intro, titre, retour };
+    pwSuiteGoto(0);
+  }
+
+  function pwSuiteQuit() {
+    pwState.suiteSrc = null;
+    pwState.suitePly = -1;
+    pwRefreshBoard();
+    renderPawnsPanel();
+    renderStatus();
+  }
+
   function pwSuiteGoto(ply) {
-    pwState.suitePly = Math.max(0, Math.min(ply, pwState.exo.suite.coups.length));
+    pwState.suitePly = Math.max(0, Math.min(ply, pwState.suiteSrc.coups.length));
     pwSuiteApplique();
     renderPawnsPanel();
     renderStatus();
@@ -2140,6 +2157,9 @@
       + '<span class="op-count">' + escapeHtml(vue.titre)
       + (n > 1 ? ' · vue ' + (pwState.vue + 1) + ' / ' + n : '') + '</span>'
       + '<div class="op-caption">' + escapeHtml(vue.caption) + '</div>';
+    if (vue.suite) {
+      html += '<button type="button" class="btn btn-primary" data-pw-suite-start="1">🎬 Voir l\'exploitation coup par coup</button>';
+    }
     if (n > 1) {
       html += '<div class="op-nav">'
         + '<button type="button" class="btn btn-secondary" data-pw-vue="-1"' + (pwState.vue === 0 ? ' disabled' : '') + '>◀ Vue précédente</button>'
@@ -2150,12 +2170,42 @@
     return html;
   }
 
+  /** Visionneuse d'une séquence rejouable (partagée fiches / exercices). */
+  function pwSuiteHtml() {
+    const src = pwState.suiteSrc;
+    const total = src.coups.length;
+    const i = pwState.suitePly;
+    const caption = i === 0
+      ? escapeHtml(src.intro) + ' Avancez avec « Suivant » — la flèche montre chaque coup.'
+      : '<b>' + escapeHtml(src.coups[i - 1][0]) + '</b> — ' + escapeHtml(src.coups[i - 1][1]);
+    return '<div class="op-viewer tr-card">'
+      + '<span class="op-count">🎬 ' + escapeHtml(src.titre) + ' · coup ' + i + ' / ' + total + '</span>'
+      + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + Math.round((i / total) * 100) + '%"></div></div>'
+      + '<div class="op-caption">' + caption + '</div>'
+      + '<div class="op-nav">'
+      + '<button type="button" class="btn btn-secondary" data-pw-suite="-1"' + (i === 0 ? ' disabled' : '') + '>◀ Précédent</button>'
+      + '<button type="button" class="btn btn-primary" data-pw-suite="1"' + (i === total ? ' disabled' : '') + '>Suivant ▶</button>'
+      + '</div>'
+      + '<button type="button" class="btn btn-secondary" data-pw-suite-quit="1">↩ '
+      + (src.retour === 'exo' ? 'Revenir à l\'exercice' : 'Revenir à la fiche') + '</button>'
+      + '</div>';
+  }
+
   function renderPawnsPanel() {
     let html = '<div class="op-tabs">'
       + ['notions', 'structures', 'exercices'].map(t =>
         '<button type="button" class="op-tab' + (pwState.onglet === t ? ' active' : '') + '" data-pw-onglet="' + t + '">'
         + (t === 'notions' ? 'Notions' : t === 'structures' ? 'Structures' : 'Entraînement') + '</button>').join('')
       + '</div>';
+
+    // Une séquence en cours de lecture remplace le contenu de l'onglet
+    if (pwState.suiteSrc) {
+      html += '<button type="button" class="op-back" data-pw-suite-quit="1">⬅ '
+        + (pwState.suiteSrc.retour === 'exo' ? 'L\'exercice' : 'La fiche') + '</button>'
+        + pwSuiteHtml();
+      pawnsPanel.innerHTML = html;
+      return;
+    }
 
     if (pwState.onglet === 'exercices') {
       html += pwExercicesHtml();
@@ -2215,25 +2265,6 @@
     }
     // Exercice ouvert
     let html = '<button type="button" class="op-back" data-pw-back="1">⬅ Tous les exercices</button>';
-    if (pwState.suitePly >= 0) {
-      // Visionneuse de la séquence de démonstration
-      const total = exo.suite.coups.length;
-      const i = pwState.suitePly;
-      const caption = i === 0
-        ? escapeHtml(exo.suite.intro) + ' Avancez avec « Suivant » — la flèche montre chaque coup.'
-        : '<b>' + escapeHtml(exo.suite.coups[i - 1][0]) + '</b> — ' + escapeHtml(exo.suite.coups[i - 1][1]);
-      html += '<div class="op-viewer tr-card">'
-        + '<span class="op-count">🎬 ' + escapeHtml(exo.titre) + ' · coup ' + i + ' / ' + total + '</span>'
-        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + Math.round((i / total) * 100) + '%"></div></div>'
-        + '<div class="op-caption">' + caption + '</div>'
-        + '<div class="op-nav">'
-        + '<button type="button" class="btn btn-secondary" data-pw-suite="-1"' + (i === 0 ? ' disabled' : '') + '>◀ Précédent</button>'
-        + '<button type="button" class="btn btn-primary" data-pw-suite="1"' + (i === total ? ' disabled' : '') + '>Suivant ▶</button>'
-        + '</div>'
-        + '<button type="button" class="btn btn-secondary" data-pw-suite-quit="1">↩ Revenir à l\'exercice</button>'
-        + '</div>';
-      return html;
-    }
     html += '<div class="tr-card">'
       + '<span class="op-count">' + pwNiveauHtml(exo.niveau) + ' ' + escapeHtml(exo.titre) + '</span>'
       + '<p class="pw-question">' + escapeHtml(exo.question) + '</p>';
@@ -2263,6 +2294,7 @@
   function pwOuvreExo(exo) {
     pwState.exo = exo;
     pwState.repondu = -1;
+    pwState.suiteSrc = null;
     pwState.suitePly = -1;
     pwRefreshBoard();
     renderPawnsPanel();
@@ -2278,6 +2310,7 @@
       pwState.vue = 0;
       pwState.exo = null;
       pwState.repondu = -1;
+      pwState.suiteSrc = null;
       pwState.suitePly = -1;
       pwRefreshBoard();
       renderPawnsPanel();
@@ -2294,6 +2327,7 @@
       pwState.vue = 0;
       pwState.exo = null;
       pwState.repondu = -1;
+      pwState.suiteSrc = null;
       pwState.suitePly = -1;
       pwRefreshBoard();
       renderPawnsPanel();
@@ -2316,23 +2350,27 @@
       renderPawnsPanel();
       renderStatus();
     } else if (target.dataset.pwSuiteStart) {
-      pwSuiteGoto(0);
+      // Depuis un exercice répondu, ou depuis la vue d'une fiche théorique
+      if (pwState.exo) {
+        pwSuiteStart(pwState.exo.fen, pwState.exo.suite, pwState.exo.titre, 'exo');
+      } else if (pwState.item) {
+        const vue = pwState.item.vues[pwState.vue];
+        pwSuiteStart(vue.fen, vue.suite, vue.titre, 'fiche');
+      }
     } else if (target.dataset.pwSuite) {
       pwSuiteGoto(pwState.suitePly + Number(target.dataset.pwSuite));
     } else if (target.dataset.pwSuiteQuit) {
-      pwState.suitePly = -1;
-      pwRefreshBoard();
-      renderPawnsPanel();
-      renderStatus();
+      pwSuiteQuit();
     }
   });
 
-  // Navigation clavier : vues d'une fiche, ou séquence d'un exercice
+  // Navigation clavier : séquence en cours, sinon vues d'une fiche
   document.addEventListener('keydown', (event) => {
     if (mode !== 'pawns') return;
-    if (pwState.exo && pwState.suitePly >= 0) {
+    if (pwState.suiteSrc && pwState.suitePly >= 0) {
       if (event.key === 'ArrowRight') { pwSuiteGoto(pwState.suitePly + 1); event.preventDefault(); }
       else if (event.key === 'ArrowLeft') { pwSuiteGoto(pwState.suitePly - 1); event.preventDefault(); }
+      else if (event.key === 'Escape') { pwSuiteQuit(); }
     } else if (pwState.item && pwState.item.vues.length > 1) {
       const move = (d) => {
         pwState.vue = Math.max(0, Math.min(pwState.item.vues.length - 1, pwState.vue + d));

@@ -99,10 +99,18 @@
         },
         {
           titre: 'Le candidat : « candidate first »',
-          fen: '8/1p6/4k3/8/1PP5/4K3/8/8 w - - 0 1',
+          fen: '8/8/1p2k3/8/1PP5/4K3/8/8 w - - 0 1',
           hl: { verts: ['c4'] },
           arrows: [['c4', 'c5', 'orange']],
-          caption: 'Dans la majorité b4+c4 contre b7, le candidat est c4 : il n\'a pas de vis-à-vis. Règle d\'or : on pousse le candidat en premier — b4-b5 ?? laisserait la majorité se figer.'
+          caption: 'Dans la majorité b4+c4 contre b6, le candidat est c4 : il n\'a pas de vis-à-vis. Règle d\'or : on pousse le candidat en premier — b4-b5 ?? laisserait la majorité se figer.',
+          suite: {
+            intro: 'Le candidat avance, la majorité accouche d\'un pion passé.',
+            coups: [
+              ['c5', 'Le candidat d\'abord ! (1.b5 ?? figerait tout : après ...b6, plus aucun passé possible.)'],
+              ['bxc5', 'Forcé tôt ou tard…'],
+              ['bxc5', 'Un pion passé tout neuf : la majorité a rempli son contrat.']
+            ]
+          }
         }
       ],
       points: [
@@ -162,10 +170,20 @@
       vues: [
         {
           titre: 'd4-e5 contre d5-e6 (Française)',
-          fen: '2b3k1/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/6K1 w - - 0 1',
+          fen: '2b3k1/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/6K1 b - - 0 1',
           hl: { rouges: ['d4'], bleus: ['e6'] },
           arrows: [['c7', 'c5', 'rouge'], ['f7', 'f6', 'rouge'], ['f2', 'f4', 'vert']],
-          caption: 'Principe de Nimzowitsch : on attaque une chaîne à sa BASE. Les Noirs frappent d4 par ...c5 (puis e5 par ...f6) ; les Blancs visent e6 via f4-f5. Chacun attaque du côté où sa chaîne « pointe » : les Blancs vers l\'aile roi, les Noirs vers l\'aile dame.'
+          caption: 'Principe de Nimzowitsch : on attaque une chaîne à sa BASE. Les Noirs frappent d4 par ...c5 (puis e5 par ...f6) ; les Blancs visent e6 via f4-f5. Chacun attaque du côté où sa chaîne « pointe » : les Blancs vers l\'aile roi, les Noirs vers l\'aile dame.',
+          suite: {
+            intro: 'La démolition d\'une chaîne, dans les règles de l\'art : la base d4, puis l\'autre base e5.',
+            coups: [
+              ['c5', 'Premier levier : la base d4 est attaquée.'],
+              ['c3', 'Les Blancs étayent la base…'],
+              ['f6', '…mais le second levier frappe déjà e5. La chaîne est prise entre deux feux.'],
+              ['exf6', 'Les Blancs cèdent le terrain (sinon ...fxe5 et tout s\'écroule)…'],
+              ['gxf6', 'Plus de chaîne : d4 est seul face à c5, et la colonne g s\'est ouverte pour les Noirs. Les deux leviers ont tout dynamité.']
+            ]
+          }
         }
       ],
       points: [
@@ -209,14 +227,43 @@
           fen: '6k1/pp3ppp/8/8/8/8/PPP2PPP/6K1 w - - 0 1',
           hl: { verts: ['c2'] },
           arrows: [['c2', 'c4', 'orange']],
-          caption: '3 contre 2 à l\'aile dame, sans pion doublé : cette majorité fabriquera un pion passé en finale. Le candidat est c2 (pas de vis-à-vis) — on le pousse en premier.'
+          caption: '3 contre 2 à l\'aile dame, sans pion doublé : cette majorité fabriquera un pion passé en finale. Le candidat est c2 (pas de vis-à-vis) — on le pousse en premier.',
+          suite: {
+            intro: 'La machine à pion passé, de bout en bout : le candidat ouvre la marche, le duo suit, la percée conclut.',
+            coups: [
+              ['c4', 'Le candidat d\'abord — il n\'a pas de vis-à-vis, personne ne peut l\'échanger.'],
+              ['g6', 'Les Noirs ne peuvent qu\'assister : leur propre majorité est de l\'autre côté.'],
+              ['c5', 'Le candidat continue sa route sans se laisser fixer.'],
+              ['Kg7', 'Le roi noir se prépare… mais il est loin.'],
+              ['b4', 'Le duo se forme : b4 vient épauler.'],
+              ['f6', 'Trop lent pour créer du contre-jeu.'],
+              ['b5', 'L\'étau : c6 et b6 sont maintenant DEUX menaces de percée.'],
+              ['Kf7', 'Le roi accourt…'],
+              ['c6', 'La percée !'],
+              ['bxc6', 'Forcé (sinon c6-c7 suivait),'],
+              ['bxc6', 'Et voilà le pion passé promis. Le roi noir est condamné à monter la garde devant c6 pendant que le roi blanc ira se servir ailleurs : la majorité a été convertie.']
+            ]
+          }
         },
         {
           titre: 'L\'attaque de minorité (Carlsbad)',
           fen: '6k1/pp3ppp/2p5/3p4/3P4/4P3/PP3PPP/6K1 w - - 0 1',
           hl: { rouges: ['c6'] },
           arrows: [['b2', 'b5', 'vert']],
-          caption: 'Deux pions attaquent trois ! La marche a4-b4-b5 force bxc6 (ou b5xc6) et laisse c6 arriéré sur colonne ouverte : une faiblesse éternelle. La minorité ne cherche pas à passer — elle cherche à créer une cible.'
+          caption: 'Deux pions attaquent trois ! La marche a4-b4-b5 force bxc6 (ou b5xc6) et laisse c6 arriéré sur colonne ouverte : une faiblesse éternelle. La minorité ne cherche pas à passer — elle cherche à créer une cible.',
+          suite: {
+            intro: 'La minorité en marche : deux pions partent créer une faiblesse — pas un pion passé.',
+            coups: [
+              ['b4', 'La minorité s\'ébranle : b4 ne cherche pas à passer, il cherche une cible.'],
+              ['g6', 'Difficile de s\'y opposer sans créer d\'autres faiblesses.'],
+              ['a4', 'Le second pion soutient : la marche est méthodique.'],
+              ['Kg7', 'Les Noirs préparent leur défense…'],
+              ['b5', 'Le contact ! (Sur ...cxb5 axb5, même thème : le pion d5 devient l\'isolé à cibler.)'],
+              ['h5', 'Retarder l\'échéance ne l\'annule pas.'],
+              ['bxc6', 'L\'échange fatidique…'],
+              ['bxc6', 'Voilà l\'œuvre : c6 arriéré sur colonne ouverte, indéfendable par un pion, cible ÉTERNELLE. Les tours blanches ont leur programme pour les 30 prochains coups.']
+            ]
+          }
         }
       ],
       points: [
@@ -269,7 +316,20 @@
           fen: '6k1/pp3ppp/2p5/3p4/3P4/4P3/PP3PPP/6K1 w - - 0 1',
           hl: { rouges: ['c6'] },
           arrows: [['b2', 'b5', 'vert'], ['f7', 'f5', 'rouge']],
-          caption: 'Colonne c semi-ouverte pour les Blancs, colonne e pour les Noirs. Plan blanc : la minorité a4-b4-b5 pour créer la faiblesse c6. Plan noir : le jeu de pièces à l\'aile roi (...Ce4, ...f5) — chacun sa moitié d\'échiquier.'
+          caption: 'Colonne c semi-ouverte pour les Blancs, colonne e pour les Noirs. Plan blanc : la minorité a4-b4-b5 pour créer la faiblesse c6. Plan noir : le jeu de pièces à l\'aile roi (...Ce4, ...f5) — chacun sa moitié d\'échiquier.',
+          suite: {
+            intro: 'Le plan blanc de A à Z : l\'attaque de minorité fabrique la faiblesse c6.',
+            coups: [
+              ['b4', 'Coup 1 du plan : la minorité s\'ébranle.'],
+              ['g6', 'Les Noirs, eux, jouent normalement à l\'aile roi.'],
+              ['a4', 'Coup 2 : tout avance ensemble.'],
+              ['Kg7', '…'],
+              ['b5', 'Coup 3 : le contact est créé.'],
+              ['h5', 'Sur ...cxb5 axb5, c\'est d5 qui devient la cible — pas d\'échappatoire.'],
+              ['bxc6', 'Coup 4 : l\'échange…'],
+              ['bxc6', '…et le but est atteint : c6 arriéré sur colonne ouverte. En partie réelle, les tours s\'empilent maintenant sur c6 — un plan complet, du 10e au 40e coup.']
+            ]
+          }
         }
       ],
       plansB: ['Attaque de minorité b4-b5 → faiblesse durable en c6', 'Ou attaque centrale f3 + e3-e4', 'Ou Ce5 et f2-f4 contre le roi'],
@@ -352,7 +412,24 @@
           titre: 'Le squelette',
           fen: '6k1/ppp2p1p/3p2p1/3Pp3/2P1P3/5P2/PP4PP/6K1 w - - 0 1',
           arrows: [['c4', 'c5', 'vert'], ['f7', 'f5', 'rouge']],
-          caption: 'Règle d\'or des centres bloqués : on attaque du côté où pointent ses pions. Blancs : c4-c5, ouverture de la colonne c, invasion à l\'aile dame. Noirs : ...f5-f4 puis l\'avalanche g5-g4-g3 et le mat. C\'est une course : vitesse > matériel — chaque tempo défensif est un tempo perdu.'
+          caption: 'Règle d\'or des centres bloqués : on attaque du côté où pointent ses pions. Blancs : c4-c5, ouverture de la colonne c, invasion à l\'aile dame. Noirs : ...f5-f4 puis l\'avalanche g5-g4-g3 et le mat. C\'est une course : vitesse > matériel — chaque tempo défensif est un tempo perdu.',
+          suite: {
+            intro: 'Les deux courses lancées en parallèle : chacun fonce du côté où pointent ses pions — et personne ne défend.',
+            coups: [
+              ['c5', 'Départ de la course blanche, côté aile dame.'],
+              ['f5', 'Départ de la course noire, côté aile roi. Aucun des deux ne regarde l\'autre.'],
+              ['cxd6', 'Les Blancs ouvrent la colonne c…'],
+              ['cxd6', '…c\'est par là que leurs tours envahiront (c7 !).'],
+              ['b4', 'Et déjà la suite : b4-b5, l\'aile dame noire va craquer.'],
+              ['f4', 'Les Noirs ne prennent même pas en e4 : ...f4 fige et prépare l\'avalanche.'],
+              ['b5', 'Chaque coup blanc gagne un mètre à l\'aile dame…'],
+              ['g5', '…chaque coup noir un mètre vers le roi blanc.'],
+              ['a4', 'Personne ne freine :'],
+              ['g4', 'l\'avalanche approche…'],
+              ['a5', 'Les files a et b vont s\'ouvrir —'],
+              ['g3', '— et g3 frappe à la porte du roi. En partie réelle, tout se joue à UN tempo près : défendre, c\'est déjà perdre. Vitesse > matériel.']
+            ]
+          }
         }
       ],
       plansB: ['c4-c5 et cxd6 / c6 : ouvrir la colonne c', 'Invasion par c7 avec tours et cavaliers', 'Défense minimale à l\'aile roi (souvent : fuir en cas d\'urgence)'],
