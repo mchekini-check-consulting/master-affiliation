@@ -1,0 +1,379 @@
+{
+  "source": "Questions_Reponses_Entretien_BA_Assurance_BNP — 63 questions d'entretien et réponses attendues, complétées d'une section bonus.",
+  "sections": [
+    {
+      "id": "ateliers",
+      "titre": "Ateliers métier & recueil du besoin",
+      "questions": [
+        {
+          "q": "Racontez-moi comment vous préparez et animez un atelier de cadrage. Prenez un exemple réel.",
+          "r": "Je prépare toujours un atelier autour d'un objectif unique : un atelier = une décision à obtenir. Exemple réel : le cadrage de la signature électronique sur le parcours devis-contrat. En préparation, j'avais l'ordre du jour, les maquettes du parcours, et une liste de questions sur les règles à trancher : durée de validité du lien de signature, relances, comportement en cas de refus ou de pièce non conforme. En animation, je déroule le parcours pas à pas avec le métier et je challenge les cas limites (« et si le client ne signe pas sous 15 jours ? »), en notant décisions, hypothèses et actions en séance. En sortie : un compte-rendu Confluence validé, six user stories avec leurs critères d'acceptation, et deux points ouverts arbitrés par le PO la semaine suivante."
+        },
+        {
+          "q": "Comment faites-vous quand deux métiers ne sont pas d'accord en atelier (ex. tarification vs distribution) ?",
+          "r": "Je ne tranche pas à leur place : ce n'est pas le rôle du BA. Je reformule les deux besoins pour vérifier qu'ils se comprennent, puis j'objective le désaccord : impact de chaque option en chiffres (taux d'abandon du parcours d'un côté, qualité de la tarification de l'autre). Je propose des compromis quand c'est possible — par exemple différer une question après l'affichage du devis, ou une valeur par défaut modifiable. Si le désaccord persiste, je prépare un dossier d'arbitrage factuel (options, impacts, recommandation) et je le porte au PO ou au sponsor. L'essentiel : la décision est prise au bon niveau et elle est tracée."
+        },
+        {
+          "q": "Un métier vous décrit un besoin flou du type « je veux que ce soit plus simple ». Comment le transformez-vous en exigences ?",
+          "r": "Je fais préciser par les irritants concrets : qu'est-ce qui est compliqué, pour qui, à quelle étape ? Je m'appuie sur des faits mesurables : nombre de champs, taux d'abandon par écran, motifs d'appels au support. Puis je reformule en objectif mesurable — « simplifier la souscription » devient « passer de 12 à 7 champs en pré-remplissant depuis les référentiels » — que je décline en user stories priorisées. Le flou disparaît quand on passe du ressenti à l'observable."
+        },
+        {
+          "q": "Comment gérez-vous un métier peu disponible qui ne valide jamais vos comptes-rendus ?",
+          "r": "Je m'adapte à sa contrainte : des créneaux courts et récurrents plutôt que de grandes réunions, une préparation telle que 30 minutes suffisent, et les décisions prises en séance plutôt que par mail. Sur les comptes-rendus, j'annonce une règle de validation tacite : « sans retour sous 5 jours ouvrés, le CR est réputé validé » — annoncée à l'avance, jamais imposée après coup. Si le blocage persiste et met le planning en risque, j'escalade factuellement via le PO, sans mettre la personne en cause."
+        },
+        {
+          "q": "Que faites-vous d'une règle de gestion que personne ne sait justifier (« on a toujours fait comme ça ») ?",
+          "r": "Surtout ne pas la supprimer par défaut : une règle inexpliquée est souvent une contrainte réglementaire ou un correctif historique oublié. J'investigue : l'historique (origine réglementaire ? contrainte technique ? héritage d'un ancien produit ?), l'impact en données (combien de contrats du stock passent par cette règle ?), et l'avis de la conformité. Si l'analyse démontre qu'elle est obsolète, sa suppression devient une décision métier documentée, couverte par des tests de non-régression."
+        },
+        {
+          "q": "Comment restituez-vous un atelier ? Quels livrables produisez-vous derrière ?",
+          "r": "Un compte-rendu structuré sous Confluence — décisions, hypothèses, actions avec porteurs et échéances, points ouverts — validé formellement par les participants. Le CR n'est pas un verbatim : il capture ce qui a été décidé. Derrière, je traduis en user stories et critères d'acceptation dans Jira, avec un lien vers le CR pour garder la traçabilité entre la décision métier et le développement."
+        },
+        {
+          "q": "Avez-vous déjà animé un atelier qui s'est mal passé ? Qu'en avez-vous retiré ?",
+          "r": "Oui — un atelier sur la qualité des données CRM avec douze participants et un objectif trop large : c'est devenu une réunion d'opinions sans décision. J'en ai retiré des règles que j'applique depuis : un atelier = une décision, six à sept participants maximum et les bons (ceux qui peuvent décider), un support envoyé en amont, et un timeboxing strict par sujet. Depuis, quand un atelier déborde, c'est que le sujet devait être découpé en deux ateliers."
+        }
+      ]
+    },
+    {
+      "id": "quotidien",
+      "titre": "Le quotidien du BA & la rédaction",
+      "questions": [
+        {
+          "q": "Décrivez-moi une journée ou une semaine type dans votre mission actuelle.",
+          "r": "Ma semaine s'articule autour du sprint : le daily chaque matin, un refinement hebdomadaire, et selon le calendrier le planning ou la démo. Autour de cela : un à deux ateliers métier, de la rédaction (US, règles de gestion, specs d'interface), de la recette en continu sur les livraisons, une part quotidienne de support N2 et de suivi d'anomalies, et un point régulier avec le PO. En proportion : environ 40 % d'analyse et de rédaction, 30 % de recette, 15 % de support et de run, 15 % de cérémonies et de coordination."
+        },
+        {
+          "q": "Comment rédigez-vous une user story ? Donnez-moi un exemple complet.",
+          "r": "Format classique : « En tant que prospect, je veux obtenir un devis habitation en saisissant mon adresse, mon statut (locataire ou propriétaire) et le nombre de pièces, afin de connaître ma prime avant de souscrire. » J'y attache les règles de gestion référencées (zone inondable = surprime ; local commercial = hors cible), la maquette, et des critères d'acceptation en Gherkin : un cas passant nominal, le cas surprime, le cas refus. La US n'entre en sprint que si elle respecte la Definition of Ready."
+        },
+        {
+          "q": "Quelle différence entre un BRD, une spécification fonctionnelle détaillée et une US ?",
+          "r": "Le BRD exprime le besoin métier au niveau macro — objectifs, périmètre, gains attendus — en amont, pour faire valider le « quoi » et le « pourquoi ». La SFD décrit le fonctionnement cible en détail : règles, écrans, flux, données ; elle reste utile en cycle en V et pour les sujets structurants comme une interface partenaire. La US est l'unité de valeur livrable en sprint, avec ses critères d'acceptation. En agile, j'utilise un BRD léger au cadrage, des US pour le delivery, et une SFD quand le sujet est transverse et engage des tiers."
+        },
+        {
+          "q": "Comment faites-vous une étude d'impact quand une évolution touche backoffice, écrans digitaux et flux partenaires ?",
+          "r": "Je pars du parcours et je suis la donnée de bout en bout : écran (équipe externe) → API → backoffice (paramétrage, règles) → base de données → flux sortants (partenaires, éditique, comptabilité). Pour chaque maillon : qu'est-ce qui change, qui en est responsable, quel test le couvrira. J'ajoute systématiquement deux questions : quel impact sur le stock de contrats existants, et faut-il une reprise de données ? Le livrable est une matrice d'impacts validée avec les référents techniques de chaque maillon."
+        },
+        {
+          "q": "Les écrans digitaux sont développés par une équipe externe. Comment spécifie-t-on sans maîtriser le front ?",
+          "r": "On spécifie le contrat entre les deux mondes : le besoin fonctionnel (parcours, règles d'affichage, messages d'erreur, cas limites) d'un côté, et le contrat d'API de l'autre (endpoints, payloads, codes retour). J'y ajoute des critères d'acceptation testables des deux côtés et des maquettes partagées. Puis des ateliers tripartites réguliers et une recette d'intégration conjointe."
+        },
+        {
+          "q": "Comment documentez-vous votre travail pour qu'il survive à votre départ ?",
+          "r": "Tout ce qui est décidé va sous Confluence, structuré par périmètre : règles de gestion, parcours, interfaces, fiches produit, FAQ support. Les US gardent le « pourquoi » de chaque évolution, et chaque ticket support résolu alimente la base de connaissances. Mon test : un nouveau BA doit pouvoir retrouver une règle et son origine sans me solliciter. C'est d'autant plus important quand une équipe vit le départ d'un senior — je sais ce que coûte la connaissance non documentée."
+        },
+        {
+          "q": "Comment priorisez-vous entre projet, évolutions, run et support ?",
+          "r": "Par l'impact : le réglementaire et les incidents bloquants pour le client passent d'abord, puis les engagements de sprint, puis le reste. Je rends ma charge visible dans Jira, je négocie les délais en amont plutôt que de les subir, et j'alerte tôt le PO ou le manager quand tout ne rentre pas : prioriser, c'est renoncer explicitement à quelque chose — pas silencieusement."
+        },
+        {
+          "q": "Comment montez-vous rapidement en compétence sur un produit que vous ne connaissez pas ?",
+          "r": "Cinq leviers dans l'ordre : lire les conditions générales et particulières — la vérité contractuelle du produit ; dérouler le parcours complet en environnement de test ; explorer le paramétrage et les données du stock, qui racontent le produit réel ; binômer avec le BA ou le gestionnaire référent ; et traiter des tickets de support sur ce périmètre — c'est l'accélérateur le plus efficace, on apprend par les cas concrets. Je synthétise le tout dans une fiche produit qui sert ensuite à toute l'équipe."
+        }
+      ]
+    },
+    {
+      "id": "recette",
+      "titre": "Organisation des tests & recette",
+      "questions": [
+        {
+          "q": "Décrivez-moi votre processus de recette de bout en bout.",
+          "r": "Cinq étapes. D'abord la stratégie : périmètre, environnements, jeux de données, responsabilités, critères d'arrêt. Ensuite le cahier de test, dérivé des US et de leurs critères d'acceptation : cas passants, non passants, cas limites, plus le périmètre de TNR. Puis l'exécution : déroulé des scénarios, qualification des anomalies (bloquante, majeure, mineure) sous Jira, suivi jusqu'à clôture, retest. Ensuite le PV de recette signé avec le métier, qui liste le périmètre testé, les résultats et les anomalies résiduelles acceptées : c'est le support du go/no-go. Enfin la MEP avec les vérifications de service régulier et la surveillance des premiers jours."
+        },
+        {
+          "q": "Comment construisez-vous un cahier de test à partir d'une US ?",
+          "r": "Chaque critère d'acceptation donne au moins un cas de test. J'ajoute : le cas passant nominal, les cas non passants (les erreurs attendues doivent bien se produire), les cas limites (bornes de dates, montants maximum, bonus à 0,50), les contrôles transverses (éditique générée, donnée correcte en base, flux émis) et la TNR sur les parcours adjacents. Le tout avec une traçabilité exigence-test : je dois pouvoir démontrer que chaque exigence est couverte."
+        },
+        {
+          "q": "Qu'est-ce qu'un PV de recette ? Qui le signe, que contient-il ?",
+          "r": "C'est le document formel de fin de recette : périmètre testé, taux d'exécution et de réussite, liste des anomalies ouvertes avec leur criticité et leur plan de traitement (correction post-MEP ou acceptation), et les éventuelles réserves. Il est signé par le métier ou le PO et par le BA. C'est le support factuel de la décision de mise en production — il protège tout le monde, car ce qui est accepté l'est en connaissance de cause."
+        },
+        {
+          "q": "Comment qualifiez-vous les anomalies ? Que faire d'une mineure non corrigée à la veille de la MEP ?",
+          "r": "Bloquante : empêche l'usage ou crée un risque réglementaire ou financier — pas de MEP. Majeure : fonction dégradée sans contournement — à arbitrer. Mineure : contournement possible ou cosmétique. Une mineure à J-1 ne bloque pas la MEP : je la documente au PV avec l'accord explicite du métier et une échéance de correction. On ne bloque pas une mise en production pour une mineure, mais on ne la perd pas non plus dans la nature."
+        },
+        {
+          "q": "Qu'est-ce que la TNR et comment constituez-vous votre patrimoine de tests ?",
+          "r": "La TNR (tests de non-régression) vérifie à chaque livraison que l'existant fonctionne toujours, sur les parcours critiques : devis-contrat par produit, quittancement, éditique. Je la constitue en promouvant les meilleurs cas de recette, et surtout en y intégrant chaque bug de production corrigé : un incident qui a existé une fois est un excellent candidat à la récidive. Le patrimoine est priorisé par criticité et maintenu à chaque évolution, sinon il meurt."
+        },
+        {
+          "q": "La recette est sous Excel, avec un objectif de montée en outillage. Comment aborderiez-vous cette transition ?",
+          "r": "J'ai pratiqué xRay intégré à Jira : référentiel de cas de test, plans d'exécution, traçabilité exigence-test-anomalie, tableaux de bord. Pour la transition, je commencerais par migrer le patrimoine de TNR — c'est le plus réutilisé, donc le meilleur retour sur effort — sur un périmètre pilote, avec des conventions de nommage claires, avant d'étendre. Et je garderais Excel en parallèle le temps de prouver la valeur : un outil de test doit alléger la recette, pas devenir une charge administrative."
+        },
+        {
+          "q": "Quel rôle joueriez-vous dans l'automatisation des recettes, sans développer les scripts ?",
+          "r": "Le rôle du BA y est central : identifier les candidats à l'automatisation (TNR fréquents, parcours stables, fort ROI), écrire les scénarios dans un formalisme structuré et réutilisable (Gherkin), définir les jeux de données et les résultats attendus, puis analyser les résultats des campagnes automatisées. Je commencerais par la TNR tarifaire : une dizaine de profils types de devis avec leurs tarifs de référence, rejoués à chaque livraison — périmètre stable, régressions critiques, ROI immédiat."
+        },
+        {
+          "q": "Comment testez-vous une API ? Décrivez un test concret fait avec Postman.",
+          "r": "Exemple réel sur l'API de souscription : un POST avec un payload nominal — je vérifie le code 201, l'identifiant de contrat renvoyé, et la création effective du contrat en base. Puis les cas d'erreur : date d'effet au mauvais format → 400 avec le bon message ; appel sans jeton → 401 ; et je contrôle la cohérence du tarif renvoyé avec celui du moteur tarifaire. Les collections Postman sont partagées à l'équipe pour être rejouables par tous."
+        },
+        {
+          "q": "Le métier vous dit « pas le temps de recetter, on vous fait confiance ». Que faites-vous ?",
+          "r": "Je n'accepte pas un GO sans filet, mais je ne bloque pas non plus : je propose une recette proportionnée au risque. Concrètement : une journée ciblée sur les cas critiques, le déroulé de la TNR existante, et un PV qui acte explicitement ce qui n'a pas été testé. Si le métier maintient sa position, la décision est tracée et portée par lui. Mon rôle n'est pas d'empêcher la décision, c'est de rendre le risque visible avant qu'elle soit prise."
+        },
+        {
+          "q": "Racontez-moi une mise en production qui s'est mal passée.",
+          "r": "Sur une évolution des règles de routage des paiements : un cas de figure — certains BIC hors zone — était absent du cahier de test parce qu'absent des spécifications. Résultat : des rejets en production, un correctif rapide et une reprise des opérations concernées. J'en ai changé deux choses : une revue systématique des cas limites avec les développeurs avant la recette — ils voient des cas que le BA ne voit pas — et l'entrée immédiate du cas dans la TNR. Une erreur qui a existé ne doit plus jamais coûter deux fois."
+        }
+      ]
+    },
+    {
+      "id": "run",
+      "titre": "Run, incidents & support",
+      "questions": [
+        {
+          "q": "Un incident de production arrive : par quoi commencez-vous ?",
+          "r": "Par l'impact, pas par la cause : combien de clients touchés, y a-t-il un enjeu réglementaire ou financier, depuis quand ? C'est ce qui fixe la priorité. Ensuite je fige les faits : reproduction, captures, logs Kibana, requête en base, et je communique un premier statut aux parties prenantes. Puis seulement la recherche de cause, la correction, la régularisation du stock impacté — et l'ajout du cas en TNR."
+        },
+        {
+          "q": "Un exemple réel de bug investigué avec les logs et la base ? Déroulez le raisonnement.",
+          "r": "Des devis auto en erreur sur certains codes postaux. Étape 1 : reproduction — l'erreur est systématique sur un code postal donné. Étape 2 : logs Kibana — le moteur tarifaire renvoie une erreur 500 « zone tarifaire introuvable ». Étape 3 : requête sur le référentiel des zones — les codes postaux récents sont absents, le millésime n'a pas été chargé. Correction de la donnée, contrôle sur les cas signalés, information du support N1 pendant toute l'investigation, et demande d'automatisation du chargement du référentiel pour éviter la récidive."
+        },
+        {
+          "q": "Quand escaladez-vous au N3, et que contient votre dossier de transmission ?",
+          "r": "J'escalade quand la cause relève du code ou n'est pas identifiable avec mes accès. Le dossier contient : le symptôme, les étapes de reproduction, l'environnement, un contrat témoin, les extraits de logs, les requêtes déjà exécutées et leurs résultats, l'impact et la priorité, et mon hypothèse. Un dossier bien qualifié divise le temps de résolution par deux — et c'est ce qui fait la crédibilité du N2 auprès des développeurs."
+        },
+        {
+          "q": "1 000 à 1 500 demandes par an : comment gérer ce volume sans sacrifier vos projets ?",
+          "r": "Trois leviers. D'abord des créneaux dédiés — par exemple deux plages par jour — plutôt qu'un traitement au fil de l'eau qui fragmente tout : le projet est protégé, le demandeur a un délai prévisible. Ensuite la base de connaissances, qui tue les questions récurrentes, et l'analyse des motifs récurrents pour les transformer en évolutions : le meilleur ticket est celui qu'on ne reçoit plus. Enfin un suivi du stock de tickets visible de l'équipe, pour arbitrer collectivement quand ça déborde."
+        },
+        {
+          "q": "Comment travailler sur des produits historiques mal documentés dont les sachants sont partis ?",
+          "r": "La documentation, c'est le SI lui-même : le paramétrage, les données du stock et l'éditique racontent le produit réel. Je reconstruis la connaissance à partir de contrats témoins, je documente chaque découverte au fil de l'eau dans une fiche produit, je m'appuie sur les gestionnaires anciens qui manipulent ces contrats au quotidien, et je sanctuarise une TNR minimale sur ces produits — chaque intervention y est risquée précisément parce que personne ne connaît plus tous les cas."
+        },
+        {
+          "q": "Un utilisateur signale un montant faux à l'écran. Bug, donnée corrompue ou comportement normal ?",
+          "r": "Je compare les trois vérités : ce qu'affiche l'écran, ce que contient la base, ce que disent les règles (conditions générales, paramétrage). Écran différent de la base : bug de restitution. Base fausse : je cherche l'événement qui a écrit la donnée — un flux, un avenant, une reprise. Écran et base cohérents avec les règles : comportement normal, à expliquer à l'utilisateur (et si l'incompréhension est récurrente, c'est un sujet d'ergonomie ou de formation). Ce triage évite d'ouvrir de faux bugs aux développeurs."
+        }
+      ]
+    },
+    {
+      "id": "agilite",
+      "titre": "Agilité & organisation d'équipe",
+      "questions": [
+        {
+          "q": "Décrivez vos cérémonies agiles et votre rôle dans chacune.",
+          "r": "Le daily : synchronisation de 15 minutes — fait hier, prévu aujourd'hui, blocages. Le refinement : je présente les US et leurs critères, je réponds aux questions des développeurs, je note ce qui doit mûrir. Le sprint planning : j'éclaire le périmètre fonctionnel, les développeurs s'engagent. La démo : je co-présente avec le PO ce qui a été réalisé, les développeurs interviennent quand ils le souhaitent. La rétro : j'y apporte les sujets qualité et process. Mon fil rouge dans toutes : rendre le besoin limpide et lever les ambiguïtés le plus tôt possible."
+        },
+        {
+          "q": "Comment se passe un refinement ? Que faites-vous d'une US jugée pas assez mûre ?",
+          "r": "Le PO ou moi présentons la US et ses critères d'acceptation ; les développeurs analysent et posent leurs questions. Si la US n'est pas mûre, on la sort du circuit : je complète — un atelier ciblé, des données, une règle à trancher — et elle revient au refinement suivant. Si elle est trop grosse, on la découpe : par cas d'usage, par produit ou par étape de parcours. Ensuite le poker planning : estimation en points sur la suite de Fibonacci (1, 2, 3, 5, 8, 13) ; au-delà de 13 points, le découpage est obligatoire. Les écarts d'estimation sont précieux : ils révèlent les incompréhensions avant le développement."
+        },
+        {
+          "q": "C'est quoi votre DoR et votre DoD ? Pourquoi est-ce important ?",
+          "r": "La Definition of Ready liste les conditions pour qu'une US entre en sprint : US claire, critères d'acceptation présents, dépendances identifiées, maquettes disponibles, US estimée. La Definition of Done liste les conditions pour la déclarer terminée : code review effectuée, tests unitaires OK, tests d'intégration OK, tests fonctionnels OK, déployée en environnement de recette. La DoR protège le sprint des sujets flous en entrée ; la DoD garantit que « fini » veut dire fini en sortie. Sans elles, on accumule des US qui traînent et des « presque fini »."
+        },
+        {
+          "q": "Comment l'équipe s'engage-t-elle au sprint planning ? Vélocité et capacité ?",
+          "r": "La vélocité est le nombre moyen de points réalisés sur les derniers sprints : c'est la base factuelle de l'engagement. On l'ajuste par la capacité réelle du sprint — les absences : en été, on s'engage sur moins de points que le reste de l'année. Le PO priorise le backlog, et l'équipe tire les US en tête de liste jusqu'à hauteur de sa capacité. L'engagement appartient à ceux qui réalisent, pas à celui qui priorise."
+        },
+        {
+          "q": "Comment gérez-vous la cohabitation build/run dans un sprint ?",
+          "r": "On réserve 10 à 20 % des points du sprint au run : incidents, support, correctifs. Cette réserve absorbe l'imprévu sans faire exploser l'engagement de build. Si le run déborde sur un sprint, on désengage explicitement des US — décision du PO, tracée — plutôt que de sacrifier la qualité en silence. Et si le run déborde régulièrement, c'est un signal de fond à remonter : dette technique ou problème de qualité à traiter à la racine."
+        },
+        {
+          "q": "Le PO veut ajouter une US urgente en plein sprint. Comment réagissez-vous ?",
+          "r": "Je qualifie d'abord l'urgence réelle : réglementaire ou incident majeur, ou simplement important ? Une vraie urgence entre dans le sprint, mais en échange : on sort un volume équivalent de points, décision prise avec l'équipe et tracée. Une fausse urgence va en tête de backlog pour le sprint suivant — ce qui, avec des sprints de trois semaines, reste rapide. Le sprint n'est pas un guichet ouvert, mais ce n'est pas un bunker non plus."
+        },
+        {
+          "q": "4 PO métier pour 3 BA : comment gérer plusieurs donneurs d'ordre en parallèle ?",
+          "r": "Une dominante par BA pour l'expertise, mais des backlogs visibles de tous pour la continuité. L'arbitrage de capacité entre périmètres se fait au bon niveau — le manager et les PO ensemble, en amont du planning — pas silencieusement par le BA qui subirait quatre priorités concurrentes. Ma responsabilité : rendre visible ce que la priorité d'un PO coûte aux autres, avec des faits. Et la polyvalence de l'équipe permet de se prêter main-forte sur les pics."
+        }
+      ]
+    },
+    {
+      "id": "partenaires",
+      "titre": "Partenaires & flux",
+      "questions": [
+        {
+          "q": "Avez-vous travaillé avec des partenaires externes ou des gestionnaires délégués ?",
+          "r": "Oui, dans les deux missions. En banque : les flux interbancaires avec les systèmes de place (SWIFT, Target2, Euro1) — suivi quotidien des flux, contrôles, traitement des rejets, réconciliations. En assurance : le prestataire de signature électronique et les flux internes du parcours. Les rituels qui fonctionnent : une supervision quotidienne des comptes-rendus de flux, un comité récurrent avec le partenaire, et un registre des incidents de flux avec leurs causes pour attaquer les récurrences."
+        },
+        {
+          "q": "Un flux quotidien vers un partenaire part en rejet. Déroulez votre traitement.",
+          "r": "D'abord mesurer l'étendue : tout le flux ou quelques enregistrements ? Ce n'est pas la même urgence. Ensuite analyser le compte-rendu de rejet et identifier la cause : donnée manquante, format, référentiel désynchronisé, ou incident côté partenaire. Puis corriger à la source, rejouer ou reprendre les enregistrements rejetés, et vérifier la réconciliation au cycle suivant. Enfin, tracer l'incident et le prévenir : un contrôle en amont de l'émission vaut mieux qu'un traitement de rejet en aval."
+        },
+        {
+          "q": "Comment spécifiez-vous une évolution d'interface avec un partenaire qui a ses propres contraintes ?",
+          "r": "Par une spécification d'interface conjointe et versionnée : format, champs, règles de gestion, codes de rejet — validée des deux côtés. Le planning s'aligne sur les cycles de release des deux parties, avec si possible une période de rétrocompatibilité ou de double-run pour ne pas exiger une bascule simultanée. Et une recette d'intégration conjointe, avec des jeux de données échangés à l'avance. La clé : ne jamais découvrir l'interprétation du partenaire le jour de la bascule."
+        }
+      ]
+    },
+    {
+      "id": "assurance",
+      "titre": "Connaissance assurance",
+      "questions": [
+        {
+          "q": "Expliquez le cycle de vie d'un contrat IARD, du devis à la résiliation.",
+          "r": "Le devis : tarification selon les critères de risque. La souscription : création du contrat, édition des conditions particulières, premier encaissement. La vie du contrat : avenants (changement d'adresse, de véhicule, de garanties), quittancement à chaque échéance annuelle, indexation. Les sinistres : déclaration, instruction, règlement, recours éventuel. La résiliation : à l'échéance, via la loi Chatel (information sur l'avis d'échéance), la loi Hamon (à tout moment après un an), ou à l'initiative de l'assureur après sinistre. À chaque étape, des documents (devis, CP, avis d'échéance, attestations) et des écritures comptables."
+        },
+        {
+          "q": "Bonus-malus ? Convention IRSA ? Quittance ? Avenant ?",
+          "r": "Le bonus-malus (coefficient de réduction-majoration) va de 0,50 à 3,50 : réduction de 5 % par année sans sinistre responsable, majoration de 25 % par sinistre responsable, appliqué à la prime de référence auto. La convention IRSA est un accord entre assureurs pour accélérer l'indemnisation des dommages matériels auto : chaque assureur indemnise son propre client, puis des recours forfaitaires s'appliquent selon un barème de responsabilité. La quittance est l'appel et le justificatif de la prime pour une période. L'avenant est l'acte qui modifie un contrat en cours."
+        },
+        {
+          "q": "Différence assurance de biens / assurance de personnes ? Où placer prévoyance et assurance vie ?",
+          "r": "L'assurance de biens couvre le patrimoine et la responsabilité, sur un principe indemnitaire — on répare un préjudice — c'est la branche non-vie, l'IARD. L'assurance de personnes couvre la personne elle-même (vie, intégrité, santé), souvent sur un principe forfaitaire. La prévoyance (décès, incapacité, invalidité) est une assurance de personnes ; l'assurance vie est un produit d'épargne de la branche vie ; l'assurance emprunteur est une assurance de personnes adossée à un crédit."
+        },
+        {
+          "q": "Que savez-vous de l'assurance affinitaire et de ses spécificités ?",
+          "r": "C'est l'assurance distribuée en accessoire d'un produit non assurantiel — par exemple un compte ou une carte : protection des moyens de paiement, télésurveillance. Ses caractéristiques : primes faibles, très forts volumes, souscription simplifiée. Et ses points de vigilance : la distribution accessoire est très encadrée par la DDA (devoir de conseil, information précontractuelle), le droit de renonciation de 14 jours s'applique, et la vie du contrat est liée aux événements bancaires — une clôture de compte a des effets côté assurance. Côté SI : industrialisation et fiabilité des traitements de masse."
+        },
+        {
+          "q": "Que savez-vous de la loi Lemoine et de son impact SI ?",
+          "r": "La loi Lemoine (2022) permet de résilier et substituer l'assurance emprunteur à tout moment, sans attendre l'échéance ; elle supprime le questionnaire médical sous conditions (part assurée jusqu'à 200 000 euros, terme du prêt avant les 60 ans de l'assuré) et ramène le droit à l'oubli à 5 ans. Impacts SI majeurs : parcours de substitution entrants et sortants, vérification d'équivalence des garanties selon les critères CCSF, suppression conditionnelle des formalités médicales dans les parcours, courriers et volumétrie de résiliations à absorber."
+        },
+        {
+          "q": "Vous n'avez jamais pratiqué Cléva. Qu'en savez-vous, et comment le prendre en main vite ?",
+          "r": "Cléva est un progiciel de gestion d'assurance qui couvre tout le cycle de vie du contrat — référentiel produits et tarifs, souscription et gestion, sinistres, comptabilité technique, éditique, interfaces — piloté par paramétrage. Je ne l'ai pas pratiqué, mais je travaille quotidiennement avec un backoffice du même type : mêmes objets métier (contrat, quittance, avenant, événement), même logique de paramétrage produit et d'éditique. Pour un BA, l'essentiel est le modèle de données et les règles de gestion — l'outil est un vocabulaire, et un vocabulaire s'apprend vite avec des cas réels et le dictionnaire de données."
+        }
+      ]
+    },
+    {
+      "id": "technique",
+      "titre": "Technique (SQL, API, architecture)",
+      "questions": [
+        {
+          "q": "Écrivez une requête : nombre de contrats par produit, puis prime moyenne des seuls contrats actifs.",
+          "r": "Première requête : SELECT produit, COUNT(*) AS nb_contrats FROM contrats GROUP BY produit; — une ligne de résultat par produit. Seconde : SELECT produit, AVG(prime_annuelle) AS prime_moyenne FROM contrats WHERE statut = 'ACTIF' GROUP BY produit; — le WHERE filtre les lignes avant le regroupement, donc la moyenne ne porte que sur les contrats actifs. Et je précise spontanément la règle : toute colonne du SELECT hors fonction d'agrégation doit figurer dans le GROUP BY."
+        },
+        {
+          "q": "Clé primaire, clé étrangère, jointure : illustrez sur contrats / clients / sinistres.",
+          "r": "La clé primaire identifie de manière unique chaque ligne d'une table — id_contrat dans la table contrats : jamais vide, jamais en double. La clé étrangère est une colonne qui référence la clé primaire d'une autre table : id_client dans contrats pointe vers clients.id_client, ce qui garantit qu'un contrat est toujours rattaché à un client existant (intégrité référentielle). La jointure relie les tables par ces clés : sinistres joint à contrats par id_contrat, puis à clients par id_client, pour lister par exemple tous les sinistres en cours avec le numéro de contrat et le nom du client."
+        },
+        {
+          "q": "Vous avez fait du PostgreSQL, pas du DB2. Qu'est-ce qui change ?",
+          "r": "Le SQL standard — SELECT, jointures, agrégations, GROUP BY — est identique : c'est 90 % de mon usage en investigation. Ce qui change relève du dialecte : quelques fonctions, la syntaxe de limitation des résultats (FETCH FIRST n ROWS ONLY), la manipulation des dates, et les outils clients. Pour un usage en lecture au support N2, la marche est très faible : je m'appuierai sur le dictionnaire de données de l'équipe et un jeu de requêtes types que je me constituerai les premières semaines."
+        },
+        {
+          "q": "Différence synchrone / asynchrone, avec un exemple de chaque en assurance ?",
+          "r": "En synchrone, l'appelant attend la réponse pour continuer : l'appel au moteur tarifaire pour établir un devis — le tarif revient instantanément à l'écran, typiquement via une API REST. En asynchrone, le message est déposé et le traitement se fait en différé : la déclaration de sinistre — accusé de réception immédiat, mais l'instruction est traitée plus tard — ou le quittancement en batch de nuit. Le choix : réponse nécessaire à l'instant pour l'utilisateur = synchrone ; traitement long, massif ou rejouable = asynchrone, plus résilient."
+        },
+        {
+          "q": "Une API renvoie une 403, puis une 500. Que comprenez-vous et que faites-vous ?",
+          "r": "La 403 : l'appelant est authentifié mais pas autorisé — je vérifie les habilitations, le profil, le périmètre de l'utilisateur ou de l'application. Ce n'est pas un bug de données, c'est un sujet de droits. La 500 : erreur côté serveur — réflexe immédiat : les logs (Kibana), identifier l'exception, reproduire, et ticket développeur si la cause est dans le code. La grille de lecture générale : 4xx, le problème est côté appelant (données, droits, chemin) ; 5xx, il est côté serveur."
+        }
+      ]
+    },
+    {
+      "id": "situationnel",
+      "titre": "Situationnel & problématiques réelles (format STAR)",
+      "questions": [
+        {
+          "q": "La problématique la plus difficile de votre mission actuelle, et comment vous l'avez résolue ?",
+          "r": "Situation : intégrer les exigences de conformité RGPD/KYC dans le parcours de souscription sans dégrader la conversion — deux objectifs en tension frontale. Tâche : trouver le parcours conforme le moins frictionnel. Actions : des ateliers réunissant conformité et distribution autour des mêmes cas concrets, un benchmark des pratiques du marché, le report en asynchrone des contrôles qui pouvaient l'être (vérifications post-souscription), et des cas de dérogation tracés. Résultat : un parcours validé par la conformité, sans chute de conversion mesurée, et des règles documentées qui servent depuis de référence sur les autres parcours."
+        },
+        {
+          "q": "Une évolution en prod produit des tarifs faux depuis trois jours. Que faites-vous, dans quel ordre ?",
+          "r": "Un : mesurer — quels produits, combien de devis et de contrats, sur-tarification ou sous-tarification ? L'impact client et financier d'abord. Deux : stopper l'hémorragie — corriger ou désactiver la règle fautive, décision prise avec le PO. Trois : informer — management, métier, et conformité si des clients sont lésés. Quatre : régulariser le stock — lister les contrats touchés et définir la stratégie de reprise (remboursement, avenant, geste commercial) selon le sens de l'erreur et le cadre juridique. Cinq : le post-mortem — pourquoi la recette ne l'a pas vu ; en général la réponse est l'absence de TNR tarifaire et de contrôle de cohérence post-MEP, donc on les met en place. L'ordre compte : l'impact d'abord, la cause ensuite."
+        },
+        {
+          "q": "Vous héritez du périmètre d'un senior parti à la retraite, sans passation complète. Vos 90 premiers jours ?",
+          "r": "Jours 1 à 30 — comprendre et sécuriser : cartographier le périmètre (produits, stock, flux, partenaires, contacts clés), traiter du support pour apprendre par les cas réels, et identifier les 20 % de sujets qui portent 80 % du risque — typiquement le quittancement, les échéances et les flux partenaires. Jours 31 à 60 — consolider : documenter au fil de l'eau chaque découverte, reprendre les sujets en cours, sanctuariser une TNR minimale sur les zones critiques. Jours 61 à 90 — contribuer : reprendre les projets et proposer les premières améliorations, notamment sur l'outillage de recette. Et pendant toute la période : poser toutes les questions tant que les sachants indirects — gestionnaires, développeurs anciens — sont disponibles."
+        },
+        {
+          "q": "Vous découvrez en recette que votre propre spécification était fausse. Comment le gérez-vous ?",
+          "r": "Je le dis immédiatement et factuellement : l'anomalie est dans la spécification, pas dans le développement — le développeur n'a pas à porter mon erreur. Ensuite je mesure l'impact : qu'est-ce qui a été développé sur cette base, qu'est-ce qui doit être repris ? Je corrige la spécification avec le métier et je replanifie le correctif avec le PO en toute transparence. La crédibilité d'un BA se joue précisément là : une équipe corrige beaucoup plus vite quand personne ne cherche à se couvrir."
+        },
+        {
+          "q": "Un développeur implémente autre chose que la spec et soutient que sa version est meilleure. Comment tranchez-vous ?",
+          "r": "J'écoute d'abord sur le fond : il a parfois raison, techniquement ou même fonctionnellement. Mais la décision fonctionnelle appartient au métier, pas à l'équipe technique ni à moi : si sa version est meilleure, je la fais valider par le métier et la spécification évolue officiellement ; sinon, retour à la spécification. Et je cadre pour la suite : les écarts se discutent avant le développement, au refinement — c'est exactement à ça que sert cette cérémonie."
+        },
+        {
+          "q": "Le métier valide une règle en atelier, puis la conteste après la mise en production. Que faites-vous ?",
+          "r": "Je ressors la traçabilité — compte-rendu d'atelier, US validée, PV de recette — non pas pour « gagner », mais pour établir sereinement les faits : la règle livrée est celle qui a été validée. Ensuite je traite le vrai sujet : cette règle validée ne convient pas à l'usage réel, donc c'est une nouvelle évolution, à prioriser normalement. Et j'en tire la leçon en amont : si la validation a échoué, c'est souvent qu'elle portait sur un cas trop abstrait — désormais je fais valider sur des cas réels chiffrés, pas sur des principes."
+        },
+        {
+          "q": "Racontez-moi une erreur professionnelle formatrice.",
+          "r": "En début de mission data quality, j'ai lancé un dédoublonnage de la base clients avec des critères de rapprochement trop larges : des fiches distinctes ont été fusionnées à tort. Nous avons arrêté le traitement, restauré, puis repris par lots avec un échantillon de contrôle validé par le métier avant chaque exécution. Résultat : une base fiabilisée — et surtout un réflexe définitif : toute opération de masse a depuis un dry-run, un échantillon validé et un plan de retour arrière. Cette erreur m'a appris plus que bien des succès, et elle me sert encore sur chaque reprise de données."
+        }
+      ]
+    },
+    {
+      "id": "motivation",
+      "titre": "Motivation & fit d'équipe",
+      "questions": [
+        {
+          "q": "Pourquoi quitter votre mission actuelle pour celle-ci ?",
+          "r": "Ma mission actuelle est riche, mais le périmètre est centré sur un cycle produit que je maîtrise désormais bien. Ce poste m'offre ce que je recherche : la polyvalence multi-produits — biens, prévoyance, affinitaire, vie —, le mélange projet, évolutions, run et support que j'apprécie, et un contexte bancassurance qui fait la jonction exacte entre mes deux mondes : l'assurance et la banque. C'est une suite logique, pas une fuite."
+        },
+        {
+          "q": "Qu'est-ce qui vous attire dans la bancassurance par rapport à un assureur direct ?",
+          "r": "Trois choses. La distribution s'appuie sur le réseau et sur les moments de vie bancaires — un crédit amène l'assurance emprunteur, un compte amène l'affinitaire — ce qui crée des parcours et des volumes spécifiques. Les SI dialoguent en permanence avec le monde bancaire et avec des gestionnaires délégués comme Cardif : cette dimension flux et interfaces, je la connais et je l'aime. Et la palette produits y est plus large que chez un assureur direct mono-ligne : c'est exactement la polyvalence que je viens chercher."
+        },
+        {
+          "q": "L'équipe est soudée et vient de perdre un pilier. Comment vous intégrez-vous ?",
+          "r": "En écoutant d'abord : une équipe soudée a ses codes et son histoire, et je ne remplace pas une personne, je reprends un périmètre. Je crée du lien par le concret : prendre rapidement des sujets de support et de run qui soulagent visiblement les autres, demander de l'aide sans ego, et apporter mes pratiques — xRay, Gherkin, structuration de la recette — comme des propositions au service de l'équipe, jamais comme des leçons. La confiance se gagne par ce qu'on rend, pas par ce qu'on annonce."
+        },
+        {
+          "q": "Où vous voyez-vous dans cette mission dans un an ?",
+          "r": "Autonome sur ma dominante produit et opérationnelle sur les autres périmètres — capable de couvrir un collègue absent, puisque c'est le besoin de l'équipe. Référente sur une partie du legacy repris du BA senior, avec une documentation qui a comblé le trou de connaissance. Et contributrice visible des deux chantiers d'outillage : la recette outillée et l'automatisation de la TNR — deux sujets où mon expérience apporte de la valeur dès les premiers mois."
+        }
+      ]
+    },
+    {
+      "id": "bonus",
+      "titre": "Bonus — pour aller plus loin",
+      "questions": [
+        {
+          "q": "Quels codes réponse HTTP un BA doit-il connaître par cœur, et comment les lire ?",
+          "r": "La grille : 2xx = succès, 3xx = redirection, 4xx = erreur côté appelant, 5xx = erreur côté serveur. Les incontournables : 200 OK (lecture réussie), 201 Created (ressource créée, ex. contrat souscrit), 204 No Content (succès sans corps, ex. suppression), 400 Bad Request (payload invalide — champ manquant, mauvais format), 401 Unauthorized (pas ou plus authentifié — jeton absent ou expiré), 403 Forbidden (authentifié mais pas habilité), 404 Not Found (ressource inexistante — mauvais identifiant), 409 Conflict (état incompatible, ex. souscription en double), 422 Unprocessable Entity (syntaxe correcte mais règle métier violée), 500 Internal Server Error (bug ou exception serveur → logs), 503 Service Unavailable (service indisponible, souvent temporaire — maintenance, saturation)."
+        },
+        {
+          "q": "GET, POST, PUT, PATCH, DELETE : quelle différence, et qu'est-ce que l'idempotence ?",
+          "r": "GET lit sans modifier. POST crée une ressource (ou déclenche un traitement). PUT remplace intégralement une ressource existante. PATCH la modifie partiellement (ex. changer seulement l'adresse du contrat). DELETE la supprime. L'idempotence : rejouer le même appel produit le même état — GET, PUT et DELETE sont idempotents, POST ne l'est pas (deux POST de souscription = deux contrats, d'où les mécanismes anti-doublon). Pour un BA, ce point est concret : sur un réseau instable, un front peut rejouer un appel — la spec doit dire ce qui se passe alors."
+        },
+        {
+          "q": "À quoi sert un contrat d'API (Swagger / OpenAPI) pour un BA ?",
+          "r": "C'est la spécification formelle et exécutable de l'interface : endpoints, verbes, paramètres, schémas de payload, codes réponse et messages d'erreur. Pour le BA, c'est le livrable pivot entre le front (souvent une équipe externe), le back et les partenaires : chacun développe contre le contrat, pas contre des suppositions. Il sert aussi de support de recette (on teste chaque endpoint contre son contrat avec Postman) et de documentation vivante. Une modification du contrat est une évolution d'interface : versionnée, communiquée, avec étude d'impact sur tous les consommateurs."
+        },
+        {
+          "q": "JSON : savez-vous le lire ? Décrivez la structure d'un payload de sinistre.",
+          "r": "Oui — le JSON est le format d'échange standard des API REST : des paires clé-valeur, des objets imbriqués entre accolades et des tableaux entre crochets. Exemple de déclaration de sinistre : { \"numContrat\": \"AUTO-2024-0042\", \"typeSinistre\": \"BRIS_DE_GLACE\", \"dateSurvenance\": \"2026-08-12\", \"tiers\": [ { \"nom\": \"Durand\", \"assureur\": \"MAIF\" } ] }. En recette, je vérifie la présence et le format de chaque champ contre le contrat d'interface, les champs optionnels, la gestion des valeurs nulles et des accents/encodages."
+        },
+        {
+          "q": "INNER JOIN vs LEFT JOIN : quelle différence, avec un exemple assurance ?",
+          "r": "L'INNER JOIN ne garde que les lignes qui matchent des deux côtés : contrats INNER JOIN sinistres = uniquement les contrats ayant au moins un sinistre. Le LEFT JOIN garde toutes les lignes de la table de gauche, avec NULL à droite quand il n'y a pas de correspondance : contrats LEFT JOIN sinistres = tous les contrats, sinistrés ou non. Le piège classique : compter les sinistres par contrat avec un INNER JOIN fait disparaître les contrats sans sinistre — il faut un LEFT JOIN avec COUNT(s.id_sinistre), qui compte 0 pour eux."
+        },
+        {
+          "q": "WHERE vs HAVING : quand utiliser l'un ou l'autre ?",
+          "r": "WHERE filtre les lignes avant le regroupement, HAVING filtre les groupes après agrégation. Exemple : « les produits dont la prime moyenne des contrats actifs dépasse 500 € » = WHERE statut = 'ACTIF' (filtre les lignes) puis GROUP BY produit HAVING AVG(prime_annuelle) > 500 (filtre les groupes). On ne peut pas mettre une fonction d'agrégation dans le WHERE — c'est le signe qu'il faut un HAVING."
+        },
+        {
+          "q": "Qu'est-ce qu'une transaction et les propriétés ACID ? Pourquoi c'est important en assurance ?",
+          "r": "Une transaction regroupe plusieurs opérations en un tout indivisible : tout passe ou tout est annulé. ACID : Atomicité (tout ou rien), Cohérence (la base reste dans un état valide), Isolation (les transactions concurrentes ne se voient pas à moitié faites), Durabilité (une fois validé, c'est persisté). En assurance c'est critique : une souscription écrit le contrat, la quittance et l'écriture comptable — si l'une échoue, on ne veut pas d'un contrat sans quittance. Idem pour un règlement de sinistre : le virement et la mise à jour du dossier doivent rester cohérents."
+        },
+        {
+          "q": "Kafka, files de messages : expliquez topic, producteur, consommateur, offset — et l'intérêt en assurance.",
+          "r": "Un topic est un canal nommé où des producteurs déposent des messages et où des consommateurs viennent les lire, chacun à son rythme : l'offset est le curseur de lecture de chaque consommateur. Le message est persisté : si l'équipe consommatrice est arrêtée, rien n'est perdu — elle rattrape son retard (le lag) au redémarrage. Intérêt en assurance : découpler les équipes et absorber les pics — la déclaration de sinistre publie un événement, l'indemnisation, la comptabilité et l'éditique le consomment chacun de leur côté ; une tempête qui génère 10 000 déclarations en une heure ne fait pas tomber le système, elle allonge juste la file."
+        },
+        {
+          "q": "Batch vs temps réel : donnez des exemples assurance et les critères de choix.",
+          "r": "Temps réel (API synchrone) : le devis — l'utilisateur attend son tarif à l'écran. Batch : le quittancement annuel — des centaines de milliers de quittances générées la nuit ; l'indexation des primes ; les flux comptables quotidiens ; l'éditique de masse. Critères : besoin de réponse immédiate → synchrone ; volume massif, traitement planifié, rejouable → batch ; entre les deux, l'événementiel (Kafka) pour du quasi-temps réel découplé. Le BA doit connaître le mode de chaque flux : un bug de batch se diagnostique par les comptes-rendus d'exécution, pas par les logs d'API."
+        },
+        {
+          "q": "Qu'est-ce qu'un modèle de données (MCD) et pourquoi le BA doit-il savoir le lire ?",
+          "r": "Le MCD représente les entités métier (client, contrat, garantie, sinistre, quittance), leurs attributs et leurs relations avec les cardinalités : un client détient 0 à n contrats, un contrat porte 1 à n garanties, un sinistre se rattache à exactement un contrat. Le lire permet au BA de valider que le modèle supporte les règles métier (peut-on avoir un sinistre sur un contrat résilié ? une garantie sans plafond ?), d'écrire ses requêtes d'investigation, et de détecter tôt les impacts d'une évolution : ajouter la co-souscription, c'est passer une relation de 1-1 à n-n — un chantier, pas un champ."
+        },
+        {
+          "q": "Quels environnements connaissez-vous (dev, recette, préprod, prod) et quelles règles sur les données de test ?",
+          "r": "Dev : l'équipe technique développe et teste unitairement. Recette (ou UAT) : le BA et le métier valident fonctionnellement, avec des jeux de données maîtrisés. Préprod : iso-prod, pour les répétitions de MEP et les tests de performance. Prod : les vrais clients. Règle d'or RGPD : pas de données personnelles réelles hors production sans anonymisation ou pseudonymisation — les jeux de recette sont soit synthétiques, soit issus d'une copie anonymisée. Et chaque anomalie doit préciser son environnement : un bug de recette n'a pas la même urgence qu'un bug de prod."
+        },
+        {
+          "q": "Webhook vs polling : quelle différence pour intégrer un partenaire ?",
+          "r": "Le polling : j'interroge le partenaire à intervalle régulier (« la signature est-elle faite ? ») — simple mais coûteux et avec une latence égale à l'intervalle. Le webhook : le partenaire m'appelle quand l'événement survient (« le client a signé ») — temps réel et économe, mais il faut exposer un endpoint sécurisé, gérer les rejeux si on était indisponible, et vérifier l'authenticité de l'appel. Exemple typique : le prestataire de signature électronique notifie par webhook la signature du contrat, avec un polling de rattrapage en filet de sécurité."
+        },
+        {
+          "q": "Écrivez un critère d'acceptation en Gherkin sur la déclaration de sinistre.",
+          "r": "Étant donné un contrat AUTO-2024-0042 actif avec la garantie bris de glace / Quand l'assuré déclare un sinistre de type « bris de glace » survenu il y a moins de 5 jours / Alors le sinistre est créé au statut « DECLARE », un accusé de réception est envoyé par email, et le dossier est affecté à la corbeille de l'équipe indemnisation. Et le cas non passant : Étant donné un contrat résilié / Quand l'assuré tente de déclarer un sinistre postérieur à la date de résiliation / Alors la déclaration est refusée avec le message « contrat non couvert à la date de survenance ». Le Gherkin force à expliciter l'état initial, l'action et le résultat observable — c'est directement testable, voire automatisable."
+        },
+        {
+          "q": "Comment lisez-vous des logs applicatifs, et à quoi sert un identifiant de corrélation ?",
+          "r": "Je pars d'un fait daté (l'heure de l'erreur, le numéro de contrat) et je filtre dans Kibana par période, niveau (ERROR/WARN) et mots-clés. L'identifiant de corrélation (correlation ID) est un identifiant unique propagé par tous les composants traversés par une même demande : front → API → backoffice → flux. Avec lui, je reconstitue le parcours complet d'un appel à travers les microservices ; sans lui, chaque composant raconte une histoire isolée. Bonne pratique que je pousse en spec : tout message d'erreur affiché au client porte une référence que le support peut corréler aux logs."
+        }
+      ]
+    }
+  ]
+}

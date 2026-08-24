@@ -23,9 +23,9 @@ export const preparations: Preparation[] = [
     slug: 'business-analyst',
     label: 'Business Analyst',
     description:
-      'Recueil du besoin, spécifications, modélisation, agilité et pilotage produit.',
-    matieres: 'Programme en cours d’écriture',
-    disponible: false,
+      'La préparation BA orientée assurance : le métier, les questions d’entretien, et des ateliers interactifs SQL, API et asynchrone.',
+    matieres: 'Métier assurance · 77 questions · SQL · API · Kafka',
+    disponible: true,
   },
   {
     slug: 'qa',

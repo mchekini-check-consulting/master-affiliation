@@ -1,0 +1,771 @@
+---
+// Onglet Asynchrone — simulateur visuel de bus de messages (type Kafka) :
+// l'équipe Déclaration publie des sinistres sur un topic, l'équipe
+// Indemnisation les consomme à son rythme, les traite, puis publie le
+// résultat sur un topic retour que l'équipe Déclaration consomme.
+---
+
+<div class="async">
+  <div class="contexte">
+    <p>
+      La déclaration de sinistre est le cas d'école de l'<strong>asynchrone</strong> :
+      l'assuré reçoit un accusé de réception immédiat, mais l'instruction est
+      traitée plus tard, par une autre équipe, à son rythme. Déposez des
+      messages sur le topic, arrêtez le consommateur pour voir le
+      <strong>lag</strong> se creuser, puis redémarrez-le : rien n'est perdu.
+    </p>
+    <div class="legende">
+      <span><i class="pastille pastille--attente"></i> en attente sur le topic</span>
+      <span><i class="pastille pastille--consomme"></i> consommé</span>
+      <span><i class="pastille pastille--traitement"></i> en cours de traitement</span>
+    </div>
+  </div>
+
+  <div class="scene">
+    <!-- Équipe Déclaration (producteur) -->
+    <div class="boite boite--equipe">
+      <h3>🧑‍💻 Équipe Déclaration <span class="role">producteur</span></h3>
+      <p class="boite-desc">Le parcours SelfCare enregistre la déclaration, répond « accusé de réception » à l'assuré… et publie un message. Son travail s'arrête là : elle n'attend pas le traitement.</p>
+      <button class="btn btn--principal" id="as-declarer">📨 Déclarer un sinistre</button>
+      <button class="btn" id="as-declarer-5">⛈️ Tempête ! (5 déclarations d'un coup)</button>
+      <div class="journal" id="as-journal-prod"></div>
+      <div class="notifications">
+        <h4>🔔 Notifications reçues <span class="via">via <code>sinistres.traites</code></span></h4>
+        <div class="journal journal--notifs" id="as-notifs"></div>
+      </div>
+    </div>
+
+    <div class="fleche" aria-hidden="true">
+      <span class="fleche-trait fleche-trait--aller">⟶</span>
+      <span class="fleche-legende">publie</span>
+      <span class="fleche-trait fleche-trait--retour">⟵</span>
+      <span class="fleche-legende">notifie</span>
+    </div>
+
+    <!-- Topics -->
+    <div class="boite boite--broker">
+      <h3>📚 Broker de messages <span class="role">type Kafka</span></h3>
+      <div class="topic">
+        <div class="topic-entete">
+          <code>sinistres.declares</code>
+          <span class="lag" id="as-lag1">lag : 0</span>
+        </div>
+        <div class="topic-messages" id="as-topic1">
+          <p class="topic-vide">Aucun message — déclarez un sinistre !</p>
+        </div>
+      </div>
+      <div class="topic">
+        <div class="topic-entete">
+          <code>sinistres.traites</code>
+          <span class="lag" id="as-lag2">lag : 0</span>
+        </div>
+        <div class="topic-messages" id="as-topic2">
+          <p class="topic-vide">Les résultats de traitement arriveront ici.</p>
+        </div>
+      </div>
+      <p class="boite-desc">Les messages sont <strong>persistés</strong> et lus dans l'ordre. Chaque consommateur garde son <strong>offset</strong> (curseur de lecture) : le retard s'appelle le <strong>lag</strong>.</p>
+    </div>
+
+    <div class="fleche" aria-hidden="true">
+      <span class="fleche-trait fleche-trait--aller">⟶</span>
+      <span class="fleche-legende">consomme</span>
+      <span class="fleche-trait fleche-trait--retour">⟵</span>
+      <span class="fleche-legende">publie le résultat</span>
+    </div>
+
+    <!-- Équipe Indemnisation (consommateur) -->
+    <div class="boite boite--equipe">
+      <h3>🕵️ Équipe Indemnisation <span class="role">consommateur</span></h3>
+      <p class="boite-desc">Elle tire les messages à son rythme : vérification des garanties, franchise, décision — puis publie le résultat sur le topic retour.</p>
+      <div class="etat-conso">
+        <span id="as-etat-conso" class="etat etat--marche">● en marche</span>
+        <button class="btn" id="as-toggle-conso">⏸ Arrêter le consommateur</button>
+        <button class="btn" id="as-consommer-un" hidden>⏭ Consommer 1 message</button>
+      </div>
+      <div class="traitement" id="as-traitement" hidden>
+        <p id="as-traitement-titre"></p>
+        <div class="barre"><div class="barre-fill" id="as-barre"></div></div>
+        <p class="etape" id="as-etape"></p>
+      </div>
+      <div class="journal" id="as-journal-conso"></div>
+    </div>
+  </div>
+
+  <div class="retenir">
+    <h3>Ce que ce simulateur montre</h3>
+    <div class="retenir-grille">
+      <div class="carte-retenir"><strong>Découplage</strong><p>L'équipe Déclaration ne connaît pas l'équipe Indemnisation : elles ne partagent que le contrat de message. L'une peut évoluer, tomber, redémarrer — sans casser l'autre.</p></div>
+      <div class="carte-retenir"><strong>Résilience</strong><p>Arrêtez le consommateur puis déclarez des sinistres : rien n'est perdu. Les messages attendent sur le topic, et le rattrapage se fait au redémarrage.</p></div>
+      <div class="carte-retenir"><strong>Absorption des pics</strong><p>Une tempête génère 5 déclarations d'un coup : le producteur n'est pas ralenti, la file s'allonge (le lag monte), puis se résorbe. En synchrone, le service serait saturé.</p></div>
+      <div class="carte-retenir"><strong>Le retour est aussi un message</strong><p>Le résultat du traitement revient par un second topic — pas par une réponse directe. L'accusé de réception immédiat et la décision différée sont deux moments distincts du parcours.</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------------------------------------------------------------
+  // État du simulateur
+  // ---------------------------------------------------------------
+  interface Message {
+    offset: number;
+    cle: string;
+    payload: any;
+    etat: 'attente' | 'traitement' | 'consomme';
+  }
+
+  const topic1: Message[] = []; // sinistres.declares
+  const topic2: Message[] = []; // sinistres.traites
+  let offsetConso1 = 0; // offset de l'équipe Indemnisation sur topic1
+  let offsetConso2 = 0; // offset de l'équipe Déclaration sur topic2
+  let consoEnMarche = true;
+  let traitementEnCours = false;
+  let compteurSinistre = 0;
+
+  const TYPES = [
+    ['BRIS_DE_GLACE', 'AUTO-2023-0001', 420],
+    ['DEGAT_DES_EAUX', 'HAB-2023-0002', 1900],
+    ['COLLISION', 'AUTO-2022-0003', 5600],
+    ['VOL', 'AUTO-2025-0011', 8000],
+    ['INCENDIE', 'HAB-2021-0010', 26000],
+    ['RC_PRO', 'MRP-2023-0006', 3200],
+  ] as const;
+
+  const ETAPES_TRAITEMENT = [
+    'Lecture du message (offset avancé)…',
+    'Vérification du contrat et des garanties…',
+    'Application de la franchise…',
+    'Décision de prise en charge…',
+    'Publication du résultat sur sinistres.traites…',
+  ];
+
+  // ---------------------------------------------------------------
+  // Producteur : équipe Déclaration
+  // ---------------------------------------------------------------
+  function declarer() {
+    const [type, contrat, montant] = TYPES[Math.floor(Math.random() * TYPES.length)];
+    compteurSinistre++;
+    const num = `SIN-2026-${String(compteurSinistre).padStart(4, '0')}`;
+    const message: Message = {
+      offset: topic1.length,
+      cle: contrat,
+      payload: {
+        numSinistre: num,
+        numContrat: contrat,
+        typeSinistre: type,
+        montantEstime: montant,
+        declareLe: new Date().toLocaleTimeString('fr-FR'),
+      },
+      etat: 'attente',
+    };
+    topic1.push(message);
+    journal(
+      'as-journal-prod',
+      `📨 <strong>${num}</strong> (${type}) publié — offset ${message.offset}. Accusé de réception envoyé à l'assuré. <em>Je n'attends pas la réponse.</em>`
+    );
+    rendre();
+    boucleConsommateur();
+  }
+
+  document.getElementById('as-declarer')!.addEventListener('click', declarer);
+  document.getElementById('as-declarer-5')!.addEventListener('click', () => {
+    for (let i = 0; i < 5; i++) declarer();
+    journal('as-journal-prod', `⛈️ Pic d'activité : 5 déclarations en rafale. Le topic absorbe, le lag monte.`);
+  });
+
+  // ---------------------------------------------------------------
+  // Consommateur : équipe Indemnisation
+  // ---------------------------------------------------------------
+  function boucleConsommateur() {
+    if (!consoEnMarche || traitementEnCours) return;
+    if (offsetConso1 >= topic1.length) return;
+    traiterSuivant();
+  }
+
+  function traiterSuivant() {
+    const message = topic1[offsetConso1];
+    traitementEnCours = true;
+    message.etat = 'traitement';
+    rendre();
+
+    const bloc = document.getElementById('as-traitement')!;
+    bloc.hidden = false;
+    document.getElementById('as-traitement-titre')!.innerHTML =
+      `Traitement de <strong>${message.payload.numSinistre}</strong> (offset ${message.offset})`;
+
+    let etape = 0;
+    const barre = document.getElementById('as-barre') as HTMLElement;
+    const etapeEl = document.getElementById('as-etape')!;
+
+    const minuterie = setInterval(() => {
+      if (etape < ETAPES_TRAITEMENT.length) {
+        etapeEl.textContent = ETAPES_TRAITEMENT[etape];
+        barre.style.width = `${((etape + 1) / ETAPES_TRAITEMENT.length) * 100}%`;
+        etape++;
+      } else {
+        clearInterval(minuterie);
+        finirTraitement(message);
+      }
+    }, 550);
+  }
+
+  function finirTraitement(message: Message) {
+    message.etat = 'consomme';
+    offsetConso1++;
+    traitementEnCours = false;
+    document.getElementById('as-traitement')!.hidden = true;
+    (document.getElementById('as-barre') as HTMLElement).style.width = '0';
+
+    // Décision simulée : franchise déduite, acceptation quasi systématique
+    const accepte = Math.random() > 0.15;
+    const franchise = [0, 80, 150, 300][Math.floor(Math.random() * 4)];
+    const indemnite = accepte
+      ? Math.max(0, message.payload.montantEstime - franchise)
+      : 0;
+
+    journal(
+      'as-journal-conso',
+      `✔️ <strong>${message.payload.numSinistre}</strong> traité : ${
+        accepte ? `accepté, indemnité ${indemnite.toLocaleString('fr-FR')} €` : 'refusé (garantie non couverte)'
+      }. Résultat publié sur <code>sinistres.traites</code>.`
+    );
+
+    const retour: Message = {
+      offset: topic2.length,
+      cle: message.payload.numContrat,
+      payload: {
+        numSinistre: message.payload.numSinistre,
+        decision: accepte ? 'ACCEPTE' : 'REFUSE',
+        franchiseAppliquee: accepte ? franchise : null,
+        indemnite: accepte ? indemnite : 0,
+        traiteLe: new Date().toLocaleTimeString('fr-FR'),
+      },
+      etat: 'attente',
+    };
+    topic2.push(retour);
+    rendre();
+
+    // L'équipe Déclaration consomme le topic retour avec un léger différé
+    setTimeout(consommerRetours, 900);
+    // Puis on enchaîne sur le message suivant s'il y en a
+    setTimeout(boucleConsommateur, 400);
+  }
+
+  function consommerRetours() {
+    while (offsetConso2 < topic2.length) {
+      const m = topic2[offsetConso2];
+      m.etat = 'consomme';
+      offsetConso2++;
+      const p = m.payload;
+      journal(
+        'as-notifs',
+        p.decision === 'ACCEPTE'
+          ? `🔔 <strong>${p.numSinistre}</strong> accepté — indemnité ${p.indemnite.toLocaleString('fr-FR')} € (franchise ${p.franchiseAppliquee} €). L'assuré est notifié par email.`
+          : `🔔 <strong>${p.numSinistre}</strong> refusé. Un courrier motivé part à l'assuré.`
+      );
+    }
+    rendre();
+  }
+
+  // Marche/arrêt du consommateur
+  document.getElementById('as-toggle-conso')!.addEventListener('click', () => {
+    consoEnMarche = !consoEnMarche;
+    const etat = document.getElementById('as-etat-conso')!;
+    const bouton = document.getElementById('as-toggle-conso')!;
+    const pasAPas = document.getElementById('as-consommer-un')!;
+    if (consoEnMarche) {
+      etat.textContent = '● en marche';
+      etat.classList.replace('etat--arret', 'etat--marche');
+      bouton.textContent = '⏸ Arrêter le consommateur';
+      pasAPas.hidden = true;
+      journal('as-journal-conso', `▶️ Consommateur redémarré — rattrapage du lag…`);
+      boucleConsommateur();
+    } else {
+      etat.textContent = '■ arrêté';
+      etat.classList.replace('etat--marche', 'etat--arret');
+      bouton.textContent = '▶ Redémarrer le consommateur';
+      pasAPas.hidden = false;
+      journal('as-journal-conso', `⏸ Consommateur arrêté (mise en production, incident…). Les messages s'accumulent sans être perdus.`);
+    }
+    rendre();
+  });
+
+  // Consommation manuelle pas à pas quand le consommateur est arrêté
+  document.getElementById('as-consommer-un')!.addEventListener('click', () => {
+    if (traitementEnCours || offsetConso1 >= topic1.length) return;
+    traiterSuivant();
+  });
+
+  // ---------------------------------------------------------------
+  // Rendu
+  // ---------------------------------------------------------------
+  function rendre() {
+    rendreTopic('as-topic1', topic1, offsetConso1);
+    rendreTopic('as-topic2', topic2, offsetConso2);
+    const lag1 = topic1.length - offsetConso1;
+    const lag2 = topic2.length - offsetConso2;
+    const lag1El = document.getElementById('as-lag1')!;
+    const lag2El = document.getElementById('as-lag2')!;
+    lag1El.textContent = `offset conso : ${offsetConso1} · lag : ${lag1}`;
+    lag2El.textContent = `offset conso : ${offsetConso2} · lag : ${lag2}`;
+    lag1El.classList.toggle('lag--haut', lag1 > 2);
+    lag2El.classList.toggle('lag--haut', lag2 > 2);
+  }
+
+  function rendreTopic(id: string, messages: Message[], _offset: number) {
+    const conteneur = document.getElementById(id)!;
+    if (!messages.length) return;
+    conteneur.innerHTML = messages
+      .slice()
+      .reverse()
+      .map((m) => {
+        const cls =
+          m.etat === 'traitement'
+            ? 'msg--traitement'
+            : m.etat === 'consomme'
+              ? 'msg--consomme'
+              : 'msg--attente';
+        return `<details class="msg ${cls}">
+          <summary><span class="msg-offset">#${m.offset}</span> <span class="msg-cle">${m.cle}</span> <span class="msg-nom">${m.payload.numSinistre}</span></summary>
+          <pre>${JSON.stringify(m.payload, null, 2)}</pre>
+        </details>`;
+      })
+      .join('');
+  }
+
+  function journal(id: string, html: string) {
+    const j = document.getElementById(id)!;
+    const ligne = document.createElement('p');
+    ligne.className = 'journal-ligne';
+    ligne.innerHTML = `<span class="heure">${new Date().toLocaleTimeString('fr-FR')}</span> ${html}`;
+    j.prepend(ligne);
+    while (j.children.length > 30) j.removeChild(j.lastChild!);
+  }
+</script>
+
+<style>
+  .contexte p {
+    max-width: 56rem;
+    color: var(--estompe);
+    margin: 0 0 0.75rem;
+  }
+
+  .legende {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-family: var(--f-display);
+    font-size: 0.7813rem;
+    color: var(--estompe);
+    margin-bottom: 1.25rem;
+  }
+
+  .pastille {
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+  }
+
+  .pastille--attente { background: var(--bic); }
+  .pastille--consomme { background: var(--trait); }
+  .pastille--traitement { background: #e8a020; }
+
+  /* -------- Scène -------- */
+  .scene {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1.2fr) auto minmax(0, 1.1fr);
+    gap: 0.75rem;
+    align-items: start;
+    margin-bottom: 2rem;
+  }
+
+  .boite {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+  }
+
+  .boite--broker {
+    background: var(--papier);
+    border-style: dashed;
+  }
+
+  .boite h3 {
+    font-size: 0.9688rem;
+    font-weight: 750;
+    margin: 0 0 0.5rem;
+  }
+
+  .role {
+    font-family: var(--f-display);
+    font-size: 0.6563rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--bic);
+    background: var(--bic-doux);
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    vertical-align: middle;
+    margin-left: 0.25rem;
+  }
+
+  .boite-desc {
+    font-family: var(--f-display);
+    font-size: 0.7813rem;
+    color: var(--estompe);
+    line-height: 1.55;
+    margin: 0 0 0.75rem;
+  }
+
+  .btn {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    cursor: pointer;
+    margin: 0 0.3rem 0.5rem 0;
+  }
+
+  .btn:hover {
+    border-color: var(--bic);
+    color: var(--bic);
+  }
+
+  .btn--principal {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  .btn--principal:hover {
+    filter: brightness(1.12);
+    color: var(--blanc);
+  }
+
+  /* Flèches entre les boîtes */
+  .fleche {
+    display: grid;
+    justify-items: center;
+    gap: 0.1rem;
+    padding-top: 4.5rem;
+    font-family: var(--f-display);
+  }
+
+  .fleche-trait {
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--bic);
+  }
+
+  .fleche-trait--retour {
+    color: var(--vert);
+  }
+
+  .fleche-legende {
+    font-size: 0.625rem;
+    color: var(--estompe);
+    font-weight: 650;
+  }
+
+  /* Topics */
+  .topic {
+    margin-bottom: 0.85rem;
+  }
+
+  .topic-entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .topic-entete code {
+    font-size: 0.7813rem;
+    font-weight: 700;
+  }
+
+  .lag {
+    font-family: var(--f-mono);
+    font-size: 0.6563rem;
+    color: var(--estompe);
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  :global(.lag--haut) {
+    color: var(--rouge) !important;
+    border-color: var(--rouge) !important;
+    font-weight: 700;
+  }
+
+  .topic-messages {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    padding: 0.4rem;
+    min-height: 3rem;
+    max-height: 14rem;
+    overflow-y: auto;
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+  }
+
+  .topic-vide {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    color: var(--estompe);
+    font-style: italic;
+    margin: 0.4rem 0.3rem;
+  }
+
+  :global(.msg) {
+    border-radius: 6px;
+    border: 1px solid var(--trait);
+    overflow: hidden;
+    animation: msg-entre 0.3s ease;
+  }
+
+  @keyframes msg-entre {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  :global(.msg summary) {
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    list-style: none;
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+  }
+
+  :global(.msg summary::-webkit-details-marker) {
+    display: none;
+  }
+
+  :global(.msg-offset) {
+    font-weight: 800;
+    color: var(--estompe);
+  }
+
+  :global(.msg-cle) {
+    color: var(--bic);
+  }
+
+  :global(.msg-nom) {
+    font-weight: 700;
+  }
+
+  :global(.msg pre) {
+    margin: 0;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.6563rem;
+    border-top: 1px dashed var(--trait);
+    border-radius: 0;
+    background: var(--papier);
+  }
+
+  :global(.msg--attente) {
+    border-left: 3px solid var(--bic);
+    background: var(--bic-doux);
+  }
+
+  :global(.msg--traitement) {
+    border-left: 3px solid #e8a020;
+    background: #fdf6e3;
+  }
+
+  :global(.msg--consomme) {
+    border-left: 3px solid var(--trait);
+    background: var(--blanc);
+    opacity: 0.65;
+  }
+
+  /* Consommateur */
+  .etat-conso {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .etat {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 750;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+  }
+
+  :global(.etat--marche) {
+    color: var(--vert);
+    background: var(--vert-doux);
+  }
+
+  :global(.etat--arret) {
+    color: var(--rouge);
+    background: var(--rouge-doux);
+  }
+
+  .traitement {
+    background: #fdf6e3;
+    border: 1px solid #efdf9a;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .traitement p {
+    font-family: var(--f-display);
+    font-size: 0.7813rem;
+    margin: 0 0 0.35rem;
+  }
+
+  .barre {
+    height: 6px;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 0.35rem;
+  }
+
+  .barre-fill {
+    height: 100%;
+    width: 0;
+    background: #e8a020;
+    transition: width 0.4s ease;
+  }
+
+  .etape {
+    color: var(--estompe);
+  }
+
+  /* Journaux */
+  .journal {
+    display: grid;
+    gap: 0.3rem;
+    max-height: 11rem;
+    overflow-y: auto;
+    align-content: start;
+  }
+
+  :global(.journal-ligne) {
+    font-family: var(--f-display);
+    font-size: 0.7500rem;
+    line-height: 1.5;
+    background: var(--papier);
+    border-radius: 6px;
+    padding: 0.35rem 0.55rem;
+    margin: 0;
+    animation: msg-entre 0.3s ease;
+  }
+
+  :global(.journal-ligne .heure) {
+    font-family: var(--f-mono);
+    font-size: 0.625rem;
+    color: var(--estompe);
+    margin-right: 0.25rem;
+  }
+
+  .notifications {
+    margin-top: 0.85rem;
+    border-top: 1px dashed var(--trait);
+    padding-top: 0.6rem;
+  }
+
+  .notifications h4 {
+    font-family: var(--f-display);
+    font-size: 0.7813rem;
+    font-weight: 750;
+    margin: 0 0 0.4rem;
+  }
+
+  .via {
+    font-weight: 500;
+    color: var(--estompe);
+  }
+
+  .via code {
+    font-size: 0.85em;
+  }
+
+  .journal--notifs :global(.journal-ligne) {
+    background: var(--vert-doux);
+  }
+
+  /* Ce qu'il faut retenir */
+  .retenir h3 {
+    font-size: 1.2rem;
+    font-weight: 750;
+    margin: 0 0 0.75rem;
+  }
+
+  .retenir-grille {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .carte-retenir {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+  }
+
+  .carte-retenir strong {
+    font-family: var(--f-display);
+    font-size: 0.9063rem;
+  }
+
+  .carte-retenir p {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--estompe);
+    line-height: 1.55;
+    margin: 0.3rem 0 0;
+  }
+
+  @media (max-width: 1080px) {
+    .scene {
+      grid-template-columns: 1fr;
+    }
+    .fleche {
+      padding: 0;
+      grid-auto-flow: column;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .fleche-trait {
+      transform: rotate(90deg);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .retenir-grille {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,933 @@
+---
+// Onglet API Lab — un mini-Swagger d'API d'assurance simulées dans le
+// navigateur : on choisit le verbe, on ajuste les paramètres et le corps,
+// on observe le code réponse. Plus un jeu : deviner le code réponse
+// d'une situation donnée.
+---
+
+<div class="apilab">
+  <div class="sous-onglets">
+    <button class="sous-onglet sous-onglet--actif" data-vue="explorateur">🔌 Explorateur d'API</button>
+    <button class="sous-onglet" data-vue="jeu">🎯 Le jeu des codes réponse</button>
+  </div>
+
+  <!-- ================= EXPLORATEUR ================= -->
+  <div id="vue-explorateur">
+    <div class="contexte">
+      <p>
+        L'API <strong>Assurance IARD</strong> ci-dessous est simulée : chaque
+        appel est traité par de vraies règles (authentification, habilitations,
+        données, règles métier). Modifiez les paramètres et observez les codes
+        réponse — <em>4xx : le problème est côté appelant ; 5xx : côté
+        serveur.</em>
+      </p>
+      <div class="reglages">
+        <label class="reglage">
+          <input type="checkbox" id="api-jeton" checked />
+          Envoyer le jeton d'authentification
+        </label>
+        <label class="reglage">
+          Profil :
+          <select id="api-profil">
+            <option value="gestionnaire">Gestionnaire (lecture + écriture)</option>
+            <option value="lecture">Lecture seule</option>
+          </select>
+        </label>
+        <label class="reglage">
+          <input type="checkbox" id="api-panne" />
+          💥 Simuler une panne du serveur
+        </label>
+      </div>
+    </div>
+
+    <div id="api-endpoints"></div>
+  </div>
+
+  <!-- ================= JEU ================= -->
+  <div id="vue-jeu" hidden>
+    <div class="contexte">
+      <p>
+        Une situation, un appel — <strong>quel code réponse l'API doit-elle
+        renvoyer ?</strong> Comprendre le problème avant de regarder la
+        réponse : c'est exactement le réflexe attendu d'un BA au support.
+      </p>
+    </div>
+    <div class="jeu-carte" id="jeu-carte">
+      <p class="jeu-avancement" id="jeu-avancement"></p>
+      <p class="jeu-situation" id="jeu-situation"></p>
+      <p class="jeu-appel" id="jeu-appel"></p>
+      <div class="jeu-choix" id="jeu-choix"></div>
+      <div class="jeu-feedback" id="jeu-feedback" hidden></div>
+      <div class="jeu-actions">
+        <button class="btn btn--principal" id="jeu-suivant" hidden>Question suivante →</button>
+        <button class="btn" id="jeu-rejouer" hidden>↺ Rejouer</button>
+      </div>
+    </div>
+    <p class="jeu-score" id="jeu-score"></p>
+  </div>
+</div>
+
+<script>
+  // ---------------------------------------------------------------
+  // Données simulées côté « serveur »
+  // ---------------------------------------------------------------
+  const contrats: Record<string, any> = {
+    '1': { id: 1, numContrat: 'AUTO-2023-0001', produit: 'AUTO', statut: 'ACTIF', primeAnnuelle: 620 },
+    '2': { id: 2, numContrat: 'HAB-2023-0002', produit: 'HABITATION', statut: 'ACTIF', primeAnnuelle: 280 },
+    '3': { id: 3, numContrat: 'AUTO-2022-0003', produit: 'AUTO', statut: 'ACTIF', primeAnnuelle: 540 },
+    '4': { id: 4, numContrat: 'AUTO-2021-0004', produit: 'AUTO', statut: 'RESILIE', primeAnnuelle: 780 },
+  };
+  const sinistresParContrat: Record<string, any[]> = {
+    '1': [
+      { id: 1, numSinistre: 'SIN-2024-0001', type: 'BRIS_DE_GLACE', statut: 'CLOS', montantRegle: 380 },
+      { id: 4, numSinistre: 'SIN-2025-0004', type: 'VOL', statut: 'EN_EXPERTISE', montantRegle: null },
+    ],
+    '3': [{ id: 2, numSinistre: 'SIN-2024-0002', type: 'RC_MATERIEL', statut: 'CLOS', montantRegle: 2200 }],
+  };
+  const ZONES_CONNUES = ['75', '69', '13', '59', '33', '44', '31', '06', '35', '67'];
+
+  const RAISONS: Record<number, string> = {
+    200: 'OK', 201: 'Created', 204: 'No Content',
+    400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found',
+    409: 'Conflict', 422: 'Unprocessable Entity', 500: 'Internal Server Error', 503: 'Service Unavailable',
+  };
+
+  interface Reponse {
+    code: number;
+    corps: any;
+    explication: string;
+  }
+
+  interface Endpoint {
+    verbe: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+    chemin: string;
+    resume: string;
+    description: string;
+    param?: { nom: string; exemple: string };
+    corpsExemple?: string;
+    ecriture?: boolean;
+    executer: (param: string, corps: any) => Reponse;
+  }
+
+  function protege(ecriture: boolean): Reponse | null {
+    if ((document.getElementById('api-panne') as HTMLInputElement).checked) {
+      return {
+        code: 503,
+        corps: { erreur: 'Service temporairement indisponible', reessayerDans: '120s' },
+        explication: 'Le serveur est en panne ou en maintenance : 503 Service Unavailable. Ce n’est pas une erreur de l’appelant — on réessaie plus tard, et côté support on vérifie la supervision.',
+      };
+    }
+    if (!(document.getElementById('api-jeton') as HTMLInputElement).checked) {
+      return {
+        code: 401,
+        corps: { erreur: 'Jeton d’authentification absent ou expiré' },
+        explication: 'Pas de jeton (ou jeton expiré) : 401 Unauthorized. L’API ne sait pas QUI appelle. À ne pas confondre avec 403 : là, elle sait qui appelle mais lui refuse le droit.',
+      };
+    }
+    const profil = (document.getElementById('api-profil') as HTMLSelectElement).value;
+    if (ecriture && profil === 'lecture') {
+      return {
+        code: 403,
+        corps: { erreur: 'Profil « lecture seule » : opération d’écriture non autorisée' },
+        explication: 'L’appelant est authentifié mais pas habilité à écrire : 403 Forbidden. Sujet de droits/habilitations, pas de données — le réflexe : vérifier le profil, pas déboguer le payload.',
+      };
+    }
+    return null;
+  }
+
+  const ENDPOINTS: Endpoint[] = [
+    {
+      verbe: 'GET',
+      chemin: '/contrats',
+      resume: 'Lister les contrats',
+      description: 'Renvoie la liste des contrats du portefeuille. Lecture simple, toujours 200 si l’appelant est authentifié.',
+      executer: () => {
+        const refus = protege(false);
+        if (refus) return refus;
+        return {
+          code: 200,
+          corps: Object.values(contrats),
+          explication: 'Lecture réussie : 200 OK avec la collection dans le corps de réponse.',
+        };
+      },
+    },
+    {
+      verbe: 'GET',
+      chemin: '/contrats/{id}',
+      resume: 'Consulter un contrat',
+      description: 'Renvoie un contrat par son identifiant. Essayez un id existant (1 à 4)… puis 999.',
+      param: { nom: 'id', exemple: '1' },
+      executer: (param) => {
+        const refus = protege(false);
+        if (refus) return refus;
+        const c = contrats[param];
+        if (!c)
+          return {
+            code: 404,
+            corps: { erreur: `Contrat ${param} introuvable` },
+            explication: 'La ressource demandée n’existe pas : 404 Not Found. Côté appelant : mauvais identifiant, ou contrat dans un autre système.',
+          };
+        return { code: 200, corps: c, explication: 'Le contrat existe : 200 OK avec la ressource.' };
+      },
+    },
+    {
+      verbe: 'POST',
+      chemin: '/contrats',
+      resume: 'Souscrire un contrat',
+      description: 'Crée un contrat. Champs obligatoires : idClient, produit (AUTO | HABITATION | MRP), primeAnnuelle. Supprimez un champ du corps pour voir le 400.',
+      corpsExemple: '{\n  "idClient": 5,\n  "produit": "AUTO",\n  "primeAnnuelle": 640\n}',
+      ecriture: true,
+      executer: (_p, corps) => {
+        const refus = protege(true);
+        if (refus) return refus;
+        if (corps === undefined)
+          return {
+            code: 400,
+            corps: { erreur: 'Corps JSON invalide' },
+            explication: 'Le JSON envoyé est mal formé (accolade manquante, virgule en trop…) : 400 Bad Request avant même d’examiner le contenu.',
+          };
+        for (const champ of ['idClient', 'produit', 'primeAnnuelle'])
+          if (corps[champ] === undefined)
+            return {
+              code: 400,
+              corps: { erreur: `Champ obligatoire manquant : ${champ}` },
+              explication: `Payload syntaxiquement correct mais incomplet : 400 Bad Request avec un message qui désigne le champ fautif — c'est ce que le BA spécifie dans le contrat d'API.`,
+            };
+        if (!['AUTO', 'HABITATION', 'MRP'].includes(corps.produit))
+          return {
+            code: 422,
+            corps: { erreur: `Produit inconnu : ${corps.produit}`, produitsValides: ['AUTO', 'HABITATION', 'MRP'] },
+            explication: 'Syntaxe correcte mais règle métier violée (produit hors référentiel) : 422 Unprocessable Entity. La frontière 400/422 doit être définie dans la spec.',
+          };
+        return {
+          code: 201,
+          corps: { id: 16, numContrat: 'AUTO-2026-0016', ...corps, statut: 'ACTIF' },
+          explication: 'Ressource créée : 201 Created. La réponse renvoie l’identifiant du contrat créé — le front en a besoin pour la suite du parcours.',
+        };
+      },
+    },
+    {
+      verbe: 'PATCH',
+      chemin: '/contrats/{id}',
+      resume: 'Modifier un contrat (avenant)',
+      description: 'Modification partielle : seuls les champs envoyés changent (ex. la prime). PATCH ≠ PUT qui remplace la ressource entière.',
+      param: { nom: 'id', exemple: '1' },
+      corpsExemple: '{\n  "primeAnnuelle": 660\n}',
+      ecriture: true,
+      executer: (param, corps) => {
+        const refus = protege(true);
+        if (refus) return refus;
+        const c = contrats[param];
+        if (!c)
+          return { code: 404, corps: { erreur: `Contrat ${param} introuvable` }, explication: 'Impossible de modifier une ressource qui n’existe pas : 404 Not Found.' };
+        if (corps === undefined)
+          return { code: 400, corps: { erreur: 'Corps JSON invalide' }, explication: 'JSON mal formé : 400 Bad Request.' };
+        if (c.statut === 'RESILIE')
+          return {
+            code: 422,
+            corps: { erreur: 'Un contrat résilié ne peut plus être modifié' },
+            explication: 'La demande est bien formée mais l’état de la ressource l’interdit (règle métier) : 422. Certains choisissent 409 — l’important est que la spec tranche et documente.',
+          };
+        return { code: 200, corps: { ...c, ...corps }, explication: 'Modification appliquée : 200 OK avec la ressource à jour.' };
+      },
+    },
+    {
+      verbe: 'DELETE',
+      chemin: '/contrats/{id}',
+      resume: 'Supprimer un contrat',
+      description: 'Suppression (cas d’école — en vrai on résilie, on ne supprime pas !). Un DELETE réussi renvoie 204 sans corps.',
+      param: { nom: 'id', exemple: '2' },
+      ecriture: true,
+      executer: (param) => {
+        const refus = protege(true);
+        if (refus) return refus;
+        if (!contrats[param])
+          return { code: 404, corps: { erreur: `Contrat ${param} introuvable` }, explication: 'Rien à supprimer : 404 Not Found. (DELETE est idempotent : certains renvoient 204 même si la ressource n’existe plus.)' };
+        return {
+          code: 204,
+          corps: null,
+          explication: 'Suppression réussie : 204 No Content — succès sans corps de réponse. Le front ne doit pas essayer de parser du JSON !',
+        };
+      },
+    },
+    {
+      verbe: 'GET',
+      chemin: '/contrats/{id}/sinistres',
+      resume: 'Sinistres d’un contrat',
+      description: 'Ressource imbriquée : les sinistres du contrat {id}. Essayez le contrat 1 (2 sinistres), le 2 (aucun — liste vide, pas 404 !) et le 999.',
+      param: { nom: 'id', exemple: '1' },
+      executer: (param) => {
+        const refus = protege(false);
+        if (refus) return refus;
+        if (!contrats[param])
+          return { code: 404, corps: { erreur: `Contrat ${param} introuvable` }, explication: 'Le contrat parent n’existe pas : 404.' };
+        return {
+          code: 200,
+          corps: sinistresParContrat[param] || [],
+          explication: 'Un contrat sans sinistre renvoie 200 avec une liste vide [] — pas un 404 : la collection existe, elle est juste vide. Distinction classique à préciser en spec.',
+        };
+      },
+    },
+    {
+      verbe: 'POST',
+      chemin: '/sinistres',
+      resume: 'Déclarer un sinistre',
+      description: 'Déclaration de sinistre. Règles : contrat existant et non résilié, date de survenance non future, pas de doublon (même contrat + même type + même date). Déclarez deux fois de suite le même sinistre pour voir le 409.',
+      corpsExemple: '{\n  "idContrat": 1,\n  "typeSinistre": "BRIS_DE_GLACE",\n  "dateSurvenance": "2026-08-20"\n}',
+      ecriture: true,
+      executer: (_p, corps) => {
+        const refus = protege(true);
+        if (refus) return refus;
+        if (corps === undefined)
+          return { code: 400, corps: { erreur: 'Corps JSON invalide' }, explication: 'JSON mal formé : 400 Bad Request.' };
+        for (const champ of ['idContrat', 'typeSinistre', 'dateSurvenance'])
+          if (corps[champ] === undefined)
+            return { code: 400, corps: { erreur: `Champ obligatoire manquant : ${champ}` }, explication: 'Champ obligatoire absent : 400 Bad Request.' };
+        const c = contrats[String(corps.idContrat)];
+        if (!c)
+          return { code: 404, corps: { erreur: `Contrat ${corps.idContrat} introuvable` }, explication: 'Le contrat référencé n’existe pas : 404.' };
+        if (c.statut === 'RESILIE')
+          return {
+            code: 422,
+            corps: { erreur: 'Contrat non couvert à la date de survenance (résilié)' },
+            explication: 'Demande bien formée, mais la règle métier refuse : contrat résilié → 422 Unprocessable Entity avec un message exploitable par le conseiller.',
+          };
+        if (String(corps.dateSurvenance) > '2026-08-24')
+          return {
+            code: 422,
+            corps: { erreur: 'La date de survenance ne peut pas être dans le futur' },
+            explication: 'Une date future viole une règle métier (pas la syntaxe) : 422.',
+          };
+        const cle = `${corps.idContrat}|${corps.typeSinistre}|${corps.dateSurvenance}`;
+        if (declarations.has(cle))
+          return {
+            code: 409,
+            corps: { erreur: 'Sinistre déjà déclaré pour ce contrat, ce type et cette date', sinistreExistant: 'SIN-2026-0099' },
+            explication: 'Conflit avec l’état existant (doublon) : 409 Conflict. C’est le mécanisme anti-double-déclaration — crucial car POST n’est pas idempotent.',
+          };
+        declarations.add(cle);
+        return {
+          code: 201,
+          corps: { id: 99, numSinistre: 'SIN-2026-0099', statut: 'DECLARE', accuseReception: true, ...corps },
+          explication: 'Sinistre créé : 201 Created, statut DECLARE, accusé de réception. L’instruction se fera en asynchrone — voir l’onglet Asynchrone !',
+        };
+      },
+    },
+    {
+      verbe: 'POST',
+      chemin: '/devis',
+      resume: 'Tarifer un devis',
+      description: 'Appel synchrone au moteur tarifaire. Champs : produit, codePostal. Essayez le code postal 20200 : la zone tarifaire n’est pas chargée dans le référentiel… (le bug classique du support N2 !)',
+      corpsExemple: '{\n  "produit": "AUTO",\n  "codePostal": "75011"\n}',
+      executer: (_p, corps) => {
+        const refus = protege(false);
+        if (refus) return refus;
+        if (corps === undefined)
+          return { code: 400, corps: { erreur: 'Corps JSON invalide' }, explication: 'JSON mal formé : 400 Bad Request.' };
+        for (const champ of ['produit', 'codePostal'])
+          if (corps[champ] === undefined)
+            return { code: 400, corps: { erreur: `Champ obligatoire manquant : ${champ}` }, explication: 'Champ manquant : 400 Bad Request.' };
+        if (!ZONES_CONNUES.includes(String(corps.codePostal).slice(0, 2)))
+          return {
+            code: 500,
+            corps: { erreur: 'Zone tarifaire introuvable', exception: 'ZoneTarifaireException: aucun millésime pour le département ' + String(corps.codePostal).slice(0, 2) },
+            explication: 'Le moteur tarifaire lève une exception : 500 Internal Server Error. Le payload était pourtant correct — le vrai problème est une donnée référentielle manquante côté serveur. Réflexe BA : logs Kibana → requête sur le référentiel des zones → millésime non chargé.',
+          };
+        return {
+          code: 200,
+          corps: { produit: corps.produit, primeAnnuelle: 587.4, devisValideJusquau: '2026-09-23' },
+          explication: 'Tarification synchrone réussie : 200 OK, le tarif revient instantanément à l’écran.',
+        };
+      },
+    },
+  ];
+  const declarations = new Set<string>();
+
+  // ---------------------------------------------------------------
+  // Rendu de l'explorateur
+  // ---------------------------------------------------------------
+  const conteneur = document.getElementById('api-endpoints')!;
+  ENDPOINTS.forEach((ep, i) => {
+    const det = document.createElement('details');
+    det.className = 'endpoint';
+    det.innerHTML = `
+      <summary>
+        <span class="verbe verbe--${ep.verbe.toLowerCase()}">${ep.verbe}</span>
+        <code class="chemin">${ep.chemin}</code>
+        <span class="resume">${ep.resume}</span>
+      </summary>
+      <div class="endpoint-corps">
+        <p class="description">${ep.description}</p>
+        ${ep.param ? `<label class="champ">Paramètre <code>{${ep.param.nom}}</code> : <input type="text" id="ep-param-${i}" value="${ep.param.exemple}" /></label>` : ''}
+        ${ep.corpsExemple ? `<label class="champ champ--corps">Corps de la requête (JSON) :<textarea id="ep-corps-${i}" rows="5" spellcheck="false">${ep.corpsExemple}</textarea></label>` : ''}
+        <button class="btn btn--principal" id="ep-envoyer-${i}">📡 Envoyer la requête</button>
+        <div class="reponse" id="ep-reponse-${i}" hidden></div>
+      </div>`;
+    conteneur.appendChild(det);
+    det.querySelector(`#ep-envoyer-${i}`)!.addEventListener('click', () => {
+      const param = (det.querySelector(`#ep-param-${i}`) as HTMLInputElement)?.value ?? '';
+      let corps: any = undefined;
+      const zone = det.querySelector(`#ep-corps-${i}`) as HTMLTextAreaElement | null;
+      if (zone) {
+        try {
+          corps = JSON.parse(zone.value);
+        } catch {
+          corps = undefined; // JSON invalide → 400 géré par l'endpoint
+        }
+      } else if (ep.verbe === 'GET' || ep.verbe === 'DELETE') {
+        corps = null;
+      }
+      const rep = ep.executer(param, zone ? corps : null);
+      const bloc = det.querySelector(`#ep-reponse-${i}`) as HTMLElement;
+      const famille = Math.floor(rep.code / 100);
+      bloc.hidden = false;
+      bloc.innerHTML = `
+        <p class="statut statut--${famille}xx">HTTP ${rep.code} ${RAISONS[rep.code]}</p>
+        ${rep.corps !== null ? `<pre class="corps-reponse">${JSON.stringify(rep.corps, null, 2)}</pre>` : '<p class="sans-corps">— pas de corps de réponse —</p>'}
+        <p class="explication">💬 ${rep.explication}</p>`;
+    });
+  });
+
+  // ---------------------------------------------------------------
+  // Jeu des codes réponse
+  // ---------------------------------------------------------------
+  interface Scenario {
+    situation: string;
+    appel: string;
+    bonneReponse: number;
+    explication: string;
+  }
+
+  const SCENARIOS: Scenario[] = [
+    {
+      situation: 'Le front demande le contrat n° 999… qui n’existe pas dans la base.',
+      appel: 'GET /contrats/999',
+      bonneReponse: 404,
+      explication: '404 Not Found : la ressource demandée n’existe pas. Problème côté appelant (mauvais identifiant), pas côté serveur.',
+    },
+    {
+      situation: 'Une application partenaire appelle l’API de déclaration de sinistre sans jeton d’authentification.',
+      appel: 'POST /sinistres (sans en-tête Authorization)',
+      bonneReponse: 401,
+      explication: '401 Unauthorized : l’API ne sait pas qui appelle. Le jeton est absent ou expiré — à distinguer du 403.',
+    },
+    {
+      situation: 'Un conseiller au profil « lecture seule » tente de supprimer un contrat. Il est bien connecté.',
+      appel: 'DELETE /contrats/12 (jeton valide, profil lecture)',
+      bonneReponse: 403,
+      explication: '403 Forbidden : authentifié mais pas habilité. C’est un sujet de droits — inutile de déboguer les données.',
+    },
+    {
+      situation: 'Le payload de souscription arrive sans le champ obligatoire « produit ».',
+      appel: 'POST /contrats  { "idClient": 5, "primeAnnuelle": 640 }',
+      bonneReponse: 400,
+      explication: '400 Bad Request : la requête est invalide (champ obligatoire manquant, mauvais format). Le message d’erreur doit désigner le champ fautif.',
+    },
+    {
+      situation: 'La souscription aboutit : le contrat est créé en base et son identifiant renvoyé.',
+      appel: 'POST /contrats (payload complet et valide)',
+      bonneReponse: 201,
+      explication: '201 Created : la ressource a été créée. La réponse contient l’identifiant du contrat — le front en a besoin pour continuer le parcours.',
+    },
+    {
+      situation: 'La suppression du contrat réussit ; le serveur n’a rien à renvoyer dans le corps.',
+      appel: 'DELETE /contrats/2',
+      bonneReponse: 204,
+      explication: '204 No Content : succès sans corps de réponse. Le front ne doit pas tenter de parser du JSON.',
+    },
+    {
+      situation: 'Le moteur tarifaire lève une exception « zone tarifaire introuvable » : le millésime des codes postaux n’a pas été chargé.',
+      appel: 'POST /devis  { "produit": "AUTO", "codePostal": "20200" }',
+      bonneReponse: 500,
+      explication: '500 Internal Server Error : l’erreur est côté serveur (exception, donnée référentielle manquante). Réflexe : les logs, puis le référentiel.',
+    },
+    {
+      situation: 'Un assuré déclare deux fois le même bris de glace : même contrat, même type, même date que la déclaration déjà enregistrée.',
+      appel: 'POST /sinistres (doublon exact)',
+      bonneReponse: 409,
+      explication: '409 Conflict : la demande entre en conflit avec l’état existant (doublon). C’est le garde-fou anti-double-déclaration — POST n’est pas idempotent.',
+    },
+    {
+      situation: 'Le backoffice est arrêté pour la maintenance mensuelle ; l’API ne peut momentanément pas répondre.',
+      appel: 'GET /contrats (pendant la maintenance)',
+      bonneReponse: 503,
+      explication: '503 Service Unavailable : indisponibilité temporaire du service. On réessaie plus tard ; côté exploitation, c’est un sujet de supervision.',
+    },
+    {
+      situation: 'Le JSON est bien formé et tous les champs sont présents, mais la date de survenance du sinistre est dans le futur.',
+      appel: 'POST /sinistres  { …, "dateSurvenance": "2027-01-01" }',
+      bonneReponse: 422,
+      explication: '422 Unprocessable Entity : syntaxe correcte mais règle métier violée. La frontière avec le 400 (syntaxe) doit être tranchée dans la spec d’API.',
+    },
+    {
+      situation: 'Le front consulte la liste des sinistres clos ; tout se passe bien.',
+      appel: 'GET /sinistres?statut=CLOS',
+      bonneReponse: 200,
+      explication: '200 OK : lecture réussie, la collection (éventuellement vide) est dans le corps de réponse.',
+    },
+    {
+      situation: 'Après 30 minutes d’inactivité, le jeton de session du conseiller a expiré ; il relance une recherche.',
+      appel: 'GET /contrats (jeton expiré)',
+      bonneReponse: 401,
+      explication: '401 Unauthorized : jeton expiré = plus authentifié. Le front doit renvoyer vers la connexion — un cas à spécifier dans tous les parcours.',
+    },
+  ];
+
+  const CODES_PROPOSES = [200, 201, 204, 400, 401, 403, 404, 409, 422, 500, 503];
+  let jeuIndex = 0;
+  let jeuScore = 0;
+  let jeuOrdre: number[] = [];
+
+  function melanger<T>(tab: T[]): T[] {
+    const copie = [...tab];
+    for (let i = copie.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copie[i], copie[j]] = [copie[j], copie[i]];
+    }
+    return copie;
+  }
+
+  function demarrerJeu() {
+    jeuIndex = 0;
+    jeuScore = 0;
+    jeuOrdre = melanger(SCENARIOS.map((_, i) => i));
+    afficherScenario();
+  }
+
+  function afficherScenario() {
+    const s = SCENARIOS[jeuOrdre[jeuIndex]];
+    document.getElementById('jeu-avancement')!.textContent =
+      `Question ${jeuIndex + 1} / ${SCENARIOS.length}`;
+    document.getElementById('jeu-situation')!.textContent = s.situation;
+    document.getElementById('jeu-appel')!.textContent = s.appel;
+    document.getElementById('jeu-feedback')!.hidden = true;
+    document.getElementById('jeu-suivant')!.hidden = true;
+    document.getElementById('jeu-rejouer')!.hidden = true;
+    const choix = document.getElementById('jeu-choix')!;
+    choix.innerHTML = '';
+    CODES_PROPOSES.forEach((code) => {
+      const b = document.createElement('button');
+      b.className = 'code-choix';
+      b.textContent = String(code);
+      b.addEventListener('click', () => repondre(code, b));
+      choix.appendChild(b);
+    });
+    majScore();
+  }
+
+  function repondre(code: number, bouton: HTMLButtonElement) {
+    const s = SCENARIOS[jeuOrdre[jeuIndex]];
+    const ok = code === s.bonneReponse;
+    if (ok) jeuScore++;
+    document.querySelectorAll<HTMLButtonElement>('.code-choix').forEach((b) => {
+      b.disabled = true;
+      if (+b.textContent! === s.bonneReponse) b.classList.add('code-choix--bon');
+    });
+    if (!ok) bouton.classList.add('code-choix--mauvais');
+    const fb = document.getElementById('jeu-feedback')!;
+    fb.hidden = false;
+    fb.classList.remove('jeu-feedback--ok', 'jeu-feedback--ko');
+    fb.classList.add(ok ? 'jeu-feedback--ok' : 'jeu-feedback--ko');
+    fb.innerHTML = `${ok ? '✅ Bien vu !' : `❌ C'était <strong>${s.bonneReponse} ${RAISONS[s.bonneReponse]}</strong>.`}<br />${s.explication}`;
+    if (jeuIndex < jeuOrdre.length - 1) {
+      document.getElementById('jeu-suivant')!.hidden = false;
+    } else {
+      const rejouer = document.getElementById('jeu-rejouer')!;
+      rejouer.hidden = false;
+      fb.innerHTML += `<br /><br />🏁 <strong>Partie terminée : ${jeuScore} / ${SCENARIOS.length}</strong>${jeuScore === SCENARIOS.length ? ' — sans faute, niveau support N2 confirmé !' : jeuScore >= 8 ? ' — solide !' : ' — revoyez la grille 4xx/5xx dans l’onglet Questions.'}`;
+    }
+    majScore();
+  }
+
+  function majScore() {
+    document.getElementById('jeu-score')!.textContent =
+      `Score : ${jeuScore} bonne${jeuScore > 1 ? 's' : ''} réponse${jeuScore > 1 ? 's' : ''}`;
+  }
+
+  document.getElementById('jeu-suivant')!.addEventListener('click', () => {
+    jeuIndex++;
+    afficherScenario();
+  });
+  document.getElementById('jeu-rejouer')!.addEventListener('click', demarrerJeu);
+
+  // ---------------------------------------------------------------
+  // Sous-onglets
+  // ---------------------------------------------------------------
+  let jeuLance = false;
+  document.querySelectorAll<HTMLButtonElement>('.sous-onglet').forEach((b) =>
+    b.addEventListener('click', () => {
+      document
+        .querySelectorAll('.sous-onglet')
+        .forEach((x) => x.classList.toggle('sous-onglet--actif', x === b));
+      document.getElementById('vue-explorateur')!.hidden = b.dataset.vue !== 'explorateur';
+      document.getElementById('vue-jeu')!.hidden = b.dataset.vue !== 'jeu';
+      if (b.dataset.vue === 'jeu' && !jeuLance) {
+        jeuLance = true;
+        demarrerJeu();
+      }
+    })
+  );
+</script>
+
+<style>
+  .sous-onglets {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .sous-onglet {
+    font-family: var(--f-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--trait);
+    border-radius: 999px;
+    background: var(--blanc);
+    color: var(--estompe);
+    cursor: pointer;
+  }
+
+  .sous-onglet--actif {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  .contexte p {
+    max-width: 56rem;
+    color: var(--estompe);
+    margin: 0 0 1rem;
+  }
+
+  .reglages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .reglage {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 650;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .reglage select {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--trait);
+    border-radius: 6px;
+    background: var(--blanc);
+  }
+
+  .reglage input[type='checkbox'] {
+    accent-color: var(--bic);
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* -------- Endpoints (style Swagger) --------
+     Le contenu est injecté en JS : les sélecteurs passent par :global
+     sous l'ancre statique #api-endpoints pour échapper au scoping Astro. */
+  #api-endpoints :global(.endpoint) {
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    background: var(--blanc);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+
+  #api-endpoints :global(.endpoint summary) {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.6rem 0.9rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  #api-endpoints :global(.endpoint summary::-webkit-details-marker) {
+    display: none;
+  }
+
+  #api-endpoints :global(.endpoint[open] summary) {
+    border-bottom: 1px dashed var(--trait);
+  }
+
+  #api-endpoints :global(.verbe) {
+    font-family: var(--f-mono);
+    font-size: 0.7188rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    color: var(--blanc);
+    min-width: 3.6rem;
+    text-align: center;
+  }
+
+  #api-endpoints :global(.verbe--get) { background: #1e7d5e; }
+  #api-endpoints :global(.verbe--post) { background: var(--bic); }
+  #api-endpoints :global(.verbe--patch) { background: #b4690e; }
+  #api-endpoints :global(.verbe--delete) { background: var(--rouge); }
+
+  #api-endpoints :global(.chemin) {
+    font-size: 0.8438rem;
+    background: none;
+    padding: 0;
+    font-weight: 700;
+  }
+
+  #api-endpoints :global(.resume) {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--estompe);
+    margin-left: auto;
+    text-align: right;
+  }
+
+  #api-endpoints :global(.endpoint-corps) {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  #api-endpoints :global(.description) {
+    font-family: var(--f-display);
+    font-size: 0.875rem;
+    color: var(--estompe);
+    margin: 0 0 0.75rem;
+    max-width: 52rem;
+  }
+
+  #api-endpoints :global(.champ) {
+    display: block;
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 650;
+    margin-bottom: 0.6rem;
+  }
+
+  #api-endpoints :global(.champ input) {
+    font-family: var(--f-mono);
+    font-size: 0.8438rem;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid var(--trait);
+    border-radius: 6px;
+    margin-left: 0.35rem;
+    width: 7rem;
+  }
+
+  #api-endpoints :global(.champ--corps textarea) {
+    display: block;
+    width: 100%;
+    max-width: 32rem;
+    font-family: var(--f-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    margin-top: 0.3rem;
+    resize: vertical;
+    background: var(--papier);
+  }
+
+  #api-endpoints :global(.btn) {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 650;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  #api-endpoints :global(.btn--principal) {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  #api-endpoints :global(.btn--principal:hover) {
+    filter: brightness(1.12);
+  }
+
+  #api-endpoints :global(.reponse) {
+    margin-top: 0.85rem;
+    border-top: 1px dashed var(--trait);
+    padding-top: 0.75rem;
+  }
+
+  .btn {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 650;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .btn--principal {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  .btn--principal:hover {
+    filter: brightness(1.12);
+  }
+
+  :global(.statut) {
+    font-family: var(--f-mono);
+    font-size: 0.875rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+  }
+
+  :global(.statut--2xx) { color: var(--vert); }
+  :global(.statut--4xx) { color: #b4690e; }
+  :global(.statut--5xx) { color: var(--rouge); }
+
+  :global(.corps-reponse) {
+    margin: 0 0 0.5rem;
+    font-size: 0.7813rem;
+    max-width: 40rem;
+    background: var(--papier);
+  }
+
+  :global(.sans-corps) {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--estompe);
+    font-style: italic;
+    margin: 0 0 0.5rem;
+  }
+
+  :global(.explication) {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    background: var(--bic-doux);
+    border-radius: 8px;
+    padding: 0.55rem 0.8rem;
+    margin: 0;
+    max-width: 44rem;
+  }
+
+  /* -------- Jeu -------- */
+  .jeu-carte {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 1.25rem 1.4rem;
+    max-width: 46rem;
+  }
+
+  .jeu-avancement {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--bic);
+    margin: 0 0 0.6rem;
+  }
+
+  .jeu-situation {
+    font-size: 1.0625rem;
+    margin: 0 0 0.5rem;
+  }
+
+  .jeu-appel {
+    font-family: var(--f-mono);
+    font-size: 0.8438rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    margin: 0 0 1rem;
+  }
+
+  .jeu-choix {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  :global(.code-choix) {
+    font-family: var(--f-mono);
+    font-size: 0.9375rem;
+    font-weight: 800;
+    padding: 0.45rem 0.85rem;
+    border: 1.5px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  :global(.code-choix:hover:not(:disabled)) {
+    border-color: var(--bic);
+    color: var(--bic);
+    transform: translateY(-1px);
+  }
+
+  :global(.code-choix:disabled) {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  :global(.code-choix--bon) {
+    background: var(--vert) !important;
+    border-color: var(--vert) !important;
+    color: var(--blanc) !important;
+    opacity: 1 !important;
+  }
+
+  :global(.code-choix--mauvais) {
+    background: var(--rouge) !important;
+    border-color: var(--rouge) !important;
+    color: var(--blanc) !important;
+    opacity: 1 !important;
+  }
+
+  .jeu-feedback {
+    font-family: var(--f-display);
+    font-size: 0.9063rem;
+    line-height: 1.6;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  :global(.jeu-feedback--ok) {
+    background: var(--vert-doux);
+    border: 1px solid color-mix(in srgb, var(--vert) 35%, transparent);
+  }
+
+  :global(.jeu-feedback--ko) {
+    background: var(--rouge-doux);
+    border: 1px solid color-mix(in srgb, var(--rouge) 35%, transparent);
+  }
+
+  .jeu-score {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 700;
+    color: var(--estompe);
+    margin-top: 0.75rem;
+  }
+</style>

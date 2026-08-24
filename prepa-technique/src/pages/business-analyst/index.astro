@@ -1,0 +1,262 @@
+---
+// Page de la préparation Business Analyst — orientée assurance.
+// Tout le contenu vit dans cette page, organisé en onglets interactifs :
+// Métier, Questions d'entretien, Pratique SQL, API Lab et Asynchrone.
+import Layout from '../../layouts/Layout.astro';
+import OngletMetier from '../../components/ba/OngletMetier.astro';
+import OngletQuestions from '../../components/ba/OngletQuestions.astro';
+import OngletPratique from '../../components/ba/OngletPratique.astro';
+import OngletApi from '../../components/ba/OngletApi.astro';
+import OngletAsync from '../../components/ba/OngletAsync.astro';
+
+const onglets = [
+  { id: 'metier', label: 'Métier', sous: 'Assurance IARD, santé & vie' },
+  { id: 'questions', label: 'Questions', sous: "77 questions d'entretien" },
+  { id: 'pratique', label: 'Pratique SQL', sous: 'Base IARD + exercices' },
+  { id: 'api', label: 'API Lab', sous: 'Swagger + jeu des codes' },
+  { id: 'async', label: 'Asynchrone', sous: 'Simulateur Kafka sinistres' },
+];
+---
+
+<Layout
+  title="Préparation Business Analyst Assurance — Prépa Technique"
+  description="La préparation BA assurance : le métier (IARD, santé, assurance-vie), 77 questions d'entretien corrigées, un atelier SQL sur une base IARD, un laboratoire d'API et un simulateur Kafka de déclaration de sinistres."
+>
+  <main class="ba">
+    <nav class="retour" aria-label="Fil d'Ariane">
+      <a href="/">← Toutes les préparations</a>
+    </nav>
+
+    <header class="entete">
+      <p class="eyebrow">Préparation</p>
+      <h1>Business Analyst <span class="marque">Assurance</span></h1>
+      <p class="sous">
+        Le métier, les questions d'entretien, et trois ateliers interactifs
+        pour pratiquer le SQL, les API et l'asynchrone sur des cas d'assurance
+        IARD.
+      </p>
+    </header>
+
+    <div class="onglets" role="tablist" aria-label="Sections de la préparation">
+      {
+        onglets.map((o, i) => (
+          <button
+            class="onglet"
+            role="tab"
+            id={`tab-${o.id}`}
+            aria-controls={`panel-${o.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-onglet={o.id}
+          >
+            <span class="onglet-label">{o.label}</span>
+            <span class="onglet-sous">{o.sous}</span>
+          </button>
+        ))
+      }
+    </div>
+
+    <section
+      id="panel-metier"
+      role="tabpanel"
+      aria-labelledby="tab-metier"
+      class="panneau"
+    >
+      <OngletMetier />
+    </section>
+    <section
+      id="panel-questions"
+      role="tabpanel"
+      aria-labelledby="tab-questions"
+      class="panneau"
+      hidden
+    >
+      <OngletQuestions />
+    </section>
+    <section
+      id="panel-pratique"
+      role="tabpanel"
+      aria-labelledby="tab-pratique"
+      class="panneau"
+      hidden
+    >
+      <OngletPratique />
+    </section>
+    <section
+      id="panel-api"
+      role="tabpanel"
+      aria-labelledby="tab-api"
+      class="panneau"
+      hidden
+    >
+      <OngletApi />
+    </section>
+    <section
+      id="panel-async"
+      role="tabpanel"
+      aria-labelledby="tab-async"
+      class="panneau"
+      hidden
+    >
+      <OngletAsync />
+    </section>
+  </main>
+</Layout>
+
+<script>
+  // Bascule d'onglets, synchronisée avec le hash de l'URL pour pouvoir
+  // partager un lien direct vers un onglet (#pratique, #api…).
+  const boutons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('.onglet')
+  );
+  const panneaux = new Map(
+    boutons.map((b) => [
+      b.dataset.onglet!,
+      document.getElementById(`panel-${b.dataset.onglet}`)!,
+    ])
+  );
+
+  function activer(id: string, pousserHash = true) {
+    if (!panneaux.has(id)) id = 'metier';
+    for (const b of boutons) {
+      const actif = b.dataset.onglet === id;
+      b.setAttribute('aria-selected', actif ? 'true' : 'false');
+      panneaux.get(b.dataset.onglet!)!.hidden = !actif;
+    }
+    if (pousserHash) history.replaceState(null, '', `#${id}`);
+    // Certains ateliers s'initialisent à la première ouverture
+    document.dispatchEvent(new CustomEvent('ba:onglet', { detail: id }));
+  }
+
+  boutons.forEach((b) =>
+    b.addEventListener('click', () => activer(b.dataset.onglet!))
+  );
+  window.addEventListener('hashchange', () =>
+    activer(location.hash.slice(1), false)
+  );
+  if (location.hash) activer(location.hash.slice(1), false);
+</script>
+
+<style>
+  .ba {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 3rem clamp(1.25rem, 4vw, 3rem) 5rem;
+  }
+
+  .retour {
+    margin-bottom: 2rem;
+  }
+
+  .retour a {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--estompe);
+    text-decoration: none;
+  }
+
+  .retour a:hover {
+    color: var(--bic);
+  }
+
+  .eyebrow {
+    font-family: var(--f-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--bic);
+    margin: 0 0 0.5rem;
+  }
+
+  .entete h1 {
+    font-size: clamp(2rem, 4.5vw, 2.9rem);
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.75rem;
+  }
+
+  .sous {
+    font-size: 1.125rem;
+    color: var(--estompe);
+    max-width: 44rem;
+    margin: 0 0 2.25rem;
+  }
+
+  /* ---------- Barre d'onglets ---------- */
+  .onglets {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+    position: sticky;
+    top: 0.75rem;
+    z-index: 20;
+  }
+
+  .onglet {
+    display: grid;
+    gap: 0.15rem;
+    text-align: left;
+    padding: 0.7rem 0.9rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--f-display);
+    color: var(--encre);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .onglet:hover {
+    border-color: var(--bic);
+    transform: translateY(-1px);
+  }
+
+  .onglet[aria-selected='true'] {
+    border-color: var(--bic);
+    box-shadow: inset 0 -3px 0 var(--surligneur), 0 6px 16px rgba(25, 29, 43, 0.07);
+  }
+
+  .onglet-label {
+    font-weight: 750;
+    font-size: 0.9375rem;
+  }
+
+  .onglet[aria-selected='true'] .onglet-label {
+    color: var(--bic);
+  }
+
+  .onglet-sous {
+    font-size: 0.6875rem;
+    color: var(--estompe);
+  }
+
+  .panneau {
+    animation: apparait 0.25s ease;
+  }
+
+  @keyframes apparait {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .onglets {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      position: static;
+    }
+    .onglet-sous {
+      display: none;
+    }
+  }
+</style>

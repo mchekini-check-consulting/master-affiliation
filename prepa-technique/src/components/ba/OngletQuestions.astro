@@ -1,0 +1,368 @@
+---
+// Onglet Questions — les 63 questions du document d'entretien BNP,
+// complétées d'une section bonus. Filtres par thème, recherche,
+// et suivi de progression en localStorage.
+import donnees from '../../data/ba/questions.json';
+
+let compteur = 0;
+const sections = donnees.sections.map((s) => ({
+  ...s,
+  questions: s.questions.map((q) => ({ ...q, num: ++compteur })),
+}));
+const total = compteur;
+---
+
+<div class="questions">
+  <div class="outils">
+    <input
+      type="search"
+      id="q-recherche"
+      placeholder={`Rechercher parmi les ${total} questions…`}
+      aria-label="Rechercher une question"
+    />
+    <div class="filtres" id="q-filtres">
+      <button class="filtre filtre--actif" data-section="toutes">Toutes</button>
+      {
+        sections.map((s) => (
+          <button class="filtre" data-section={s.id}>
+            {s.titre}
+          </button>
+        ))
+      }
+    </div>
+    <div class="progression">
+      <div class="jauge"><div class="jauge-fill" id="q-jauge"></div></div>
+      <span id="q-score">0 / {total} maîtrisées</span>
+      <button id="q-reset" class="reset" title="Réinitialiser la progression">↺</button>
+    </div>
+  </div>
+
+  {
+    sections.map((s) => (
+      <section class="groupe" data-section={s.id}>
+        <h2>{s.titre}</h2>
+        {s.questions.map((q) => (
+          <details class="question" data-num={q.num}>
+            <summary>
+              <span class="num">Q{q.num}</span>
+              <span class="texte">{q.q}</span>
+              <label class="maitrise" title="Je maîtrise cette question">
+                <input type="checkbox" class="coche" data-num={q.num} />
+                <span>✓</span>
+              </label>
+            </summary>
+            <div class="reponse">
+              <p class="etiquette">Réponse attendue</p>
+              <p>{q.r}</p>
+            </div>
+          </details>
+        ))}
+      </section>
+    ))
+  }
+
+  <p class="vide" id="q-vide" hidden>Aucune question ne correspond à la recherche.</p>
+</div>
+
+<script>
+  const CLE = 'ba-questions-maitrisees';
+  const total = document.querySelectorAll('.question').length;
+  const coches = Array.from(
+    document.querySelectorAll<HTMLInputElement>('.coche')
+  );
+
+  // --- Progression persistée ---
+  function lire(): Set<string> {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(CLE) || '[]'));
+    } catch {
+      return new Set();
+    }
+  }
+
+  function majProgression() {
+    const acquis = lire();
+    coches.forEach((c) => {
+      c.checked = acquis.has(c.dataset.num!);
+      c.closest('.question')!.classList.toggle('question--ok', c.checked);
+    });
+    document.getElementById('q-score')!.textContent =
+      `${acquis.size} / ${total} maîtrisées`;
+    (document.getElementById('q-jauge') as HTMLElement).style.width =
+      `${(acquis.size / total) * 100}%`;
+  }
+
+  coches.forEach((c) => {
+    // Empêche le clic sur la coche d'ouvrir/fermer le details
+    c.closest('.maitrise')!.addEventListener('click', (e) => e.stopPropagation());
+    c.addEventListener('change', () => {
+      const acquis = lire();
+      c.checked ? acquis.add(c.dataset.num!) : acquis.delete(c.dataset.num!);
+      localStorage.setItem(CLE, JSON.stringify([...acquis]));
+      majProgression();
+    });
+  });
+
+  document.getElementById('q-reset')!.addEventListener('click', () => {
+    localStorage.removeItem(CLE);
+    majProgression();
+  });
+
+  majProgression();
+
+  // --- Filtres par thème ---
+  const filtres = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('.filtre')
+  );
+  let sectionActive = 'toutes';
+
+  filtres.forEach((f) =>
+    f.addEventListener('click', () => {
+      sectionActive = f.dataset.section!;
+      filtres.forEach((x) =>
+        x.classList.toggle('filtre--actif', x === f)
+      );
+      appliquer();
+    })
+  );
+
+  // --- Recherche plein texte ---
+  const champ = document.getElementById('q-recherche') as HTMLInputElement;
+  champ.addEventListener('input', appliquer);
+
+  function normaliser(s: string) {
+    return s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '');
+  }
+
+  function appliquer() {
+    const terme = normaliser(champ.value.trim());
+    let visibles = 0;
+    document
+      .querySelectorAll<HTMLElement>('.groupe')
+      .forEach((g) => {
+        const groupeVisible =
+          sectionActive === 'toutes' || g.dataset.section === sectionActive;
+        let visiblesGroupe = 0;
+        g.querySelectorAll<HTMLElement>('.question').forEach((q) => {
+          const ok =
+            groupeVisible &&
+            (!terme || normaliser(q.textContent || '').includes(terme));
+          q.hidden = !ok;
+          if (ok) visiblesGroupe++;
+        });
+        g.hidden = visiblesGroupe === 0;
+        visibles += visiblesGroupe;
+      });
+    document.getElementById('q-vide')!.hidden = visibles > 0;
+  }
+</script>
+
+<style>
+  .outils {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  #q-recherche {
+    width: 100%;
+    max-width: 30rem;
+    font-family: var(--f-display);
+    font-size: 0.9375rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    background: var(--blanc);
+    color: var(--encre);
+  }
+
+  #q-recherche:focus {
+    outline: 2px solid var(--bic);
+    outline-offset: 1px;
+  }
+
+  .filtres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .filtre {
+    font-family: var(--f-display);
+    font-size: 0.7813rem;
+    font-weight: 650;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--trait);
+    background: var(--blanc);
+    color: var(--estompe);
+    cursor: pointer;
+  }
+
+  .filtre:hover {
+    border-color: var(--bic);
+    color: var(--bic);
+  }
+
+  .filtre--actif {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  .progression {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--estompe);
+  }
+
+  .jauge {
+    flex: 0 1 16rem;
+    height: 8px;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .jauge-fill {
+    height: 100%;
+    width: 0;
+    background: var(--vert);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .reset {
+    border: 1px solid var(--trait);
+    background: var(--blanc);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--estompe);
+    padding: 0.1rem 0.4rem;
+  }
+
+  .reset:hover {
+    color: var(--rouge);
+    border-color: var(--rouge);
+  }
+
+  .groupe h2 {
+    font-size: 1.2rem;
+    font-weight: 750;
+    margin: 1.75rem 0 0.75rem;
+  }
+
+  .question {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+
+  .question--ok {
+    border-color: color-mix(in srgb, var(--vert) 45%, var(--trait));
+    background: var(--vert-doux);
+  }
+
+  .question summary {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    cursor: pointer;
+    padding: 0.7rem 0.9rem;
+    list-style: none;
+  }
+
+  .question summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .num {
+    font-family: var(--f-mono);
+    font-size: 0.7188rem;
+    font-weight: 700;
+    color: var(--bic);
+    flex-shrink: 0;
+  }
+
+  .question--ok .num {
+    color: var(--vert);
+  }
+
+  .texte {
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9375rem;
+    flex: 1;
+  }
+
+  .maitrise {
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  .maitrise input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .maitrise span {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1.5px solid var(--trait);
+    border-radius: 6px;
+    color: transparent;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .maitrise:hover span {
+    border-color: var(--vert);
+  }
+
+  .maitrise input:checked + span {
+    background: var(--vert);
+    border-color: var(--vert);
+    color: var(--blanc);
+  }
+
+  .reponse {
+    padding: 0.2rem 0.9rem 0.9rem 2.35rem;
+    border-top: 1px dashed var(--trait);
+  }
+
+  .etiquette {
+    font-family: var(--f-display);
+    font-size: 0.6875rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--vert);
+    margin: 0.6rem 0 0.3rem;
+  }
+
+  .reponse p:not(.etiquette) {
+    margin: 0;
+    font-size: 0.9688rem;
+    line-height: 1.65;
+  }
+
+  .vide {
+    color: var(--estompe);
+    font-family: var(--f-display);
+  }
+</style>

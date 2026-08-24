@@ -1,0 +1,862 @@
+---
+// Onglet Métier — synthèse des documents « Parcours BA Assurance »
+// (fondamentaux IARD & santé) et « Guide Euodia » (assurance-vie).
+const jargon = [
+  ['Police', "Le contrat d'assurance écrit", 'Votre contrat auto de 12 pages'],
+  ['Avenant', "Modification d'un contrat en cours", "Ajout d'un conducteur secondaire"],
+  ['Résiliation', "Fin du contrat (par l'assuré ou l'assureur)", 'Résiliation après non-paiement'],
+  ['Garantie', 'Ce qui est couvert par le contrat', 'Garantie bris de glace'],
+  ['Exclusion', "Ce qui n'est PAS couvert", 'Dommages intentionnels exclus'],
+  ['Plafond', 'Montant maximum remboursé par garantie', 'Plafond vol = 50 000 €'],
+  ['Franchise', "Reste à charge de l'assuré par sinistre", 'Franchise 300 € sur un dégât des eaux'],
+  ['Quittance', "Appel et justificatif de la prime d'une période", "Quittance annuelle à l'échéance"],
+  ['Prime / Cotisation', "Somme payée par l'assuré pour être couvert", '600 €/an — « prime » en IARD, « cotisation » en santé'],
+];
+
+const sigles = [
+  ['ACPR', 'Autorité de Contrôle Prudentiel et de Résolution', 'Le gendarme des assureurs en France', 'commun'],
+  ['DDA', "Directive sur la Distribution d'Assurances", "Encadre la vente de produits d'assurance", 'commun'],
+  ['KYC', 'Know Your Customer', "Vérification d'identité obligatoire", 'commun'],
+  ['S/P', 'Ratio Sinistres sur Primes', 'Indicateur de rentabilité technique', 'commun'],
+  ['BRD', 'Business Requirements Document', 'Document de cadrage des besoins', 'commun'],
+  ['UAT', 'User Acceptance Testing', 'Recette utilisateur avant mise en production', 'commun'],
+  ['MoSCoW', 'Must / Should / Could / Won’t have', 'Méthode de priorisation des exigences', 'commun'],
+  ['IPID', 'Insurance Product Information Document', 'Document normalisé remis avant souscription', 'commun'],
+  ['IRSA', 'Indemnisation et Recours des Sinistres Automobiles', 'Convention inter-assureurs auto', 'iard'],
+  ['CRM', 'Coefficient de Réduction-Majoration', 'Le bonus-malus auto : de 0,50 à 3,50', 'iard'],
+  ['ANI', 'Accord National Interprofessionnel', 'Complémentaire santé obligatoire en entreprise', 'sante'],
+  ['AMO', 'Assurance Maladie Obligatoire', 'La Sécurité sociale', 'sante'],
+  ['AMC', 'Assurance Maladie Complémentaire', 'La mutuelle / complémentaire santé', 'sante'],
+  ['CSS', 'Complémentaire Santé Solidaire', "Aide de l'État pour les faibles revenus", 'sante'],
+];
+
+const lois = [
+  {
+    nom: 'Loi Hamon (2014)',
+    badge: 'commun',
+    texte:
+      "L'assuré peut résilier à tout moment après 1 an de contrat, sans préavis ni justification. Le nouvel assureur gère les formalités.",
+  },
+  {
+    nom: 'Loi Châtel',
+    badge: 'commun',
+    texte:
+      "Si l'assureur n'envoie pas l'avis d'échéance à temps, l'assuré peut résilier jusqu'à 20 jours après réception de l'avis tardif.",
+  },
+  {
+    nom: 'Résiliation infra-annuelle (2020)',
+    badge: 'sante',
+    texte:
+      'Après 1 an, un contrat complémentaire santé se résilie à tout moment avec 1 mois de préavis.',
+  },
+  {
+    nom: 'Loi Lemoine (2022)',
+    badge: 'sante',
+    texte:
+      "Assurance emprunteur : résiliation/substitution à tout moment, suppression du questionnaire médical (part assurée ≤ 200 000 €, terme avant 60 ans), droit à l'oubli ramené à 5 ans. Impacts SI : parcours de substitution, équivalence de garanties (critères CCSF), volumétrie de résiliations.",
+  },
+  {
+    nom: 'Loi Badinter (1985)',
+    badge: 'iard',
+    texte:
+      'Indemnisation automatique et rapide des victimes non conductrices (piétons, passagers) des accidents de la circulation, indépendamment de la faute.',
+  },
+  {
+    nom: 'Convention IRSA',
+    badge: 'iard',
+    texte:
+      'Règlement amiable entre assureurs : chaque assureur indemnise son propre client puis exerce des recours forfaitaires selon un barème de responsabilité. Objectif : accélérer l’indemnisation.',
+  },
+  {
+    nom: 'ANI (2016)',
+    badge: 'sante',
+    texte:
+      'Toute entreprise privée doit proposer une complémentaire santé collective co-financée au moins à 50 % par l’employeur.',
+  },
+  {
+    nom: 'Loi Évin & portabilité',
+    badge: 'sante',
+    texte:
+      'Maintien de la complémentaire collective après rupture du contrat de travail (12 mois minimum) ; portabilité des droits santé/prévoyance pendant le chômage indemnisé. Enjeu SI : automatiser le suivi et la résiliation des droits.',
+  },
+  {
+    nom: '100 % Santé (2019-2021)',
+    badge: 'sante',
+    texte:
+      'Zéro reste à charge en optique, dentaire et audiologie sur le panier « 100 % Santé » — remboursement obligatoire à 100 % par les complémentaires. Pour le BA : paramétrage du moteur de prestations.',
+  },
+  {
+    nom: 'DDA (2018) & devoir de conseil',
+    badge: 'commun',
+    texte:
+      "Remise de l'IPID avant souscription, traçabilité écrite du conseil, 15 h de formation annuelle des distributeurs. Tout parcours de souscription digitale doit intégrer ces obligations, sinon il est non conforme.",
+  },
+  {
+    nom: 'Solvabilité II & IFRS 17',
+    badge: 'commun',
+    texte:
+      "Solvabilité II : fonds propres suffisants, traçabilité des données, reporting réglementaire (QRT). IFRS 17 (2023) : comptabilisation des contrats à la valeur actuelle des engagements — chantiers majeurs de référentiels de données et de reporting.",
+  },
+  {
+    nom: 'Loi Sapin 2',
+    badge: 'vie',
+    texte:
+      "En cas de menace grave pour le système financier, le HCSF peut limiter temporairement les versements et les rachats sur les contrats d'assurance-vie (3 mois renouvelables, 6 mois maximum pour les rachats) afin d'éviter un retrait massif.",
+  },
+];
+---
+
+<div class="metier">
+  <nav class="sommaire" aria-label="Sommaire du métier">
+    <a href="#m-fondamentaux">Fondamentaux</a>
+    <a href="#m-jargon">Jargon & sigles</a>
+    <a href="#m-lois">Réglementation & lois</a>
+    <a href="#m-processus">Processus & digital</a>
+    <a href="#m-vie">Assurance-vie</a>
+    <a href="#m-role">Le rôle du BA</a>
+  </nav>
+
+  <!-- ============ FONDAMENTAUX ============ -->
+  <section id="m-fondamentaux" class="bloc">
+    <h2>Les fondamentaux de l'assurance</h2>
+
+    <div class="carte">
+      <h3>La mutualisation du risque</h3>
+      <p>
+        Chaque assuré verse une petite somme (la <strong>prime</strong>) dans un
+        pot commun. Lorsqu'un sinistre survient pour l'un d'eux, le pot commun
+        finance l'indemnisation. L'assureur organise cette solidarité : il
+        calcule les probabilités, fixe les primes et gère les indemnisations.
+      </p>
+      <blockquote>
+        💡 1 000 conducteurs cotisent 600 €/an → pot commun de 600 000 €. Si 10
+        d'entre eux ont un accident à 20 000 €, les 200 000 € sont couverts —
+        sans que personne ne débourse une fortune seul.
+      </blockquote>
+    </div>
+
+    <div class="grille-2">
+      <div class="carte">
+        <h3>🚗 IARD — Incendie, Accidents, Risques Divers</h3>
+        <ul>
+          <li>Couvre les <strong>biens</strong> et la responsabilité civile</li>
+          <li>Exemples : auto, habitation, multirisque pro</li>
+          <li><strong>Principe indemnitaire</strong> : on répare le préjudice réel subi, jamais plus — on ne peut pas « gagner » avec une assurance</li>
+          <li>Déclencheur : sinistre matériel ou corporel tiers</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>🩺 Santé — complémentaire maladie</h3>
+        <ul>
+          <li>Couvre les <strong>frais de santé</strong> de la personne</li>
+          <li>Exemples : complémentaire santé, prévoyance, mutuelle</li>
+          <li><strong>Principe forfaitaire</strong> : montant fixé au contrat, indépendant du coût réel (ex. forfait optique 150 €/an)</li>
+          <li>Déclencheur : consultation, hospitalisation, optique…</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="carte">
+      <h3>Les acteurs</h3>
+      <div class="grille-4">
+        <div class="acteur"><strong>🏦 L'assureur</strong><span>Porte le risque et indemnise. AXA, Allianz, MAIF…</span></div>
+        <div class="acteur"><strong>👤 L'assuré</strong><span>Personne physique ou morale dont le risque est couvert.</span></div>
+        <div class="acteur"><strong>🤝 Le courtier</strong><span>Intermédiaire indépendant — il travaille pour l'assuré, pas pour l'assureur.</span></div>
+        <div class="acteur"><strong>🔄 Le réassureur</strong><span>L'assureur de l'assureur. Swiss Re, Munich Re. Proportionnelle (% des primes et sinistres) ou excédent de sinistre (au-delà d'une « priorité », ex. 5 M€).</span></div>
+      </div>
+    </div>
+
+    <div class="carte">
+      <h3>Le cycle de vie d'un contrat</h3>
+      <div class="frise">
+        <span>Devis<br /><em>tarification du risque</em></span>
+        <span>Souscription<br /><em>contrat + CP + 1er encaissement</em></span>
+        <span>Vie du contrat<br /><em>avenants, quittancement, indexation</em></span>
+        <span>Sinistres<br /><em>déclaration → règlement</em></span>
+        <span>Résiliation<br /><em>échéance, Hamon, Châtel…</em></span>
+      </div>
+      <p class="note">
+        À chaque étape : des documents (devis, conditions particulières, avis
+        d'échéance, attestations) et des écritures comptables — autant de sujets
+        de spécification pour le BA.
+      </p>
+    </div>
+
+    <div class="carte">
+      <h3>Le parcours d'un sinistre IARD</h3>
+      <div class="frise frise--sinistre">
+        <span>1. Déclaration<br /><em>sous 5 jours (2 j vol, 10 j cat. nat.)</em></span>
+        <span>2. Ouverture<br /><em>dossier + gestionnaire</em></span>
+        <span>3. Instruction<br /><em>pièces, expertise éventuelle</em></span>
+        <span>4. Décision<br /><em>acceptation ou refus</em></span>
+        <span>5. Indemnisation<br /><em>virement ou règlement direct</em></span>
+      </div>
+      <p class="note">
+        L'expert mandaté chiffre les dommages ; l'assuré peut demander une
+        contre-expertise. L'indemnité est versée déduction faite de la
+        franchise.
+      </p>
+    </div>
+
+    <div class="grille-2">
+      <div class="carte carte--outil">
+        <h3>🧮 Franchise : qui paie quoi ?</h3>
+        <p class="note">Réglez les curseurs et lisez la répartition.</p>
+        <label>Coût du sinistre : <output id="fr-cout-out">1 200</output> €
+          <input type="range" id="fr-cout" min="100" max="10000" step="100" value="1200" />
+        </label>
+        <label>Franchise contractuelle : <output id="fr-franchise-out">300</output> €
+          <input type="range" id="fr-franchise" min="0" max="2000" step="50" value="300" />
+        </label>
+        <p class="resultat" id="fr-resultat"></p>
+      </div>
+      <div class="carte carte--outil">
+        <h3>🧮 Ratio S/P : le portefeuille est-il rentable ?</h3>
+        <p class="note">S/P = sinistres payés ÷ primes encaissées. &lt; 100 % : rentable.</p>
+        <label>Primes encaissées (M€) : <output id="sp-primes-out">10</output>
+          <input type="range" id="sp-primes" min="1" max="50" step="1" value="10" />
+        </label>
+        <label>Sinistres payés (M€) : <output id="sp-sinistres-out">6.5</output>
+          <input type="range" id="sp-sinistres" min="0" max="60" step="0.5" value="6.5" />
+        </label>
+        <p class="resultat" id="sp-resultat"></p>
+        <p class="note">
+          Le <strong>provisionnement</strong> : mettre en réserve de quoi couvrir
+          les sinistres survenus mais pas encore réglés — une obligation
+          comptable.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JARGON ============ -->
+  <section id="m-jargon" class="bloc">
+    <h2>Le jargon & les sigles incontournables</h2>
+    <div class="carte">
+      <h3>Le vocabulaire de base</h3>
+      <table>
+        <thead>
+          <tr><th>Terme</th><th>Définition courte</th><th>Exemple</th></tr>
+        </thead>
+        <tbody>
+          {jargon.map(([t, d, e]) => (
+            <tr><td><strong>{t}</strong></td><td>{d}</td><td>{e}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="carte">
+      <h3>Les sigles à maîtriser</h3>
+      <table>
+        <thead>
+          <tr><th>Sigle</th><th>Signification</th><th>Contexte</th><th></th></tr>
+        </thead>
+        <tbody>
+          {sigles.map(([s, sig, ctx, badge]) => (
+            <tr>
+              <td><strong>{s}</strong></td>
+              <td>{sig}</td>
+              <td>{ctx}</td>
+              <td><span class={`badge badge--${badge}`}>{badge === 'iard' ? '🚗 IARD' : badge === 'sante' ? '🩺 Santé' : '🔵 Commun'}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="carte">
+      <h3>Le bonus-malus (CRM) en 30 secondes</h3>
+      <p>
+        Coefficient de <strong>0,50 à 3,50</strong> appliqué à la prime de
+        référence auto : <strong>−5 %</strong> par année sans sinistre
+        responsable, <strong>+25 %</strong> par sinistre responsable. Un
+        conducteur au bonus maximal (0,50) paie moitié moins que la prime de
+        référence.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ LOIS ============ -->
+  <section id="m-lois" class="bloc">
+    <h2>Réglementation & lois clés</h2>
+    <p class="intro">
+      Les textes qui reviennent dans tous les projets assurance — cliquez pour
+      dérouler. Le cadre général : le <strong>Code des assurances</strong>{' '}
+      régit les contrats, l'<strong>ACPR</strong> contrôle les assureurs, le{' '}
+      <strong>RGPD</strong> protège des données particulièrement sensibles
+      (santé, finances).
+    </p>
+    {lois.map((l) => (
+      <details class="pli">
+        <summary>
+          <span class={`badge badge--${l.badge}`}>
+            {l.badge === 'iard' ? '🚗 IARD' : l.badge === 'sante' ? '🩺 Santé / personnes' : l.badge === 'vie' ? '💰 Vie' : '🔵 Commun'}
+          </span>
+          {l.nom}
+        </summary>
+        <p>{l.texte}</p>
+      </details>
+    ))}
+  </section>
+
+  <!-- ============ PROCESSUS & DIGITAL ============ -->
+  <section id="m-processus" class="bloc">
+    <h2>Processus métier & transformation digitale</h2>
+
+    <div class="carte">
+      <h3>La souscription digitale</h3>
+      <div class="frise">
+        <span>Saisie infos</span>
+        <span>Tarification<br /><em>moteur + scoring</em></span>
+        <span>Choix formule</span>
+        <span>KYC & pièces<br /><em>CNI, domicile, RIB…</em></span>
+        <span>Signature<br /><em>électronique</em></span>
+      </div>
+      <p class="note">
+        Le <strong>KYC</strong> (Know Your Customer) est une obligation légale
+        anti-fraude et anti-blanchiment : pièce d'identité, justificatif de
+        domicile &lt; 3 mois, RIB — et en auto : carte grise, permis, relevé
+        d'information. Le BA spécifie les contrôles automatiques, les cas de
+        rejet et les interfaces avec les prestataires de vérification (Ubble,
+        Onfido…).
+      </p>
+    </div>
+
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Tarification & scoring</h3>
+        <p>Le moteur de tarification calcule la prime selon le profil de risque ; le scoring est la note de risque du profil.</p>
+        <ul>
+          <li>🚗 Variables IARD : âge/expérience du conducteur, véhicule et puissance, bonus-malus, zone géographique</li>
+          <li>🩺 Variables santé : âge, composition familiale, catégorie socioprofessionnelle, niveau de garantie</li>
+        </ul>
+        <p class="note">Souvent la partie la plus complexe à spécifier : variables d'entrée, formules, cas particuliers.</p>
+      </div>
+      <div class="carte">
+        <h3>SelfCare & portail adhérent</h3>
+        <p>L'assuré gère lui-même son contrat sans intervention humaine : consulter, déclarer un sinistre, uploader des justificatifs, suivre ses remboursements, modifier son contrat.</p>
+        <p class="note">Levier majeur de réduction des coûts et d'amélioration de l'expérience client.</p>
+      </div>
+      <div class="carte">
+        <h3>OCR & automatisation documentaire</h3>
+        <p>Lecture automatique des documents scannés : feuilles de soins, carte grise, indexation des pièces (CNI, RIB), pré-remplissage des formulaires de sinistre.</p>
+        <p class="note">Le BA définit les champs à extraire, le taux d'erreur acceptable, les cas de contrôle humain et l'archivage.</p>
+      </div>
+      <div class="carte">
+        <h3>IA conversationnelle</h3>
+        <p>Chatbots et voice bots 24/7 : déclaration de sinistre guidée, réponses aux questions courantes (délais, franchise, documents), modifications simples en autonomie.</p>
+      </div>
+      <div class="carte">
+        <h3>Microservices & API REST</h3>
+        <p>L'application est découpée en services indépendants (tarification, sinistres, KYC…) qui communiquent par API. Si l'un tombe, les autres continuent.</p>
+        <p class="note">→ Voir l'onglet <a href="#api" class="lien-onglet" data-cible="api">API Lab</a> pour pratiquer.</p>
+      </div>
+      <div class="carte">
+        <h3>Open Insurance & télématique</h3>
+        <p>Partage sécurisé des données d'assurance via des API ouvertes, avec consentement (inspiré de l'Open Banking). En auto : le boîtier télématique score la conduite, personnalise la prime et peut pré-instruire un sinistre détecté (indemnisation fast track).</p>
+      </div>
+      <div class="carte">
+        <h3>🩺 Tiers payant & remboursements</h3>
+        <p>L'assuré n'avance pas les frais : l'<strong>AMO</strong> (Sécu) rembourse sa part (ex. 70 % du tarif de convention), l'<strong>AMC</strong> (mutuelle) complète. Réseaux de soins partenaires (Carte Blanche, Santéclair) : tarifs négociés et tiers payant renforcé.</p>
+      </div>
+      <div class="carte">
+        <h3>Anti-fraude & data governance</h3>
+        <p>Scoring de fraude, croisement de fichiers (AGIRA), IA de détection d'anomalies — le BA spécifie les règles de détection et les workflows d'alerte. Data governance : qui accède aux données de santé, combien de temps les conserver, qui est data owner. Un sinistre mal renseigné = une provision fausse = un ratio S/P erroné.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ASSURANCE-VIE ============ -->
+  <section id="m-vie" class="bloc">
+    <h2>💰 L'assurance-vie <span class="src">d'après le guide Euodia</span></h2>
+
+    <div class="carte">
+      <h3>Définition & acteurs</h3>
+      <p>
+        L'assurance-vie est une <strong>enveloppe d'épargne</strong> : en
+        contrepartie du versement de primes, l'assureur s'engage à verser une
+        rente ou un capital à une ou plusieurs personnes déterminées. Trois
+        codes la régissent : Code civil, Code des assurances, Code général des
+        impôts.
+      </p>
+      <div class="grille-3">
+        <div class="acteur"><strong>Le souscripteur</strong><span>Souscrit, paie les primes, désigne l'assuré et les bénéficiaires ; peut racheter ou demander des avances.</span></div>
+        <div class="acteur"><strong>L'assuré</strong><span>Personne sur la tête de qui repose le risque vie/décès — généralement le souscripteur lui-même.</span></div>
+        <div class="acteur"><strong>Le bénéficiaire</strong><span>Personne physique ou morale qui perçoit les capitaux au décès. Clause modifiable à tout moment (sauf bénéficiaire acceptant).</span></div>
+      </div>
+    </div>
+
+    <div class="carte">
+      <h3>Trois idées reçues à démonter</h3>
+      <details class="pli"><summary>« Mon argent est bloqué 8 ans »</summary><p>Non — l'argent est disponible à tout moment via rachats ou avances. Les 8 ans ne concernent que l'avantage fiscal (abattement de 4 600 € / 9 200 €).</p></details>
+      <details class="pli"><summary>« L'assurance-vie ne rapporte plus rien »</summary><p>Faux — ne pas confondre fonds en euros et assurance-vie. Le rendement dépend de l'allocation choisie parmi les supports du contrat (actions, obligations, immobilier…).</p></details>
+      <details class="pli"><summary>« On ne peut avoir qu'une seule assurance-vie »</summary><p>Faux — on peut détenir autant de contrats que l'on veut, sans plafond de versement.</p></details>
+    </div>
+
+    <div class="grille-2">
+      <div class="carte">
+        <h3>Les supports</h3>
+        <ul>
+          <li><strong>Fonds euros</strong> : placement obligataire géré par l'assureur, <em>capital garanti</em>, rendement en baisse tendancielle.</li>
+          <li><strong>Unités de compte (UC)</strong> : OPCVM, SCPI/OPCI, produits structurés, ETF, titres vifs — <em>pas de garantie en capital</em> ; l'assureur garantit le nombre d'UC, pas leur valeur.</li>
+        </ul>
+        <p class="note">Un contrat avec les deux = multisupport. Gestion libre (l'épargnant arbitre) ou gestion pilotée (mandat à une société de gestion).</p>
+      </div>
+      <div class="carte">
+        <h3>Les trois sorties du contrat</h3>
+        <ul>
+          <li><strong>Le rachat</strong> (partiel ou total) : à tout moment ; seule la part d'intérêts comprise dans le rachat est imposée.</li>
+          <li><strong>L'avance</strong> : prêt consenti par l'assureur (max 80 % des avoirs en fonds euros, 60 % en UC), 6 mois à 3 ans, les intérêts du contrat continuent de courir.</li>
+          <li><strong>La rente viagère</strong> : aliénation du capital contre des revenus réguliers — choix irréversible. Part imposable selon l'âge d'entrée en jouissance : 70 % avant 50 ans, 50 % de 50 à 59, 40 % de 60 à 69, 30 % à partir de 70 ans.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="carte">
+      <h3>Fiscalité des rachats (versements après le 27/09/2017 — PFU)</h3>
+      <table>
+        <thead>
+          <tr><th>Ancienneté du contrat</th><th>Imposition des gains</th><th>Total avec prélèvements sociaux (17,2 %)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Moins de 8 ans</td><td>PFU 12,8 %</td><td>30 %</td></tr>
+          <tr><td>Plus de 8 ans — versements ≤ 150 000 €</td><td>7,5 % après abattement annuel de 4 600 € (célibataire) / 9 200 € (couple)</td><td>24,7 %</td></tr>
+          <tr><td>Plus de 8 ans — versements &gt; 150 000 €</td><td>12,8 %</td><td>30 %</td></tr>
+        </tbody>
+      </table>
+      <p class="note">
+        La fiscalité ne s'applique qu'à la sortie (rachat ou dénouement au
+        décès), et uniquement sur la part de plus-value — exception : les
+        prélèvements sociaux du fonds euros sont prélevés chaque 31/12.
+        Exonération d'IR possible en cas de licenciement, mise en retraite
+        anticipée, invalidité ou fin de CDD (sauf option PFU).
+      </p>
+    </div>
+
+    <div class="carte">
+      <h3>Transmission au décès</h3>
+      <table>
+        <thead>
+          <tr><th>Primes versées…</th><th>Régime</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Avant les 70 ans</strong> de l'assuré (art. 990 I CGI)</td>
+            <td>Abattement de <strong>152 500 € par bénéficiaire</strong>, puis 20 % jusqu'à 700 000 € et 31,25 % au-delà. Plus-values et intérêts exonérés.</td>
+          </tr>
+          <tr>
+            <td><strong>Après les 70 ans</strong> (art. 757 B CGI)</td>
+            <td>Abattement global de <strong>30 500 €</strong> sur les sommes versées (tous bénéficiaires), puis droits de succession.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">
+        La clause bénéficiaire peut être démembrée (quasi-usufruit au conjoint,
+        nue-propriété aux enfants) ; un bénéficiaire peut renoncer à la
+        succession tout en acceptant le bénéfice de l'assurance-vie. La
+        co-souscription n'est possible que pour les couples mariés en
+        communauté. Délai de renonciation : 30 jours après l'adhésion.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ RÔLE DU BA ============ -->
+  <section id="m-role" class="bloc">
+    <h2>Le rôle du BA en assurance, par niveau de maturité</h2>
+    <div class="grille-3">
+      <div class="carte">
+        <h3>🌱 Débutant</h3>
+        <ul>
+          <li>Cartographier les acteurs (matrice RACI)</li>
+          <li>Lire une police et en extraire les règles métier (garanties, exclusions, plafonds, franchises)</li>
+          <li>Rédiger le glossaire projet — le premier livrable de tout projet</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>⚙️ Intermédiaire</h3>
+        <ul>
+          <li>Modéliser les parcours en BPMN</li>
+          <li>Rédiger des user stories avec critères d'acceptation</li>
+          <li>Documenter les règles de tarification</li>
+          <li>Spécifier un module KYC</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <h3>🚀 Avancé</h3>
+        <ul>
+          <li>Cadrer un projet end-to-end (BRD complet)</li>
+          <li>Spécifier une intégration API partenaire (endpoints, formats, sécurité, SLA)</li>
+          <li>Animer un atelier MoSCoW</li>
+          <li>Piloter une stratégie UAT</li>
+        </ul>
+      </div>
+    </div>
+    <div class="carte">
+      <h3>La boîte à outils</h3>
+      <p>
+        <span class="outil">Glossaire métier</span>
+        <span class="outil">Cartographies BPMN</span>
+        <span class="outil">User stories & BRD</span>
+        <span class="outil">Plan de recette UAT</span>
+        <span class="outil">Matrice MoSCoW</span>
+        <span class="outil">Spécifications API</span>
+        <span class="outil">Matrice d'impacts</span>
+        <span class="outil">PV de recette</span>
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Calculateur de franchise
+  const frCout = document.getElementById('fr-cout') as HTMLInputElement;
+  const frFranchise = document.getElementById('fr-franchise') as HTMLInputElement;
+  function majFranchise() {
+    const cout = +frCout.value;
+    const franchise = +frFranchise.value;
+    const assureur = Math.max(0, cout - franchise);
+    const assure = Math.min(cout, franchise);
+    document.getElementById('fr-cout-out')!.textContent = cout.toLocaleString('fr-FR');
+    document.getElementById('fr-franchise-out')!.textContent = franchise.toLocaleString('fr-FR');
+    document.getElementById('fr-resultat')!.innerHTML =
+      `L'assureur rembourse <strong>${assureur.toLocaleString('fr-FR')} €</strong> · ` +
+      `l'assuré paie <strong>${assure.toLocaleString('fr-FR')} €</strong>` +
+      (franchise >= cout ? ' — sinistre entièrement sous franchise !' : '');
+  }
+  frCout.addEventListener('input', majFranchise);
+  frFranchise.addEventListener('input', majFranchise);
+  majFranchise();
+
+  // Calculateur S/P
+  const spPrimes = document.getElementById('sp-primes') as HTMLInputElement;
+  const spSinistres = document.getElementById('sp-sinistres') as HTMLInputElement;
+  function majSP() {
+    const p = +spPrimes.value;
+    const s = +spSinistres.value;
+    const ratio = Math.round((s / p) * 100);
+    document.getElementById('sp-primes-out')!.textContent = String(p);
+    document.getElementById('sp-sinistres-out')!.textContent = String(s);
+    const el = document.getElementById('sp-resultat')!;
+    el.innerHTML = `S/P = <strong>${ratio} %</strong> — ${
+      ratio < 100
+        ? '✅ portefeuille rentable'
+        : "❌ l'assureur perd de l'argent sur ce segment"
+    }`;
+    el.style.color = ratio < 100 ? 'var(--vert)' : 'var(--rouge)';
+  }
+  spPrimes.addEventListener('input', majSP);
+  spSinistres.addEventListener('input', majSP);
+  majSP();
+
+  // Liens internes vers d'autres onglets
+  document.querySelectorAll<HTMLAnchorElement>('.lien-onglet').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      (
+        document.querySelector(
+          `.onglet[data-onglet="${a.dataset.cible}"]`
+        ) as HTMLButtonElement
+      )?.click();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    })
+  );
+</script>
+
+<style>
+  .metier {
+    display: grid;
+    gap: 0;
+  }
+
+  .sommaire {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sommaire a {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    text-decoration: none;
+    color: var(--bic);
+    background: var(--bic-doux);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+  }
+
+  .sommaire a:hover {
+    background: var(--surligneur);
+    color: var(--encre);
+  }
+
+  .bloc {
+    margin-bottom: 2.5rem;
+  }
+
+  .bloc h2 {
+    font-size: 1.5rem;
+    font-weight: 750;
+    margin: 0 0 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--trait);
+  }
+
+  .src {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--estompe);
+    font-family: var(--f-display);
+  }
+
+  .intro {
+    color: var(--estompe);
+    max-width: 52rem;
+    margin: 0 0 1rem;
+  }
+
+  .carte {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 1.15rem 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .carte h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 0.6rem;
+  }
+
+  .carte p,
+  .carte ul {
+    margin: 0 0 0.5rem;
+    font-size: 0.9688rem;
+  }
+
+  .carte ul {
+    padding-left: 1.2rem;
+  }
+
+  .carte li {
+    margin: 0.25rem 0;
+  }
+
+  .carte li::marker {
+    color: var(--bic);
+  }
+
+  .carte blockquote {
+    margin: 0.75rem 0 0;
+    padding: 0.6rem 1rem;
+    border-left: 3px solid var(--surligneur);
+    background: var(--papier);
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9375rem;
+  }
+
+  .note {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--estompe);
+  }
+
+  .grille-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .grille-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .grille-4 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .grille-2 > .carte,
+  .grille-3 > .carte {
+    margin-bottom: 0;
+  }
+
+  .acteur {
+    display: grid;
+    gap: 0.25rem;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.875rem;
+  }
+
+  .acteur span {
+    color: var(--estompe);
+    font-size: 0.8438rem;
+    line-height: 1.5;
+  }
+
+  /* Frises chronologiques */
+  .frise {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: stretch;
+    counter-reset: etape;
+  }
+
+  .frise span {
+    flex: 1 1 8rem;
+    position: relative;
+    background: var(--bic-doux);
+    border-radius: 8px;
+    padding: 0.55rem 0.7rem 0.55rem 0.9rem;
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.35;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%);
+  }
+
+  .frise span em {
+    display: block;
+    font-style: normal;
+    font-weight: 450;
+    font-size: 0.71rem;
+    color: var(--estompe);
+    margin-top: 0.15rem;
+  }
+
+  .frise--sinistre span {
+    background: var(--vert-doux);
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: var(--f-display);
+    font-size: 0.85rem;
+    background: var(--blanc);
+  }
+
+  th {
+    text-align: left;
+    background: var(--bic-doux);
+    font-weight: 650;
+    padding: 0.5rem 0.75rem;
+  }
+
+  td {
+    padding: 0.45rem 0.75rem;
+    border-top: 1px solid var(--trait);
+    vertical-align: top;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--f-display);
+    font-size: 0.6563rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    margin-right: 0.4rem;
+  }
+
+  .badge--commun { background: var(--bic-doux); color: var(--bic); }
+  .badge--iard { background: #fdf3e7; color: #b4690e; }
+  .badge--sante { background: var(--vert-doux); color: var(--vert); }
+  .badge--vie { background: #f3ecfc; color: #6d3bbf; }
+
+  /* Accordéons */
+  .pli {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+
+  .pli summary {
+    cursor: pointer;
+    padding: 0.7rem 1rem;
+    font-family: var(--f-display);
+    font-weight: 650;
+    font-size: 0.9063rem;
+    list-style: none;
+  }
+
+  .pli summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .pli summary::before {
+    content: '▸ ';
+    color: var(--bic);
+  }
+
+  .pli[open] summary::before {
+    content: '▾ ';
+  }
+
+  .pli[open] summary {
+    border-bottom: 1px dashed var(--trait);
+  }
+
+  .pli p {
+    margin: 0;
+    padding: 0.7rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  /* Calculateurs */
+  .carte--outil label {
+    display: block;
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 650;
+    margin: 0.6rem 0 0.2rem;
+  }
+
+  .carte--outil input[type='range'] {
+    width: 100%;
+    accent-color: var(--bic);
+  }
+
+  .resultat {
+    font-family: var(--f-display);
+    font-size: 0.9375rem;
+    background: var(--papier);
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    margin-top: 0.6rem;
+  }
+
+  .outil {
+    display: inline-block;
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin: 0.15rem 0.15rem 0.15rem 0;
+  }
+
+  @media (max-width: 860px) {
+    .grille-2,
+    .grille-3,
+    .grille-4 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,942 @@
+---
+// Onglet Pratique SQL — une base IARD (SQLite via sql.js, exécutée dans le
+// navigateur) avec un éditeur CodeMirror (autocomplétion des tables et
+// colonnes), des exercices progressifs et la comparaison automatique du
+// résultat avec le résultat attendu.
+---
+
+<div class="pratique">
+  <div class="presentation">
+    <p>
+      Une base de données <strong>assurance IARD</strong> tourne directement
+      dans votre navigateur : clients, contrats, garanties, sinistres,
+      quittances. Choisissez un exercice, écrivez votre requête
+      (<kbd>Ctrl</kbd>+<kbd>Espace</kbd> pour l'autocomplétion), exécutez avec
+      <kbd>Ctrl</kbd>+<kbd>Entrée</kbd> — le résultat est comparé
+      automatiquement au résultat attendu.
+    </p>
+  </div>
+
+  <div id="sql-chargement" class="chargement">Chargement de la base de données…</div>
+
+  <div class="atelier" id="sql-atelier" hidden>
+    <aside class="colonne-gauche">
+      <details class="schema" open>
+        <summary>📋 Schéma de la base</summary>
+        <div id="sql-schema"></div>
+      </details>
+      <h3 class="titre-liste">Exercices</h3>
+      <ol id="sql-exercices" class="liste-exos"></ol>
+      <button class="exo exo--libre" id="sql-libre">
+        🧪 Bac à sable — requêtes libres
+      </button>
+    </aside>
+
+    <div class="colonne-droite">
+      <div class="enonce" id="sql-enonce"></div>
+      <div class="editeur-cadre">
+        <textarea id="sql-editeur" spellcheck="false"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn btn--principal" id="sql-executer">▶ Exécuter (Ctrl+Entrée)</button>
+        <button class="btn" id="sql-indice">💡 Indice</button>
+        <button class="btn" id="sql-solution">👀 Solution</button>
+        <button class="btn" id="sql-reinit" title="Recharger les données d'origine">↺ Réinitialiser la base</button>
+      </div>
+      <p class="indice" id="sql-indice-texte" hidden></p>
+      <div class="verdict" id="sql-verdict" hidden></div>
+      <div class="resultats">
+        <div class="resultat-bloc">
+          <h4>Votre résultat</h4>
+          <div class="table-scroll" id="sql-resultat"><p class="placeholder">Exécutez une requête pour voir le résultat.</p></div>
+        </div>
+        <div class="resultat-bloc" id="sql-attendu-bloc" hidden>
+          <h4>Résultat attendu</h4>
+          <div class="table-scroll" id="sql-attendu"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------------------------------------------------------------
+  // Base de données IARD : schéma + jeu de données
+  // ---------------------------------------------------------------
+  const SEED = `
+    CREATE TABLE clients (
+      id_client INTEGER PRIMARY KEY,
+      nom TEXT NOT NULL,
+      prenom TEXT NOT NULL,
+      date_naissance TEXT,
+      ville TEXT,
+      code_postal TEXT
+    );
+    CREATE TABLE garanties (
+      id_garantie INTEGER PRIMARY KEY,
+      code TEXT NOT NULL,
+      libelle TEXT NOT NULL,
+      produit TEXT NOT NULL
+    );
+    CREATE TABLE contrats (
+      id_contrat INTEGER PRIMARY KEY,
+      num_contrat TEXT NOT NULL,
+      id_client INTEGER NOT NULL REFERENCES clients(id_client),
+      produit TEXT NOT NULL,            -- AUTO / HABITATION / MRP
+      statut TEXT NOT NULL,             -- ACTIF / RESILIE / SUSPENDU
+      date_effet TEXT NOT NULL,
+      date_resiliation TEXT,
+      prime_annuelle REAL NOT NULL,
+      bonus_malus REAL                  -- uniquement AUTO
+    );
+    CREATE TABLE contrat_garanties (
+      id_contrat INTEGER NOT NULL REFERENCES contrats(id_contrat),
+      id_garantie INTEGER NOT NULL REFERENCES garanties(id_garantie),
+      plafond REAL,
+      franchise REAL NOT NULL DEFAULT 0,
+      PRIMARY KEY (id_contrat, id_garantie)
+    );
+    CREATE TABLE sinistres (
+      id_sinistre INTEGER PRIMARY KEY,
+      num_sinistre TEXT NOT NULL,
+      id_contrat INTEGER NOT NULL REFERENCES contrats(id_contrat),
+      id_garantie INTEGER REFERENCES garanties(id_garantie),
+      type_sinistre TEXT NOT NULL,
+      date_survenance TEXT NOT NULL,
+      date_declaration TEXT NOT NULL,
+      statut TEXT NOT NULL,             -- DECLARE / EN_EXPERTISE / ACCEPTE / REFUSE / CLOS
+      montant_estime REAL,
+      montant_regle REAL
+    );
+    CREATE TABLE quittances (
+      id_quittance INTEGER PRIMARY KEY,
+      id_contrat INTEGER NOT NULL REFERENCES contrats(id_contrat),
+      periode_debut TEXT NOT NULL,
+      periode_fin TEXT NOT NULL,
+      montant REAL NOT NULL,
+      statut TEXT NOT NULL,             -- EMISE / PAYEE / IMPAYEE
+      date_paiement TEXT
+    );
+
+    INSERT INTO clients VALUES
+      (1,'Dupont','Marie','1985-03-12','Paris','75011'),
+      (2,'Martin','Karim','1990-07-25','Lyon','69003'),
+      (3,'Bernard','Sophie','1978-11-02','Marseille','13008'),
+      (4,'Petit','Lucas','1988-01-19','Lille','59000'),
+      (5,'Durand','Nadia','1995-06-30','Bordeaux','33000'),
+      (6,'Moreau','Julien','1982-09-14','Nantes','44000'),
+      (7,'Garcia','Ines','1971-04-08','Toulouse','31000'),
+      (8,'Roux','Thomas','1998-12-01','Nice','06000'),
+      (9,'Fournier','Emma','1986-02-22','Rennes','35000'),
+      (10,'Benali','Yasmine','1992-08-17','Strasbourg','67000');
+
+    INSERT INTO garanties VALUES
+      (1,'RC','Responsabilité civile','AUTO'),
+      (2,'BDG','Bris de glace','AUTO'),
+      (3,'VOL','Vol du véhicule','AUTO'),
+      (4,'DTA','Dommages tous accidents','AUTO'),
+      (5,'DDE','Dégât des eaux','HABITATION'),
+      (6,'INC','Incendie','HABITATION'),
+      (7,'VOLH','Vol et vandalisme','HABITATION'),
+      (8,'CATNAT','Catastrophes naturelles','HABITATION'),
+      (9,'RCPRO','RC professionnelle','MRP'),
+      (10,'PEXP','Perte d''exploitation','MRP');
+
+    INSERT INTO contrats VALUES
+      (1,'AUTO-2023-0001',1,'AUTO','ACTIF','2023-01-15',NULL,620,0.85),
+      (2,'HAB-2023-0002',1,'HABITATION','ACTIF','2023-02-01',NULL,280,NULL),
+      (3,'AUTO-2022-0003',2,'AUTO','ACTIF','2022-06-10',NULL,540,0.72),
+      (4,'AUTO-2021-0004',3,'AUTO','RESILIE','2021-03-01','2024-03-01',780,1.25),
+      (5,'HAB-2022-0005',3,'HABITATION','ACTIF','2022-09-15',NULL,310,NULL),
+      (6,'MRP-2023-0006',4,'MRP','ACTIF','2023-04-01',NULL,1450,NULL),
+      (7,'AUTO-2024-0007',5,'AUTO','ACTIF','2024-01-05',NULL,690,1.00),
+      (8,'HAB-2024-0008',5,'HABITATION','RESILIE','2024-02-01','2025-08-01',260,NULL),
+      (9,'AUTO-2023-0009',6,'AUTO','SUSPENDU','2023-07-20',NULL,850,1.12),
+      (10,'HAB-2021-0010',7,'HABITATION','ACTIF','2021-11-30',NULL,340,NULL),
+      (11,'AUTO-2025-0011',8,'AUTO','ACTIF','2025-03-12',NULL,580,0.90),
+      (12,'MRP-2024-0012',9,'MRP','ACTIF','2024-06-01',NULL,1980,NULL),
+      (13,'AUTO-2020-0013',10,'AUTO','ACTIF','2020-05-18',NULL,470,0.50),
+      (14,'HAB-2025-0014',2,'HABITATION','ACTIF','2025-01-10',NULL,295,NULL),
+      (15,'AUTO-2024-0015',4,'AUTO','RESILIE','2024-04-01','2026-04-01',720,1.00);
+
+    INSERT INTO contrat_garanties VALUES
+      (1,1,NULL,0),(1,2,1500,80),(1,3,15000,300),
+      (2,5,10000,150),(2,6,200000,0),(2,8,50000,380),
+      (3,1,NULL,0),(3,2,1200,60),
+      (4,1,NULL,0),(4,4,20000,400),
+      (5,5,12000,150),(5,6,250000,0),(5,7,30000,200),
+      (6,9,500000,1000),(6,10,80000,2000),
+      (7,1,NULL,0),(7,2,1500,90),(7,4,25000,350),
+      (9,1,NULL,0),(9,2,1000,75),
+      (10,5,9000,120),(10,6,180000,0),
+      (11,1,NULL,0),(11,3,12000,250),
+      (12,9,750000,1500),(12,10,120000,2500),
+      (13,1,NULL,0),
+      (14,5,11000,140),(14,7,25000,180),
+      (15,1,NULL,0),(15,4,22000,380);
+
+    INSERT INTO sinistres VALUES
+      (1,'SIN-2024-0001',1,2,'BRIS_DE_GLACE','2024-05-12','2024-05-13','CLOS',450,380),
+      (2,'SIN-2024-0002',3,1,'RC_MATERIEL','2024-02-03','2024-02-05','CLOS',2200,2200),
+      (3,'SIN-2023-0003',4,4,'COLLISION','2023-10-21','2023-10-23','CLOS',5600,5100),
+      (4,'SIN-2025-0004',1,3,'VOL','2025-06-02','2025-06-03','EN_EXPERTISE',8000,NULL),
+      (5,'SIN-2025-0005',6,9,'RC_PRO','2025-04-18','2025-04-22','ACCEPTE',3200,NULL),
+      (6,'SIN-2024-0006',7,4,'COLLISION','2024-09-09','2024-09-15','REFUSE',1500,0),
+      (7,'SIN-2025-0007',9,2,'BRIS_DE_GLACE','2025-07-30','2025-07-31','DECLARE',500,NULL),
+      (8,'SIN-2024-0008',12,10,'PERTE_EXPLOITATION','2024-11-14','2024-11-15','CLOS',12500,11800),
+      (9,'SIN-2023-0009',15,1,'RC_CORPOREL','2023-12-05','2023-12-06','CLOS',15000,14200),
+      (10,'SIN-2025-0010',3,2,'BRIS_DE_GLACE','2025-01-17','2025-01-17','CLOS',420,420),
+      (11,'SIN-2025-0011',5,5,'DEGAT_DES_EAUX','2025-03-22','2025-03-24','ACCEPTE',1900,NULL),
+      (12,'SIN-2024-0012',10,6,'INCENDIE','2024-07-08','2024-07-08','CLOS',26000,24500),
+      (13,'SIN-2025-0013',7,2,'BRIS_DE_GLACE','2025-05-11','2025-05-12','CLOS',390,320),
+      (14,'SIN-2025-0014',13,1,'RC_MATERIEL','2025-08-01','2025-08-04','DECLARE',1100,NULL);
+
+    INSERT INTO quittances VALUES
+      (1,1,'2025-01-15','2026-01-14',620,'PAYEE','2025-01-20'),
+      (2,2,'2025-02-01','2026-01-31',280,'PAYEE','2025-02-03'),
+      (3,3,'2025-06-10','2026-06-09',540,'PAYEE','2025-06-12'),
+      (4,5,'2025-09-15','2026-09-14',310,'EMISE',NULL),
+      (5,6,'2025-04-01','2026-03-31',1450,'PAYEE','2025-04-10'),
+      (6,7,'2025-01-05','2026-01-04',690,'IMPAYEE',NULL),
+      (7,9,'2025-07-20','2026-07-19',850,'IMPAYEE',NULL),
+      (8,10,'2024-11-30','2025-11-29',340,'PAYEE','2024-12-02'),
+      (9,11,'2025-03-12','2026-03-11',580,'PAYEE','2025-03-15'),
+      (10,12,'2025-06-01','2026-05-31',1980,'PAYEE','2025-06-05'),
+      (11,13,'2025-05-18','2026-05-17',470,'PAYEE','2025-05-19'),
+      (12,14,'2025-01-10','2026-01-09',295,'IMPAYEE',NULL),
+      (13,4,'2023-03-01','2024-02-29',780,'PAYEE','2023-03-04'),
+      (14,8,'2024-02-01','2025-01-31',260,'PAYEE','2024-02-06'),
+      (15,15,'2025-04-01','2026-03-31',720,'EMISE',NULL);
+  `;
+
+  const SCHEMA: Record<string, string[]> = {
+    clients: ['id_client', 'nom', 'prenom', 'date_naissance', 'ville', 'code_postal'],
+    contrats: ['id_contrat', 'num_contrat', 'id_client', 'produit', 'statut', 'date_effet', 'date_resiliation', 'prime_annuelle', 'bonus_malus'],
+    garanties: ['id_garantie', 'code', 'libelle', 'produit'],
+    contrat_garanties: ['id_contrat', 'id_garantie', 'plafond', 'franchise'],
+    sinistres: ['id_sinistre', 'num_sinistre', 'id_contrat', 'id_garantie', 'type_sinistre', 'date_survenance', 'date_declaration', 'statut', 'montant_estime', 'montant_regle'],
+    quittances: ['id_quittance', 'id_contrat', 'periode_debut', 'periode_fin', 'montant', 'statut', 'date_paiement'],
+  };
+
+  // ---------------------------------------------------------------
+  // Exercices
+  // ---------------------------------------------------------------
+  interface Exo {
+    titre: string;
+    niveau: 1 | 2 | 3;
+    enonce: string;
+    indice: string;
+    solution: string;
+    ordre?: boolean; // true si l'ordre des lignes fait partie de l'attendu
+  }
+
+  const EXOS: Exo[] = [
+    {
+      titre: 'Tous les clients',
+      niveau: 1,
+      enonce: 'Affichez toutes les colonnes de tous les clients.',
+      indice: 'SELECT * FROM … — la requête la plus simple qui existe.',
+      solution: 'SELECT * FROM clients;',
+    },
+    {
+      titre: 'Contrats actifs',
+      niveau: 1,
+      enonce: "Listez le numéro de contrat, le produit et la prime annuelle des contrats au statut 'ACTIF'.",
+      indice: "Un WHERE sur la colonne statut. Les chaînes s'écrivent entre apostrophes : 'ACTIF'.",
+      solution: "SELECT num_contrat, produit, prime_annuelle FROM contrats WHERE statut = 'ACTIF';",
+    },
+    {
+      titre: 'Top 5 des primes',
+      niveau: 1,
+      enonce: 'Les 5 contrats les plus chers : numéro de contrat et prime annuelle, du plus cher au moins cher.',
+      indice: 'ORDER BY … DESC puis LIMIT 5.',
+      solution: 'SELECT num_contrat, prime_annuelle FROM contrats ORDER BY prime_annuelle DESC LIMIT 5;',
+      ordre: true,
+    },
+    {
+      titre: 'Contrats par produit',
+      niveau: 1,
+      enonce: 'Comptez le nombre de contrats par produit (colonnes : produit, nb_contrats).',
+      indice: 'COUNT(*) avec un GROUP BY produit.',
+      solution: 'SELECT produit, COUNT(*) AS nb_contrats FROM contrats GROUP BY produit;',
+    },
+    {
+      titre: 'Prime moyenne des contrats actifs',
+      niveau: 2,
+      enonce: "Par produit, la prime annuelle moyenne des seuls contrats actifs (la question classique d'entretien !).",
+      indice: 'Le WHERE filtre les lignes AVANT le regroupement : WHERE statut = … puis GROUP BY.',
+      solution: "SELECT produit, AVG(prime_annuelle) AS prime_moyenne FROM contrats WHERE statut = 'ACTIF' GROUP BY produit;",
+    },
+    {
+      titre: 'Sinistres avec contrat et client',
+      niveau: 2,
+      enonce: 'Pour chaque sinistre : son numéro, le numéro de contrat et le nom du client. Trois tables à relier.',
+      indice: 'sinistres JOIN contrats ON id_contrat, puis JOIN clients ON id_client.',
+      solution:
+        'SELECT s.num_sinistre, c.num_contrat, cl.nom FROM sinistres s JOIN contrats c ON s.id_contrat = c.id_contrat JOIN clients cl ON c.id_client = cl.id_client;',
+    },
+    {
+      titre: 'Contrats sans sinistre',
+      niveau: 2,
+      enonce: "Listez les numéros des contrats qui n'ont jamais eu de sinistre.",
+      indice: 'LEFT JOIN sinistres … puis WHERE s.id_sinistre IS NULL. (Un NOT IN fonctionne aussi.)',
+      solution:
+        'SELECT c.num_contrat FROM contrats c LEFT JOIN sinistres s ON s.id_contrat = c.id_contrat WHERE s.id_sinistre IS NULL;',
+    },
+    {
+      titre: 'Nombre de sinistres par contrat (0 inclus)',
+      niveau: 2,
+      enonce: 'Pour chaque contrat : numéro de contrat et nombre de sinistres — y compris 0 pour les contrats jamais sinistrés.',
+      indice: "LEFT JOIN + COUNT(s.id_sinistre) : COUNT sur une colonne ignore les NULL, donc compte 0 pour les contrats sans sinistre. Un COUNT(*) compterait 1 — c'est le piège.",
+      solution:
+        'SELECT c.num_contrat, COUNT(s.id_sinistre) AS nb_sinistres FROM contrats c LEFT JOIN sinistres s ON s.id_contrat = c.id_contrat GROUP BY c.id_contrat, c.num_contrat;',
+    },
+    {
+      titre: 'Produits chers (HAVING)',
+      niveau: 2,
+      enonce: 'Les produits dont la prime annuelle moyenne (tous statuts) dépasse 600 € — avec cette moyenne.',
+      indice: 'On filtre un agrégat → HAVING AVG(…) > 600, pas WHERE.',
+      solution:
+        'SELECT produit, AVG(prime_annuelle) AS prime_moyenne FROM contrats GROUP BY produit HAVING AVG(prime_annuelle) > 600;',
+    },
+    {
+      titre: 'Quittances impayées',
+      niveau: 2,
+      enonce: 'Les quittances impayées avec le numéro de contrat, le nom du client et le montant dû.',
+      indice: "quittances JOIN contrats JOIN clients, WHERE q.statut = 'IMPAYEE'.",
+      solution:
+        "SELECT c.num_contrat, cl.nom, q.montant FROM quittances q JOIN contrats c ON q.id_contrat = c.id_contrat JOIN clients cl ON c.id_client = cl.id_client WHERE q.statut = 'IMPAYEE';",
+    },
+    {
+      titre: 'Montant réglé par type de sinistre',
+      niveau: 3,
+      enonce: "Pour les sinistres clos, le montant total réglé par type de sinistre, trié du plus coûteux au moins coûteux.",
+      indice: "WHERE statut = 'CLOS', SUM(montant_regle), GROUP BY type_sinistre, ORDER BY … DESC.",
+      solution:
+        "SELECT type_sinistre, SUM(montant_regle) AS total_regle FROM sinistres WHERE statut = 'CLOS' GROUP BY type_sinistre ORDER BY total_regle DESC;",
+      ordre: true,
+    },
+    {
+      titre: 'Clients multi-contrats actifs',
+      niveau: 3,
+      enonce: "Les clients (nom, prénom) qui détiennent plus d'un contrat actif, avec le nombre de contrats.",
+      indice: 'JOIN + WHERE sur le statut + GROUP BY client + HAVING COUNT(*) > 1.',
+      solution:
+        "SELECT cl.nom, cl.prenom, COUNT(*) AS nb_contrats FROM clients cl JOIN contrats c ON c.id_client = cl.id_client WHERE c.statut = 'ACTIF' GROUP BY cl.id_client, cl.nom, cl.prenom HAVING COUNT(*) > 1;",
+    },
+    {
+      titre: 'Ratio S/P par produit',
+      niveau: 3,
+      enonce:
+        "Le grand classique du pilotage : par produit, le total des primes des contrats, le total des sinistres réglés, et le ratio S/P en % (sinistres réglés ÷ primes × 100, arrondi). Tous statuts confondus.",
+      indice:
+        'Partez de contrats, LEFT JOIN sinistres. Attention : SUM(prime_annuelle) serait faussé par la démultiplication des lignes — agrégez les sinistres par contrat dans une sous-requête, ou utilisez une sous-requête corrélée.',
+      solution:
+        "SELECT c.produit, SUM(c.prime_annuelle) AS total_primes, SUM(COALESCE(s.regle, 0)) AS total_sinistres, ROUND(SUM(COALESCE(s.regle, 0)) * 100.0 / SUM(c.prime_annuelle)) AS ratio_sp FROM contrats c LEFT JOIN (SELECT id_contrat, SUM(montant_regle) AS regle FROM sinistres WHERE montant_regle IS NOT NULL GROUP BY id_contrat) s ON s.id_contrat = c.id_contrat GROUP BY c.produit;",
+    },
+  ];
+
+  // ---------------------------------------------------------------
+  // Chargement paresseux des bibliothèques (sql.js + CodeMirror)
+  // ---------------------------------------------------------------
+  const CDN = {
+    sqljs: 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js',
+    sqljsWasmDir: 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/',
+    cm: 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js',
+    cmCss: 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css',
+    cmSql: 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/sql/sql.min.js',
+    cmHint: 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.js',
+    cmHintCss: 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/show-hint.min.css',
+    cmSqlHint: 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/hint/sql-hint.min.js',
+  };
+
+  function chargerScript(src: string) {
+    return new Promise<void>((res, rej) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => res();
+      s.onerror = () => rej(new Error(`Échec de chargement : ${src}`));
+      document.head.appendChild(s);
+    });
+  }
+
+  function chargerCss(href: string) {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    document.head.appendChild(l);
+  }
+
+  let db: any = null;
+  let editeur: any = null;
+  let exoCourant: number | null = 0;
+  let initLancee = false;
+
+  async function initialiser() {
+    if (initLancee) return;
+    initLancee = true;
+    const chargement = document.getElementById('sql-chargement')!;
+    try {
+      chargerCss(CDN.cmCss);
+      chargerCss(CDN.cmHintCss);
+      await Promise.all([chargerScript(CDN.sqljs), chargerScript(CDN.cm)]);
+      await chargerScript(CDN.cmSql);
+      await chargerScript(CDN.cmHint);
+      await chargerScript(CDN.cmSqlHint);
+
+      const SQL = await (window as any).initSqlJs({
+        locateFile: (f: string) => CDN.sqljsWasmDir + f,
+      });
+      db = new SQL.Database();
+      db.run(SEED);
+
+      const CodeMirror = (window as any).CodeMirror;
+      editeur = CodeMirror.fromTextArea(
+        document.getElementById('sql-editeur'),
+        {
+          mode: 'text/x-sql',
+          lineNumbers: true,
+          viewportMargin: Infinity,
+          extraKeys: {
+            'Ctrl-Space': 'autocomplete',
+            'Ctrl-Enter': executer,
+            'Cmd-Enter': executer,
+          },
+          hintOptions: { tables: SCHEMA, completeSingle: false },
+        }
+      );
+      // Autocomplétion au fil de la frappe
+      editeur.on('inputRead', (cm: any, change: any) => {
+        if (/^[a-zA-Z_.]$/.test(change.text[0]) && !cm.state.completionActive) {
+          cm.showHint({ completeSingle: false });
+        }
+      });
+
+      afficherSchema();
+      afficherListeExos();
+      choisirExo(0);
+
+      chargement.hidden = true;
+      document.getElementById('sql-atelier')!.hidden = false;
+    } catch (e: any) {
+      chargement.textContent = `⚠️ Impossible de charger l'atelier SQL (connexion internet requise) — ${e.message}`;
+    }
+  }
+
+  // Initialisation à l'ouverture de l'onglet (ou immédiate si lien direct)
+  document.addEventListener('ba:onglet', (e: any) => {
+    if (e.detail === 'pratique') initialiser();
+  });
+  if (location.hash === '#pratique') initialiser();
+
+  // ---------------------------------------------------------------
+  // Rendu
+  // ---------------------------------------------------------------
+  function afficherSchema() {
+    const conteneur = document.getElementById('sql-schema')!;
+    conteneur.innerHTML = Object.entries(SCHEMA)
+      .map(
+        ([table, cols]) =>
+          `<div class="table-schema"><strong>${table}</strong><span>${cols.join(', ')}</span></div>`
+      )
+      .join('');
+  }
+
+  function afficherListeExos() {
+    const ol = document.getElementById('sql-exercices')!;
+    ol.innerHTML = '';
+    EXOS.forEach((exo, i) => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.className = 'exo';
+      btn.innerHTML = `<span class="exo-niveau">${'●'.repeat(exo.niveau)}${'○'.repeat(3 - exo.niveau)}</span> ${exo.titre} <span class="exo-etat" data-exo="${i}"></span>`;
+      btn.addEventListener('click', () => choisirExo(i));
+      li.appendChild(btn);
+      ol.appendChild(li);
+    });
+    document.getElementById('sql-libre')!.addEventListener('click', () => choisirExo(null));
+    majEtatsExos();
+  }
+
+  const CLE_REUSSIS = 'ba-sql-reussis';
+  function lireReussis(): Set<number> {
+    try {
+      return new Set(JSON.parse(localStorage.getItem(CLE_REUSSIS) || '[]'));
+    } catch {
+      return new Set();
+    }
+  }
+
+  function majEtatsExos() {
+    const reussis = lireReussis();
+    document.querySelectorAll<HTMLElement>('.exo-etat').forEach((e) => {
+      e.textContent = reussis.has(+e.dataset.exo!) ? '✅' : '';
+    });
+    document.querySelectorAll<HTMLElement>('.liste-exos .exo').forEach((b, i) => {
+      b.classList.toggle('exo--actif', exoCourant === i);
+    });
+    document
+      .getElementById('sql-libre')!
+      .classList.toggle('exo--actif', exoCourant === null);
+  }
+
+  function choisirExo(i: number | null) {
+    exoCourant = i;
+    const enonce = document.getElementById('sql-enonce')!;
+    if (i === null) {
+      enonce.innerHTML =
+        '<h3>🧪 Bac à sable</h3><p>Requêtes libres sur la base — explorez, testez des jointures, cassez des choses : le bouton « Réinitialiser » restaure les données.</p>';
+    } else {
+      const exo = EXOS[i];
+      enonce.innerHTML = `<h3>Exercice ${i + 1} — ${exo.titre} <span class="niveau">${'●'.repeat(exo.niveau)}${'○'.repeat(3 - exo.niveau)}</span></h3><p>${exo.enonce}</p>${exo.ordre ? '<p class="ordre">⚠️ L’ordre des lignes compte pour cet exercice.</p>' : ''}`;
+    }
+    document.getElementById('sql-indice-texte')!.hidden = true;
+    document.getElementById('sql-verdict')!.hidden = true;
+    document.getElementById('sql-attendu-bloc')!.hidden = true;
+    document.getElementById('sql-resultat')!.innerHTML =
+      '<p class="placeholder">Exécutez une requête pour voir le résultat.</p>';
+    if (editeur) {
+      editeur.setValue('');
+      editeur.focus();
+    }
+    majEtatsExos();
+  }
+
+  function tableHtml(colonnes: string[], lignes: any[][]) {
+    if (!lignes.length)
+      return '<p class="placeholder">0 ligne retournée.</p>';
+    const tete = colonnes.map((c) => `<th>${c}</th>`).join('');
+    const corps = lignes
+      .map(
+        (l) =>
+          `<tr>${l.map((v) => `<td>${v === null ? '<em class="nul">NULL</em>' : v}</td>`).join('')}</tr>`
+      )
+      .join('');
+    return `<table><thead><tr>${tete}</tr></thead><tbody>${corps}</tbody></table><p class="compte">${lignes.length} ligne${lignes.length > 1 ? 's' : ''}</p>`;
+  }
+
+  function executerSql(sql: string): { columns: string[]; values: any[][] } | null {
+    const res = db.exec(sql);
+    if (!res.length) return { columns: [], values: [] };
+    return res[res.length - 1];
+  }
+
+  function normaliserValeur(v: any) {
+    if (v === null) return '␀';
+    if (typeof v === 'number') return String(Math.round(v * 100) / 100);
+    return String(v);
+  }
+
+  function comparer(
+    obtenu: { columns: string[]; values: any[][] },
+    attendu: { columns: string[]; values: any[][] },
+    ordre: boolean
+  ): boolean {
+    if (obtenu.columns.length !== attendu.columns.length) return false;
+    if (obtenu.values.length !== attendu.values.length) return false;
+    const cle = (l: any[]) => l.map(normaliserValeur).join('¦');
+    const a = obtenu.values.map(cle);
+    const b = attendu.values.map(cle);
+    if (!ordre) {
+      a.sort();
+      b.sort();
+    }
+    return a.every((x, i) => x === b[i]);
+  }
+
+  function executer() {
+    if (!db || !editeur) return;
+    const sql = editeur.getValue().trim();
+    const zone = document.getElementById('sql-resultat')!;
+    const verdict = document.getElementById('sql-verdict')!;
+    const attenduBloc = document.getElementById('sql-attendu-bloc')!;
+    verdict.hidden = true;
+    attenduBloc.hidden = true;
+    if (!sql) return;
+
+    let resultat;
+    try {
+      resultat = executerSql(sql);
+    } catch (e: any) {
+      zone.innerHTML = `<p class="erreur">❌ Erreur SQL : ${e.message}</p>`;
+      return;
+    }
+    zone.innerHTML = tableHtml(resultat!.columns, resultat!.values);
+
+    // Comparaison avec le résultat attendu si un exercice est sélectionné
+    if (exoCourant !== null && /^select/i.test(sql)) {
+      const exo = EXOS[exoCourant];
+      let attendu;
+      try {
+        attendu = executerSql(exo.solution)!;
+      } catch {
+        return;
+      }
+      const ok = comparer(resultat!, attendu, !!exo.ordre);
+      verdict.hidden = false;
+      verdict.classList.remove('verdict--ok', 'verdict--ko');
+      verdict.classList.add(ok ? 'verdict--ok' : 'verdict--ko');
+      if (ok) {
+        verdict.innerHTML = '✅ <strong>Correct !</strong> Votre résultat correspond au résultat attendu.';
+        const reussis = lireReussis();
+        reussis.add(exoCourant);
+        localStorage.setItem(CLE_REUSSIS, JSON.stringify([...reussis]));
+        majEtatsExos();
+      } else {
+        verdict.innerHTML =
+          '❌ <strong>Pas encore…</strong> Le résultat ne correspond pas à l’attendu (nombre de colonnes, de lignes ou valeurs). Comparez ci-dessous.';
+        attenduBloc.hidden = false;
+        document.getElementById('sql-attendu')!.innerHTML = tableHtml(
+          attendu.columns,
+          attendu.values
+        );
+      }
+    }
+  }
+
+  document.getElementById('sql-executer')!.addEventListener('click', executer);
+
+  document.getElementById('sql-indice')!.addEventListener('click', () => {
+    if (exoCourant === null) return;
+    const el = document.getElementById('sql-indice-texte')!;
+    el.textContent = `💡 ${EXOS[exoCourant].indice}`;
+    el.hidden = false;
+  });
+
+  document.getElementById('sql-solution')!.addEventListener('click', () => {
+    if (exoCourant === null || !editeur) return;
+    editeur.setValue(EXOS[exoCourant].solution);
+  });
+
+  document.getElementById('sql-reinit')!.addEventListener('click', () => {
+    if (!db) return;
+    db.close();
+    const SQL = (window as any).initSqlJs;
+    // Recréation synchrone : le module est déjà chargé, on réutilise le cache
+    (window as any)
+      .initSqlJs({ locateFile: (f: string) => CDN.sqljsWasmDir + f })
+      .then((S: any) => {
+        db = new S.Database();
+        db.run(SEED);
+        document.getElementById('sql-resultat')!.innerHTML =
+          '<p class="placeholder">Base réinitialisée — les données d’origine sont restaurées.</p>';
+      });
+  });
+</script>
+
+<style>
+  .presentation p {
+    max-width: 56rem;
+    color: var(--estompe);
+    margin: 0 0 1.25rem;
+  }
+
+  kbd {
+    font-family: var(--f-mono);
+    font-size: 0.75em;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 0.05em 0.35em;
+  }
+
+  .chargement {
+    font-family: var(--f-display);
+    color: var(--estompe);
+    padding: 2rem 0;
+  }
+
+  .atelier {
+    display: grid;
+    grid-template-columns: 19rem minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  /* -------- Colonne gauche -------- */
+  .schema {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    font-family: var(--f-display);
+  }
+
+  .schema summary {
+    cursor: pointer;
+    padding: 0.6rem 0.85rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    list-style: none;
+  }
+
+  .schema summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .schema[open] summary {
+    border-bottom: 1px dashed var(--trait);
+  }
+
+  :global(.table-schema) {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.5rem 0.85rem;
+    border-bottom: 1px solid var(--papier);
+    font-size: 0.8125rem;
+  }
+
+  :global(.table-schema strong) {
+    font-family: var(--f-mono);
+    font-size: 0.7813rem;
+    color: var(--bic);
+  }
+
+  :global(.table-schema span) {
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    color: var(--estompe);
+    line-height: 1.5;
+  }
+
+  .titre-liste {
+    font-family: var(--f-display);
+    font-size: 0.9375rem;
+    font-weight: 750;
+    margin: 0 0 0.5rem;
+  }
+
+  .liste-exos {
+    list-style: none;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .exo {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 600;
+    padding: 0.5rem 0.7rem;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .exo:hover {
+    border-color: var(--bic);
+  }
+
+  :global(.exo--actif) {
+    border-color: var(--bic) !important;
+    box-shadow: inset 3px 0 0 var(--bic);
+  }
+
+  :global(.exo-niveau) {
+    font-size: 0.6rem;
+    color: var(--bic);
+    letter-spacing: 0.1em;
+    margin-right: 0.2rem;
+  }
+
+  .exo--libre {
+    width: 100%;
+  }
+
+  /* -------- Colonne droite -------- */
+  .enonce {
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .enonce :global(h3) {
+    font-size: 1rem;
+    font-weight: 750;
+    margin: 0 0 0.35rem;
+  }
+
+  .enonce :global(p) {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .enonce :global(.niveau) {
+    font-size: 0.65rem;
+    color: var(--bic);
+    letter-spacing: 0.1em;
+    vertical-align: middle;
+  }
+
+  .enonce :global(.ordre) {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    color: var(--rouge);
+    margin-top: 0.4rem;
+  }
+
+  .editeur-cadre {
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--blanc);
+    margin-bottom: 0.6rem;
+  }
+
+  .editeur-cadre :global(.CodeMirror) {
+    height: auto;
+    min-height: 7.5rem;
+    font-family: var(--f-mono);
+    font-size: 0.875rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    font-weight: 650;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--trait);
+    border-radius: 8px;
+    background: var(--blanc);
+    color: var(--encre);
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    border-color: var(--bic);
+    color: var(--bic);
+  }
+
+  .btn--principal {
+    background: var(--bic);
+    border-color: var(--bic);
+    color: var(--blanc);
+  }
+
+  .btn--principal:hover {
+    filter: brightness(1.12);
+    color: var(--blanc);
+  }
+
+  .indice {
+    font-family: var(--f-display);
+    font-size: 0.875rem;
+    background: #fffbe8;
+    border: 1px solid #efdf9a;
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    margin: 0 0 0.75rem;
+  }
+
+  .verdict {
+    font-family: var(--f-display);
+    font-size: 0.9063rem;
+    border-radius: 8px;
+    padding: 0.65rem 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+
+  :global(.verdict--ok) {
+    background: var(--vert-doux);
+    border: 1px solid color-mix(in srgb, var(--vert) 35%, transparent);
+    color: var(--vert);
+  }
+
+  :global(.verdict--ko) {
+    background: var(--rouge-doux);
+    border: 1px solid color-mix(in srgb, var(--rouge) 35%, transparent);
+    color: var(--rouge);
+  }
+
+  .resultats {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .resultat-bloc h4 {
+    font-family: var(--f-display);
+    font-size: 0.8125rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--estompe);
+    margin: 0 0 0.4rem;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    background: var(--blanc);
+    border: 1px solid var(--trait);
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .table-scroll :global(table) {
+    border-collapse: collapse;
+    font-family: var(--f-mono);
+    font-size: 0.7813rem;
+    width: 100%;
+  }
+
+  .table-scroll :global(th) {
+    text-align: left;
+    background: var(--bic-doux);
+    padding: 0.35rem 0.6rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .table-scroll :global(td) {
+    padding: 0.3rem 0.6rem;
+    border-top: 1px solid var(--papier);
+    white-space: nowrap;
+  }
+
+  .table-scroll :global(.nul) {
+    color: var(--estompe);
+    font-style: italic;
+  }
+
+  .table-scroll :global(.compte) {
+    font-family: var(--f-display);
+    font-size: 0.7188rem;
+    color: var(--estompe);
+    margin: 0.4rem 0 0.1rem;
+  }
+
+  .table-scroll :global(.placeholder) {
+    font-family: var(--f-display);
+    font-size: 0.8438rem;
+    color: var(--estompe);
+    margin: 0.4rem 0;
+  }
+
+  .table-scroll :global(.erreur) {
+    font-family: var(--f-mono);
+    font-size: 0.8125rem;
+    color: var(--rouge);
+    margin: 0.4rem 0;
+  }
+
+  @media (max-width: 980px) {
+    .atelier {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
