@@ -831,6 +831,51 @@ button { font-family: inherit; }
 #pawns-panel .op-nav .btn { flex: 1; }
 #pawns-panel .anim-row .btn { flex: 1; }
 
+/* ================================================================ rapport -- */
+
+#report-panel .btn { flex: none; }
+.rp-note { font-size: 11.5px; color: var(--gray-text); line-height: 1.5; }
+.rp-section {
+  font-size: 14px; font-weight: 800; letter-spacing: -0.01em;
+  margin: 6px 0 -2px; padding: 8px 12px; border-radius: 10px;
+  background: var(--green); color: #fff;
+}
+.rp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.rp-chip {
+  font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  padding: 7px 12px; border-radius: 99px; border: 1.5px solid var(--line);
+  background: #fff; color: var(--gray-text);
+}
+.rp-chip.actif { background: var(--green); border-color: var(--green); color: #fff; }
+.rp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rp-table th {
+  text-align: left; font-size: 10.5px; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--gray-text); padding: 4px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.rp-table td { padding: 5px 6px; border-bottom: 1px solid rgba(0, 0, 0, .05); vertical-align: top; }
+.rp-table tr.rp-alerte td { background: #fbeae6; }
+.rp-bar { height: 8px; background: #f0efe9; border-radius: 99px; overflow: hidden; }
+.rp-bar-fill { height: 100%; border-radius: 99px; background: var(--green); }
+.rp-bar-fill.rp-best, .rp-bar-fill.rp-excellent { background: #1c8c5a; }
+.rp-bar-fill.rp-good { background: #7cb08a; }
+.rp-bar-fill.rp-inaccuracy { background: #e0b23c; }
+.rp-bar-fill.rp-mistake { background: #e0862e; }
+.rp-bar-fill.rp-blunder { background: #d64f3a; }
+.rp-kind { font-weight: 700; white-space: nowrap; }
+.rp-kind.rp-inaccuracy { color: #b28a1d; }
+.rp-kind.rp-mistake { color: #b4690e; }
+.rp-kind.rp-blunder { color: #c0503a; }
+.rp-moment {
+  border: 1.5px solid var(--line); border-radius: 10px;
+  padding: 9px 11px; margin-bottom: 8px;
+}
+.rp-moment p { margin: 0 0 7px; font-size: 12.5px; line-height: 1.55; }
+.rp-blunder { color: #c0503a; }
+.rp-best { color: var(--green); }
+.rp-exemples { margin: 4px 0 0; padding-left: 18px; font-size: 11.5px; color: var(--gray-text); }
+.rp-exemples li { margin: 2px 0; line-height: 1.5; }
+
 /* Lecture automatique des visionneuses : bouton Lecture/Pause + cadence.
    Placés au-dessus du commentaire pour que rien ne bouge à l'écran. */
 .anim-row { display: flex; gap: 8px; align-items: stretch; }

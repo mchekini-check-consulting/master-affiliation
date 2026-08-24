@@ -576,6 +576,15 @@
       }
       return;
     }
+    if (mode === 'report') {
+      statusMain.textContent = 'Rapport de jeu';
+      statusSub.textContent = repState.phase === 'scan'
+        ? 'Analyse Stockfish en cours — le rapport arrive.'
+        : repState.phase === 'done'
+          ? 'Votre bilan complet : constats, diagnostic et plan.'
+          : 'Choisissez la cadence et le nombre de parties à analyser.';
+      return;
+    }
     if (mode === 'config') {
       statusMain.textContent = 'Configuration';
       statusSub.textContent = 'Pseudo chess.com et chargement des parties.';
@@ -903,6 +912,7 @@
     if (mode === 'missmates') return missM !== null && missM.state === 'guess' && !missM.busy && !missM.introBusy;
     if (mode === 'openings') return false;
     if (mode === 'pawns') return false;
+    if (mode === 'report') return false;
     return true;
   }
 
@@ -2484,6 +2494,909 @@
       };
       if (event.key === 'ArrowRight') { move(1); event.preventDefault(); }
       else if (event.key === 'ArrowLeft') { move(-1); event.preventDefault(); }
+    }
+  });
+
+  // --------------------------------------------------------------- rapport --
+  // Bilan complet du joueur sur ses N dernières parties chess.com (cadence au
+  // choix) : Game Review agrégé (précision, répartition des coups, phases,
+  // répertoire, moments critiques), diagnostic comportemental chiffré, et
+  // plan de progression. Analyse Stockfish dans le navigateur, mise en cache.
+
+  const reportPanel = document.getElementById('report-panel');
+  const REPORT_KIND = 'report-sf';
+  let repState = { cadence: 'rapid', nombre: 30, phase: 'config', progres: '', data: null, erreur: null };
+  let repToken = 0;
+
+  const REP_CADENCES = [
+    ['rapid', 'Rapide'], ['blitz', 'Blitz'], ['bullet', 'Bullet'], ['tout', 'Toutes']
+  ];
+
+  /** Précision lichess (harmonique + pondérée volatilité) — version paramétrée. */
+  function repAccuracy(evals, plyCount, color) {
+    const wps = evals.map(cp => color === 'w' ? winPct(cp) : 100 - winPct(cp));
+    const accs = [];
+    const weights = [];
+    const windowSize = Math.max(2, Math.min(8, Math.floor(plyCount / 10)));
+    for (let i = 0; i + 1 < evals.length && i < plyCount; i++) {
+      if ((i % 2 === 0 ? 'w' : 'b') !== color) continue;
+      const drop = Math.max(0, wps[i] - wps[i + 1]);
+      accs.push(Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * drop) - 3.1669)));
+      const slice = wps.slice(Math.max(0, i - windowSize + 1), i + 2);
+      const mean = slice.reduce((s, w) => s + w, 0) / slice.length;
+      const stdev = Math.sqrt(slice.reduce((s, w) => s + (w - mean) * (w - mean), 0) / slice.length);
+      weights.push(Math.max(0.5, Math.min(12, stdev)));
+    }
+    if (accs.length === 0) return null;
+    let ws = 0, wt = 0, hd = 0;
+    for (let i = 0; i < accs.length; i++) {
+      ws += accs[i] * weights[i];
+      wt += weights[i];
+      hd += 1 / Math.max(accs[i], 1);
+    }
+    return (ws / wt + accs.length / hd) / 2;
+  }
+
+  /** Horloges %clk du PGN chess.com → secondes restantes par demi-coup. */
+  function repClocks(pgn) {
+    const clocks = [];
+    const re = /\[%clk\s+(\d+):(\d+):(\d+(?:\.\d+)?)\]/g;
+    let m;
+    while ((m = re.exec(pgn)) !== null) clocks.push((+m[1]) * 3600 + (+m[2]) * 60 + parseFloat(m[3]));
+    return clocks;
+  }
+
+  function repTimeControl(headers) {
+    const tc = (headers.TimeControl || '600').split('+');
+    return { base: parseInt(tc[0], 10) || 600, inc: parseInt(tc[1] || '0', 10) || 0 };
+  }
+
+  /** Nom d'ouverture lisible depuis l'en-tête ECOUrl (famille, pas la sous-variante). */
+  function repOpeningName(headers) {
+    const url = headers.ECOUrl || '';
+    const slug = url.split('/openings/')[1];
+    if (!slug) return headers.ECO || 'Inconnue';
+    const mots = slug.split('-');
+    const garde = [];
+    for (const mot of mots) {
+      if (/\d/.test(mot)) break;
+      garde.push(mot);
+      if (garde.length >= 3) break;
+    }
+    return garde.join(' ') || headers.ECO || 'Inconnue';
+  }
+
+  /** Récupère les N dernières parties de la cadence voulue via l'API publique. */
+  async function repFetchGames(username, cadence, nombre) {
+    const resp = await fetch('https://api.chess.com/pub/player/'
+      + encodeURIComponent(username.toLowerCase()) + '/games/archives');
+    if (resp.status === 404) throw new Error('Pseudo chess.com introuvable — vérifiez la Configuration.');
+    if (!resp.ok) throw new Error('Erreur réseau (' + resp.status + ').');
+    const archives = (await resp.json()).archives || [];
+    const games = [];
+    for (let i = archives.length - 1; i >= 0 && games.length < nombre; i--) {
+      const month = await fetch(archives[i]).then(r => r.ok ? r.json() : { games: [] });
+      const list = month.games || [];
+      for (let j = list.length - 1; j >= 0 && games.length < nombre; j--) {
+        const g = list[j];
+        if (g.rules !== 'chess' || !g.pgn) continue;
+        if (cadence !== 'tout' && g.time_class !== cadence) continue;
+        games.push(g);
+      }
+    }
+    if (games.length === 0) throw new Error('Aucune partie trouvée pour cette cadence.');
+    games.sort((a, b) => a.end_time - b.end_time); // chronologique
+    return games;
+  }
+
+  /** Passe Stockfish sur une partie : éval + mat + meilleur coup par position. */
+  async function repScanGame(engine, sans, alive) {
+    const s = Chess.newGame();
+    const fens = [Chess.toFen(s)];
+    for (const san of sans) {
+      const move = Pgn.sanToMove(Chess, s, san);
+      if (!move) break;
+      Chess.play(s, move);
+      fens.push(Chess.toFen(s));
+    }
+    const evals = [], mates = [], bests = [];
+    for (let i = 0; i < fens.length; i++) {
+      if (!alive()) return null;
+      const pos = Chess.fromFen(fens[i]);
+      const status = Chess.statusOf(pos);
+      if (status.over) {
+        evals.push(status.result === '1-0' ? 1500 : status.result === '0-1' ? -1500 : 0);
+        mates.push(null);
+        bests.push(null);
+        continue;
+      }
+      const lines = await engine.analyze(fens[i], { multipv: 1, movetime: 90, depth: 12 });
+      if (!alive()) return null;
+      const top = lines && lines[0];
+      const mate = top && top.mate !== null && top.mate !== undefined ? top.mate : null;
+      evals.push(!top ? 0 : (mate !== null ? (mate > 0 ? 1500 : -1500)
+        : Math.max(-1500, Math.min(1500, top.cp || 0))));
+      mates.push(mate);
+      bests.push(top ? top.uci : null);
+    }
+    return { evals, mates, bests, fens };
+  }
+
+  /** Rejoue une partie pour extraire les données « métier » par demi-coup. */
+  function repReplayFacts(sans) {
+    const s = Chess.newGame();
+    const uci = [], estCapture = [], materiel = [], matNonPions = [];
+    const castlePly = { w: -1, b: -1 };
+    const dameSortiePly = { w: -1, b: -1 };
+    const mineursDev = { w: 0, b: 0 };
+    const devAvantDame = { w: 0, b: 0 };
+    const pousseesRoi = { w: 0, b: 0 }; // pions f/g/h poussés APRÈS le petit roque
+    const VAL = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+    const compter = () => {
+      let tout = 0, sansPions = 0, blanc = 0, noir = 0;
+      for (const piece of s.board) {
+        if (!piece) continue;
+        const v = VAL[piece.toLowerCase()];
+        tout += v;
+        if (piece.toLowerCase() !== 'p') sansPions += v;
+        if (piece === piece.toUpperCase()) blanc += v; else noir += v;
+      }
+      return { tout, sansPions, blanc, noir };
+    };
+    let m = compter();
+    materiel.push({ w: m.blanc, b: m.noir });
+    matNonPions.push(m.sansPions);
+    for (let i = 0; i < sans.length; i++) {
+      const san = sans[i];
+      const move = Pgn.sanToMove(Chess, s, san);
+      if (!move) break;
+      const mover = i % 2 === 0 ? 'w' : 'b';
+      if (san === 'O-O' || san === 'O-O-O') castlePly[mover] = i;
+      const piece = (s.board[move.from] || '').toLowerCase();
+      if ((piece === 'n' || piece === 'b')
+          && (mover === 'w' ? move.from >= 56 : move.from <= 7)) mineursDev[mover]++;
+      if (piece === 'q' && dameSortiePly[mover] < 0
+          && (move.from === (mover === 'w' ? 59 : 3))) {
+        dameSortiePly[mover] = i;
+        devAvantDame[mover] = mineursDev[mover];
+      }
+      if (piece === 'p' && castlePly[mover] >= 0) {
+        const col = move.from % 8;
+        if (col >= 5) pousseesRoi[mover]++; // colonnes f, g, h
+      }
+      uci.push(Chess.algebraic(move.from) + Chess.algebraic(move.to) + (move.promo || ''));
+      estCapture.push(!!(move.capture || move.ep));
+      Chess.play(s, move);
+      m = compter();
+      materiel.push({ w: m.blanc, b: m.noir });
+      matNonPions.push(m.sansPions);
+    }
+    return { uci, estCapture, materiel, matNonPions, castlePly, dameSortiePly, devAvantDame, pousseesRoi };
+  }
+
+  /** Lance l'analyse complète : téléchargement, scan Stockfish, agrégation. */
+  async function repAnalyser() {
+    const token = ++repToken;
+    const alive = () => token === repToken && mode === 'report';
+    repState.phase = 'scan';
+    repState.erreur = null;
+    repState.progres = 'Téléchargement des parties chess.com…';
+    renderReportPanel();
+    let games;
+    try {
+      games = await repFetchGames(chesscomUsername, repState.cadence, repState.nombre);
+    } catch (e) {
+      if (!alive()) return;
+      repState.phase = 'config';
+      repState.erreur = e.message;
+      renderReportPanel();
+      return;
+    }
+    if (!alive()) return;
+
+    repState.progres = 'Chargement de Stockfish…';
+    renderReportPanel();
+    const cores = navigator.hardwareConcurrency || 4;
+    const poolSize = Math.max(1, Math.min(4, cores - 2));
+    const engines = (await Promise.all(Array.from({ length: poolSize }, () => {
+      const engine = SfEngine.createEngine(16);
+      return engine.ready().then(ok => ok ? engine : (engine.terminate(), null));
+    }))).filter(Boolean);
+    if (engines.length === 0 || !alive()) {
+      for (const e of engines) e.terminate();
+      if (alive()) {
+        repState.phase = 'config';
+        repState.erreur = 'Stockfish indisponible dans ce navigateur.';
+        renderReportPanel();
+      }
+      return;
+    }
+
+    const me = chesscomUsername.toLowerCase();
+    const dossiers = new Array(games.length).fill(null);
+    let faits = 0;
+    try {
+      let next = 0;
+      await Promise.all(engines.map(async (engine) => {
+        for (;;) {
+          const idx = next++;
+          if (idx >= games.length || !alive()) return;
+          const g = games[idx];
+          const meIsWhite = (g.white.username || '').toLowerCase() === me;
+          const color = meIsWhite ? 'w' : 'b';
+          const parsed = Pgn.parsePgn(g.pgn || '');
+          let scan = scanCacheGet(REPORT_KIND, g, color);
+          const complet = scan && scan.evals && scan.evals.length === parsed.sans.length + 1;
+          if (!complet) {
+            const res = await repScanGame(engine, parsed.sans, alive);
+            if (!res) return;
+            scan = { evals: res.evals, mates: res.mates, bests: res.bests };
+            scanCachePut(scanCacheKey(REPORT_KIND, g, color), scan);
+          }
+          dossiers[idx] = { g, color, parsed, scan };
+          faits++;
+          repState.progres = 'Analyse Stockfish : partie ' + faits + ' / ' + games.length
+            + ' (' + engines.length + ' moteurs — les parties déjà scannées sortent du cache)';
+          renderReportPanel();
+        }
+      }));
+      if (!alive()) return;
+      repState.progres = 'Agrégation et rédaction du rapport…';
+      renderReportPanel();
+      const data = repAgreger(dossiers.filter(Boolean));
+      // Vérification profonde des 5 moments critiques (meilleur coup fiable)
+      for (const cm of data.critiques) {
+        if (!alive()) return;
+        const lines = await engines[0].analyze(cm.fen, { multipv: 1, movetime: 800, depth: 20 });
+        const top = lines && lines[0];
+        if (top) {
+          const st = Chess.fromFen(cm.fen);
+          const move = uciToMove(st, top.uci);
+          if (move) cm.bestSan = Chess.sanOf(st, move);
+        }
+      }
+      if (!alive()) return;
+      repState.data = data;
+      repState.phase = 'done';
+      renderReportPanel();
+      renderStatus();
+    } finally {
+      for (const engine of engines) engine.terminate();
+    }
+  }
+
+  // ------------------------------------------------- agrégation du rapport --
+
+  function repAgreger(dossiers) {
+    const parties = [];
+    for (const d of dossiers) {
+      const { g, color, parsed, scan } = d;
+      const faits = repReplayFacts(parsed.sans);
+      const plyCount = faits.uci.length;
+      const { base, inc } = repTimeControl(parsed.headers || {});
+      const clocks = repClocks(g.pgn || '');
+      const meIsWhite = color === 'w';
+      const moi = meIsWhite ? g.white : g.black;
+      const lui = meIsWhite ? g.black : g.white;
+      const res = resultBadge(moi.result); // V / N / D
+      const date = new Date(g.end_time * 1000);
+
+      // Coups du joueur : classification, pertes, temps
+      const coups = [];
+      for (let i = 0; i < plyCount && i + 1 < scan.evals.length; i++) {
+        if ((i % 2 === 0 ? 'w' : 'b') !== color) continue;
+        const entry = {
+          cpBefore: scan.mates[i] !== null ? null : scan.evals[i],
+          mateBefore: scan.mates[i],
+          cpAfter: scan.mates[i + 1] !== null ? null : scan.evals[i + 1],
+          mateAfter: scan.mates[i + 1],
+          mover: color,
+          isBest: scan.bests[i] === faits.uci[i]
+        };
+        const c = MoveClassifier.classify(entry);
+        const wpAvant = color === 'w' ? winPct(scan.evals[i]) : 100 - winPct(scan.evals[i]);
+        const wpApres = color === 'w' ? winPct(scan.evals[i + 1]) : 100 - winPct(scan.evals[i + 1]);
+        const restant = clocks[i] !== undefined ? clocks[i] : null;
+        const restantAvant = i >= 2 && clocks[i - 2] !== undefined ? clocks[i - 2] : base;
+        coups.push({
+          ply: i,
+          san: parsed.sans[i],
+          kind: c ? c.kind : null,
+          chute: Math.max(0, wpAvant - wpApres),
+          wpAvant,
+          temps: restant !== null ? Math.max(0, restantAvant - restant + inc) : null,
+          restant,
+          mateAvant: scan.mates[i],
+          mateApres: scan.mates[i + 1],
+          best: scan.bests[i]
+        });
+      }
+
+      // Fin d'ouverture / début de finale
+      let finaleDebut = scan.evals.length;
+      for (let i = 0; i < faits.matNonPions.length; i++) {
+        if (faits.matNonPions[i] <= 12) { finaleDebut = i; break; }
+      }
+      const accuracy = repAccuracy(scan.evals, plyCount, color);
+      const maxWp = Math.max(...coups.map(c => c.wpAvant), 0);
+      const minWp = Math.min(...coups.map(c => c.wpAvant), 100);
+
+      parties.push({
+        g, color, res: res.label, accuracy, coups, faits, plyCount,
+        finaleDebut, base, inc, clocks,
+        adv: lui.username, monElo: moi.rating, date,
+        cadence: g.time_class,
+        ouverture: repOpeningName(parsed.headers || {}),
+        maxWp, minWp,
+        evals: scan.evals, mates: scan.mates, sans: parsed.sans,
+        meIsWhite
+      });
+    }
+
+    const tous = parties.flatMap(p => p.coups.map(c => ({ ...c, p })));
+    const ref = (p) => p.adv + ', ' + p.date.toLocaleDateString('fr-FR');
+    const numCoup = (ply) => Math.floor(ply / 2) + 1;
+
+    // --- Répartition des coups
+    const kinds = ['best', 'excellent', 'good', 'inaccuracy', 'mistake', 'blunder'];
+    const repartition = {};
+    for (const k of kinds) repartition[k] = 0;
+    let classes = 0;
+    for (const c of tous) if (c.kind) { repartition[c.kind] = (repartition[c.kind] || 0) + 1; classes++; }
+
+    // --- Précision par cadence + évolution première/seconde moitié
+    const parCadence = {};
+    for (const p of parties) {
+      if (p.accuracy === null) continue;
+      (parCadence[p.cadence] = parCadence[p.cadence] || []).push(p);
+    }
+    const precisions = Object.entries(parCadence).map(([cad, liste]) => {
+      const moy = a => a.reduce((s, p) => s + p.accuracy, 0) / a.length;
+      const demie = Math.floor(liste.length / 2);
+      return {
+        cadence: cad, n: liste.length, moyenne: moy(liste),
+        avant: demie >= 2 ? moy(liste.slice(0, demie)) : null,
+        apres: demie >= 2 ? moy(liste.slice(demie)) : null
+      };
+    });
+
+    // --- Phases : perte moyenne de % de victoire par coup, et gaffes
+    const phases = { ouverture: [], milieu: [], finale: [] };
+    const phaseGaffes = { ouverture: 0, milieu: 0, finale: 0 };
+    for (const c of tous) {
+      const zone = c.ply < 20 ? 'ouverture' : (c.ply >= c.p.finaleDebut ? 'finale' : 'milieu');
+      phases[zone].push(c.chute);
+      if (c.kind === 'blunder') phaseGaffes[zone]++;
+    }
+    const phaseNote = (chutes) => {
+      if (chutes.length === 0) return null;
+      const moy = chutes.reduce((s, x) => s + x, 0) / chutes.length;
+      return { moy, note: Math.max(1.5, Math.min(9.5, 9.8 - moy * 1.15)) };
+    };
+
+    // --- Répertoire d'ouvertures
+    const repertoire = { w: {}, b: {} };
+    for (const p of parties) {
+      const slot = repertoire[p.color][p.ouverture] = repertoire[p.color][p.ouverture]
+        || { n: 0, v: 0, n_: 0, d: 0 };
+      slot.n++;
+      if (p.res === 'V') slot.v++; else if (p.res === 'N') slot.n_++; else slot.d++;
+    }
+    const topOuvertures = (couleur) => Object.entries(repertoire[couleur])
+      .sort((a, b) => b[1].n - a[1].n).slice(0, 5)
+      .map(([nom, s]) => ({ nom, ...s, score: (s.v + s.n_ / 2) / s.n * 100 }));
+
+    // --- Moments critiques : plus grosses chutes de % de victoire
+    const candidats = tous
+      .filter(c => c.chute >= 25 && c.wpAvant >= 25)
+      .sort((a, b) => b.chute - a.chute);
+    const critiques = [];
+    const parPartie = {};
+    for (const c of candidats) {
+      const cle = c.p.g.url || c.p.g.end_time;
+      if ((parPartie[cle] || 0) >= 1) continue;
+      parPartie[cle] = 1;
+      // FEN de la position avant le coup fautif
+      const st = Chess.newGame();
+      for (let i = 0; i < c.ply; i++) {
+        const mv = Pgn.sanToMove(Chess, st, c.p.sans[i]);
+        if (!mv) break;
+        Chess.play(st, mv);
+      }
+      critiques.push({
+        p: c.p, ply: c.ply, san: c.san, chute: c.chute, wpAvant: c.wpAvant,
+        mate: c.mateAvant, fen: Chess.toFen(st), bestSan: null
+      });
+      if (critiques.length >= 5) break;
+    }
+
+    // --- Diagnostic comportemental
+    const diag = {};
+
+    // Temps : gaffes éclair (< 5 s avec > 60 s de pendule), zeitnot, ouverture
+    const avecTemps = tous.filter(c => c.temps !== null && c.restant !== null);
+    const fautes = c => c.kind === 'blunder' || c.kind === 'mistake';
+    diag.eclairs = avecTemps.filter(c => fautes(c) && c.temps <= 5 && c.restant > 60);
+    diag.zeitnotFautes = avecTemps.filter(c => fautes(c) && c.restant < 20);
+    diag.fautesTotal = tous.filter(fautes).length;
+    const tempsOuverture = parties.map(p => {
+      const dix = p.coups.filter(c => c.ply < 20 && c.temps !== null);
+      return dix.length ? dix.reduce((s, c) => s + c.temps, 0) / p.base * 100 : null;
+    }).filter(x => x !== null);
+    diag.ouvertureTempsPct = tempsOuverture.length
+      ? tempsOuverture.reduce((s, x) => s + x, 0) / tempsOuverture.length : null;
+
+    // Pièces en prise : gaffe suivie d'une capture adverse qui gagne ≥ 3 pts
+    diag.pendues = [];
+    for (const c of tous) {
+      if (c.kind !== 'blunder') continue;
+      const p = c.p;
+      const suivant = p.sans[c.ply + 1];
+      const mat = p.faits.materiel;
+      if (suivant && suivant.includes('x') && mat[c.ply + 2]
+          && mat[c.ply + 1][p.color] - mat[c.ply + 2][p.color] >= 3) {
+        diag.pendues.push(c);
+      }
+    }
+
+    // Mats ratés : mat forcé en ≤ 4 disponible, perdu par le coup joué
+    diag.matsRates = [];
+    for (const c of tous) {
+      const m = c.mateAvant;
+      if (m === null) continue;
+      const pour = c.p.color === 'w' ? m > 0 : m < 0;
+      if (!pour || Math.abs(m) > 4) continue;
+      const apres = c.mateApres;
+      const encore = apres !== null && (c.p.color === 'w' ? apres > 0 : apres < 0)
+        && Math.abs(apres) <= Math.abs(m);
+      if (!encore) diag.matsRates.push(c);
+    }
+
+    // Sécurité du roi : roque tardif ou absent, poussées devant le roi roqué
+    diag.roqueTardif = parties.filter(p => p.faits.castlePly[p.color] < 0 && p.plyCount > 30
+      || p.faits.castlePly[p.color] >= 24);
+    diag.sansRoquePerdues = parties.filter(p => p.faits.castlePly[p.color] < 0
+      && p.plyCount > 30 && p.res === 'D');
+    diag.pousseesRoi = parties.filter(p => p.faits.pousseesRoi[p.color] >= 2);
+
+    // Attaque prématurée : dame sortie avant 2 mineurs développés
+    diag.dameTot = parties.filter(p => {
+      const ds = p.faits.dameSortiePly[p.color];
+      return ds >= 0 && ds < 12 && p.faits.devAvantDame[p.color] < 2;
+    });
+
+    // Conversion et défense
+    diag.gagnantes = parties.filter(p => p.maxWp >= 85);
+    diag.converties = diag.gagnantes.filter(p => p.res === 'V');
+    diag.gachees = diag.gagnantes.filter(p => p.res === 'D');
+    diag.perdues3 = parties.filter(p => p.minWp <= 15);
+    diag.sauvees = diag.perdues3.filter(p => p.res !== 'D');
+
+    // Finales : parties équilibrées à l'entrée en finale, perdues quand même
+    diag.finalesJouees = parties.filter(p => p.finaleDebut < p.plyCount);
+    diag.finalesPerduesEq = diag.finalesJouees.filter(p => {
+      const ev = p.evals[p.finaleDebut];
+      const wp = p.color === 'w' ? winPct(ev) : 100 - winPct(ev);
+      return wp >= 40 && p.res === 'D';
+    });
+
+    // Tilt : séries de défaites le même jour, précision après défaite
+    const chrono = [...parties].sort((a, b) => a.g.end_time - b.g.end_time);
+    diag.series = [];
+    let serie = [];
+    for (const p of chrono) {
+      if (p.res === 'D' && serie.length > 0
+          && p.g.end_time - serie[serie.length - 1].g.end_time < 3600 * 3) {
+        serie.push(p);
+      } else {
+        if (serie.length >= 3) diag.series.push([...serie]);
+        serie = p.res === 'D' ? [p] : [];
+      }
+    }
+    if (serie.length >= 3) diag.series.push(serie);
+    const apresDefaite = [], apresAutre = [];
+    for (let i = 1; i < chrono.length; i++) {
+      if (chrono[i].accuracy === null) continue;
+      if (chrono[i].g.end_time - chrono[i - 1].g.end_time > 3600) continue;
+      (chrono[i - 1].res === 'D' ? apresDefaite : apresAutre).push(chrono[i].accuracy);
+    }
+    const moyDe = a => a.length >= 3 ? a.reduce((s, x) => s + x, 0) / a.length : null;
+    diag.accApresDefaite = moyDe(apresDefaite);
+    diag.accApresAutre = moyDe(apresAutre);
+
+    // Bilan global et tendance Elo
+    const bilan = { V: 0, N: 0, D: 0 };
+    for (const p of parties) bilan[p.res]++;
+    const eloDebut = chrono.length ? chrono[0].monElo : null;
+    const eloFin = chrono.length ? chrono[chrono.length - 1].monElo : null;
+
+    return {
+      parties, chrono, tous, classes, repartition, precisions,
+      phases: {
+        ouverture: phaseNote(phases.ouverture),
+        milieu: phaseNote(phases.milieu),
+        finale: phaseNote(phases.finale)
+      },
+      phaseGaffes,
+      ouverturesW: topOuvertures('w'), ouverturesB: topOuvertures('b'),
+      critiques, diag, bilan, eloDebut, eloFin,
+      periode: chrono.length
+        ? chrono[0].date.toLocaleDateString('fr-FR') + ' → ' + chrono[chrono.length - 1].date.toLocaleDateString('fr-FR')
+        : '',
+      ref, numCoup
+    };
+  }
+
+  // --------------------------------------------------- rendu du rapport --
+
+  function repPct(n, total) { return total ? Math.round(n / total * 100) : 0; }
+
+  function renderReportPanel() {
+    if (repState.phase === 'scan') {
+      reportPanel.innerHTML = '<div class="tr-card"><h3>📊 Rapport en préparation</h3>'
+        + '<p>' + escapeHtml(repState.progres) + '</p>'
+        + '<p class="rp-note">Vous pouvez laisser tourner : le résultat s\'affichera ici. '
+        + 'Quitter ce mode annule l\'analyse (les parties déjà scannées restent en cache).</p></div>';
+      return;
+    }
+    if (repState.phase === 'done' && repState.data) {
+      reportPanel.innerHTML = repRapportHtml(repState.data);
+      return;
+    }
+    // Écran de sélection
+    let html = '<div class="tr-card"><h3>📊 Rapport de jeu</h3>'
+      + '<p>Le bilan complet de vos dernières parties chess.com : précision, répartition des coups, '
+      + 'phases de jeu, répertoire, moments critiques — puis un diagnostic de vos habitudes et un plan de progression.</p>';
+    if (!chesscomUsername) {
+      html += '<p class="cfg-status err">Renseignez d\'abord votre pseudo chess.com dans la Configuration.</p></div>';
+      reportPanel.innerHTML = html;
+      return;
+    }
+    html += '<p class="rp-note">Compte analysé : <b>' + escapeHtml(chesscomUsername) + '</b></p></div>';
+    html += '<div class="tr-card"><h3>Cadence</h3><div class="rp-chips">'
+      + REP_CADENCES.map(([id, label]) =>
+        '<button type="button" class="rp-chip' + (repState.cadence === id ? ' actif' : '')
+        + '" data-rep-cadence="' + id + '">' + label + '</button>').join('')
+      + '</div><h3>Nombre de parties</h3><div class="rp-chips">'
+      + [30, 50, 100].map(n =>
+        '<button type="button" class="rp-chip' + (repState.nombre === n ? ' actif' : '')
+        + '" data-rep-nombre="' + n + '">' + n + ' dernières</button>').join('')
+      + '</div>'
+      + '<button type="button" class="btn btn-primary" data-rep-analyser="1">🚀 Générer le rapport</button>'
+      + (repState.erreur ? '<p class="cfg-status err">' + escapeHtml(repState.erreur) + '</p>' : '')
+      + '<p class="rp-note">Durée indicative : ~2 s par partie non encore en cache (analyse Stockfish locale).</p>'
+      + '</div>';
+    reportPanel.innerHTML = html;
+  }
+
+  function repRapportHtml(d) {
+    const KIND_FR = {
+      best: ['★ Meilleurs', 'best'], excellent: ['‼ Excellents', 'excellent'],
+      good: ['! Bons', 'good'], inaccuracy: ['?! Imprécisions', 'inaccuracy'],
+      mistake: ['? Erreurs', 'mistake'], blunder: ['?? Gaffes', 'blunder']
+    };
+    const diag = d.diag;
+    const nb = d.parties.length;
+    const cadLabel = { rapid: 'Rapide', blitz: 'Blitz', bullet: 'Bullet', daily: 'Quotidien' };
+    let html = '<button type="button" class="op-back" data-rep-retour="1">⬅ Nouvelle analyse</button>';
+
+    // ---- En-tête
+    html += '<div class="tr-card"><h3>📊 Rapport — ' + nb + ' parties</h3>'
+      + '<p class="rp-note">' + escapeHtml(d.periode) + ' · '
+      + d.bilan.V + ' V / ' + d.bilan.N + ' N / ' + d.bilan.D + ' D'
+      + (d.eloDebut !== null ? ' · Elo ' + d.eloDebut + ' → <b>' + d.eloFin + '</b> ('
+        + (d.eloFin - d.eloDebut >= 0 ? '+' : '') + (d.eloFin - d.eloDebut) + ')' : '')
+      + '</p></div>';
+
+    // ================= PARTIE 1 : GAME REVIEW =================
+    html += '<div class="rp-section">Partie 1 — Rapport de jeu</div>';
+
+    html += '<div class="tr-card"><h3>Précision moyenne</h3><table class="rp-table"><thead>'
+      + '<tr><th>Cadence</th><th>Parties</th><th>Précision</th><th>Tendance</th></tr></thead><tbody>';
+    for (const pr of d.precisions) {
+      const tend = pr.avant !== null
+        ? (pr.apres - pr.avant >= 1.5 ? '📈 +' + (pr.apres - pr.avant).toFixed(1)
+          : pr.apres - pr.avant <= -1.5 ? '📉 ' + (pr.apres - pr.avant).toFixed(1)
+            : '→ stable')
+        : '—';
+      html += '<tr><td>' + (cadLabel[pr.cadence] || pr.cadence) + '</td><td>' + pr.n + '</td>'
+        + '<td><b>' + pr.moyenne.toFixed(1) + ' %</b></td><td>' + tend
+        + (pr.avant !== null ? ' <span class="rp-note">(' + pr.avant.toFixed(1) + ' → ' + pr.apres.toFixed(1) + ')</span>' : '')
+        + '</td></tr>';
+    }
+    html += '</tbody></table></div>';
+
+    html += '<div class="tr-card"><h3>Répartition des coups (' + d.classes + ' coups classés)</h3>'
+      + '<table class="rp-table"><tbody>';
+    for (const [k, [label, css]] of Object.entries(KIND_FR)) {
+      const n = d.repartition[k] || 0;
+      const pct = repPct(n, d.classes);
+      html += '<tr><td class="rp-kind rp-' + css + '">' + label + '</td><td>' + n + '</td>'
+        + '<td style="width:45%"><div class="rp-bar"><div class="rp-bar-fill rp-' + css
+        + '" style="width:' + Math.min(100, pct * 2) + '%"></div></div></td><td><b>' + pct + ' %</b></td></tr>';
+    }
+    html += '</tbody></table></div>';
+
+    const constats = {
+      ouverture: 'Perte moyenne de ' + (d.phases.ouverture ? d.phases.ouverture.moy.toFixed(1) : '—')
+        + ' % de victoire par coup, ' + d.phaseGaffes.ouverture + ' gaffe(s) avant le 10ᵉ coup.',
+      milieu: d.phaseGaffes.milieu + ' gaffes en milieu de jeu — c\'est là que les parties basculent.',
+      finale: d.phaseGaffes.finale + ' gaffe(s) en finale'
+        + (diag.finalesPerduesEq.length ? ', dont ' + diag.finalesPerduesEq.length
+          + ' finale(s) équilibrée(s) à l\'entrée… et perdue(s) quand même.' : '.')
+    };
+    html += '<div class="tr-card"><h3>Phases de jeu</h3><table class="rp-table"><thead>'
+      + '<tr><th>Phase</th><th>Note</th><th>Constat</th></tr></thead><tbody>';
+    for (const [phase, label] of [['ouverture', 'Ouverture'], ['milieu', 'Milieu de jeu'], ['finale', 'Finale']]) {
+      const ph = d.phases[phase];
+      html += '<tr><td>' + label + '</td><td><b>' + (ph ? ph.note.toFixed(1) : '—') + ' / 10</b></td>'
+        + '<td class="rp-note">' + constats[phase] + '</td></tr>';
+    }
+    html += '</tbody></table></div>';
+
+    const tableOuvertures = (liste, titre) => {
+      let t = '<div class="tr-card"><h3>' + titre + '</h3><table class="rp-table"><thead>'
+        + '<tr><th>Ouverture</th><th>Parties</th><th>V/N/D</th><th>Score</th></tr></thead><tbody>';
+      for (const o of liste) {
+        const alerte = o.score < 45 && o.n >= 3;
+        t += '<tr' + (alerte ? ' class="rp-alerte"' : '') + '><td>' + escapeHtml(o.nom)
+          + (alerte ? ' ⚠️' : '') + '</td><td>' + o.n + '</td><td>'
+          + o.v + '/' + o.n_ + '/' + o.d + '</td><td><b>' + Math.round(o.score) + ' %</b></td></tr>';
+      }
+      return t + '</tbody></table></div>';
+    };
+    html += tableOuvertures(d.ouverturesW, 'Répertoire avec les Blancs (top 5)');
+    html += tableOuvertures(d.ouverturesB, 'Répertoire avec les Noirs (top 5)');
+
+    html += '<div class="tr-card"><h3>5 moments critiques</h3>';
+    for (const cm of d.critiques) {
+      const mateTxt = cm.mate !== null && (cm.p.color === 'w' ? cm.mate > 0 : cm.mate < 0)
+        ? ' (mat en ' + Math.abs(cm.mate) + ' raté !)' : '';
+      html += '<div class="rp-moment"><p><b>vs ' + escapeHtml(cm.p.adv) + '</b> · '
+        + cm.p.date.toLocaleDateString('fr-FR') + ' · coup ' + d.numCoup(cm.ply)
+        + ' — tu as joué <b class="rp-blunder">' + escapeHtml(cm.san) + '</b>'
+        + (cm.bestSan ? ', le bon coup était <b class="rp-best">' + escapeHtml(cm.bestSan) + '</b>' : '')
+        + mateTxt + ' : −' + Math.round(cm.chute) + ' % de chances de gain.'
+        + '</p><button type="button" class="btn btn-secondary" data-rep-voir="' + d.critiques.indexOf(cm)
+        + '">♟ Revoir cette position</button></div>';
+    }
+    html += '</div>';
+
+    // ================= PARTIE 2 : DIAGNOSTIC =================
+    html += '<div class="rp-section">Partie 2 — Ton diagnostic</div>';
+    const bloc = (titre, corps) => corps
+      ? '<div class="tr-card"><h3>' + titre + '</h3>' + corps + '</div>' : '';
+    const exemples = (liste, n) => liste.slice(0, n || 2)
+      .map(c => '<li>vs <b>' + escapeHtml(c.p.adv) + '</b> (' + c.p.date.toLocaleDateString('fr-FR')
+        + '), coup ' + d.numCoup(c.ply) + ' : ' + escapeHtml(c.san)
+        + (c.temps !== null ? ' joué en ' + Math.round(c.temps) + ' s' : '') + '</li>').join('');
+
+    // Temps
+    let corps = '';
+    if (diag.eclairs.length >= 3) {
+      corps += '<p>' + diag.eclairs.length + ' de tes fautes graves ont été jouées en <b>moins de 5 secondes</b> '
+        + 'alors que tu avais plus d\'une minute à la pendule. Tu ne perds pas au temps : tu perds en refusant de le dépenser.</p>'
+        + '<ul class="rp-exemples">' + exemples(diag.eclairs) + '</ul>';
+    }
+    if (diag.zeitnotFautes.length >= 3) {
+      corps += '<p>' + diag.zeitnotFautes.length + ' fautes en zeitnot (moins de 20 s restantes) — soit '
+        + repPct(diag.zeitnotFautes.length, diag.fautesTotal) + ' % de tes fautes.</p>';
+    }
+    if (diag.ouvertureTempsPct !== null && diag.ouvertureTempsPct > 30) {
+      corps += '<p>Tu dépenses en moyenne ' + Math.round(diag.ouvertureTempsPct)
+        + ' % de ta pendule sur les 10 premiers coups : ton répertoire n\'est pas assez automatique.</p>';
+    }
+    html += bloc('⏱ Gestion du temps', corps);
+
+    // Pièces en prise
+    corps = '';
+    if (diag.pendues.length >= 2) {
+      corps = '<p><b>' + diag.pendues.length + ' pièces laissées en prise et prises en un coup</b> sur ' + nb
+        + ' parties — c\'est le poste de pertes n° 1 à ton niveau. Avant chaque coup : échecs, captures, menaces.</p>'
+        + '<ul class="rp-exemples">' + exemples(diag.pendues, 3) + '</ul>';
+    }
+    html += bloc('🎁 Pièces en prise', corps);
+
+    // Mats ratés
+    corps = '';
+    if (diag.matsRates.length >= 1) {
+      corps = '<p><b>' + diag.matsRates.length + ' mat(s) forcé(s) en 4 coups ou moins ratés.</b> '
+        + 'Un mat raté, c\'est souvent une partie qui se retourne.</p>'
+        + '<ul class="rp-exemples">' + exemples(diag.matsRates, 3) + '</ul>';
+    }
+    html += bloc('👑 Mats ratés', corps);
+
+    // Sécurité du roi
+    corps = '';
+    if (diag.roqueTardif.length >= Math.max(3, nb * 0.15)) {
+      corps += '<p>' + diag.roqueTardif.length + ' parties avec un roque au-delà du 12ᵉ coup ou jamais joué'
+        + (diag.sansRoquePerdues.length ? ' — dont ' + diag.sansRoquePerdues.length + ' perdues roi au centre' : '')
+        + '. Le roque n\'est pas un coup « quand j\'aurai le temps ».</p>';
+    }
+    if (diag.pousseesRoi.length >= Math.max(3, nb * 0.15)) {
+      corps += '<p>' + diag.pousseesRoi.length + ' parties où tu pousses au moins deux pions devant ton roi roqué : '
+        + 'chaque poussée crée un trou ou un crochet définitif (revois l\'onglet Structure de pions !).</p>';
+    }
+    html += bloc('🏰 Sécurité du roi', corps);
+
+    // Attaque prématurée
+    corps = '';
+    if (diag.dameTot.length >= Math.max(3, nb * 0.12)) {
+      corps = '<p>' + diag.dameTot.length + ' parties où ta dame sort avant le 6ᵉ coup avec moins de deux pièces mineures '
+        + 'développées. L\'attaque avant le développement, c\'est l\'attaque qui recule.</p>'
+        + '<ul class="rp-exemples">' + diag.dameTot.slice(0, 2).map(p =>
+          '<li>vs <b>' + escapeHtml(p.adv) + '</b> (' + p.date.toLocaleDateString('fr-FR')
+          + ') : dame sortie au coup ' + d.numCoup(p.faits.dameSortiePly[p.color]) + '</li>').join('') + '</ul>';
+    }
+    html += bloc('⚡ Attaque prématurée', corps);
+
+    // Conversion / défense
+    corps = '';
+    if (diag.gagnantes.length >= 5) {
+      const taux = repPct(diag.converties.length, diag.gagnantes.length);
+      corps += '<p>Positions gagnantes (≥ 85 % de chances de gain) : <b>' + diag.converties.length
+        + ' converties sur ' + diag.gagnantes.length + ' (' + taux + ' %)</b>'
+        + (diag.gachees.length ? ' — ' + diag.gachees.length + ' partie(s) complètement gâchée(s) : '
+          + diag.gachees.slice(0, 3).map(p => 'vs ' + escapeHtml(p.adv) + ' (' + p.date.toLocaleDateString('fr-FR') + ')').join(', ')
+          : '') + '.</p>';
+    }
+    if (diag.perdues3.length >= 3) {
+      corps += '<p>À l\'inverse, sur ' + diag.perdues3.length + ' positions quasi perdues, tu en as sauvé '
+        + diag.sauvees.length + ' — ' + (repPct(diag.sauvees.length, diag.perdues3.length) >= 25
+          ? 'belle ténacité, c\'est un vrai point fort.' : 'tu lâches trop vite quand ça tourne mal.') + '</p>';
+    }
+    html += bloc('🎯 Conversion & défense', corps);
+
+    // Tilt
+    corps = '';
+    if (diag.series.length >= 1) {
+      corps += '<p>' + diag.series.length + ' série(s) d\'au moins 3 défaites d\'affilée en moins de 3 heures'
+        + ' (la pire : ' + Math.max(...diag.series.map(s => s.length)) + ' défaites). '
+        + 'Après deux défaites de suite : on ferme l\'appli.</p>';
+    }
+    if (diag.accApresDefaite !== null && diag.accApresAutre !== null
+        && diag.accApresAutre - diag.accApresDefaite >= 3) {
+      corps += '<p>Ta précision moyenne chute de <b>' + diag.accApresAutre.toFixed(1) + ' % à '
+        + diag.accApresDefaite.toFixed(1) + ' %</b> dans la partie qui suit immédiatement une défaite : le tilt est mesurable.</p>';
+    }
+    html += bloc('🌡 Tilt', corps);
+
+    // ================= PARTIE 3 : PLAN =================
+    html += '<div class="rp-section">Partie 3 — Ton plan de progression</div>';
+    html += repPlanHtml(d);
+
+    html += '<p class="rp-note">Analyse Stockfish locale (~90 ms/position) : les précisions sont des estimations, '
+      + 'légèrement différentes de celles de chess.com. Les axes sans signal net dans tes parties ne sont pas affichés.</p>';
+    return html;
+  }
+
+  /** Partie 3 : défauts prioritaires, exercices, répertoire, routine, objectif. */
+  function repPlanHtml(d) {
+    const diag = d.diag;
+    const nb = d.parties.length;
+    // Défauts candidats, pondérés par leur coût estimé
+    const defauts = [
+      {
+        score: diag.pendues.length * 3,
+        titre: 'Les pièces en prise (' + diag.pendues.length + ' occurrences)',
+        exercice: 'Avant CHAQUE coup, la litanie « échecs – captures – menaces » sur le dernier coup adverse, '
+          + 'pendant 20 parties. Mesure : compte tes pièces pendues par tranche de 10 parties — objectif zéro sur la dernière tranche. '
+          + 'En appui : 15 min de Blunder Trainer (tes propres gaffes) 3 fois par semaine.'
+      },
+      {
+        score: diag.matsRates.length * 4,
+        titre: 'Les mats ratés (' + diag.matsRates.length + ')',
+        exercice: '10 min/jour de mats en 1-2-3 pendant 3 semaines, plus le mode Miss Mates de l\'appli '
+          + '(tes propres mats ratés, rejoués jusqu\'à la victoire). Dès que l\'adversaire a le roi exposé : cherche le mat AVANT de chercher le gain de matériel.'
+      },
+      {
+        score: (diag.gagnantes.length - diag.converties.length) * 4,
+        titre: 'La conversion des positions gagnantes ('
+          + (diag.gagnantes.length - diag.converties.length) + ' non converties sur ' + diag.gagnantes.length + ')',
+        exercice: 'Règle des +3 : dès que tu es complètement gagnant, échange les pièces (pas les pions), '
+          + 'coupe tout contre-jeu avant de pousser. Rejoue tes ' + Math.min(5, diag.gachees.length || 5)
+          + ' parties gâchées via Miss Puzzles, et 2 finales techniques par semaine dans Exercices intensifs.'
+      },
+      {
+        score: diag.eclairs.length * 2.5,
+        titre: 'Les coups éclair (' + diag.eclairs.length + ' fautes en < 5 s)',
+        exercice: 'Discipline : dans toute position avec échange possible ou pièce attaquée, minimum 15 secondes '
+          + 'de réflexion, montre en main, pendant 15 parties rapides. La pendule est une ressource, pas un score.'
+      },
+      {
+        score: (diag.roqueTardif.length + diag.pousseesRoi.length) * 1.5,
+        titre: 'La sécurité du roi (' + diag.roqueTardif.length + ' roques tardifs, '
+          + diag.pousseesRoi.length + ' parties avec pions poussés devant le roi)',
+        exercice: 'Règle des 10 coups : roque joué avant le 10ᵉ coup sauf raison concrète écrite (note-la après la partie). '
+          + 'Et zéro poussée f/g/h devant ton roi sans avoir vérifié le crochet (revois la fiche Leviers de Structure de pions).'
+      },
+      {
+        score: diag.zeitnotFautes.length * 2,
+        titre: 'Le zeitnot (' + diag.zeitnotFautes.length + ' fautes sous 20 s)',
+        exercice: 'Budget-temps par phase : au coup 15 il doit te rester 60 % de la pendule, au coup 30 : 30 %. '
+          + 'Vérifie à ces deux jalons pendant 15 parties.'
+      }
+    ].filter(x => x.score >= 5).sort((a, b) => b.score - a.score).slice(0, 3);
+
+    let html = '<div class="tr-card"><h3>🥇 Tes 3 chantiers prioritaires</h3>';
+    if (defauts.length === 0) {
+      html += '<p>Pas de défaut massif qui ressorte : ton levier principal est la régularité — vise la précision, pas le spectaculaire.</p>';
+    }
+    defauts.forEach((df, i) => {
+      html += '<div class="rp-moment"><p><b>' + (i + 1) + '. ' + df.titre + '</b></p>'
+        + '<p class="rp-note">' + df.exercice + '</p></div>';
+    });
+    html += '</div>';
+
+    // Répertoire
+    const faibles = [...d.ouverturesW, ...d.ouverturesB].filter(o => o.score < 45 && o.n >= 3);
+    const fortes = [...d.ouverturesW, ...d.ouverturesB].filter(o => o.score >= 60 && o.n >= 4);
+    html += '<div class="tr-card"><h3>📖 Ajustement du répertoire</h3>';
+    if (faibles.length) {
+      html += '<p><b>À retravailler ou abandonner</b> (score < 45 %) : '
+        + faibles.map(o => escapeHtml(o.nom) + ' (' + Math.round(o.score) + ' % sur ' + o.n + ')').join(' · ')
+        + '. Pour chacune : soit 30 min sur la ligne principale dans l\'onglet Ouvertures, soit remplace-la.</p>';
+    }
+    if (fortes.length) {
+      html += '<p><b>À approfondir</b> (ça marche déjà) : '
+        + fortes.map(o => escapeHtml(o.nom) + ' (' + Math.round(o.score) + ' %)').join(' · ')
+        + '. Joue-les plus souvent : un répertoire court et solide bat un répertoire large et flou.</p>';
+    }
+    if (!faibles.length && !fortes.length) {
+      html += '<p>Ton répertoire est homogène — pas de changement urgent, approfondis ce que tu joues déjà.</p>';
+    }
+    html += '</div>';
+
+    // Routine
+    html += '<div class="tr-card"><h3>📅 Routine hebdomadaire (30-45 min/jour)</h3>'
+      + '<table class="rp-table"><tbody>'
+      + '<tr><td>Lun / Mer / Ven</td><td>15 min tactique ciblée (Blunder Trainer + mats) puis 1 partie rapide jouée SANS pendule dans la tête : échecs-captures-menaces à chaque coup</td></tr>'
+      + '<tr><td>Mar / Jeu</td><td>15 min finales ou structure de pions (onglets Exercices / Structure de pions), puis 1-2 parties</td></tr>'
+      + '<tr><td>Sam</td><td>1 partie lente (30 min+) jouée sérieusement, puis analyse immédiate avec « Analyser la partie »</td></tr>'
+      + '<tr><td>Dim</td><td>Repos ou relecture des gaffes de la semaine — jamais de session après 2 défaites de suite</td></tr>'
+      + '</tbody></table></div>';
+
+    // Objectif Elo
+    if (d.eloDebut !== null && d.eloFin !== null) {
+      const delta = d.eloFin - d.eloDebut;
+      const gainDefauts = Math.min(150, Math.max(50,
+        (diag.pendues.length + d.diag.matsRates.length) * 6
+        + (diag.gagnantes.length - diag.converties.length) * 8));
+      const cible = d.eloFin + gainDefauts;
+      html += '<div class="tr-card"><h3>🎯 Objectif à 3 mois</h3>'
+        + '<p>Elo actuel : <b>' + d.eloFin + '</b> (tendance ' + (delta >= 0 ? '+' : '') + delta
+        + ' sur la période analysée). Les défauts identifiés ci-dessus sont mécaniques, pas un plafond de compréhension : '
+        + 'en corrigeant les deux premiers chantiers, <b>' + cible + '</b> est un objectif réaliste à 3 mois. '
+        + 'Condition : la routine, pas le volume — 100 parties en tilt valent moins que 20 parties analysées.</p></div>';
+    }
+    return html;
+  }
+
+  // Ouvre une partie d'un moment critique dans « Mes parties », au bon coup
+  function repVoirMoment(index) {
+    const cm = repState.data && repState.data.critiques[index];
+    if (!cm) return;
+    loadReplay(cm.p.g, cm.p.meIsWhite);
+    switchMode('games');
+    gotoPly(cm.ply);
+  }
+
+  reportPanel.addEventListener('click', (event) => {
+    const target = event.target.closest('[data-rep-cadence],[data-rep-nombre],[data-rep-analyser],[data-rep-retour],[data-rep-voir]');
+    if (!target) return;
+    if (target.dataset.repCadence) {
+      repState.cadence = target.dataset.repCadence;
+      renderReportPanel();
+    } else if (target.dataset.repNombre) {
+      repState.nombre = Number(target.dataset.repNombre);
+      renderReportPanel();
+    } else if (target.dataset.repAnalyser) {
+      repAnalyser();
+    } else if (target.dataset.repRetour) {
+      repState.phase = 'config';
+      renderReportPanel();
+    } else if (target.dataset.repVoir) {
+      repVoirMoment(Number(target.dataset.repVoir));
     }
   });
 
@@ -5046,6 +5959,12 @@
     const inConfig = next === 'config';
     const inOpenings = next === 'openings';
     const inPawns = next === 'pawns';
+    const inReport = next === 'report';
+    if (!inReport && repState.phase === 'scan') {
+      // Quitter le mode annule l'analyse en cours (le cache est conservé)
+      repToken++;
+      repState.phase = repState.data ? 'done' : 'config';
+    }
     if (!inOpenings) {
       const opArrow = document.getElementById('op-arrow');
       if (opArrow) opArrow.remove();
@@ -5076,7 +5995,7 @@
       renderMissMPanel();
     }
     gamesPanel.style.display = inGames && !replay ? 'block' : 'none';
-    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inMissP || inMissM || inConfig || inOpenings || inPawns ? 'none' : '';
+    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inMissP || inMissM || inConfig || inOpenings || inPawns || inReport ? 'none' : '';
     replayNav.style.display = inGames && replay ? 'flex' : 'none';
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
@@ -5087,9 +6006,10 @@
     document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
     document.getElementById('ex-toolbar').style.display = inExercises && exCurrent ? 'flex' : 'none';
     document.getElementById('ex-explanation').style.display = 'none';
-    document.getElementById('controls').style.display = inExercises || inTrainer || inMissP || inMissM || inConfig || inOpenings || inPawns ? 'none' : 'flex';
+    document.getElementById('controls').style.display = inExercises || inTrainer || inMissP || inMissM || inConfig || inOpenings || inPawns || inReport ? 'none' : 'flex';
     trainerPanel.style.display = inTrainer ? 'flex' : 'none';
     pawnsPanel.style.display = inPawns ? 'flex' : 'none';
+    reportPanel.style.display = inReport ? 'flex' : 'none';
     missPPanel.style.display = inMissP ? 'flex' : 'none';
     missMPanel.style.display = inMissM ? 'flex' : 'none';
     configPanel.style.display = inConfig ? 'flex' : 'none';
@@ -5123,6 +6043,10 @@
       placeSquares();
       pwRefreshBoard();
       renderPawnsPanel();
+      renderStatus();
+    } else if (next === 'report') {
+      startGame('w');
+      renderReportPanel();
       renderStatus();
     } else if (next === 'trainer') {
       // Arriver sur le mode démarre toujours une nouvelle session : l'état
