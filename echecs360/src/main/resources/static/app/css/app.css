@@ -373,6 +373,12 @@ button { font-family: inherit; }
 .modal .result-big { font-size: 1.6rem; font-weight: 800; text-align: center; margin: 8px 0 2px; }
 .modal .reason { text-align: center; color: var(--muted); margin: 0 0 6px; }
 
+/* Indice de thème dans les quiz (niveau 1) */
+.tr-hint {
+  background: var(--chip); border-radius: 10px; padding: 9px 12px;
+  font-size: 13px; font-style: italic; color: var(--ink);
+}
+
 /* Playlist musique (onglet Configuration) */
 .mus-list { margin: 4px 0 10px; }
 .mus-item {
@@ -816,3 +822,65 @@ button { font-family: inherit; }
   .modal { padding: 20px; }
   .player-bar .name { font-size: .88rem; }
 }
+
+/* ==================================================== structure de pions -- */
+
+/* Dans ce panneau en colonne, les boutons ne doivent pas s'étirer
+   (le .btn global a flex: 1) — sauf les paires Précédent/Suivant */
+#pawns-panel .btn { flex: none; }
+#pawns-panel .op-nav .btn { flex: 1; }
+
+/* Surlignages des cases sur l'échiquier (vues des notions et structures) */
+.ov-pw-vert { background: rgba(46, 125, 91, .42); }
+.ov-pw-rouge { background: rgba(214, 79, 58, .42); }
+.ov-pw-bleu { background: rgba(58, 130, 214, .40); }
+
+/* Légende des couleurs sous la vue */
+.pw-legende {
+  display: flex; flex-wrap: wrap; gap: 10px 14px;
+  font-size: 11px; color: var(--gray-text); font-weight: 700;
+}
+.pw-legende span { display: inline-flex; align-items: center; gap: 5px; }
+.pw-swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.pw-sw-vert { background: rgba(46, 125, 91, .75); }
+.pw-sw-rouge { background: rgba(214, 79, 58, .75); }
+.pw-sw-bleu { background: rgba(58, 130, 214, .72); }
+.pw-sw-fleche { background: rgba(240, 154, 32, .9); border-radius: 6px; height: 5px; margin-top: 3px; }
+
+/* Listes à retenir : atouts / défauts / repères, plans Blancs / Noirs */
+.pw-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.pw-points li { position: relative; padding-left: 22px; font-size: 12.5px; line-height: 1.5; color: var(--gray-text); }
+.pw-points li::before { position: absolute; left: 0; top: 0; font-weight: 800; }
+.pw-points li.plus::before { content: '✓'; color: var(--green); }
+.pw-points li.moins::before { content: '✗'; color: #d64f3a; }
+.pw-points li.info::before { content: '➜'; color: #f09a20; }
+.pw-points li.plan-b::before { content: '□'; color: var(--ink); }
+.pw-points li.plan-n::before { content: '■'; color: #8a877f; }
+.pw-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.pw-plans h3 { margin: 0 0 8px; font-size: 12.5px; }
+.pw-origine {
+  font-size: 10px; font-weight: 700; color: var(--gray-text);
+  background: #f1efe8; border-radius: 999px; padding: 2px 8px;
+}
+
+/* Exercices : niveau, question, choix et verdict */
+.pw-niveau { font-size: 9px; letter-spacing: 2px; color: var(--green); margin-right: 6px; vertical-align: middle; }
+.pw-fait { color: var(--green); font-weight: 800; }
+.pw-score { font-weight: 800; color: var(--green); }
+.pw-question { margin: 8px 0 10px; font-size: 13.5px; font-weight: 700; line-height: 1.5; }
+.pw-choix {
+  display: block; width: 100%; text-align: left; margin-bottom: 8px;
+  background: #fff; border: 1.5px solid var(--line);
+  color: var(--ink); border-radius: 10px; padding: 10px 12px;
+  font: inherit; font-size: 12.5px; line-height: 1.45; cursor: pointer;
+}
+.pw-choix:hover:not(:disabled) { border-color: rgba(46, 125, 91, .55); }
+.pw-choix:disabled { cursor: default; }
+.pw-choix.bon { border-color: var(--green); background: rgba(46, 125, 91, .18); opacity: 1; }
+.pw-choix.mauvais { border-color: #d64f3a; background: rgba(214, 79, 58, .16); }
+.pw-choix.neutre { opacity: .55; }
+.pw-feedback {
+  border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.55;
+}
+.pw-feedback.ok { background: rgba(46, 125, 91, .16); border: 1px solid rgba(46, 125, 91, .45); }
+.pw-feedback.ko { background: rgba(214, 79, 58, .14); border: 1px solid rgba(214, 79, 58, .4); }

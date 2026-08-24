@@ -474,6 +474,13 @@
       bar.querySelector('.avatar').textContent = color === 'w' ? 'B' : 'N';
       bar.querySelector('.name').textContent = names[color];
       bar.classList.toggle('to-move', turn === color && !gameOver);
+      // En mode Structure de pions, les positions sont des squelettes
+      // pédagogiques : afficher les pièces « capturées » n'a pas de sens
+      if (mode === 'pawns') {
+        bar.querySelector('.captured').innerHTML = '';
+        bar.querySelector('.material').textContent = '';
+        continue;
+      }
       const mine = capturedBy(board, color);
       const other = capturedBy(board, color === 'w' ? 'b' : 'w');
       const capturedHost = bar.querySelector('.captured');
@@ -551,6 +558,21 @@
       } else {
         statusMain.textContent = 'Ouvertures';
         statusSub.textContent = 'Choisissez votre camp puis une ouverture à étudier.';
+      }
+      return;
+    }
+    if (mode === 'pawns') {
+      statusMain.textContent = 'Structure de pions';
+      if (pwState.exo && pwState.suitePly >= 0) {
+        statusSub.textContent = pwState.exo.titre + ' — la démonstration, coup par coup.';
+      } else if (pwState.exo) {
+        statusSub.textContent = pwState.repondu < 0
+          ? pwState.exo.titre + ' — observez la position puis répondez.'
+          : (pwState.repondu === pwState.exo.bonne ? '✓ Exact !' : '✗ Regardez l\'explication.');
+      } else if (pwState.item) {
+        statusSub.textContent = pwState.item.nom + ' — ' + pwState.item.vues[pwState.vue].titre;
+      } else {
+        statusSub.textContent = 'Notions, structures types et exercices — tout se lit sur l\'échiquier.';
       }
       return;
     }
@@ -876,10 +898,11 @@
     if (mode === 'exercises') {
       return exCurrent !== null && !exBusy && !botThinking && game.turn === exPlayerColor;
     }
-    if (mode === 'trainer') return trainer !== null && trainer.state === 'guess';
-    if (mode === 'misspuzzles') return missP !== null && missP.state === 'guess';
-    if (mode === 'missmates') return missM !== null && missM.state === 'guess' && !missM.busy;
+    if (mode === 'trainer') return trainer !== null && trainer.state === 'guess' && !trainer.introBusy;
+    if (mode === 'misspuzzles') return missP !== null && missP.state === 'guess' && !missP.introBusy;
+    if (mode === 'missmates') return missM !== null && missM.state === 'guess' && !missM.busy && !missM.introBusy;
     if (mode === 'openings') return false;
+    if (mode === 'pawns') return false;
     return true;
   }
 
@@ -1975,6 +1998,352 @@
     else if (event.key === 'Escape') { opQuitViewer(); }
   });
 
+  // ------------------------------------------------- structure de pions --
+  // Trois volets (données : pawns-data.js) : les notions fondamentales et
+  // les structures types illustrées sur l'échiquier (cases surlignées +
+  // flèches des plans), et des exercices QCM avec séquences rejouables.
+
+  const pawnsPanel = document.getElementById('pawns-panel');
+  // onglet : notions | structures | exercices ; item : notion/structure
+  // ouverte ; vue : diagramme courant ; exo + repondu + suitePly : état du QCM
+  let pwState = { onglet: 'notions', item: null, vue: 0, exo: null, repondu: -1, suitePly: -1 };
+
+  const PW_COULEURS = {
+    vert: 'rgba(46, 125, 91, .85)',
+    rouge: 'rgba(196, 64, 48, .8)',
+    orange: 'rgba(240, 154, 32, .9)'
+  };
+  const PW_CLE_REUSSIS = 'echecs360-pw-reussis';
+
+  function pwSq(alg) { return 'abcdefgh'.indexOf(alg[0]) + (8 - Number(alg[1])) * 8; }
+
+  function pwReussis() {
+    try { return new Set(JSON.parse(localStorage.getItem(PW_CLE_REUSSIS) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+
+  function pwClearBoardMarks() {
+    document.querySelectorAll('.ov-pw').forEach(n => n.remove());
+    document.querySelectorAll('svg[id^="pw-arrow-"]').forEach(n => n.remove());
+  }
+
+  function pwApplyMarks(hl, arrows) {
+    pwClearBoardMarks();
+    const poser = (list, cls) => (list || []).forEach(alg => {
+      const ov = document.createElement('div');
+      ov.className = 'ov ov-pw ' + cls;
+      squares[pwSq(alg)].appendChild(ov);
+    });
+    if (hl) {
+      poser(hl.verts, 'ov-pw-vert');
+      poser(hl.rouges, 'ov-pw-rouge');
+      poser(hl.bleus, 'ov-pw-bleu');
+    }
+    (arrows || []).forEach((a, i) =>
+      drawArrow(pwSq(a[0]), pwSq(a[1]), PW_COULEURS[a[2]] || PW_COULEURS.orange, 'pw-arrow-' + i));
+  }
+
+  /** Affiche une position figée (FEN) avec ses surlignages et flèches. */
+  function pwShow(fen, hl, arrows) {
+    game = Chess.fromFen(fen);
+    sanHistory = [];
+    lastMove = null;
+    selected = -1;
+    legalTargets = [];
+    gameOver = false;
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    renderGame({});
+    pwApplyMarks(hl, arrows);
+  }
+
+  /** Position à afficher pour l'état courant (item/vue, exo, ou accueil). */
+  function pwRefreshBoard() {
+    if (pwState.exo && pwState.suitePly >= 0) { pwSuiteApplique(); return; }
+    if (pwState.exo) {
+      const exo = pwState.exo;
+      const ok = pwState.repondu === exo.bonne;
+      pwShow(exo.fen, ok ? exo.hlApres : null, null);
+      return;
+    }
+    if (pwState.item) {
+      const vue = pwState.item.vues[pwState.vue];
+      pwShow(vue.fen, vue.hl, vue.arrows);
+      return;
+    }
+    // Accueil du mode : échiquier de départ, sans annotations
+    game = Chess.newGame();
+    sanHistory = [];
+    lastMove = null;
+    selected = -1;
+    legalTargets = [];
+    gameOver = false;
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    renderGame({});
+    pwClearBoardMarks();
+  }
+
+  /** Rejoue la séquence de démonstration de l'exercice jusqu'à suitePly. */
+  function pwSuiteApplique() {
+    const exo = pwState.exo;
+    game = Chess.fromFen(exo.fen);
+    sanHistory = [];
+    lastMove = null;
+    for (let i = 0; i < pwState.suitePly; i++) {
+      const mv = Pgn.sanToMove(Chess, game, exo.suite.coups[i][0]);
+      Chess.play(game, mv);
+      sanHistory.push(exo.suite.coups[i][0]);
+      lastMove = { from: mv.from, to: mv.to };
+    }
+    selected = -1;
+    legalTargets = [];
+    for (const el of pieceEls.values()) el.remove();
+    pieceEls.clear();
+    renderGame({});
+    pwClearBoardMarks();
+    if (pwState.suitePly < exo.suite.coups.length) {
+      const next = Pgn.sanToMove(Chess, game, exo.suite.coups[pwState.suitePly][0]);
+      if (next) drawArrow(next.from, next.to, PW_COULEURS.orange, 'pw-arrow-0');
+    }
+  }
+
+  function pwSuiteGoto(ply) {
+    pwState.suitePly = Math.max(0, Math.min(ply, pwState.exo.suite.coups.length));
+    pwSuiteApplique();
+    renderPawnsPanel();
+    renderStatus();
+  }
+
+  const PW_LEGENDE =
+    '<div class="pw-legende">'
+    + '<span><i class="pw-swatch pw-sw-vert"></i>Atout</span>'
+    + '<span><i class="pw-swatch pw-sw-rouge"></i>Faiblesse / cible</span>'
+    + '<span><i class="pw-swatch pw-sw-bleu"></i>Case clé</span>'
+    + '<span><i class="pw-swatch pw-sw-fleche"></i>Plan / levier</span>'
+    + '</div>';
+
+  function pwNiveauHtml(n) {
+    return '<span class="pw-niveau">' + '●'.repeat(n) + '○'.repeat(3 - n) + '</span>';
+  }
+
+  function pwPointsHtml(points) {
+    return '<ul class="pw-points">'
+      + points.map(p => '<li class="' + p.t + '">' + escapeHtml(p.txt) + '</li>').join('')
+      + '</ul>';
+  }
+
+  function pwVueHtml(item) {
+    const vue = item.vues[pwState.vue];
+    const n = item.vues.length;
+    let html = '<div class="op-viewer tr-card">'
+      + '<span class="op-count">' + escapeHtml(vue.titre)
+      + (n > 1 ? ' · vue ' + (pwState.vue + 1) + ' / ' + n : '') + '</span>'
+      + '<div class="op-caption">' + escapeHtml(vue.caption) + '</div>';
+    if (n > 1) {
+      html += '<div class="op-nav">'
+        + '<button type="button" class="btn btn-secondary" data-pw-vue="-1"' + (pwState.vue === 0 ? ' disabled' : '') + '>◀ Vue précédente</button>'
+        + '<button type="button" class="btn btn-primary" data-pw-vue="1"' + (pwState.vue === n - 1 ? ' disabled' : '') + '>Vue suivante ▶</button>'
+        + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderPawnsPanel() {
+    let html = '<div class="op-tabs">'
+      + ['notions', 'structures', 'exercices'].map(t =>
+        '<button type="button" class="op-tab' + (pwState.onglet === t ? ' active' : '') + '" data-pw-onglet="' + t + '">'
+        + (t === 'notions' ? 'Notions' : t === 'structures' ? 'Structures' : 'Entraînement') + '</button>').join('')
+      + '</div>';
+
+    if (pwState.onglet === 'exercices') {
+      html += pwExercicesHtml();
+    } else if (pwState.item) {
+      // Fiche ouverte (notion ou structure)
+      const item = pwState.item;
+      html += '<button type="button" class="op-back" data-pw-back="1">⬅ '
+        + (pwState.onglet === 'notions' ? 'Toutes les notions' : 'Toutes les structures') + '</button>';
+      html += pwVueHtml(item);
+      html += PW_LEGENDE;
+      if (item.points) {
+        html += '<div class="tr-card"><h3>À retenir</h3>' + pwPointsHtml(item.points) + '</div>';
+      }
+      if (item.plansB) {
+        html += '<div class="tr-card pw-plans"><div><h3>Plans des Blancs</h3><ul class="pw-points">'
+          + item.plansB.map(p => '<li class="plan-b">' + escapeHtml(p) + '</li>').join('')
+          + '</ul></div><div><h3>Plans des Noirs</h3><ul class="pw-points">'
+          + item.plansN.map(p => '<li class="plan-n">' + escapeHtml(p) + '</li>').join('')
+          + '</ul></div></div>';
+      }
+      if (item.verdict) {
+        html += '<div class="tr-card"><h3>Le verdict</h3><p>' + escapeHtml(item.verdict) + '</p></div>';
+      }
+    } else {
+      // Liste des notions ou des structures
+      const liste = pwState.onglet === 'notions' ? PAWNS.notions : PAWNS.structures;
+      html += '<div class="tr-card"><p>'
+        + (pwState.onglet === 'notions'
+          ? 'Les concepts fondamentaux, chacun illustré sur l\'échiquier : cases surlignées, flèches des plans, et l\'essentiel à retenir.'
+          : 'Les grandes structures types : le squelette, les plans des deux camps, et le verdict. Connaître SA structure = connaître son plan.')
+        + '</p></div>';
+      for (const item of liste) {
+        html += '<button type="button" class="op-card" data-pw-item="' + item.id + '">'
+          + '<span class="op-titre">' + escapeHtml(item.nom)
+          + (item.origine ? ' <span class="pw-origine">' + escapeHtml(item.origine) + '</span>' : '') + '</span>'
+          + '<span class="op-resume">' + escapeHtml(item.resume) + '</span>'
+          + '</button>';
+      }
+    }
+    pawnsPanel.innerHTML = html;
+  }
+
+  function pwExercicesHtml() {
+    const exo = pwState.exo;
+    if (!exo) {
+      const reussis = pwReussis();
+      let html = '<div class="tr-card"><p>Reconnaître les faiblesses à vue, pousser le bon pion, gérer la tension : '
+        + 'chaque exercice montre un principe — souvent avec la séquence d\'échanges rejouable coup par coup.</p>'
+        + '<p class="pw-score">' + reussis.size + ' / ' + PAWNS.exercices.length + ' réussis</p></div>';
+      for (const e of PAWNS.exercices) {
+        html += '<button type="button" class="op-card" data-pw-exo="' + e.id + '">'
+          + '<span class="op-titre">' + pwNiveauHtml(e.niveau) + escapeHtml(e.titre)
+          + (reussis.has(e.id) ? ' <span class="pw-fait">✓</span>' : '') + '</span>'
+          + '</button>';
+      }
+      return html;
+    }
+    // Exercice ouvert
+    let html = '<button type="button" class="op-back" data-pw-back="1">⬅ Tous les exercices</button>';
+    if (pwState.suitePly >= 0) {
+      // Visionneuse de la séquence de démonstration
+      const total = exo.suite.coups.length;
+      const i = pwState.suitePly;
+      const caption = i === 0
+        ? escapeHtml(exo.suite.intro) + ' Avancez avec « Suivant » — la flèche montre chaque coup.'
+        : '<b>' + escapeHtml(exo.suite.coups[i - 1][0]) + '</b> — ' + escapeHtml(exo.suite.coups[i - 1][1]);
+      html += '<div class="op-viewer tr-card">'
+        + '<span class="op-count">🎬 ' + escapeHtml(exo.titre) + ' · coup ' + i + ' / ' + total + '</span>'
+        + '<div class="tr-progress-track"><div class="tr-progress-fill" style="width:' + Math.round((i / total) * 100) + '%"></div></div>'
+        + '<div class="op-caption">' + caption + '</div>'
+        + '<div class="op-nav">'
+        + '<button type="button" class="btn btn-secondary" data-pw-suite="-1"' + (i === 0 ? ' disabled' : '') + '>◀ Précédent</button>'
+        + '<button type="button" class="btn btn-primary" data-pw-suite="1"' + (i === total ? ' disabled' : '') + '>Suivant ▶</button>'
+        + '</div>'
+        + '<button type="button" class="btn btn-secondary" data-pw-suite-quit="1">↩ Revenir à l\'exercice</button>'
+        + '</div>';
+      return html;
+    }
+    html += '<div class="tr-card">'
+      + '<span class="op-count">' + pwNiveauHtml(exo.niveau) + ' ' + escapeHtml(exo.titre) + '</span>'
+      + '<p class="pw-question">' + escapeHtml(exo.question) + '</p>';
+    for (let i = 0; i < exo.choix.length; i++) {
+      let cls = 'pw-choix';
+      if (pwState.repondu >= 0) {
+        if (i === exo.bonne) cls += ' bon';
+        else if (i === pwState.repondu) cls += ' mauvais';
+        else cls += ' neutre';
+      }
+      html += '<button type="button" class="' + cls + '" data-pw-choix="' + i + '"'
+        + (pwState.repondu >= 0 ? ' disabled' : '') + '>' + escapeHtml(exo.choix[i]) + '</button>';
+    }
+    html += '</div>';
+    if (pwState.repondu >= 0) {
+      const ok = pwState.repondu === exo.bonne;
+      html += '<div class="pw-feedback ' + (ok ? 'ok' : 'ko') + '">'
+        + (ok ? '✓ Exact !' : '✗ Raté — la bonne réponse est surlignée.') + ' '
+        + escapeHtml(exo.explication) + '</div>';
+      if (exo.suite) {
+        html += '<button type="button" class="btn btn-primary wide" data-pw-suite-start="1">🎬 Voir la démonstration coup par coup</button>';
+      }
+    }
+    return html;
+  }
+
+  function pwOuvreExo(exo) {
+    pwState.exo = exo;
+    pwState.repondu = -1;
+    pwState.suitePly = -1;
+    pwRefreshBoard();
+    renderPawnsPanel();
+    renderStatus();
+  }
+
+  pawnsPanel.addEventListener('click', (event) => {
+    const target = event.target.closest('[data-pw-onglet],[data-pw-item],[data-pw-back],[data-pw-vue],[data-pw-exo],[data-pw-choix],[data-pw-suite-start],[data-pw-suite],[data-pw-suite-quit]');
+    if (!target) return;
+    if (target.dataset.pwOnglet) {
+      pwState.onglet = target.dataset.pwOnglet;
+      pwState.item = null;
+      pwState.vue = 0;
+      pwState.exo = null;
+      pwState.repondu = -1;
+      pwState.suitePly = -1;
+      pwRefreshBoard();
+      renderPawnsPanel();
+      renderStatus();
+    } else if (target.dataset.pwItem) {
+      const liste = pwState.onglet === 'notions' ? PAWNS.notions : PAWNS.structures;
+      pwState.item = liste.find(x => x.id === target.dataset.pwItem);
+      pwState.vue = 0;
+      pwRefreshBoard();
+      renderPawnsPanel();
+      renderStatus();
+    } else if (target.dataset.pwBack) {
+      pwState.item = null;
+      pwState.vue = 0;
+      pwState.exo = null;
+      pwState.repondu = -1;
+      pwState.suitePly = -1;
+      pwRefreshBoard();
+      renderPawnsPanel();
+      renderStatus();
+    } else if (target.dataset.pwVue) {
+      pwState.vue = Math.max(0, Math.min(pwState.item.vues.length - 1, pwState.vue + Number(target.dataset.pwVue)));
+      pwRefreshBoard();
+      renderPawnsPanel();
+    } else if (target.dataset.pwExo) {
+      pwOuvreExo(PAWNS.exercices.find(x => x.id === target.dataset.pwExo));
+    } else if (target.dataset.pwChoix) {
+      if (pwState.repondu >= 0) return;
+      pwState.repondu = Number(target.dataset.pwChoix);
+      if (pwState.repondu === pwState.exo.bonne) {
+        const reussis = pwReussis();
+        reussis.add(pwState.exo.id);
+        localStorage.setItem(PW_CLE_REUSSIS, JSON.stringify([...reussis]));
+      }
+      pwRefreshBoard();
+      renderPawnsPanel();
+      renderStatus();
+    } else if (target.dataset.pwSuiteStart) {
+      pwSuiteGoto(0);
+    } else if (target.dataset.pwSuite) {
+      pwSuiteGoto(pwState.suitePly + Number(target.dataset.pwSuite));
+    } else if (target.dataset.pwSuiteQuit) {
+      pwState.suitePly = -1;
+      pwRefreshBoard();
+      renderPawnsPanel();
+      renderStatus();
+    }
+  });
+
+  // Navigation clavier : vues d'une fiche, ou séquence d'un exercice
+  document.addEventListener('keydown', (event) => {
+    if (mode !== 'pawns') return;
+    if (pwState.exo && pwState.suitePly >= 0) {
+      if (event.key === 'ArrowRight') { pwSuiteGoto(pwState.suitePly + 1); event.preventDefault(); }
+      else if (event.key === 'ArrowLeft') { pwSuiteGoto(pwState.suitePly - 1); event.preventDefault(); }
+    } else if (pwState.item && pwState.item.vues.length > 1) {
+      const move = (d) => {
+        pwState.vue = Math.max(0, Math.min(pwState.item.vues.length - 1, pwState.vue + d));
+        pwRefreshBoard();
+        renderPawnsPanel();
+      };
+      if (event.key === 'ArrowRight') { move(1); event.preventDefault(); }
+      else if (event.key === 'ArrowLeft') { move(-1); event.preventDefault(); }
+    }
+  });
+
   // --------------------------------------------------------- configuration --
   // Pseudo chess.com + chargement des parties une seule fois pour la session :
   // « Mes parties », l'analyse et le Blunder Trainer réutilisent gamesList.
@@ -2436,6 +2805,43 @@
   // analyses du moteur maison : elles seront refaites en qualité Stockfish.
   const BLUNDERS_KIND = 'blunders-sf';
 
+  // ------------------------------------ sessions de quiz persistées --------
+  // Une session interrompue (fenêtre fermée, navigation) se reprend depuis
+  // l'écran d'accueil du mode — cliquer sur le mode propose « Reprendre »
+  // sans relancer la session en cours d'office.
+
+  const TRAINER_SESSION_KEY = 'echecs360-session-trainer';
+  const MISSP_SESSION_KEY = 'echecs360-session-misspuzzles';
+  const MISSM_SESSION_KEY = 'echecs360-session-missmates';
+
+  function quizSessionSave(key, session) {
+    if (!session || !session.puzzles || session.puzzles.length === 0) return;
+    // En feedback, le puzzle courant est déjà répondu : on reprendra au suivant
+    const index = session.state === 'feedback' ? session.index + 1 : session.index;
+    if (index >= session.puzzles.length) {
+      quizSessionClear(key);
+      return;
+    }
+    try {
+      localStorage.setItem(key, JSON.stringify({
+        puzzles: session.puzzles, index, score: session.score
+      }));
+    } catch (e) { /* quota plein : tant pis pour la reprise */ }
+  }
+  function quizSessionLoad(key) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || 'null');
+      if (saved && saved.puzzles && saved.puzzles.length > 0
+          && saved.index < saved.puzzles.length) {
+        return saved;
+      }
+    } catch (e) { /* sauvegarde illisible */ }
+    return null;
+  }
+  function quizSessionClear(key) {
+    localStorage.removeItem(key);
+  }
+
   /** Scanne UNE partie avec Stockfish : éval de chaque position (rapide),
       puis, sur les coups fautifs du joueur (perte >= 150 cp hors positions
       déjà pliées), calcul des coups acceptés en MultiPV. Mêmes seuils que
@@ -2592,7 +2998,11 @@
       // Au plus 40 parties analysées par session : la préparation reste courte
       done: () => session.puzzles.length >= TRAINER_SIZE || session.gamesScanned >= 40,
       accept: (meta, items) => {
-        const found = items.slice();
+        // Ne garder que les gaffes qui font vraiment basculer la partie :
+        // perte d'au moins 3 pions, position pas déjà perdue avant, plus
+        // gagnante après — fini les puzzles où l'on passe de −8 à −6
+        const found = items.filter(item =>
+            item.loss >= 300 && item.before > -250 && item.after <= 100);
         // Au plus 2 positions par partie, pour varier les contextes
         while (found.length > 2) found.splice(Math.floor(Math.random() * found.length), 1);
         for (const item of found) {
@@ -2628,7 +3038,8 @@
   function trainerShowPuzzle() {
     const p = trainer.puzzles[trainer.index];
     clearAnnotations();
-    replayPuzzlePrefix(p);
+    // Position AVANT le dernier coup adverse : il sera joué animé (contexte)
+    replayPuzzlePrefix(p, Math.max(0, p.ply - 1));
     selected = -1;
     legalTargets = [];
     gameOver = false;
@@ -2641,10 +3052,16 @@
     if (arrow) arrow.remove();
     trainer.state = 'guess';
     trainer.lastResult = null;
+    trainer.hintLevel = 0;
+    trainer.hintText = null;
     renderGame({});
     renderTrainerPanel();
     updateSignalsButton();
     sfVerifyPuzzle(p);
+    quizSessionSave(TRAINER_SESSION_KEY, trainer);
+    const session = trainer;
+    animatePuzzleIntro(p, session,
+        () => trainer === session && session.state === 'guess' && mode === 'trainer');
   }
 
   /** Vérifie le meilleur coup du puzzle avec Stockfish (profondeur 18) :
@@ -2702,17 +3119,39 @@
   }
 
   /** Position d'un puzzle (trainer, Miss Puzzles, Miss Mates) rejouée dans
-      `game` : préfixe de la partie jusqu'au coup fautif. */
-  function replayPuzzlePrefix(p) {
+      `game` : préfixe de la partie jusqu'au coup fautif (ou jusqu'à
+      `uptoPly` si fourni). */
+  function replayPuzzlePrefix(p, uptoPly) {
+    const limit = uptoPly === undefined ? p.ply : uptoPly;
     game = Chess.newGame();
     sanHistory = [];
     lastMove = null;
-    for (let i = 0; i < p.ply; i++) {
+    for (let i = 0; i < limit; i++) {
       const move = Pgn.sanToMove(Chess, game, p.sans[i]);
       Chess.play(game, move);
       sanHistory.push(p.sans[i]);
       lastMove = { from: move.from, to: move.to };
     }
+  }
+
+  /** Contexte du puzzle : le dernier coup adverse est joué ANIMÉ ~0,6 s
+      après l'affichage, pour qu'on voie ce qui vient de se passer.
+      `session.introBusy` bloque la saisie pendant l'animation. */
+  function animatePuzzleIntro(p, session, stillActive) {
+    if (p.ply === 0) return;
+    session.introBusy = true;
+    setTimeout(() => {
+      if (!stillActive()) return;
+      const move = Pgn.sanToMove(Chess, game, p.sans[p.ply - 1]);
+      if (move) {
+        Chess.play(game, move);
+        sanHistory.push(p.sans[p.ply - 1]);
+        lastMove = { from: move.from, to: move.to };
+        if (move.capture) soundCapture(); else soundMove();
+        renderGame({ animate: true });
+      }
+      session.introBusy = false;
+    }, 600);
   }
 
   /** Réponse du joueur : point si le coup est (quasi) le meilleur. */
@@ -2737,6 +3176,7 @@
     trainer.state = 'feedback';
     trainer.lastResult = { ok, userSan, why };
     trainerSaveAttempt(ok);
+    quizSessionSave(TRAINER_SESSION_KEY, trainer);
     if (move.capture) soundCapture(); else soundMove();
     renderGame({ animate: true });
     // Badge façon chess.com sur le coup de l'utilisateur
@@ -2781,11 +3221,46 @@
     setTimeout(() => squares[best.from].classList.remove('hint-move'), 2200);
   }
 
+  /** Indice de niveau 1 : le THÈME du meilleur coup, sans révéler la pièce.
+      Calculé sur la position affichée du puzzle. */
+  function puzzleThemeHint(p) {
+    const best = p.acceptable && p.acceptable[0];
+    if (!best) return 'Cherchez le coup le plus fort.';
+    if (p.evalBest !== undefined && p.evalBest >= 2500) {
+      return 'Il y a une séquence de mat dans l\'air.';
+    }
+    const move = Chess.legalMoves(game).find(m =>
+        m.from === best.from && m.to === best.to && (m.promo || null) === (best.promo || null));
+    if (move && (game.board[move.to] !== null || move.ep)) {
+      return 'Un gain de matériel est possible : cherchez la bonne prise.';
+    }
+    if (best.san && best.san.includes('+')) {
+      return 'Le roi adverse manque d\'air : un échec fait très mal.';
+    }
+    if (move) {
+      const reasons = Signals.explainMove(Chess, game, move);
+      if (reasons.length > 0) return 'Le meilleur coup ' + reasons[0] + '.';
+    }
+    return 'Pas de capture immédiate : cherchez le coup qui crée la plus forte menace.';
+  }
+
+  /** Reprend la session interrompue sauvegardée (sinon : nouvelle session). */
+  function trainerResume() {
+    const saved = quizSessionLoad(TRAINER_SESSION_KEY);
+    if (!saved) { trainerStart(); return; }
+    trainer = {
+      state: 'guess', puzzles: saved.puzzles, index: saved.index, score: saved.score,
+      order: [], oi: 0, gamesScanned: 0
+    };
+    trainerShowPuzzle();
+  }
+
   function trainerNext() {
     if (!trainer) return;
     trainer.index++;
     if (trainer.index >= trainer.puzzles.length) {
       trainer.state = 'done';
+      quizSessionClear(TRAINER_SESSION_KEY);
       renderTrainerPanel();
       renderStatus();
       updateSignalsButton();
@@ -2813,13 +3288,18 @@
       + '</div>';
 
     if (trainer.state === 'intro') {
+      const saved = quizSessionLoad(TRAINER_SESSION_KEY);
       trainerPanel.innerHTML =
         '<div class="tr-card"><h3>🧩 Blunder Trainer</h3>'
         + '<p>' + TRAINER_SIZE + ' positions tirées au hasard de vos 100 dernières parties chess.com, '
-        + 'juste avant une gaffe ou une erreur que vous avez commise. '
+        + 'juste avant une gaffe qui a fait basculer la partie. '
         + 'Retrouvez le meilleur coup : 1 point par bonne réponse.</p>'
         + globalStats
-        + '<button type="button" class="btn btn-primary" data-tr="start">Démarrer · ' + TRAINER_SIZE + ' positions</button>'
+        + (saved
+            ? '<button type="button" class="btn btn-primary" data-tr="resume">Reprendre la session · position '
+              + (saved.index + 1) + '/' + saved.puzzles.length + '</button>'
+              + '<button type="button" class="btn btn-secondary" data-tr="start">Nouvelle session</button>'
+            : '<button type="button" class="btn btn-primary" data-tr="start">Démarrer · ' + TRAINER_SIZE + ' positions</button>')
         + '</div>';
     } else if (trainer.state === 'needuser') {
       trainerPanel.innerHTML =
@@ -2872,7 +3352,13 @@
         + ' · trait aux ' + (p.userColor === 'w' ? 'Blancs' : 'Noirs') + '.</p>'
         + (trainer.state === 'guess'
             ? '<p>Vous avez commis une ' + kind + ' ici. Trouvez le meilleur coup !</p>'
-              + '<button type="button" class="btn btn-secondary" data-tr="hint">💡 Suggestion : quelle pièce jouer ?</button>'
+              + (trainer.hintLevel >= 1 && trainer.hintText
+                  ? '<p class="tr-hint">💡 ' + escapeHtml(trainer.hintText) + '</p>' : '')
+              + (trainer.hintLevel === 0
+                  ? '<button type="button" class="btn btn-secondary" data-tr="hint">💡 Indice 1/2 : le thème</button>'
+                  : trainer.hintLevel === 1
+                    ? '<button type="button" class="btn btn-secondary" data-tr="hint">💡 Indice 2/2 : quelle pièce jouer ?</button>'
+                    : '')
             : '')
         + feedback
         + '</div>';
@@ -2908,8 +3394,21 @@
     if (!btn) return;
     const action = btn.dataset.tr;
     if (action === 'start') trainerStart();
+    else if (action === 'resume') trainerResume();
     else if (action === 'next') trainerNext();
-    else if (action === 'hint') trainerHint();
+    else if (action === 'hint') {
+      if (trainer && trainer.state === 'guess' && !trainer.introBusy) {
+        if (!trainer.hintLevel) {
+          trainer.hintText = puzzleThemeHint(trainer.puzzles[trainer.index]);
+          trainer.hintLevel = 1;
+          renderTrainerPanel();
+        } else if (trainer.hintLevel === 1) {
+          trainer.hintLevel = 2;
+          renderTrainerPanel();
+          trainerHint();
+        }
+      }
+    }
     else if (action === 'setuser') {
       const input = trainerPanel.querySelector('#tr-user');
       const value = (input && input.value.trim()) || '';
@@ -3049,7 +3548,7 @@
     const p = missP.puzzles[missP.index];
     clearAnnotations();
     clearMoveBadge();
-    replayPuzzlePrefix(p);
+    replayPuzzlePrefix(p, Math.max(0, p.ply - 1));
     selected = -1;
     legalTargets = [];
     gameOver = false;
@@ -3062,10 +3561,16 @@
     if (arrow) arrow.remove();
     missP.state = 'guess';
     missP.lastResult = null;
+    missP.hintLevel = 0;
+    missP.hintText = null;
     renderGame({});
     renderMissPPanel();
     updateSignalsButton();
     sfVerifyPuzzle(p);
+    quizSessionSave(MISSP_SESSION_KEY, missP);
+    const session = missP;
+    animatePuzzleIntro(p, session,
+        () => missP === session && session.state === 'guess' && mode === 'misspuzzles');
   }
 
   /** Réponse du joueur : point si le coup garde l'avantage (quasi meilleur). */
@@ -3090,6 +3595,7 @@
     missP.state = 'feedback';
     missP.lastResult = { ok, userSan, why };
     quizSaveAttempt(MISSP_STATS_KEY, ok);
+    quizSessionSave(MISSP_SESSION_KEY, missP);
     if (move.capture) soundCapture(); else soundMove();
     renderGame({ animate: true });
     showMoveBadge(move.to, ok ? MoveClassifier.KINDS.best : MoveClassifier.KINDS.mistake);
@@ -3133,11 +3639,23 @@
     setTimeout(() => squares[best.from].classList.remove('hint-move'), 2200);
   }
 
+  /** Reprend la session interrompue sauvegardée (sinon : nouvelle session). */
+  function missPResume() {
+    const saved = quizSessionLoad(MISSP_SESSION_KEY);
+    if (!saved) { missPStart(); return; }
+    missP = {
+      state: 'guess', puzzles: saved.puzzles, index: saved.index, score: saved.score,
+      order: [], oi: 0, gamesScanned: 0
+    };
+    missPShowPuzzle();
+  }
+
   function missPNext() {
     if (!missP) return;
     missP.index++;
     if (missP.index >= missP.puzzles.length) {
       missP.state = 'done';
+      quizSessionClear(MISSP_SESSION_KEY);
       renderMissPPanel();
       renderStatus();
       updateSignalsButton();
@@ -3160,6 +3678,7 @@
       + '</div>';
 
     if (missP.state === 'intro') {
+      const saved = quizSessionLoad(MISSP_SESSION_KEY);
       missPPanel.innerHTML =
         '<div class="tr-card"><h3>💡 Miss Puzzles</h3>'
         + '<p>' + MISSP_SIZE + ' positions tirées de vos 100 dernières parties chess.com, '
@@ -3167,7 +3686,11 @@
         + 'Retrouvez le coup qui gardait l\'avantage : 1 point par bonne réponse, note sur '
         + MISSP_SIZE + ' à la fin.</p>'
         + globalStats
-        + '<button type="button" class="btn btn-primary" data-mp="start">Démarrer · ' + MISSP_SIZE + ' positions</button>'
+        + (saved
+            ? '<button type="button" class="btn btn-primary" data-mp="resume">Reprendre la session · position '
+              + (saved.index + 1) + '/' + saved.puzzles.length + '</button>'
+              + '<button type="button" class="btn btn-secondary" data-mp="start">Nouvelle session</button>'
+            : '<button type="button" class="btn btn-primary" data-mp="start">Démarrer · ' + MISSP_SIZE + ' positions</button>')
         + '</div>';
     } else if (missP.state === 'needuser') {
       missPPanel.innerHTML =
@@ -3219,7 +3742,13 @@
         + (missP.state === 'guess'
             ? '<p>Vous aviez ici un avantage de <b>' + trainerEvalLabel(p.before)
               + '</b>… et vous l\'avez manqué. Trouvez le coup qui le gardait !</p>'
-              + '<button type="button" class="btn btn-secondary" data-mp="hint">💡 Suggestion : quelle pièce jouer ?</button>'
+              + (missP.hintLevel >= 1 && missP.hintText
+                  ? '<p class="tr-hint">💡 ' + escapeHtml(missP.hintText) + '</p>' : '')
+              + (missP.hintLevel === 0
+                  ? '<button type="button" class="btn btn-secondary" data-mp="hint">💡 Indice 1/2 : le thème</button>'
+                  : missP.hintLevel === 1
+                    ? '<button type="button" class="btn btn-secondary" data-mp="hint">💡 Indice 2/2 : quelle pièce jouer ?</button>'
+                    : '')
             : '')
         + feedback
         + '</div>';
@@ -3256,8 +3785,21 @@
     if (!btn) return;
     const action = btn.dataset.mp;
     if (action === 'start') missPStart();
+    else if (action === 'resume') missPResume();
     else if (action === 'next') missPNext();
-    else if (action === 'hint') missPHint();
+    else if (action === 'hint') {
+      if (missP && missP.state === 'guess' && !missP.introBusy) {
+        if (!missP.hintLevel) {
+          missP.hintText = puzzleThemeHint(missP.puzzles[missP.index]);
+          missP.hintLevel = 1;
+          renderMissPPanel();
+        } else if (missP.hintLevel === 1) {
+          missP.hintLevel = 2;
+          renderMissPPanel();
+          missPHint();
+        }
+      }
+    }
     else if (action === 'setuser') {
       const input = missPPanel.querySelector('#mp-user');
       const value = (input && input.value.trim()) || '';
@@ -3450,7 +3992,7 @@
     missM.seq = (missM.seq || 0) + 1; // invalide les vérifications en attente
     clearAnnotations();
     clearMoveBadge();
-    replayPuzzlePrefix(p);
+    replayPuzzlePrefix(p, Math.max(0, p.ply - 1));
     selected = -1;
     legalTargets = [];
     gameOver = false;
@@ -3468,6 +4010,11 @@
     missM.lastResult = null;
     renderGame({});
     renderMissMPanel();
+    quizSessionSave(MISSM_SESSION_KEY, missM);
+    const session = missM;
+    const seq = missM.seq;
+    animatePuzzleIntro(p, session,
+        () => missM === session && session.seq === seq && session.state === 'guess' && mode === 'missmates');
   }
 
   /** Coup du joueur : mat immédiat = réussi ; sinon Stockfish vérifie que le
@@ -3490,6 +4037,7 @@
       missM.state = 'feedback';
       missM.lastResult = { ok: true, userSan };
       quizSaveAttempt(MISSM_STATS_KEY, true);
+      quizSessionSave(MISSM_SESSION_KEY, missM);
       showMoveBadge(move.to, MoveClassifier.KINDS.best);
       soundEnd();
       renderMissMPanel();
@@ -3551,6 +4099,7 @@
     missM.state = 'feedback';
     missM.lastResult = { ok: false, why };
     quizSaveAttempt(MISSM_STATS_KEY, false);
+    quizSessionSave(MISSM_SESSION_KEY, missM);
     if (lastMove) showMoveBadge(lastMove.to, MoveClassifier.KINDS.blunder);
     renderMissMPanel();
     renderStatus();
@@ -3597,12 +4146,24 @@
     setTimeout(() => squares[move.from].classList.remove('hint-move'), 2200);
   }
 
+  /** Reprend la session interrompue sauvegardée (sinon : nouvelle session). */
+  function missMResume() {
+    const saved = quizSessionLoad(MISSM_SESSION_KEY);
+    if (!saved) { missMStart(); return; }
+    missM = {
+      state: 'guess', puzzles: saved.puzzles, index: saved.index, score: saved.score,
+      order: [], oi: 0, gamesScanned: 0, token: ++missMToken, seq: 0
+    };
+    missMShowPuzzle();
+  }
+
   function missMNext() {
     if (!missM) return;
     missM.index++;
     if (missM.index >= missM.puzzles.length) {
       missM.state = 'done';
       missM.seq = (missM.seq || 0) + 1; // stoppe une éventuelle solution en cours
+      quizSessionClear(MISSM_SESSION_KEY);
       renderMissMPanel();
       renderStatus();
     } else {
@@ -3624,13 +4185,18 @@
       + '</div>';
 
     if (missM.state === 'intro') {
+      const saved = quizSessionLoad(MISSM_SESSION_KEY);
       missMPanel.innerHTML =
         '<div class="tr-card"><h3>👑 Miss Mates</h3>'
         + '<p>Stockfish repère dans vos 100 dernières parties chess.com les mats en 1, 2 ou 3 coups '
         + 'que vous avez ratés. Rejouez chaque mat coup par coup — l\'adversaire défend au mieux. '
         + '1 point par mat conclu : note sur ' + MISSM_SIZE + ' à la fin.</p>'
         + globalStats
-        + '<button type="button" class="btn btn-primary" data-mm="start">Démarrer · ' + MISSM_SIZE + ' mats</button>'
+        + (saved
+            ? '<button type="button" class="btn btn-primary" data-mm="resume">Reprendre la session · mat '
+              + (saved.index + 1) + '/' + saved.puzzles.length + '</button>'
+              + '<button type="button" class="btn btn-secondary" data-mm="start">Nouvelle session</button>'
+            : '<button type="button" class="btn btn-primary" data-mm="start">Démarrer · ' + MISSM_SIZE + ' mats</button>')
         + '</div>';
     } else if (missM.state === 'needuser') {
       missMPanel.innerHTML =
@@ -3713,6 +4279,7 @@
     if (!btn) return;
     const action = btn.dataset.mm;
     if (action === 'start') missMStart();
+    else if (action === 'resume') missMResume();
     else if (action === 'next') missMNext();
     else if (action === 'hint') missMHint();
     else if (action === 'setuser') {
@@ -4276,6 +4843,14 @@
     if (next === 'exercises' && mode === 'exercises' && exCurrent) {
       exCurrent = null;
     }
+    // Re-cliquer « Structure de pions » depuis une fiche ramène aux listes
+    if (next === 'pawns' && mode === 'pawns') {
+      pwState.item = null;
+      pwState.vue = 0;
+      pwState.exo = null;
+      pwState.repondu = -1;
+      pwState.suitePly = -1;
+    }
     mode = next;
     for (const btn of document.querySelectorAll('.rail-item')) {
       btn.classList.toggle('active', btn.dataset.mode === next);
@@ -4294,10 +4869,12 @@
     const inMissM = next === 'missmates';
     const inConfig = next === 'config';
     const inOpenings = next === 'openings';
+    const inPawns = next === 'pawns';
     if (!inOpenings) {
       const opArrow = document.getElementById('op-arrow');
       if (opArrow) opArrow.remove();
     }
+    if (!inPawns) pwClearBoardMarks();
     for (const id of ['missp-arrow', 'missm-arrow']) {
       const arrow = document.getElementById(id);
       if (arrow) arrow.remove();
@@ -4323,7 +4900,7 @@
       renderMissMPanel();
     }
     gamesPanel.style.display = inGames && !replay ? 'block' : 'none';
-    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inMissP || inMissM || inConfig || inOpenings ? 'none' : '';
+    movesEl.style.display = (inGames && !replay) || (inExercises && !exCurrent) || inTrainer || inMissP || inMissM || inConfig || inOpenings || inPawns ? 'none' : '';
     replayNav.style.display = inGames && replay ? 'flex' : 'none';
     btnAnalyze.style.display = inGames && replay ? '' : 'none';
     btnUndo.style.display = inGames ? 'none' : '';
@@ -4334,8 +4911,9 @@
     document.getElementById('exercises-panel').style.display = inExercises && !exCurrent ? 'block' : 'none';
     document.getElementById('ex-toolbar').style.display = inExercises && exCurrent ? 'flex' : 'none';
     document.getElementById('ex-explanation').style.display = 'none';
-    document.getElementById('controls').style.display = inExercises || inTrainer || inMissP || inMissM || inConfig || inOpenings ? 'none' : 'flex';
+    document.getElementById('controls').style.display = inExercises || inTrainer || inMissP || inMissM || inConfig || inOpenings || inPawns ? 'none' : 'flex';
     trainerPanel.style.display = inTrainer ? 'flex' : 'none';
+    pawnsPanel.style.display = inPawns ? 'flex' : 'none';
     missPPanel.style.display = inMissP ? 'flex' : 'none';
     missMPanel.style.display = inMissM ? 'flex' : 'none';
     configPanel.style.display = inConfig ? 'flex' : 'none';
@@ -4362,6 +4940,13 @@
         startGame(opState.couleur);
         renderOpeningsPanel();
       }
+      renderStatus();
+    } else if (next === 'pawns') {
+      // Fiches et exercices vus côté Blancs : orientation fixe
+      orientation = 'w';
+      placeSquares();
+      pwRefreshBoard();
+      renderPawnsPanel();
       renderStatus();
     } else if (next === 'trainer') {
       // Arriver sur le mode démarre toujours une nouvelle session : l'état
