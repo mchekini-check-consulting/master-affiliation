@@ -2503,9 +2503,9 @@
   // répertoire, moments critiques), diagnostic comportemental chiffré, et
   // plan de progression. Analyse Stockfish dans le navigateur, mise en cache.
 
-  const reportPanel = document.getElementById('report-panel');
+  const reportPanel = document.getElementById('report-main');
   const REPORT_KIND = 'report-sf';
-  let repState = { cadence: 'rapid', nombre: 30, phase: 'config', progres: '', data: null, erreur: null };
+  let repState = { cadence: 'rapid', nombre: 30, phase: 'config', progres: '', pct: 0, data: null, erreur: null };
   let repToken = 0;
 
   const REP_CADENCES = [
@@ -2680,6 +2680,7 @@
     const alive = () => token === repToken && mode === 'report';
     repState.phase = 'scan';
     repState.erreur = null;
+    repState.pct = 0;
     repState.progres = 'Téléchargement des parties chess.com…';
     renderReportPanel();
     let games;
@@ -2735,12 +2736,14 @@
           }
           dossiers[idx] = { g, color, parsed, scan };
           faits++;
+          repState.pct = Math.round(faits / games.length * 100);
           repState.progres = 'Analyse Stockfish : partie ' + faits + ' / ' + games.length
             + ' (' + engines.length + ' moteurs — les parties déjà scannées sortent du cache)';
           renderReportPanel();
         }
       }));
       if (!alive()) return;
+      repState.pct = 100;
       repState.progres = 'Agrégation et rédaction du rapport…';
       renderReportPanel();
       const data = repAgreger(dossiers.filter(Boolean));
@@ -3033,39 +3036,43 @@
 
   function renderReportPanel() {
     if (repState.phase === 'scan') {
-      reportPanel.innerHTML = '<div class="tr-card"><h3>📊 Rapport en préparation</h3>'
+      reportPanel.innerHTML = '<div class="rp-centre"><div class="tr-card rp-hero">'
+        + '<h3>📊 Rapport en préparation</h3>'
+        + '<div class="tr-progress-track rp-progress"><div class="tr-progress-fill" style="width:' + repState.pct + '%"></div></div>'
         + '<p>' + escapeHtml(repState.progres) + '</p>'
-        + '<p class="rp-note">Vous pouvez laisser tourner : le résultat s\'affichera ici. '
-        + 'Quitter ce mode annule l\'analyse (les parties déjà scannées restent en cache).</p></div>';
+        + '<p class="rp-note">Vous pouvez laisser tourner : le rapport s\'affichera ici. '
+        + 'Quitter ce mode annule l\'analyse (les parties déjà scannées restent en cache).</p></div></div>';
       return;
     }
     if (repState.phase === 'done' && repState.data) {
       reportPanel.innerHTML = repRapportHtml(repState.data);
+      reportPanel.scrollTop = 0;
       return;
     }
-    // Écran de sélection
-    let html = '<div class="tr-card"><h3>📊 Rapport de jeu</h3>'
+    // Écran de sélection, centré à la place de l'échiquier
+    let html = '<div class="rp-centre"><div class="tr-card rp-hero">'
+      + '<h3>📊 Rapport de jeu</h3>'
       + '<p>Le bilan complet de vos dernières parties chess.com : précision, répartition des coups, '
       + 'phases de jeu, répertoire, moments critiques — puis un diagnostic de vos habitudes et un plan de progression.</p>';
     if (!chesscomUsername) {
-      html += '<p class="cfg-status err">Renseignez d\'abord votre pseudo chess.com dans la Configuration.</p></div>';
+      html += '<p class="cfg-status err">Renseignez d\'abord votre pseudo chess.com dans la Configuration.</p></div></div>';
       reportPanel.innerHTML = html;
       return;
     }
-    html += '<p class="rp-note">Compte analysé : <b>' + escapeHtml(chesscomUsername) + '</b></p></div>';
-    html += '<div class="tr-card"><h3>Cadence</h3><div class="rp-chips">'
+    html += '<p class="rp-note">Compte analysé : <b>' + escapeHtml(chesscomUsername) + '</b></p>'
+      + '<h4 class="rp-label">Cadence</h4><div class="rp-chips">'
       + REP_CADENCES.map(([id, label]) =>
         '<button type="button" class="rp-chip' + (repState.cadence === id ? ' actif' : '')
         + '" data-rep-cadence="' + id + '">' + label + '</button>').join('')
-      + '</div><h3>Nombre de parties</h3><div class="rp-chips">'
+      + '</div><h4 class="rp-label">Nombre de parties</h4><div class="rp-chips">'
       + [30, 50, 100].map(n =>
         '<button type="button" class="rp-chip' + (repState.nombre === n ? ' actif' : '')
         + '" data-rep-nombre="' + n + '">' + n + ' dernières</button>').join('')
       + '</div>'
-      + '<button type="button" class="btn btn-primary" data-rep-analyser="1">🚀 Générer le rapport</button>'
+      + '<button type="button" class="btn btn-primary rp-go" data-rep-analyser="1">🚀 Générer le rapport</button>'
       + (repState.erreur ? '<p class="cfg-status err">' + escapeHtml(repState.erreur) + '</p>' : '')
-      + '<p class="rp-note">Durée indicative : ~2 s par partie non encore en cache (analyse Stockfish locale).</p>'
-      + '</div>';
+      + '<p class="rp-note">Durée indicative : ~1 s par partie non encore en cache (analyse Stockfish locale, dans votre navigateur).</p>'
+      + '</div></div>';
     reportPanel.innerHTML = html;
   }
 
@@ -3078,18 +3085,30 @@
     const diag = d.diag;
     const nb = d.parties.length;
     const cadLabel = { rapid: 'Rapide', blitz: 'Blitz', bullet: 'Bullet', daily: 'Quotidien' };
-    let html = '<button type="button" class="op-back" data-rep-retour="1">⬅ Nouvelle analyse</button>';
+    const precGlobale = d.parties.filter(p => p.accuracy !== null);
+    const precMoy = precGlobale.length
+      ? precGlobale.reduce((s, p) => s + p.accuracy, 0) / precGlobale.length : null;
+    let html = '<div class="rp-page">';
 
-    // ---- En-tête
-    html += '<div class="tr-card"><h3>📊 Rapport — ' + nb + ' parties</h3>'
-      + '<p class="rp-note">' + escapeHtml(d.periode) + ' · '
-      + d.bilan.V + ' V / ' + d.bilan.N + ' N / ' + d.bilan.D + ' D'
-      + (d.eloDebut !== null ? ' · Elo ' + d.eloDebut + ' → <b>' + d.eloFin + '</b> ('
-        + (d.eloFin - d.eloDebut >= 0 ? '+' : '') + (d.eloFin - d.eloDebut) + ')' : '')
-      + '</p></div>';
+    // ---- En-tête : bandeau + tuiles de synthèse
+    html += '<div class="rp-entete">'
+      + '<div><h2>📊 Rapport de jeu — ' + escapeHtml(chesscomUsername) + '</h2>'
+      + '<p class="rp-note">' + escapeHtml(d.periode) + '</p></div>'
+      + '<button type="button" class="btn btn-secondary" data-rep-retour="1">⬅ Nouvelle analyse</button>'
+      + '</div>'
+      + '<div class="rp-tuiles">'
+      + '<div class="rp-tuile"><b>' + nb + '</b><span>parties analysées</span></div>'
+      + '<div class="rp-tuile"><b>' + d.bilan.V + ' / ' + d.bilan.N + ' / ' + d.bilan.D + '</b><span>V / N / D</span></div>'
+      + (d.eloDebut !== null
+        ? '<div class="rp-tuile"><b>' + d.eloFin + '</b><span>Elo ('
+          + (d.eloFin - d.eloDebut >= 0 ? '+' : '') + (d.eloFin - d.eloDebut) + ' sur la période)</span></div>' : '')
+      + (precMoy !== null
+        ? '<div class="rp-tuile"><b>' + precMoy.toFixed(1) + ' %</b><span>précision moyenne</span></div>' : '')
+      + '<div class="rp-tuile"><b>' + (d.repartition.blunder || 0) + '</b><span>gaffes au total</span></div>'
+      + '</div>';
 
     // ================= PARTIE 1 : GAME REVIEW =================
-    html += '<div class="rp-section">Partie 1 — Rapport de jeu</div>';
+    html += '<div class="rp-section">Partie 1 — Rapport de jeu</div><div class="rp-grid">';
 
     html += '<div class="tr-card"><h3>Précision moyenne</h3><table class="rp-table"><thead>'
       + '<tr><th>Cadence</th><th>Parties</th><th>Précision</th><th>Tendance</th></tr></thead><tbody>';
@@ -3125,7 +3144,7 @@
         + (diag.finalesPerduesEq.length ? ', dont ' + diag.finalesPerduesEq.length
           + ' finale(s) équilibrée(s) à l\'entrée… et perdue(s) quand même.' : '.')
     };
-    html += '<div class="tr-card"><h3>Phases de jeu</h3><table class="rp-table"><thead>'
+    html += '<div class="tr-card rp-span2"><h3>Phases de jeu</h3><table class="rp-table"><thead>'
       + '<tr><th>Phase</th><th>Note</th><th>Constat</th></tr></thead><tbody>';
     for (const [phase, label] of [['ouverture', 'Ouverture'], ['milieu', 'Milieu de jeu'], ['finale', 'Finale']]) {
       const ph = d.phases[phase];
@@ -3148,7 +3167,7 @@
     html += tableOuvertures(d.ouverturesW, 'Répertoire avec les Blancs (top 5)');
     html += tableOuvertures(d.ouverturesB, 'Répertoire avec les Noirs (top 5)');
 
-    html += '<div class="tr-card"><h3>5 moments critiques</h3>';
+    html += '<div class="tr-card rp-span2"><h3>5 moments critiques</h3><div class="rp-moments">';
     for (const cm of d.critiques) {
       const mateTxt = cm.mate !== null && (cm.p.color === 'w' ? cm.mate > 0 : cm.mate < 0)
         ? ' (mat en ' + Math.abs(cm.mate) + ' raté !)' : '';
@@ -3160,10 +3179,10 @@
         + '</p><button type="button" class="btn btn-secondary" data-rep-voir="' + d.critiques.indexOf(cm)
         + '">♟ Revoir cette position</button></div>';
     }
-    html += '</div>';
+    html += '</div></div></div>';
 
     // ================= PARTIE 2 : DIAGNOSTIC =================
-    html += '<div class="rp-section">Partie 2 — Ton diagnostic</div>';
+    html += '<div class="rp-section">Partie 2 — Ton diagnostic</div><div class="rp-grid">';
     const bloc = (titre, corps) => corps
       ? '<div class="tr-card"><h3>' + titre + '</h3>' + corps + '</div>' : '';
     const exemples = (liste, n) => liste.slice(0, n || 2)
@@ -3261,12 +3280,16 @@
     }
     html += bloc('🌡 Tilt', corps);
 
+    html += '</div>'; // fin de la grille du diagnostic
+
     // ================= PARTIE 3 : PLAN =================
-    html += '<div class="rp-section">Partie 3 — Ton plan de progression</div>';
+    html += '<div class="rp-section">Partie 3 — Ton plan de progression</div><div class="rp-grid">';
     html += repPlanHtml(d);
+    html += '</div>';
 
     html += '<p class="rp-note">Analyse Stockfish locale (~90 ms/position) : les précisions sont des estimations, '
-      + 'légèrement différentes de celles de chess.com. Les axes sans signal net dans tes parties ne sont pas affichés.</p>';
+      + 'légèrement différentes de celles de chess.com. Les axes sans signal net dans tes parties ne sont pas affichés.</p>'
+      + '</div>'; // fin .rp-page
     return html;
   }
 
@@ -3318,7 +3341,7 @@
       }
     ].filter(x => x.score >= 5).sort((a, b) => b.score - a.score).slice(0, 3);
 
-    let html = '<div class="tr-card"><h3>🥇 Tes 3 chantiers prioritaires</h3>';
+    let html = '<div class="tr-card rp-span2"><h3>🥇 Tes 3 chantiers prioritaires</h3><div class="rp-moments">';
     if (defauts.length === 0) {
       html += '<p>Pas de défaut massif qui ressorte : ton levier principal est la régularité — vise la précision, pas le spectaculaire.</p>';
     }
@@ -3326,7 +3349,7 @@
       html += '<div class="rp-moment"><p><b>' + (i + 1) + '. ' + df.titre + '</b></p>'
         + '<p class="rp-note">' + df.exercice + '</p></div>';
     });
-    html += '</div>';
+    html += '</div></div>';
 
     // Répertoire
     const faibles = [...d.ouverturesW, ...d.ouverturesB].filter(o => o.score < 45 && o.n >= 3);
@@ -3348,7 +3371,7 @@
     html += '</div>';
 
     // Routine
-    html += '<div class="tr-card"><h3>📅 Routine hebdomadaire (30-45 min/jour)</h3>'
+    html += '<div class="tr-card rp-span2"><h3>📅 Routine hebdomadaire (30-45 min/jour)</h3>'
       + '<table class="rp-table"><tbody>'
       + '<tr><td>Lun / Mer / Ven</td><td>15 min tactique ciblée (Blunder Trainer + mats) puis 1 partie rapide jouée SANS pendule dans la tête : échecs-captures-menaces à chaque coup</td></tr>'
       + '<tr><td>Mar / Jeu</td><td>15 min finales ou structure de pions (onglets Exercices / Structure de pions), puis 1-2 parties</td></tr>'
@@ -6009,7 +6032,9 @@
     document.getElementById('controls').style.display = inExercises || inTrainer || inMissP || inMissM || inConfig || inOpenings || inPawns || inReport ? 'none' : 'flex';
     trainerPanel.style.display = inTrainer ? 'flex' : 'none';
     pawnsPanel.style.display = inPawns ? 'flex' : 'none';
-    reportPanel.style.display = inReport ? 'flex' : 'none';
+    // Le rapport remplace l'échiquier : bascule de toute la zone centrale
+    reportPanel.style.display = inReport ? 'block' : 'none';
+    document.body.classList.toggle('mode-report', inReport);
     missPPanel.style.display = inMissP ? 'flex' : 'none';
     missMPanel.style.display = inMissM ? 'flex' : 'none';
     configPanel.style.display = inConfig ? 'flex' : 'none';

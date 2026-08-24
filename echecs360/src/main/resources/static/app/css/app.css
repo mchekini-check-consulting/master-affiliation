@@ -833,7 +833,54 @@ button { font-family: inherit; }
 
 /* ================================================================ rapport -- */
 
-#report-panel .btn { flex: none; }
+/* Le rapport remplace l'échiquier : zone centrale pleine largeur, panneau
+   latéral replié, contenu scrollable et structuré en grille */
+body.mode-report .layout { grid-template-columns: var(--rail-w) 1fr; }
+body.mode-report .side { display: none; }
+body.mode-report .board-zone {
+  display: block; overflow-y: auto; padding: 0;
+  background: #f6f5f0;
+}
+body.mode-report .board-wrap,
+body.mode-report .player-bar { display: none; }
+
+.report-main {
+  font-family: 'Sora', sans-serif; color: var(--ink);
+  min-height: 100%;
+}
+.report-main .btn { flex: none; }
+.rp-page { max-width: 1100px; margin: 0 auto; padding: 26px 28px 60px; display: flex; flex-direction: column; gap: 14px; }
+.rp-centre {
+  max-width: 640px; margin: 0 auto; padding: 60px 24px;
+  display: flex; flex-direction: column; justify-content: center; min-height: 80vh;
+}
+.rp-hero { gap: 12px; }
+.rp-hero h3 { font-size: 20px; }
+.rp-hero p { font-size: 13.5px; }
+.rp-label { margin: 6px 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--gray-text); }
+.rp-go { font-size: 15px; padding: 13px; }
+.rp-progress { margin: 4px 0; }
+
+.rp-entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.rp-entete h2 { margin: 0 0 2px; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+.rp-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.rp-tuile {
+  background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 2px;
+}
+.rp-tuile b { font-size: 22px; font-weight: 800; color: var(--green); letter-spacing: -0.02em; }
+.rp-tuile span { font-size: 11px; color: var(--gray-text); font-weight: 600; }
+
+.rp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+.rp-grid .tr-card { margin: 0; }
+.rp-span2 { grid-column: 1 / -1; }
+.rp-moments { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rp-moments .rp-moment { margin-bottom: 0; }
+@media (max-width: 1100px) {
+  .rp-grid, .rp-moments { grid-template-columns: 1fr; }
+  body.mode-report .layout { grid-template-columns: 1fr; }
+}
+
 .rp-note { font-size: 11.5px; color: var(--gray-text); line-height: 1.5; }
 .rp-section {
   font-size: 14px; font-weight: 800; letter-spacing: -0.01em;
