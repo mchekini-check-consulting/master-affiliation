@@ -646,33 +646,68 @@ button { font-family: inherit; }
 }
 .move-explain b { color: var(--green); }
 .btn-signals { margin: 10px 16px 0; flex: none; }
+/* Signaux de la position : commentaire façon chess.com en haut du panneau —
+   bloc vert sombre, avatar + bulle blanche avec flèche, bouton vert « Suivant ». */
 .signals-panel {
-  margin: 10px 16px 0; max-height: 42vh; overflow-y: auto;
-  background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
-  display: flex; flex-direction: column;
+  margin: 12px 14px 0; padding: 12px; flex: none;
+  background: var(--ink); border-radius: 12px;
+  display: flex; flex-direction: column; gap: 10px;
 }
-.signals-panel .sig-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; font-weight: 800; font-size: .92rem; color: var(--green);
-  position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--line);
+.sigc-row { display: flex; align-items: flex-start; gap: 10px; }
+.sigc-avatar {
+  width: 38px; height: 38px; border-radius: 8px; flex: none;
+  background: var(--green); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 800; text-transform: uppercase;
 }
-.signals-panel .sig-close { background: none; border: none; color: var(--gray-text); cursor: pointer; font-size: 1rem; }
-.signals-panel h4 {
-  margin: 10px 14px 2px; font-size: .78rem; text-transform: uppercase;
-  letter-spacing: .06em; color: var(--green);
+.sigc-bubble {
+  position: relative; flex: 1; min-width: 0;
+  background: #fff; color: var(--ink); border-radius: 10px;
+  padding: 10px 28px 10px 12px; font-size: 13px; line-height: 1.45;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
 }
-.signals-panel .sig-empty { margin: 8px 14px 12px; font-size: 12.5px; color: var(--gray-text); }
-.sig-item {
-  text-align: left; background: none; border: none; cursor: pointer; font-family: inherit;
-  padding: 8px 14px; font-size: 12.5px; line-height: 1.45; color: var(--ink);
-  border-left: 3px solid transparent;
+.sigc-bubble::before {
+  content: ''; position: absolute; left: -7px; top: 13px;
+  border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+  border-right: 8px solid #fff;
 }
-.sig-item:hover { background: var(--chip); }
-.sig-item.active { background: #fdf3e4; border-left-color: #f09a20; }
-.sig-item .sig-camp { font-weight: 800; }
-.sig-item .sig-camp.w { color: #7a877f; }
-.sig-item .sig-camp.b { color: #22302a; }
-.sig-item .sig-detail { display: block; color: var(--gray-text); font-size: 11.5px; margin-top: 2px; }
+.sigc-close {
+  position: absolute; top: 6px; right: 7px; padding: 2px;
+  background: none; border: none; cursor: pointer;
+  color: var(--gray-text); font-size: 13px; line-height: 1;
+}
+.sigc-close:hover { color: var(--ink); }
+.sigc-head { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-weight: 800; margin-bottom: 4px; }
+.sigc-ico {
+  width: 20px; height: 20px; border-radius: 99px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #fff;
+}
+.sigc-ico.tac { background: #e58f2a; }
+.sigc-ico.pos { background: #5b8fd6; }
+.sigc-ico.ok { background: var(--accent); }
+.sigc-title { min-width: 0; }
+.sigc-pill {
+  font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 6px;
+  background: var(--chip); border: 1px solid var(--line); color: var(--ink);
+}
+.sigc-pill.b { background: var(--ink); border-color: var(--ink); color: #fff; }
+.sigc-text { color: #55645c; font-size: 12.5px; }
+.sigc-nav { display: flex; gap: 8px; }
+.sigc-prev {
+  min-width: 42px; border: none; border-radius: 8px; cursor: pointer;
+  background: rgba(255, 255, 255, .12); color: #fff;
+  font-size: 17px; font-weight: 800;
+}
+.sigc-next {
+  flex: 1; border: none; border-radius: 8px; cursor: pointer;
+  background: var(--accent); color: #fff;
+  font-weight: 800; font-size: 14px; padding: 10px 0;
+  box-shadow: 0 3px 0 var(--accent-dark);
+}
+.sigc-next:not(:disabled):hover { filter: brightness(1.06); }
+.sigc-prev:disabled, .sigc-next:disabled { opacity: .4; cursor: default; }
+.sigc-count { text-align: center; font-size: 11.5px; font-weight: 700; color: rgba(242, 239, 231, .6); }
 .ov-signal {
   background: rgba(240, 154, 32, .42);
   box-shadow: inset 0 0 0 3px rgba(240, 154, 32, .8);
@@ -809,7 +844,7 @@ button { font-family: inherit; }
   .side { order: 2; border-left: none; border-top: 1.5px solid var(--line); }
   /* La page défile ; les listes internes restent bornées et scrollables */
   .moves, .games-panel, .exercises-panel, .trainer-panel, .config-panel, .openings-panel,
-  .signals-panel, .ex-explanation { max-height: 52vh; }
+  .ex-explanation { max-height: 52vh; }
 }
 
 /* Petits écrans : tout l'espace pour l'échiquier, contrôles compacts */

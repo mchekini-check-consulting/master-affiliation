@@ -118,6 +118,9 @@
 
   <!-- Panneau latéral : statut, coups, contrôles -->
   <aside class="side">
+    <!-- Signaux de la position : commentaire façon chess.com, en haut à droite -->
+    <div class="signals-panel" id="signals-panel" style="display:none"></div>
+
     <div class="status"><span id="status-main">Trait aux Blancs</span><span class="sub" id="status-sub"></span></div>
 
     <div class="thinking" id="thinking"><span class="dot"></span> Le bot réfléchit…</div>
@@ -141,7 +144,6 @@
     <!-- Signaux faibles de la position (relecture + Blunder Trainer) -->
     <button type="button" class="btn btn-secondary btn-signals" id="btn-signals" style="display:none">🔍 Signaux de la position</button>
     <button type="button" class="btn btn-secondary btn-signals" id="btn-signals-visual" style="display:none">👁 Visite des signaux</button>
-    <div class="signals-panel" id="signals-panel" style="display:none"></div>
 
     <div class="ex-toolbar" id="ex-toolbar" style="display:none">
       <button type="button" class="btn btn-secondary" id="ex-back" title="Retour à la liste">⬅ Liste</button>

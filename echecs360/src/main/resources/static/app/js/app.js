@@ -3611,7 +3611,8 @@
   const moveExplainEl = document.getElementById('move-explain');
   const btnSignals = document.getElementById('btn-signals');
   const signalsPanel = document.getElementById('signals-panel');
-  let signalsActive = null; // index du signal surligné
+  let sigList = [];  // signaux de la position affichée (tactiques puis positionnels)
+  let sigIndex = 0;  // signal actuellement commenté dans la bulle
 
   /** État moteur complet de la position affichée (relecture ou trainer). */
   function currentDisplayedState() {
@@ -3675,7 +3676,6 @@
 
   function clearSignalOverlays() {
     for (const el of squares) el.querySelectorAll('.ov-signal').forEach(n => n.remove());
-    signalsActive = null;
   }
 
   function hideSignalsPanel() {
@@ -3693,48 +3693,65 @@
     if (!available) hideSignalsPanel();
   }
 
+  /** Commentaire façon chess.com en haut du panneau latéral : avatar + bulle
+      (badge du signal, pastille de camp, texte) et bouton vert « Suivant »
+      pour faire défiler les signaux ; les cases du signal courant restent
+      surlignées sur l'échiquier. */
   function showSignalsPanel() {
     const state = currentDisplayedState();
     if (!state) return;
     const result = Signals.detectSignals(Chess, state);
-    let html = '<div class="sig-head"><span>🔍 Signaux de la position</span>'
-      + '<button type="button" class="sig-close" id="sig-close">✕ fermer</button></div>';
-    const section = (titre, items) => {
-      let out = '<h4>' + titre + '</h4>';
-      if (items.length === 0) return out + '<p class="sig-empty">Rien de notable.</p>';
-      items.forEach((item) => {
-        const campLabel = item.camp ? '<span class="sig-camp ' + item.camp + '">'
-          + (item.camp === 'w' ? 'Blancs' : 'Noirs') + '</span> · ' : '';
-        out += '<button type="button" class="sig-item" data-sig="' + signalsFlat.length + '">'
-          + campLabel + escapeHtml(item.titre)
-          + '<span class="sig-detail">' + escapeHtml(item.detail) + '</span></button>';
-        signalsFlat.push(item);
-      });
-      return out;
-    };
-    const signalsFlat = [];
-    html += section('Signaux tactiques', result.tactiques);
-    html += section('Signaux positionnels', result.positionnels);
-    signalsPanel.innerHTML = html;
-    signalsPanel.style.display = 'flex';
-    clearSignalOverlays();
-    signalsPanel.querySelector('#sig-close').addEventListener('click', hideSignalsPanel);
-    for (const btn of signalsPanel.querySelectorAll('.sig-item')) {
-      btn.addEventListener('click', () => {
-        const index = +btn.dataset.sig;
-        const wasActive = signalsActive === index;
-        clearSignalOverlays();
-        for (const el of signalsPanel.querySelectorAll('.sig-item')) el.classList.remove('active');
-        if (wasActive) return;
-        signalsActive = index;
-        btn.classList.add('active');
-        for (const sq of signalsFlat[index].cases) {
-          const ov = document.createElement('div');
-          ov.className = 'ov ov-signal';
-          squares[sq].appendChild(ov);
-        }
-      });
+    sigList = [];
+    for (const item of result.tactiques) sigList.push({ titre: item.titre, detail: item.detail, camp: item.camp, cases: item.cases, cat: 'Tactique' });
+    for (const item of result.positionnels) sigList.push({ titre: item.titre, detail: item.detail, camp: item.camp, cases: item.cases, cat: 'Positionnel' });
+    if (sigList.length === 0) {
+      sigList.push({ titre: 'Rien de notable', detail: 'Aucun signal tactique ou positionnel dans cette position.', cases: [], cat: null });
     }
+    sigIndex = 0;
+    signalsPanel.style.display = 'flex';
+    renderSignalComment();
+  }
+
+  function renderSignalComment() {
+    const item = sigList[sigIndex];
+    const avatarEl = document.getElementById('user-avatar');
+    const avatar = (avatarEl && avatarEl.textContent.trim()) || '♟';
+    const catClass = item.cat === 'Tactique' ? 'tac' : (item.cat === 'Positionnel' ? 'pos' : 'ok');
+    const catIcon = item.cat === 'Tactique' ? '⚔' : (item.cat === 'Positionnel' ? '♟' : '✓');
+    const campPill = item.camp
+      ? '<span class="sigc-pill ' + item.camp + '">' + (item.camp === 'w' ? 'Blancs' : 'Noirs') + '</span>'
+      : '';
+    signalsPanel.innerHTML =
+      '<div class="sigc-row">'
+      + '<span class="sigc-avatar">' + escapeHtml(avatar) + '</span>'
+      + '<div class="sigc-bubble">'
+      +   '<button type="button" class="sigc-close" id="sig-close" title="Fermer">✕</button>'
+      +   '<div class="sigc-head">'
+      +     '<span class="sigc-ico ' + catClass + '">' + catIcon + '</span>'
+      +     '<span class="sigc-title">' + escapeHtml(item.titre) + '</span>'
+      +     campPill
+      +   '</div>'
+      +   '<div class="sigc-text">' + escapeHtml(item.detail) + '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="sigc-nav">'
+      + '<button type="button" class="sigc-prev" id="sigc-prev" title="Signal précédent"' + (sigIndex === 0 ? ' disabled' : '') + '>‹</button>'
+      + '<button type="button" class="sigc-next" id="sigc-next"' + (sigIndex >= sigList.length - 1 ? ' disabled' : '') + '>→ Suivant</button>'
+      + '</div>'
+      + '<div class="sigc-count">' + (sigIndex + 1) + ' / ' + sigList.length + (item.cat ? ' · Signal ' + item.cat.toLowerCase() : '') + '</div>';
+    clearSignalOverlays();
+    for (const sq of item.cases || []) {
+      const ov = document.createElement('div');
+      ov.className = 'ov ov-signal';
+      squares[sq].appendChild(ov);
+    }
+    signalsPanel.querySelector('#sig-close').addEventListener('click', hideSignalsPanel);
+    signalsPanel.querySelector('#sigc-prev').addEventListener('click', () => {
+      if (sigIndex > 0) { sigIndex--; renderSignalComment(); }
+    });
+    signalsPanel.querySelector('#sigc-next').addEventListener('click', () => {
+      if (sigIndex < sigList.length - 1) { sigIndex++; renderSignalComment(); }
+    });
   }
 
   btnSignals.addEventListener('click', () => {
