@@ -3088,29 +3088,29 @@
     const precGlobale = d.parties.filter(p => p.accuracy !== null);
     const precMoy = precGlobale.length
       ? precGlobale.reduce((s, p) => s + p.accuracy, 0) / precGlobale.length : null;
-    let html = '<div class="rp-page">';
-
-    // ---- En-tête : bandeau + tuiles de synthèse
-    html += '<div class="rp-entete">'
-      + '<div><h2>📊 Rapport de jeu — ' + escapeHtml(chesscomUsername) + '</h2>'
-      + '<p class="rp-note">' + escapeHtml(d.periode) + '</p></div>'
-      + '<button type="button" class="btn btn-secondary" data-rep-retour="1">⬅ Nouvelle analyse</button>'
+    // ---- Bandeau « tableau de bord » : identité + tuiles de synthèse
+    let html = '<div class="rp-band">'
+      + '<div class="rp-band-haut">'
+      + '<div><p class="rp-eyebrow">Rapport de jeu · ' + escapeHtml(d.periode) + '</p>'
+      + '<h2>' + escapeHtml(chesscomUsername) + '</h2></div>'
+      + '<button type="button" class="btn rp-retour" data-rep-retour="1">⬅ Nouvelle analyse</button>'
       + '</div>'
       + '<div class="rp-tuiles">'
       + '<div class="rp-tuile"><b>' + nb + '</b><span>parties analysées</span></div>'
-      + '<div class="rp-tuile"><b>' + d.bilan.V + ' / ' + d.bilan.N + ' / ' + d.bilan.D + '</b><span>V / N / D</span></div>'
+      + '<div class="rp-tuile"><b>' + d.bilan.V + ' / ' + d.bilan.N + ' / ' + d.bilan.D + '</b><span>victoires / nuls / défaites</span></div>'
       + (d.eloDebut !== null
-        ? '<div class="rp-tuile"><b>' + d.eloFin + '</b><span>Elo ('
-          + (d.eloFin - d.eloDebut >= 0 ? '+' : '') + (d.eloFin - d.eloDebut) + ' sur la période)</span></div>' : '')
+        ? '<div class="rp-tuile"><b>' + d.eloFin + ' <em class="rp-delta ' + (d.eloFin - d.eloDebut >= 0 ? 'up' : 'down') + '">'
+          + (d.eloFin - d.eloDebut >= 0 ? '+' : '') + (d.eloFin - d.eloDebut) + '</em></b><span>Elo sur la période</span></div>' : '')
       + (precMoy !== null
         ? '<div class="rp-tuile"><b>' + precMoy.toFixed(1) + ' %</b><span>précision moyenne</span></div>' : '')
       + '<div class="rp-tuile"><b>' + (d.repartition.blunder || 0) + '</b><span>gaffes au total</span></div>'
-      + '</div>';
+      + '</div></div>'
+      + '<div class="rp-page">';
 
     // ================= PARTIE 1 : GAME REVIEW =================
-    html += '<div class="rp-section">Partie 1 — Rapport de jeu</div><div class="rp-grid">';
+    html += '<div class="rp-section"><span class="rp-sec-num">1</span><span class="rp-sec-titre">Rapport de jeu</span></div><div class="rp-grid">';
 
-    html += '<div class="tr-card"><h3>Précision moyenne</h3><table class="rp-table"><thead>'
+    html += '<div class="tr-card rp-c4"><h3>Précision moyenne</h3><table class="rp-table"><thead>'
       + '<tr><th>Cadence</th><th>Parties</th><th>Précision</th><th>Tendance</th></tr></thead><tbody>';
     for (const pr of d.precisions) {
       const tend = pr.avant !== null
@@ -3125,7 +3125,7 @@
     }
     html += '</tbody></table></div>';
 
-    html += '<div class="tr-card"><h3>Répartition des coups (' + d.classes + ' coups classés)</h3>'
+    html += '<div class="tr-card rp-c4"><h3>Répartition des coups (' + d.classes + ' coups classés)</h3>'
       + '<table class="rp-table"><tbody>';
     for (const [k, [label, css]] of Object.entries(KIND_FR)) {
       const n = d.repartition[k] || 0;
@@ -3144,7 +3144,7 @@
         + (diag.finalesPerduesEq.length ? ', dont ' + diag.finalesPerduesEq.length
           + ' finale(s) équilibrée(s) à l\'entrée… et perdue(s) quand même.' : '.')
     };
-    html += '<div class="tr-card rp-span2"><h3>Phases de jeu</h3><table class="rp-table"><thead>'
+    html += '<div class="tr-card rp-c4"><h3>Phases de jeu</h3><table class="rp-table"><thead>'
       + '<tr><th>Phase</th><th>Note</th><th>Constat</th></tr></thead><tbody>';
     for (const [phase, label] of [['ouverture', 'Ouverture'], ['milieu', 'Milieu de jeu'], ['finale', 'Finale']]) {
       const ph = d.phases[phase];
@@ -3154,7 +3154,7 @@
     html += '</tbody></table></div>';
 
     const tableOuvertures = (liste, titre) => {
-      let t = '<div class="tr-card"><h3>' + titre + '</h3><table class="rp-table"><thead>'
+      let t = '<div class="tr-card rp-c6"><h3>' + titre + '</h3><table class="rp-table"><thead>'
         + '<tr><th>Ouverture</th><th>Parties</th><th>V/N/D</th><th>Score</th></tr></thead><tbody>';
       for (const o of liste) {
         const alerte = o.score < 45 && o.n >= 3;
@@ -3167,7 +3167,7 @@
     html += tableOuvertures(d.ouverturesW, 'Répertoire avec les Blancs (top 5)');
     html += tableOuvertures(d.ouverturesB, 'Répertoire avec les Noirs (top 5)');
 
-    html += '<div class="tr-card rp-span2"><h3>5 moments critiques</h3><div class="rp-moments">';
+    html += '<div class="tr-card"><h3>5 moments critiques</h3><div class="rp-moments rp-crit">';
     for (const cm of d.critiques) {
       const mateTxt = cm.mate !== null && (cm.p.color === 'w' ? cm.mate > 0 : cm.mate < 0)
         ? ' (mat en ' + Math.abs(cm.mate) + ' raté !)' : '';
@@ -3182,9 +3182,9 @@
     html += '</div></div></div>';
 
     // ================= PARTIE 2 : DIAGNOSTIC =================
-    html += '<div class="rp-section">Partie 2 — Ton diagnostic</div><div class="rp-grid">';
+    html += '<div class="rp-section"><span class="rp-sec-num">2</span><span class="rp-sec-titre">Ton diagnostic</span></div><div class="rp-grid">';
     const bloc = (titre, corps) => corps
-      ? '<div class="tr-card"><h3>' + titre + '</h3>' + corps + '</div>' : '';
+      ? '<div class="tr-card rp-c4"><h3>' + titre + '</h3>' + corps + '</div>' : '';
     const exemples = (liste, n) => liste.slice(0, n || 2)
       .map(c => '<li>vs <b>' + escapeHtml(c.p.adv) + '</b> (' + c.p.date.toLocaleDateString('fr-FR')
         + '), coup ' + d.numCoup(c.ply) + ' : ' + escapeHtml(c.san)
@@ -3283,7 +3283,7 @@
     html += '</div>'; // fin de la grille du diagnostic
 
     // ================= PARTIE 3 : PLAN =================
-    html += '<div class="rp-section">Partie 3 — Ton plan de progression</div><div class="rp-grid">';
+    html += '<div class="rp-section"><span class="rp-sec-num">3</span><span class="rp-sec-titre">Ton plan de progression</span></div><div class="rp-grid">';
     html += repPlanHtml(d);
     html += '</div>';
 
@@ -3341,7 +3341,7 @@
       }
     ].filter(x => x.score >= 5).sort((a, b) => b.score - a.score).slice(0, 3);
 
-    let html = '<div class="tr-card rp-span2"><h3>🥇 Tes 3 chantiers prioritaires</h3><div class="rp-moments">';
+    let html = '<div class="tr-card"><h3>🥇 Tes 3 chantiers prioritaires</h3><div class="rp-moments rp-chantiers">';
     if (defauts.length === 0) {
       html += '<p>Pas de défaut massif qui ressorte : ton levier principal est la régularité — vise la précision, pas le spectaculaire.</p>';
     }
@@ -3354,7 +3354,7 @@
     // Répertoire
     const faibles = [...d.ouverturesW, ...d.ouverturesB].filter(o => o.score < 45 && o.n >= 3);
     const fortes = [...d.ouverturesW, ...d.ouverturesB].filter(o => o.score >= 60 && o.n >= 4);
-    html += '<div class="tr-card"><h3>📖 Ajustement du répertoire</h3>';
+    html += '<div class="tr-card rp-c6"><h3>📖 Ajustement du répertoire</h3>';
     if (faibles.length) {
       html += '<p><b>À retravailler ou abandonner</b> (score < 45 %) : '
         + faibles.map(o => escapeHtml(o.nom) + ' (' + Math.round(o.score) + ' % sur ' + o.n + ')').join(' · ')
@@ -3370,28 +3370,28 @@
     }
     html += '</div>';
 
-    // Routine
-    html += '<div class="tr-card rp-span2"><h3>📅 Routine hebdomadaire (30-45 min/jour)</h3>'
-      + '<table class="rp-table"><tbody>'
-      + '<tr><td>Lun / Mer / Ven</td><td>15 min tactique ciblée (Blunder Trainer + mats) puis 1 partie rapide jouée SANS pendule dans la tête : échecs-captures-menaces à chaque coup</td></tr>'
-      + '<tr><td>Mar / Jeu</td><td>15 min finales ou structure de pions (onglets Exercices / Structure de pions), puis 1-2 parties</td></tr>'
-      + '<tr><td>Sam</td><td>1 partie lente (30 min+) jouée sérieusement, puis analyse immédiate avec « Analyser la partie »</td></tr>'
-      + '<tr><td>Dim</td><td>Repos ou relecture des gaffes de la semaine — jamais de session après 2 défaites de suite</td></tr>'
-      + '</tbody></table></div>';
-
-    // Objectif Elo
+    // Objectif Elo (à côté du répertoire), puis routine pleine largeur
     if (d.eloDebut !== null && d.eloFin !== null) {
       const delta = d.eloFin - d.eloDebut;
       const gainDefauts = Math.min(150, Math.max(50,
         (diag.pendues.length + d.diag.matsRates.length) * 6
         + (diag.gagnantes.length - diag.converties.length) * 8));
       const cible = d.eloFin + gainDefauts;
-      html += '<div class="tr-card"><h3>🎯 Objectif à 3 mois</h3>'
+      html += '<div class="tr-card rp-c6 rp-objectif"><h3>🎯 Objectif à 3 mois</h3>'
         + '<p>Elo actuel : <b>' + d.eloFin + '</b> (tendance ' + (delta >= 0 ? '+' : '') + delta
         + ' sur la période analysée). Les défauts identifiés ci-dessus sont mécaniques, pas un plafond de compréhension : '
         + 'en corrigeant les deux premiers chantiers, <b>' + cible + '</b> est un objectif réaliste à 3 mois. '
         + 'Condition : la routine, pas le volume — 100 parties en tilt valent moins que 20 parties analysées.</p></div>';
     }
+
+    // Routine
+    html += '<div class="tr-card"><h3>📅 Routine hebdomadaire (30-45 min/jour)</h3>'
+      + '<table class="rp-table"><tbody>'
+      + '<tr><td>Lun / Mer / Ven</td><td>15 min tactique ciblée (Blunder Trainer + mats) puis 1 partie rapide jouée SANS pendule dans la tête : échecs-captures-menaces à chaque coup</td></tr>'
+      + '<tr><td>Mar / Jeu</td><td>15 min finales ou structure de pions (onglets Exercices / Structure de pions), puis 1-2 parties</td></tr>'
+      + '<tr><td>Sam</td><td>1 partie lente (30 min+) jouée sérieusement, puis analyse immédiate avec « Analyser la partie »</td></tr>'
+      + '<tr><td>Dim</td><td>Repos ou relecture des gaffes de la semaine — jamais de session après 2 défaites de suite</td></tr>'
+      + '</tbody></table></div>';
     return html;
   }
 

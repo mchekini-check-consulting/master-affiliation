@@ -868,8 +868,9 @@ button { font-family: inherit; }
 
 /* ================================================================ rapport -- */
 
-/* Le rapport remplace l'échiquier : zone centrale pleine largeur, panneau
-   latéral replié, contenu scrollable et structuré en grille */
+/* Le rapport remplace l'échiquier : zone centrale pleine largeur (rail
+   conservé), panneau latéral replié, bandeau sombre de synthèse puis
+   contenu structuré en grille 12 colonnes qui exploite tout l'écran */
 body.mode-report .layout { grid-template-columns: var(--rail-w) 1fr; }
 body.mode-report .side { display: none; }
 body.mode-report .board-zone {
@@ -884,7 +885,10 @@ body.mode-report .player-bar { display: none; }
   min-height: 100%;
 }
 .report-main .btn { flex: none; }
-.rp-page { max-width: 1100px; margin: 0 auto; padding: 26px 28px 60px; display: flex; flex-direction: column; gap: 14px; }
+/* Boutons secondaires sur fond clair (le .btn-secondary global est sombre) */
+.report-main .btn-secondary { background: var(--chip); color: var(--ink); border: 1.5px solid var(--line); }
+.report-main .btn-secondary:hover { border-color: var(--green); color: var(--green); }
+
 .rp-centre {
   max-width: 640px; margin: 0 auto; padding: 60px 24px;
   display: flex; flex-direction: column; justify-content: center; min-height: 80vh;
@@ -896,32 +900,73 @@ body.mode-report .player-bar { display: none; }
 .rp-go { font-size: 15px; padding: 13px; }
 .rp-progress { margin: 4px 0; }
 
-.rp-entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
-.rp-entete h2 { margin: 0 0 2px; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
-.rp-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-.rp-tuile {
-  background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
-  padding: 14px 16px; display: flex; flex-direction: column; gap: 2px;
+/* Bandeau « tableau de bord du coach » : vert encre, damier en filigrane,
+   grands chiffres blancs — pleine largeur au-dessus du contenu */
+.rp-band {
+  background-color: var(--ink); color: var(--ink-text);
+  background-image: repeating-conic-gradient(rgba(255, 255, 255, .022) 0% 25%, transparent 0% 50%);
+  background-size: 56px 56px;
+  padding: 30px 36px 26px;
 }
-.rp-tuile b { font-size: 22px; font-weight: 800; color: var(--green); letter-spacing: -0.02em; }
-.rp-tuile span { font-size: 11px; color: var(--gray-text); font-weight: 600; }
+.rp-band-haut { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.rp-eyebrow {
+  margin: 0; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .14em; color: var(--mint);
+}
+.rp-band h2 { margin: 4px 0 0; font-size: clamp(22px, 2vw, 30px); font-weight: 800; letter-spacing: -0.02em; color: #fff; }
+.rp-retour {
+  background: rgba(255, 255, 255, .1); color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, .25); border-radius: 10px;
+}
+.rp-retour:hover { background: rgba(255, 255, 255, .18); }
+.rp-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 20px; }
+.rp-tuile {
+  background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.rp-tuile b {
+  font-size: clamp(22px, 1.8vw, 30px); font-weight: 800; color: #fff;
+  letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.rp-tuile > span {
+  font-size: 10px; color: rgba(242, 239, 231, .6);
+  font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+}
+.rp-delta { font-style: normal; font-size: .55em; font-weight: 800; vertical-align: 3px; }
+.rp-delta.up { color: var(--mint); }
+.rp-delta.down { color: #f2a08c; }
 
-.rp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
-.rp-grid .tr-card { margin: 0; }
-.rp-span2 { grid-column: 1 / -1; }
-.rp-moments { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* Contenu : grille 12 colonnes pleine largeur */
+.rp-page { padding: 24px 36px 70px; display: flex; flex-direction: column; gap: 18px; }
+.rp-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; align-items: stretch; }
+.rp-grid > * { grid-column: span 12; min-width: 0; margin: 0; }
+.rp-c4 { grid-column: span 4; }
+.rp-c6 { grid-column: span 6; }
+.rp-moments { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
 .rp-moments .rp-moment { margin-bottom: 0; }
+@media (max-width: 1500px) {
+  .rp-c4 { grid-column: span 6; }
+}
 @media (max-width: 1100px) {
-  .rp-grid, .rp-moments { grid-template-columns: 1fr; }
+  .rp-c4, .rp-c6 { grid-column: span 12; }
+  .rp-band { padding: 22px 20px 20px; }
+  .rp-page { padding: 18px 20px 60px; }
   body.mode-report .layout { grid-template-columns: 1fr; }
 }
 
 .rp-note { font-size: 11.5px; color: var(--gray-text); line-height: 1.5; }
-.rp-section {
-  font-size: 14px; font-weight: 800; letter-spacing: -0.01em;
-  margin: 6px 0 -2px; padding: 8px 12px; border-radius: 10px;
-  background: var(--green); color: #fff;
+/* Les trois parties forment une vraie séquence (bilan → diagnostic → plan) :
+   numéro encadré + titre + filet, à la place d'un bandeau plein */
+.rp-section { display: flex; align-items: center; gap: 12px; margin: 14px 0 0; }
+.rp-sec-num {
+  width: 34px; height: 34px; flex: none; border-radius: 10px;
+  border: 2px solid var(--green); color: var(--green);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800;
 }
+.rp-sec-titre { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+.rp-section::after { content: ''; flex: 1; height: 1.5px; background: var(--line); }
 .rp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
 .rp-chip {
   font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
@@ -929,7 +974,8 @@ body.mode-report .player-bar { display: none; }
   background: #fff; color: var(--gray-text);
 }
 .rp-chip.actif { background: var(--green); border-color: var(--green); color: #fff; }
-.rp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rp-table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+.rp-table b { white-space: nowrap; }
 .rp-table th {
   text-align: left; font-size: 10.5px; text-transform: uppercase;
   letter-spacing: .05em; color: var(--gray-text); padding: 4px 6px;
@@ -949,10 +995,19 @@ body.mode-report .player-bar { display: none; }
 .rp-kind.rp-mistake { color: #b4690e; }
 .rp-kind.rp-blunder { color: #c0503a; }
 .rp-moment {
-  border: 1.5px solid var(--line); border-radius: 10px;
-  padding: 9px 11px; margin-bottom: 8px;
+  background: #faf9f5; border: 1px solid var(--line); border-radius: 12px;
+  padding: 11px 13px; margin-bottom: 8px;
+  display: flex; flex-direction: column; gap: 8px;
 }
-.rp-moment p { margin: 0 0 7px; font-size: 12.5px; line-height: 1.55; }
+.rp-moment p { margin: 0; font-size: 12.5px; line-height: 1.55; }
+.rp-moment .btn { margin-top: auto; align-self: flex-start; }
+/* Moments critiques : liseré gaffe ; chantiers du plan : liseré vert */
+.rp-crit .rp-moment { border-left: 3px solid #d64f3a; }
+.rp-chantiers .rp-moment { border-left: 3px solid var(--green); }
+.rp-chantiers { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+/* Objectif à 3 mois : la carte-conclusion, teintée */
+.rp-objectif { background: linear-gradient(135deg, #eaf5ee, #f8fbf4); border-color: rgba(46, 125, 91, .35); }
+.rp-objectif p { color: var(--ink); }
 .rp-blunder { color: #c0503a; }
 .rp-best { color: var(--green); }
 .rp-exemples { margin: 4px 0 0; padding-left: 18px; font-size: 11.5px; color: var(--gray-text); }
