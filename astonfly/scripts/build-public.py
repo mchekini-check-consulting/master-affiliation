@@ -34,6 +34,22 @@ def rewrite(text):
     text = SEO_LINK_RE.sub('', text)
     text = SEO_META_RE.sub('', text)
     text = SEO_LD_RE.sub('', text)
+    # — aucun lien vers le site astonfly.com (les mailto restent) —
+    # boutons « visite virtuelle 360° » du corps de page : masqués
+    text = text.replace(
+        '<a href="https://astonfly.com/assets/360visit/index.htm" target="_blank" rel="noopener"',
+        '<a hidden href="#"')
+    # entrée « campus à 360° » des méga-menus : retirée
+    text = re.sub(r"\.concat\(\[\{ title: '(?:Le campus à 360°|The campus in 360°)'[^\]]*\]\)", '', text)
+    # CTA du méga-menu L'école : sans href, le code retombe sur '#'
+    text = text.replace(", href: 'https://astonfly.com/assets/360visit/index.htm' }", " }")
+    # partage d'articles : URL du domaine courant au lieu du site réel
+    text = text.replace("const url = 'https://www.astonfly.com/actualites/'",
+                        "const url = window.location.origin + '/actualites/'")
+    # vidéo du hero : pas de chargement depuis astonfly.com, le poster reste
+    text = text.replace("if (!v.querySelector('source')) {", "if (false) {")
+    text = text.replace("s.src = 'https://astonfly.com/wp-content/uploads/2025/02/Astonfly-Landing-Page.mp4#t=2';",
+                        "s.src = '';")
     return ABS_RE.sub(r'/\1', text)
 
 def main():

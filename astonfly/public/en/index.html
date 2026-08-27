@@ -623,7 +623,7 @@
                 <span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:#0A78C6; background:#EAF6FD; border:1px solid #CDE9F8; padding:5px 12px; border-radius:999px;">{{ t.t }}</span>
               </sc-for>
             </div>
-            <a href="https://astonfly.com/assets/360visit/index.htm" target="_blank" rel="noopener" style="margin-top:auto; align-self:flex-start; text-decoration:none; background:linear-gradient(135deg,#00AEEF,#0A78C6); color:#fff; font-weight:700; font-size:14px; padding:12px 24px; border-radius:999px; box-shadow:0 14px 28px -12px rgba(0,174,239,.7); transition:transform .16s ease;" style-hover="transform:translateY(-2px);">{{ campusActive.cta }}</a>
+            <a hidden href="#" style="margin-top:auto; align-self:flex-start; text-decoration:none; background:linear-gradient(135deg,#00AEEF,#0A78C6); color:#fff; font-weight:700; font-size:14px; padding:12px 24px; border-radius:999px; box-shadow:0 14px 28px -12px rgba(0,174,239,.7); transition:transform .16s ease;" style-hover="transform:translateY(-2px);">{{ campusActive.cta }}</a>
           </div>
         </div>
       </div>
@@ -5652,7 +5652,7 @@
             <h2 style="font-family:'Archivo',sans-serif; font-weight:800; font-size:clamp(24px,3vw,36px); line-height:1.14; color:#fff; margin:0 0 14px; letter-spacing:-.02em;">The best way to discover your future life as a student? Come and see it.</h2>
             <p style="font-size:15.5px; line-height:1.65; color:rgba(255,255,255,.85); margin:0 0 28px; max-width:52ch;">Meet the teams, discover the training spaces and take the time to discuss your project with your family.</p>
             <div style="display:flex; flex-wrap:wrap; gap:14px 26px; align-items:center;">
-              <a href="https://astonfly.com/assets/360visit/index.htm" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:9px; text-decoration:none; background:linear-gradient(135deg,#00AEEF,#0A78C6); color:#fff; font-weight:700; font-size:15.5px; padding:15px 32px; border-radius:999px; box-shadow:0 16px 34px -14px rgba(0,174,239,.8);">Explore the campus in 360° <span aria-hidden="true">↗</span></a>
+              <a hidden href="#" style="display:inline-flex; align-items:center; gap:9px; text-decoration:none; background:linear-gradient(135deg,#00AEEF,#0A78C6); color:#fff; font-weight:700; font-size:15.5px; padding:15px 32px; border-radius:999px; box-shadow:0 16px 34px -14px rgba(0,174,239,.8);">Explore the campus in 360° <span aria-hidden="true">↗</span></a>
             </div>
           </div>
         </div>
@@ -9089,7 +9089,7 @@ class Component extends DCLogic {
   _artShareVals(art) {
     const vw = this.state.vw || (typeof window !== 'undefined' ? window.innerWidth : 1280);
     const stack = vw >= 900;
-    const url = 'https://www.astonfly.com/actualites/' + art.slug + '/';
+    const url = window.location.origin + '/actualites/' + art.slug + '/';
     const enc = encodeURIComponent(url), t = encodeURIComponent(art.title);
     const btn = {
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', flex: 'none',
@@ -9857,9 +9857,9 @@ class Component extends DCLogic {
     if (!v || v.tagName !== 'VIDEO' || this._heroVidInit) return;
     this._heroVidInit = true;
     const START = 2;
-    if (!v.querySelector('source')) {
+    if (false) {
       const s = document.createElement('source');
-      s.src = 'https://astonfly.com/wp-content/uploads/2025/02/Astonfly-Landing-Page.mp4#t=2';
+      s.src = '';
       s.type = 'video/mp4';
       v.appendChild(s);
       try { v.load(); } catch (e) {}
@@ -10747,7 +10747,7 @@ class Component extends DCLogic {
         { title: 'The team', desc: 'Meet the team' },
         { title: 'Approvals & certifications', desc: 'ATO · EASA · Qualiopi · SNPL charter' },
         { title: 'Student life & housing', desc: 'Sport, housing' } ],
-      cta: { eyebrow: 'Immersive tour', title: 'The campus in 360°', text: "Explore the Astonfly campus from home.", button: 'Start the virtual tour', href: 'https://astonfly.com/assets/360visit/index.htm' } },
+      cta: { eyebrow: 'Immersive tour', title: 'The campus in 360°', text: "Explore the Astonfly campus from home.", button: 'Start the virtual tour' } },
   ];
 
   megaFormations = [
@@ -11887,7 +11887,7 @@ class Component extends DCLogic {
         : r.key === 'admissions'
         ? r.items.concat([{ title: 'Inscription à la sélection', desc: 'Première étape · test de sélection' }])
         : r.key === 'ecole'
-        ? r.items.concat([{ title: 'Le campus à 360°', desc: 'Visite immersive', href: 'https://astonfly.com/assets/360visit/index.htm', ext: true }])
+        ? r.items
         : r.items).map((it) => ({ ...it, href: it.href || '#', target: it.ext ? '_blank' : '',
           onClick: it.title === 'The airline pilot profession'
             ? ((e) => { if (e && e.preventDefault) e.preventDefault(); this._navTo('metier'); })
