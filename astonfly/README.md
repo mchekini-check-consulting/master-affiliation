@@ -1,6 +1,6 @@
 # Astonfly
 
-Site vitrine de l'école de pilotage Astonfly — [astonfly.check-consulting.fr](https://astonfly.check-consulting.fr).
+Site vitrine de l'école de pilotage Astonfly — [aston.check-consulting.net](https://aston.check-consulting.net).
 
 - **Contenu** : export « dc-runtime » du site astonfly.com (SPA React rendue côté
   client : un seul `index.html` de ~1,7 Mo + `en/index.html`, navigation interne

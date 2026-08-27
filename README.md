@@ -26,7 +26,7 @@ master-affiliation/
 │   └── back/                 # API Spring Boot : demandes d'inscription, analyse du besoin, espace admin
 ├── parents-malins/           # Parents Malins (parents-malins.fr) — Astro statique → nginx
 ├── prepa-technique/          # Prépa Technique (preparation.check-consulting.net) — Astro statique → nginx
-├── astonfly/                 # Astonfly (astonfly.check-consulting.fr) — export SPA React (dc-runtime) servi via Astro → nginx
+├── astonfly/                 # Astonfly (aston.check-consulting.net) — export SPA React (dc-runtime) servi via Astro → nginx
 ├── my-way/                   # My Way (freelance-now.fr) — Angular + Spring Boot + PostgreSQL
 │   ├── back/                 # API Spring Boot (Dockerfile multi-stage Maven → JRE 21)
 │   └── front/                # Front Angular (Dockerfile multi-stage Node → nginx, proxifie /api)
