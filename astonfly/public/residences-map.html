@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hébergements autour des centres de formation Astonfly</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#EEF4F9; }
+  #map { position:absolute; inset:0; }
+  .rs-tiles { filter:grayscale(1) brightness(1.02) contrast(.98); opacity:.95; }
+  .leaflet-container { font-family:'Archivo', system-ui, sans-serif; background:#EEF4F9; }
+  .leaflet-control-attribution { background:rgba(255,255,255,.78) !important; color:rgba(15,42,67,.55) !important; font-size:10px; }
+  .leaflet-control-attribution a { color:#0A78C6 !important; }
+  .rs-pin { display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .rs-pin:not(.rs-campus) { flex-direction:row; align-items:center; gap:7px; }
+  .rs-pin:not(.rs-campus) .rs-dot { flex:none; }
+  .rs-pin:not(.rs-campus) .rs-lbl { position:relative; z-index:1; flex:none; }
+  .rs-dot { flex:none; width:14px; height:14px; box-sizing:border-box; border-radius:50%; background:#0F2A43; border:3px solid #fff; box-shadow:0 0 0 5px rgba(15,42,67,.14), 0 6px 16px -6px rgba(15,42,67,.5); transition:transform .2s ease, box-shadow .2s ease; }
+  .rs-pin.on .rs-dot { transform:scale(1.35); box-shadow:0 0 0 11px rgba(15,42,67,.18), 0 8px 22px -6px rgba(15,42,67,.6); }
+  .rs-lbl { font-weight:800; font-size:11px; letter-spacing:.02em; color:#0F2A43; background:#fff; border:1px solid #C6DCEC; box-shadow:0 4px 12px -6px rgba(15,42,67,.35); padding:3px 10px; border-radius:999px; white-space:nowrap; transition:background .2s ease, color .2s ease, border-color .2s ease; }
+  .rs-pin.on .rs-lbl { background:#0F2A43; border-color:#0F2A43; color:#fff; }
+  .rs-campus.rs-pin { flex-direction:column-reverse; gap:12px; }
+  .rs-campus .rs-dot { position:relative; width:20px; height:20px; background:#00AEEF; border:4px solid #fff; box-shadow:0 0 0 9px rgba(0,174,239,.16), 0 8px 20px -6px rgba(0,174,239,.6); }
+  .rs-campus .rs-dot:before, .rs-campus .rs-dot:after { content:''; position:absolute; left:50%; top:50%; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; background:rgba(0,174,239,.45); pointer-events:none; animation:rsPulse 2.6s cubic-bezier(.2,.7,.2,1) infinite; }
+  .rs-campus .rs-dot:after { animation-delay:1.3s; }
+  @keyframes rsPulse { 0% { transform:scale(.7); opacity:.55; } 70% { opacity:0; } 100% { transform:scale(3.4); opacity:0; } }
+  .rs-pin .rs-dot { position:relative; }
+  .rs-pin:not(.rs-campus) .rs-dot:before { content:''; position:absolute; left:50%; top:50%; width:14px; height:14px; margin:-7px 0 0 -7px; border-radius:50%; background:rgba(15,42,67,.35); pointer-events:none; animation:rsPulse 3.2s cubic-bezier(.2,.7,.2,1) infinite; }
+  .rs-campus .rs-lbl { text-transform:uppercase; letter-spacing:.06em; font-size:10.5px; color:#0A78C6; border-color:#CDE9F8; }
+  .rs-campus.rs-pin.on .rs-dot { box-shadow:0 0 0 11px rgba(0,174,239,.22), 0 8px 22px -6px rgba(0,174,239,.65); }
+  .rs-campus.rs-pin.on .rs-lbl { background:#00AEEF; border-color:#00AEEF; color:#fff; }
+
+  .rs-popup .leaflet-popup-content-wrapper { padding:0; overflow:hidden; border-radius:18px; box-shadow:0 30px 60px -22px rgba(15,42,67,.5); border:none; }
+  .rs-popup .leaflet-popup-content { margin:0; width:300px !important; }
+  .rs-popup .leaflet-popup-close-button { top:16px; right:18px; color:#fff !important; opacity:.75; font-size:17px; font-weight:400; }
+  .rs-popup .leaflet-popup-close-button:hover { opacity:1; }
+  .leaflet-popup-tip { background:#fff; }
+  .rs-card { width:300px; overflow:hidden; }
+  .rs-head { position:relative; padding:18px 20px 16px; background:linear-gradient(140deg,#0F2A43,#0A3D91); overflow:hidden; }
+  .rs-head:after { content:''; position:absolute; right:-46px; top:-52px; width:170px; height:170px; border-radius:50%; background:radial-gradient(circle, rgba(0,174,239,.4), rgba(0,174,239,0) 70%); }
+  .rs-head-c { background:linear-gradient(140deg,#0A78C6,#00AEEF); }
+  .rs-badge { position:relative; display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#9FD9F6; background:rgba(0,174,239,.16); border:1px solid rgba(0,174,239,.34); padding:4px 10px; border-radius:999px; }
+  .rs-badge-c { color:#fff; background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.4); }
+  .rs-name { position:relative; font-family:'Archivo', sans-serif; font-weight:800; font-size:17px; line-height:1.2; color:#fff; margin-top:11px; letter-spacing:-.01em; }
+  .rs-town { position:relative; display:flex; align-items:center; gap:6px; margin-top:6px; font-size:12px; font-weight:600; color:rgba(255,255,255,.78); }
+  .rs-town svg { width:13px; height:13px; color:#fff; }
+  .rs-body { padding:6px 20px 18px; background:#fff; }
+  .rs-line { display:flex; flex-direction:column; gap:3px; padding:11px 0; border-bottom:1px solid #F1F5F9; }
+  .rs-k { font-family:'Archivo', sans-serif; font-weight:700; font-size:9.5px; letter-spacing:.11em; text-transform:uppercase; color:#94A6B5; }
+  .rs-v { font-size:12.5px; line-height:1.5; color:#0F2A43; }
+  .rs-tel { font-weight:800; color:#0A78C6 !important; text-decoration:none; }
+  .rs-tel:hover { text-decoration:underline; }
+  .rs-acts { display:flex; gap:8px; margin-top:14px; }
+  .rs-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 15px; border-radius:999px; font-family:'Archivo', sans-serif; font-weight:700; font-size:12px; text-decoration:none; transition:all .16s ease; }
+  .rs-btn-p { flex:1; background:linear-gradient(135deg,#00AEEF,#0A78C6); color:#fff !important; box-shadow:0 10px 22px -12px rgba(0,174,239,.85); }
+  .rs-btn-p:hover { transform:translateY(-1px); }
+  .rs-btn-s { background:#F2F7FB; border:1px solid #E2ECF4; color:#33485B !important; }
+  .rs-btn-s:hover { background:#EAF6FD; border-color:#CDE9F8; color:#0A78C6 !important; }
+
+  .rs-legend { position:absolute; left:14px; bottom:14px; z-index:500; display:flex; flex-direction:column; gap:7px; background:rgba(255,255,255,.9); backdrop-filter:blur(8px); border:1px solid #DCE8F3; box-shadow:0 8px 20px -12px rgba(15,42,67,.35); border-radius:12px; padding:9px 13px; font-family:'Archivo', sans-serif; font-weight:600; font-size:11px; color:#33485B; }
+  .rs-legend div { display:flex; align-items:center; gap:9px; }
+  .rs-legend i { width:10px; height:10px; border-radius:50%; }
+  .rs-legend i.c { background:#00AEEF; }
+  .rs-legend i.r { background:#0F2A43; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="rs-legend">
+  <div><i class="c"></i>Centre de formation Astonfly</div>
+  <div><i class="r"></i>Résidences partenaires</div>
+</div>
+<script>
+  var PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>';
+
+  var CENTRES = {
+    paris: {
+      key: 'paris', label: 'Toussus le Noble', tabLabel: 'Paris — Toussus le Noble',
+      campus: { key: 'campus-paris', name: 'Toussus le Noble', pinLabel: 'Toussus le Noble', town: 'Toussus-le-Noble', addr: 'Aéroport de Toussus-le-Noble · Bâtiment 313, Zone Ouest, 78117 Toussus le Noble — France', lat: 48.74760, lon: 2.10031, sub: 'Salles de cours, flotte école et simulateurs.' },
+      res: [
+        { key: 'twenty', name: 'TWENTY Campus', town: 'Jouy-en-Josas', addr: '67 Rue Charles de Gaulle, 78350 Jouy-en-Josas', site: 'https://www.twenty-campus.com/fr/residences/twenty-campus-jouy-en-josas/', tel: '+33 3 20 12 25 89', lat: 48.7594, lon: 2.1685 },
+        { key: 'studcity', name: "Stud'City", town: 'Vélizy-Villacoublay', addr: '10 Rue Paul Dautier, 78140 Vélizy-Villacoublay', site: 'https://www.studcity.fr/aref/residences/velizy/', tel: '+33 1 06 08 07 08', lat: 48.7833, lon: 2.1936 },
+        { key: 'kley', name: 'KLEY de Saclay', town: 'Palaiseau', addr: '1 Pl. Marguerite Perey, 91120 Palaiseau', site: 'https://www.kley.fr/residence-etudiante/saclay/kley-saclay/', tel: '+33 1 83 35 31 38', lat: 48.7106, lon: 2.1503 },
+        { key: 'ecla', name: 'ECLA Campus', town: 'Massy-Palaiseau', addr: '16 Av. Emile Baudot, 91120 Palaiseau', site: 'https://www.ecla.com/fr/offre-sejour/paris/massy-palaiseau/', tel: '+33 9 73 77 73 77', lat: 48.7239, lon: 2.2570 },
+        { key: 'zenitude', name: 'ZENITUDE', town: 'Magny-les-Hameaux', addr: '50 Rte de Port Royal des Champs, 78114 Magny-les-Hameaux', site: 'https://www.zenitude-hotel-residences.com/residences/magny-les-hameaux-versailles/', tel: '+33 1 30 47 89 50', lat: 48.7444, lon: 2.0700 }
+      ]
+    },
+    castellet: {
+      key: 'castellet', label: 'Le Castellet',
+      campus: { key: 'campus-castellet', name: 'Le Castellet', pinLabel: 'Le Castellet', town: 'Le Castellet', addr: 'Aérodrome du Castellet, 83330 Le Castellet', lat: 43.251064, lon: 5.784682, sub: 'Centre utilisé pour certaines phases de la formation en vol.' },
+      res: [
+        { key: 'grandprix', name: 'Grand Prix Hôtel', town: 'Le Castellet', addr: '3100 Rte des Hauts du Camp, 83330 Le Castellet', site: 'https://grandprixhotel.fr/fr/', lat: 43.25380, lon: 5.77516 },
+        { key: 'equipages', name: 'Résidence des Équipages', town: 'Le Camp du Castellet', addr: '3100 Route des Hauts du Camp, Le Camp du Castellet, 83330 Le Castellet', site: 'https://www.secure-direct-hotel-booking.com/module_booking_engine/index.php?id_etab=e48c35a05d177fcbcf35562e979094b8&langue=francais', lat: 43.251053, lon: 5.784080 }
+      ]
+    },
+    dublin: {
+      key: 'dublin', label: 'Dublin',
+      campus: { key: 'campus-dublin', name: 'Dublin', pinLabel: 'Dublin', town: 'Dublin', addr: 'Dublin Airport, Dublin, Irlande', lat: 53.40840, lon: -6.23609, sub: 'APS MCC sur simulateur Boeing 737 selon le programme.' },
+      res: [
+        { key: 'metro', name: 'Metro Hotel Dublin Airport', town: 'Santry, Dublin', addr: 'Whitehall, Dublin 9, Irlande', site: 'https://www.metrohoteldublinairport.com/', lat: 53.40070, lon: -6.26313, included: true }
+      ]
+    },
+    berlin: {
+      key: 'berlin', label: 'Berlin',
+      campus: { key: 'campus-berlin', name: 'Berlin', pinLabel: 'Berlin', town: 'Berlin', addr: 'Berlin Brandenburg Airport, Allemagne', lat: 52.39570, lon: 13.53734, sub: 'APS MCC sur simulateur Boeing 737 selon le programme.' },
+      res: [
+        { key: 'premierinn', name: 'Premier Inn Berlin Airport', town: 'Schönefeld, Berlin', addr: 'Mittelstraße 5-5a, 12529 Schönefeld, Allemagne', site: 'https://www.premierinn.com/gb/en/hotels/germany/berlin/berlin/berlin-airport.html', lat: 52.39640, lon: 13.53953, included: true }
+      ]
+    }
+  };
+  var current = 'paris';
+  var CAMPUS = CENTRES.paris.campus;
+  var RES = CENTRES.paris.res;
+
+  var map = L.map('map', { scrollWheelZoom: false, zoomControl: true, attributionControl: true });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO', subdomains: 'abcd', maxZoom: 17, className: 'rs-tiles'
+  }).addTo(map);
+
+  function icon(o, isCampus) {
+    var sz = isCampus ? 20 : 14;
+    return L.divIcon({
+      className: '',
+      html: '<div class="rs-pin ' + (isCampus ? 'rs-campus' : '') + '" data-key="' + o.key + '">'
+        + '<span class="rs-dot"></span>'
+        + (isCampus ? '' : '<span class="rs-lbl">' + (o.pinLabel || o.name) + '</span>') + '</div>',
+      iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2]
+    });
+  }
+
+  var POPOPTS = { maxWidth: 300, minWidth: 300, autoPan: true, keepInView: true, autoPanPadding: [24, 70], className: 'rs-popup' };
+
+  var layer = L.layerGroup().addTo(map);
+  var markers = {};
+
+  function build(key) {
+    current = key;
+    var c = CENTRES[key];
+    if (!c) return;
+    layer.clearLayers();
+    markers = {};
+    CAMPUS = c.campus; RES = c.res;
+
+    var cm = L.marker([CAMPUS.lat, CAMPUS.lon], { icon: icon(CAMPUS, true), zIndexOffset: 500 }).addTo(layer);
+    cm.bindPopup('<div class="rs-card">'
+      + '<div class="rs-head rs-head-c">'
+      +   '<span class="rs-badge rs-badge-c">' + 'Centre de formation Astonfly' + '</span>'
+      +   '<div class="rs-name">' + CAMPUS.name + '</div>'
+      +   '<div class="rs-town">' + PIN_SVG + CAMPUS.town + '</div>'
+      + '</div>'
+      + '<div class="rs-body">'
+      +   '<div class="rs-line"><span class="rs-k">Adresse</span><span class="rs-v">' + CAMPUS.addr + '</span></div>'
+      +   '<div class="rs-line"><span class="rs-k">Sur place</span><span class="rs-v">' + CAMPUS.sub + '</span></div>'
+      + '</div></div>', POPOPTS);
+    markers[CAMPUS.key] = cm;
+
+    RES.forEach(function (r) {
+      var m = L.marker([r.lat, r.lon], { icon: icon(r, false), title: r.name }).addTo(layer);
+      var card = '<div class="rs-card">'
+        + '<div class="rs-head">'
+        +   '<span class="rs-badge">' + (r.included ? 'Hébergement inclus' : 'Résidence partenaire') + '</span>'
+        +   '<div class="rs-name">' + r.name + '</div>'
+        +   '<div class="rs-town">' + PIN_SVG + r.town + '</div>'
+        + '</div>'
+        + '<div class="rs-body">';
+      if (r.addr) card += '<div class="rs-line"><span class="rs-k">Adresse</span><span class="rs-v">' + r.addr + '</span></div>';
+      if (r.tel) card += '<div class="rs-line"><span class="rs-k">Téléphone</span><a class="rs-v rs-tel" href="tel:' + r.tel.replace(/[^+\d]/g, '') + '">' + r.tel + '</a></div>';
+      if (r.site) card += '<div class="rs-acts"><a class="rs-btn rs-btn-p" href="' + r.site + '" target="_blank" rel="noopener">Voir le site <span>&rarr;</span></a></div>';
+      card += '</div></div>';
+      m.bindPopup(card, POPOPTS);
+      m.on('click', function () { select(r.key); });
+      m.on('mouseover', function () { select(r.key); });
+      markers[r.key] = m;
+    });
+    fit();
+  }
+
+  function overview() {
+    current = null;
+    layer.clearLayers();
+    markers = {};
+    var pts = [];
+    Object.keys(CENTRES).forEach(function (k) {
+      var c = CENTRES[k];
+      var m = L.marker([c.campus.lat, c.campus.lon], { icon: overviewIcon(c), zIndexOffset: 400 }).addTo(layer);
+      m.on('click', function () { build(k); try { parent.postMessage({ type: 'astonfly:centre', centre: k }, '*'); } catch (e) {} });
+      markers['centre-' + k] = m;
+      pts.push([c.campus.lat, c.campus.lon]);
+    });
+    map.fitBounds(pts, { padding: [70, 70], animate: false });
+  }
+
+  function overviewIcon(c) {
+    return L.divIcon({ className: '',
+      html: '<div class="rs-pin rs-campus" data-key="centre-' + c.key + '">'
+        + '<span class="rs-dot"></span><span class="rs-lbl">' + c.label + '</span></div>',
+      iconSize: [20, 20], iconAnchor: [10, 10] });
+  }
+
+  function fit() {
+    var pts = [[CAMPUS.lat, CAMPUS.lon]].concat(RES.map(function (r) { return [r.lat, r.lon]; }));
+    if (pts.length === 1) { map.setView(pts[0], 12, { animate: false }); return; }
+    map.fitBounds(pts, { padding: [56, 56], animate: false });
+  }
+
+  function select(key) {
+    Object.keys(markers).forEach(function (k) {
+      var el = markers[k].getElement();
+      if (!el) return;
+      var p = el.querySelector('.rs-pin');
+      if (p) p.classList.toggle('on', k === key);
+    });
+    try { parent.postMessage({ type: 'astonfly:res', key: key }, '*'); } catch (e) {}
+  }
+
+  overview();
+  window.addEventListener('resize', function () { if (current) fit(); else overview(); });
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data || {};
+    if (d.type === 'astonfly:res:centre') { if (CENTRES[d.centre]) build(d.centre); else overview(); }
+    if (d.type === 'astonfly:res:set' && markers[d.key]) { select(d.key); }
+    if (d.type === 'astonfly:res:open' && markers[d.key]) {
+      select(d.key);
+      var mk = markers[d.key];
+      map.once('moveend', function () { mk.openPopup(); });
+      map.panTo(mk.getLatLng(), { animate: true });
+    }
+  });
+</script>
+</body>
+</html>

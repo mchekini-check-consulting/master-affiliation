@@ -1,0 +1,8 @@
+# Dépendances et build
+node_modules/
+dist/
+.astro/
+
+# Export source du site (630 Mo, dont seuls les assets référencés sont
+# repris dans public/ — voir README)
+ASTONFLY.COM/

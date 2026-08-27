@@ -30,7 +30,7 @@ services:
     # le volume partagé, nginx doit relire).
     command: /bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'
     networks:
-      - default   # sites de ce projet (hi-tech-academy, parents-malins, prepa-technique)
+      - default   # sites de ce projet (hi-tech-academy, parents-malins, prepa-technique, astonfly)
       - proxy     # frontends des applications (ex: fidexil-front)
     # Permet au conteneur de joindre des services qui tournent
     # directement sur l'hôte (ex: la landing page pm2 sur le port 3000)
@@ -40,6 +40,7 @@ services:
       - hi-tech-academy
       - parents-malins
       - prepa-technique
+      - astonfly
       - echecs360
       - fidexil-front
       - my-way-front
@@ -144,6 +145,12 @@ services:
     image: ghcr.io/mchekini-check-consulting/master-affiliation/prepa-technique:${PREPA_TECHNIQUE_TAG:-latest}
     build: ./prepa-technique
     container_name: prepa-technique
+    restart: unless-stopped
+
+  astonfly:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/astonfly:${ASTONFLY_TAG:-latest}
+    build: ./astonfly
+    container_name: astonfly
     restart: unless-stopped
 
   # ==========================================================

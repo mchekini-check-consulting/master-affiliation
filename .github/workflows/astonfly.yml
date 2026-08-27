@@ -1,0 +1,20 @@
+# Pipeline du projet astonfly : ne se déclenche que si astonfly/ change sur main.
+name: astonfly
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "astonfly/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-project.yml
+    with:
+      project: astonfly
+    secrets: inherit

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Besoins mondiaux en pilotes</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#EEF4F9; }
+  #map { position:absolute; inset:0; }
+  .wd-tiles { filter:grayscale(1) brightness(1.02) contrast(.96); opacity:.85; }
+  .leaflet-container { font-family:'Archivo', system-ui, sans-serif; background:#EEF4F9; }
+  .leaflet-control-attribution { background:rgba(255,255,255,.72) !important; color:rgba(15,42,67,.55) !important; font-size:10px; }
+  .leaflet-control-attribution a { color:#0A78C6 !important; }
+  .wd-pin { display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .wd-dot { border-radius:50%; background:#00AEEF; border:2px solid #fff; box-shadow:0 0 0 5px rgba(0,174,239,.16), 0 6px 16px -6px rgba(10,120,198,.5); transition:transform .22s ease, box-shadow .22s ease; }
+  .wd-pin.on .wd-dot { transform:scale(1.22); box-shadow:0 0 0 11px rgba(0,174,239,.2), 0 8px 22px -6px rgba(10,120,198,.6); }
+  .wd-val { font-weight:800; font-size:11.5px; color:#0F2A43; background:#fff; border:1px solid #C6DCEC; box-shadow:0 4px 12px -6px rgba(15,42,67,.35); padding:3px 10px; border-radius:999px; white-space:nowrap; opacity:.95; transition:opacity .2s ease, background .2s ease, border-color .2s ease, color .2s ease; }
+  .wd-pin.on .wd-val { opacity:1; background:#0A78C6; border-color:#0A78C6; color:#fff; }
+  .leaflet-popup-content-wrapper { background:#fff; border:1px solid #DCE8F3; border-radius:14px; box-shadow:0 20px 44px -18px rgba(0,0,0,.7); }
+  .leaflet-popup-tip { background:#fff; }
+  .leaflet-popup-content { margin:14px 16px; font-size:12.5px; color:#5A6B7D; line-height:1.55; }
+  .wd-pop-t { font-family:'Archivo', sans-serif; font-weight:800; font-size:14.5px; color:#0F2A43; margin-bottom:2px; }
+  .wd-pop-v { font-weight:800; font-size:13px; color:#0A78C6; margin-bottom:8px; }
+  .wd-legend { position:absolute; left:14px; bottom:14px; z-index:500; display:flex; align-items:center; gap:9px; background:rgba(255,255,255,.86); backdrop-filter:blur(8px); border:1px solid #DCE8F3; box-shadow:0 8px 20px -12px rgba(15,42,67,.35); border-radius:12px; padding:8px 13px; font-family:'Archivo', sans-serif; font-weight:600; font-size:11px; color:#33485B; }
+  .wd-legend i { width:9px; height:9px; border-radius:50%; background:#00AEEF; box-shadow:0 0 0 3px rgba(0,174,239,.16); }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="wd-legend"><i></i>Besoins estimés de nouveaux pilotes</div>
+<script>
+  var REGIONS = [
+    { key: 'eurasie', name: 'Eurasie', v: 149000, lat: 50, lon: 15 },
+    { key: 'chine', name: 'Chine', v: 124000, lat: 34.5, lon: 106 },
+    { key: 'am-nord', name: 'Amérique du Nord', v: 119000, lat: 42, lon: -98 },
+    { key: 'moyen-orient', name: 'Moyen-Orient', v: 67000, lat: 25, lon: 45 },
+    { key: 'asie-se', name: 'Asie du Sud-Est', v: 62000, lat: 2, lon: 110 },
+    { key: 'asie-sud', name: 'Asie du Sud', v: 45000, lat: 22, lon: 78 },
+    { key: 'am-latine', name: 'Amérique latine', v: 37000, lat: -14, lon: -58 },
+    { key: 'afrique', name: 'Afrique', v: 23000, lat: 2, lon: 20 },
+    { key: 'asie-ne', name: 'Asie du Nord-Est', v: 23000, lat: 38, lon: 133 },
+    { key: 'oceanie', name: 'Océanie', v: 11000, lat: -26, lon: 134 }
+  ];
+  var NOTE = "Besoins liés à la croissance du trafic, à l'évolution des flottes et au renouvellement des équipages.";
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function abbr(n) { return Math.round(n / 1000) + ' K'; }
+
+  var map = L.map('map', { scrollWheelZoom: false, zoomControl: false, attributionControl: true, worldCopyJump: false, zoomSnap: 0 });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CARTO', subdomains: 'abcd', maxZoom: 12,
+    className: 'wd-tiles'
+  }).addTo(map);
+  // le cadre est rempli comme un object-fit:cover : on couvre la plus contraignante des deux dimensions
+  var BOUNDS = L.latLngBounds([[-58, -168], [78, 192]]);
+  function fit() {
+    map.fitBounds(BOUNDS, { animate: false, padding: [12, 12] });
+  }
+  fit();
+  window.addEventListener('resize', fit);
+
+  var markers = {};
+  REGIONS.forEach(function (r) {
+    var size = 12 + Math.round((r.v / 149000) * 16);
+    var icon = L.divIcon({
+      className: '',
+      html: '<div class="wd-pin" data-key="' + r.key + '"><span class="wd-dot" style="width:' + size + 'px; height:' + size + 'px;"></span><span class="wd-val">' + abbr(r.v) + '</span></div>',
+      iconSize: [size, size], iconAnchor: [size / 2, size / 2]
+    });
+    var m = L.marker([r.lat, r.lon], { icon: icon, title: r.name }).addTo(map);
+    m.bindPopup('<div class="wd-pop-t">' + r.name + '</div><div class="wd-pop-v">' + fmt(r.v) + ' nouveaux pilotes estimés</div>' + NOTE);
+    m.on('click', function () { select(r.key); });
+    m.on('mouseover', function () { select(r.key); });
+    markers[r.key] = m;
+  });
+
+  function select(key) {
+    Object.keys(markers).forEach(function (k) {
+      var el = markers[k].getElement();
+      if (!el) return;
+      var pin = el.querySelector('.wd-pin');
+      if (pin) pin.classList.toggle('on', k === key);
+    });
+    try { parent.postMessage({ type: 'astonfly:region', key: key }, '*'); } catch (e) {}
+  }
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data || {};
+    if (d.type === 'astonfly:region:set' && markers[d.key]) { select(d.key); markers[d.key].openPopup(); }
+  });
+
+  select('eurasie');
+</script>
+</body>
+</html>

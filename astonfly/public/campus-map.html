@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Réseau de formation Astonfly</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#F4FAFD; }
+  #map { position:absolute; inset:0; }
+  .leaflet-container { font-family:'Archivo', system-ui, sans-serif; background:#EAF3F9; }
+  .af-pin { display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .af-dot { width:14px; height:14px; border-radius:50%; border:3px solid #fff; box-shadow:0 4px 12px -2px rgba(15,42,67,.5); transition:transform .18s ease; }
+  .af-dot.astonfly { background:#00AEEF; }
+  .af-dot.partner { background:#fff; border-color:#00AEEF; }
+  .af-pin.on .af-dot { transform:scale(1.4); box-shadow:0 0 0 8px rgba(0,174,239,.2), 0 6px 16px -4px rgba(0,174,239,.6); }
+  .af-label { font-weight:800; font-size:11px; letter-spacing:.02em; color:#0F2A43; background:rgba(255,255,255,.94); padding:3px 9px; border-radius:999px; white-space:nowrap; box-shadow:0 4px 12px -6px rgba(15,42,67,.5); }
+  .af-pin.on .af-label { background:#0A78C6; color:#fff; }
+  .leaflet-popup-content-wrapper { border-radius:14px; box-shadow:0 20px 44px -22px rgba(15,42,67,.55); }
+  .leaflet-popup-content { margin:14px 16px; font-size:13px; color:#43586B; line-height:1.5; }
+  .af-pop-t { font-family:'Archivo', sans-serif; font-weight:800; font-size:14.5px; color:#0F2A43; margin-bottom:3px; }
+  .af-pop-s { font-weight:700; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#0A78C6; margin-bottom:8px; }
+  .af-legend { position:absolute; left:14px; bottom:14px; z-index:500; display:flex; flex-direction:column; gap:6px; background:rgba(255,255,255,.9); backdrop-filter:blur(8px); border:1px solid #DCEAF4; border-radius:12px; padding:10px 12px; box-shadow:0 10px 26px -14px rgba(15,42,67,.4); }
+  .af-legend span { display:inline-flex; align-items:center; gap:8px; font-family:'Archivo', sans-serif; font-weight:600; font-size:11.5px; color:#33485B; }
+  .af-legend i { width:11px; height:11px; border-radius:50%; border:2px solid #fff; box-shadow:0 2px 6px -2px rgba(15,42,67,.4); }
+  .af-legend i.astonfly { background:#00AEEF; }
+  .af-legend i.partner { background:#fff; border-color:#00AEEF; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="af-legend">
+  <span><i class="astonfly"></i>Campus Astonfly</span>
+  <span><i class="partner"></i>Centre partenaire</span>
+</div>
+<script>
+  var SITES = [
+    { key: 'toussus', name: 'Paris - Toussus-le-Noble', kind: 'astonfly', status: 'Campus Astonfly', lat: 48.7517, lon: 2.1061,
+      phases: 'Phase théorique · Phase pratique — Blocs A, B et C' },
+    { key: 'castellet', name: 'Le Castellet', kind: 'astonfly', status: 'Campus Astonfly', lat: 43.2522, lon: 5.7852,
+      phases: 'Phase pratique — Bloc D' },
+    { key: 'dublin', name: 'Dublin', kind: 'partner', status: 'Centre partenaire', lat: 53.4213, lon: -6.2701,
+      phases: 'Phase pratique — Bloc E (APS MCC)' },
+    { key: 'berlin', name: 'Berlin', kind: 'partner', status: 'Centre partenaire', lat: 52.3667, lon: 13.5033,
+      phases: 'Phase pratique — Bloc E (APS MCC)' }
+  ];
+
+  var map = L.map('map', { scrollWheelZoom: false, zoomControl: true, attributionControl: true });
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 18
+  }).addTo(map);
+
+  var bounds = L.latLngBounds(SITES.map(function (s) { return [s.lat, s.lon]; }));
+  map.fitBounds(bounds, { paddingTopLeft: [60, 40], paddingBottomRight: [40, 90] });
+
+  // Trajectoires depuis Toussus vers les autres sites
+  var hub = SITES[0];
+  SITES.slice(1).forEach(function (s) {
+    L.polyline([[hub.lat, hub.lon], [s.lat, s.lon]], {
+      color: '#00AEEF', weight: 1.6, opacity: .55, dashArray: '5 8'
+    }).addTo(map);
+  });
+
+  var markers = {};
+  SITES.forEach(function (s) {
+    var icon = L.divIcon({
+      className: '',
+      html: '<div class="af-pin" data-key="' + s.key + '"><span class="af-dot ' + s.kind + '"></span><span class="af-label">' + s.name + '</span></div>',
+      iconSize: [10, 10], iconAnchor: [5, 5]
+    });
+    var m = L.marker([s.lat, s.lon], { icon: icon, title: s.name }).addTo(map);
+    m.bindPopup('<div class="af-pop-t">' + s.name + '</div><div class="af-pop-s">' + s.status + '</div>' + s.phases);
+    m.on('click', function () { select(s.key); });
+    markers[s.key] = m;
+  });
+
+  function select(key) {
+    Object.keys(markers).forEach(function (k) {
+      var el = markers[k].getElement();
+      if (!el) return;
+      var pin = el.querySelector('.af-pin');
+      if (pin) pin.classList.toggle('on', k === key);
+    });
+    try { parent.postMessage({ type: 'astonfly:campus', key: key }, '*'); } catch (e) {}
+  }
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data || {};
+    if (d.type === 'astonfly:campus:set' && markers[d.key]) {
+      select(d.key);
+      map.panTo(markers[d.key].getLatLng(), { animate: true });
+    }
+  });
+
+  select('toussus');
+</script>
+</body>
+</html>
