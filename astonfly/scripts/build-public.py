@@ -14,7 +14,25 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "ASTONFLY.COM"
+I18N = ROOT / "i18n"
 DEST = ROOT / "public"
+
+# Versions linguistiques : /  = FR (export original), /en/ = export EN,
+# /pt/ /es/ /it/ /de/ = traductions générées (voir i18n/README.md)
+LANGS = {
+    "en": SRC / "ASTONFLY EN.dc.html",
+    "pt": I18N / "ASTONFLY-PT.html",
+    "es": I18N / "ASTONFLY-ES.html",
+    "it": I18N / "ASTONFLY-IT.html",
+    "de": I18N / "ASTONFLY-DE.html",
+}
+
+# Sélecteur de langue : l'export navigue vers les fichiers .dc.html (cassé une
+# fois déployé) et ignore PT/ES/IT/DE — on le fait naviguer vers /xx/
+SWITCHER_RE = re.compile(
+    r"onClick: \(\) => \{ if \(l\.code === '(?:EN|FR)'\) \{ window\.location\.href = 'ASTONFLY%20[^']+'; return; \} this\.setState\(\{ lang: l\.code, langOpen: false \}\); \},")
+SWITCHER_NEW = ("onClick: () => { var p = { FR: '/', EN: '/en/', PT: '/pt/', ES: '/es/', "
+                "IT: '/it/', DE: '/de/' }[l.code] || '/'; window.location.href = p; },")
 
 ASSET_RE = re.compile(r'(?:images|uploads|models|docs)/[^"\'\\)\s}<>]+')
 # Réécrit les refs relatives en absolues sans toucher aux URLs complètes
@@ -50,18 +68,26 @@ def rewrite(text):
     text = text.replace("if (!v.querySelector('source')) {", "if (false) {")
     text = text.replace("s.src = 'https://astonfly.com/wp-content/uploads/2025/02/Astonfly-Landing-Page.mp4#t=2';",
                         "s.src = '';")
+    text = SWITCHER_RE.sub(SWITCHER_NEW, text)
     return ABS_RE.sub(r'/\1', text)
 
 def main():
     if DEST.exists():
         shutil.rmtree(DEST)
-    (DEST / "en").mkdir(parents=True)
+    DEST.mkdir(parents=True)
 
     fr = (SRC / "ASTONFLY FINAL VERSION.dc.html").read_text(encoding="utf8")
-    en = (SRC / "ASTONFLY EN.dc.html").read_text(encoding="utf8")
-
     (DEST / "index.html").write_text(rewrite(fr), encoding="utf8")
-    (DEST / "en" / "index.html").write_text(rewrite(en), encoding="utf8")
+
+    variants = [fr]
+    for code, path in LANGS.items():
+        if not path.is_file():
+            print(f"ATTENTION : {path.name} absent, /{code}/ non généré")
+            continue
+        text = path.read_text(encoding="utf8")
+        (DEST / code).mkdir()
+        (DEST / code / "index.html").write_text(rewrite(text), encoding="utf8")
+        variants.append(text)
 
     for f in ("support.js", "astonfly-model.js", "image-slot.js",
               ".image-slots.state.json", "campus-map.html", "residences-map.html",
@@ -69,7 +95,7 @@ def main():
         shutil.copy2(SRC / f, DEST / f)
 
     refs = set()
-    for text in (fr, en):
+    for text in variants:
         refs.update(ASSET_RE.findall(text))
     refs = {r.rstrip('.,;:!?') for r in refs}
 

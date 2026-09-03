@@ -12980,7 +12980,7 @@ class Component extends DCLogic {
       langItems: this.languages.map((l) => {
         const active = l.code === this.state.lang;
         return { code: l.code, label: l.label, flag: l.flag,
-          onClick: () => { if (l.code === 'FR') { window.location.href = 'ASTONFLY%20FINAL%20VERSION.dc.html'; return; } this.setState({ lang: l.code, langOpen: false }); },
+          onClick: () => { var p = { FR: '/', EN: '/en/', PT: '/pt/', ES: '/es/', IT: '/it/', DE: '/de/' }[l.code] || '/'; window.location.href = p; },
           itemStyle: { display: 'flex', alignItems: 'center', gap: '9px', width: '100%', textAlign: 'left',
             cursor: 'pointer', border: 'none', borderRadius: '11px', padding: '9px 11px',
             fontFamily: "'Hanken Grotesk',system-ui,sans-serif", fontSize: '13.5px',

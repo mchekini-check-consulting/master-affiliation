@@ -7,9 +7,13 @@ Site vitrine de l'école de pilotage Astonfly — [aston.check-consulting.net](h
   par état, React/Babel chargés depuis unpkg). L'export source complet vit dans
   `ASTONFLY.COM/` (non versionné, ~660 Mo) ; seuls les assets réellement
   référencés sont repris dans `public/` (~110 Mo) par `scripts/build-public.py`.
+- **Langues** : FR (`/`), EN (`/en/`), PT (`/pt/`), ES (`/es/`), IT (`/it/`),
+  DE (`/de/`). FR et EN viennent de l'export ; PT/ES/IT/DE sont générées dans
+  `i18n/` (voir `i18n/README.md`). Le sélecteur de langue navigue entre les
+  préfixes.
 - **Stack** : [Astro](https://astro.build) sert de coquille de build — `public/`
   est copié tel quel dans `dist/`, servi par nginx avec fallback SPA
-  (`/admissions/`, `/formation-…` → `index.html`, `/en/…` → `en/index.html`).
+  (`/admissions/`, `/formation-…` → `index.html`, `/xx/…` → `xx/index.html`).
 - **Service Docker** : `astonfly` (port interne 80, joint par le reverse proxy via le réseau `default`).
 - **Image** : `ghcr.io/mchekini-check-consulting/master-affiliation/astonfly`.
 - **Pipeline** : `.github/workflows/astonfly.yml` (déclenchée si `astonfly/**` change sur `main`).
