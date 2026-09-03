@@ -4,19 +4,21 @@
 const Admin = (() => {
   const API = '/api/v1';
   const LANGUES = [
-    { code: 'en', label: 'English 🇬🇧' },
-    { code: 'pt', label: 'Português 🇵🇹' },
-    { code: 'es', label: 'Español 🇪🇸' },
-    { code: 'it', label: 'Italiano 🇮🇹' },
-    { code: 'de', label: 'Deutsch 🇩🇪' },
+    { code: 'en', label: 'English', drapeau: '🇬🇧' },
+    { code: 'pt', label: 'Português', drapeau: '🇵🇹' },
+    { code: 'es', label: 'Español', drapeau: '🇪🇸' },
+    { code: 'it', label: 'Italiano', drapeau: '🇮🇹' },
+    { code: 'de', label: 'Deutsch', drapeau: '🇩🇪' },
   ];
   const NAV_CIBLES = ['', 'admissions', 'flotte', 'easa', 'cursus', 'ryanair', 'medical', 'employabilite'];
+  const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet',
+    'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 
   let auth = sessionStorage.getItem('astonfly-admin-auth') || '';
   let categories = [];
   let articles = [];
   let evenements = [];
-  let ongletActif = 'articles';
+  let slugEnEdition = null; // slug conservé quand on modifie un article existant
 
   /* ---------- HTTP ---------- */
   async function api(chemin, options = {}) {
@@ -110,22 +112,65 @@ const Admin = (() => {
     return r.url;
   }
 
-  function brancherUpload(idFichier, idUrl) {
+  function brancherUpload(idFichier, idUrl, apres) {
     $(idFichier).addEventListener('change', async (e) => {
       const f = e.target.files[0];
       if (!f) return;
       try {
         $(idUrl).value = await uploader(f);
-        message('Image téléversée');
+        message('Image uploadée');
+        if (apres) apres();
       } catch (err) { message(err.message, true); }
     });
   }
 
   function onglet(nom) {
-    ongletActif = nom;
     ['articles', 'categories', 'evenements'].forEach((o) =>
       $('nav-' + o).classList.toggle('actif', o === nom));
     ({ articles: vueArticles, categories: vueCategories, evenements: vueEvenements })[nom]();
+  }
+
+  /* ---------- Progression de publication / traduction ---------- */
+  function montrerProgression(titre, sous, langues) {
+    $('prog-titre').textContent = titre;
+    $('prog-sous').textContent = sous;
+    const zone = $('prog-langues');
+    zone.innerHTML = langues.map((l) => `
+      <div class="prog-langue" id="prog-${l.code}">
+        <span>${l.drapeau} ${ech(l.label)}</span>
+        <span class="etat">En attente</span>
+      </div>`).join('');
+    $('progression').classList.add('on');
+    // Animation séquentielle : les langues passent « en cours » puis « traduite »
+    // au fil de l'eau (le back traite la requête d'un bloc, l'animation donne
+    // le rythme réel approximatif d'une traduction par langue).
+    clearInterval(montrerProgression._t);
+    let i = 0;
+    const avancer = () => {
+      if (i > 0 && langues[i - 1]) {
+        const prev = $('prog-' + langues[i - 1].code);
+        if (prev) { prev.className = 'prog-langue fait'; prev.querySelector('.etat').textContent = 'Traduite ✓'; }
+      }
+      if (i < langues.length) {
+        const cur = $('prog-' + langues[i].code);
+        if (cur) { cur.className = 'prog-langue encours'; cur.querySelector('.etat').textContent = 'Traduction'; }
+        i++;
+      } else {
+        clearInterval(montrerProgression._t);
+      }
+    };
+    avancer();
+    // la dernière langue reste « en cours » jusqu'à la réponse du serveur
+    montrerProgression._t = setInterval(() => { if (i < langues.length) avancer(); }, 2400);
+  }
+
+  function cacherProgression() {
+    clearInterval(montrerProgression._t);
+    document.querySelectorAll('#prog-langues .prog-langue').forEach((el) => {
+      el.className = 'prog-langue fait';
+      el.querySelector('.etat').textContent = 'Traduite ✓';
+    });
+    setTimeout(() => $('progression').classList.remove('on'), 350);
   }
 
   /* =============================================================
@@ -146,7 +191,7 @@ const Admin = (() => {
           <tbody>
             ${articles.map((a) => `
               <tr>
-                <td style="font-weight:600">${ech(a.titre)}<div style="font-size:12px;color:var(--muted);font-weight:400">${ech(a.slug)}</div></td>
+                <td style="font-weight:600">${ech(a.titre)}</td>
                 <td>${ech(a.categorie)}</td>
                 <td>${ech(a.datePublication)}</td>
                 <td>${a.langues.map((l) => `<span class="pastille p-lang">${l.toUpperCase()}</span>`).join('')}</td>
@@ -189,6 +234,7 @@ const Admin = (() => {
     }
     let article = null;
     if (id) article = await api('/admin/articles/' + id);
+    slugEnEdition = article ? article.slug : null;
     const fr = article ? article.traductions.fr : null;
     const corps = fr ? fr.corps : [{ p: [''] }];
     const languesActives = article ? Object.keys(article.traductions).filter((l) => l !== 'fr') : [];
@@ -198,57 +244,57 @@ const Admin = (() => {
         <h1>${id ? 'Modifier l\'article' : 'Nouvel article'}</h1>
         <button class="btn btn-clair" onclick="Admin.onglet('articles')">← Retour</button>
       </div>
-      <div class="carte">
-        <label>Titre</label>
-        <input type="text" id="a-titre" value="${ech(fr ? fr.titre : '')}" oninput="Admin.majSlug()">
-        <div class="ligne">
-          <div><label>Slug (URL)</label><input type="text" id="a-slug" value="${ech(article ? article.slug : '')}"></div>
-          <div><label>Catégorie</label>
-            <select id="a-categorie">
-              ${categories.map((c) => `<option value="${c.id}" ${article && article.categorieId === c.id ? 'selected' : ''}>${ech(c.noms.fr)}</option>`).join('')}
-            </select></div>
-        </div>
-        <div class="ligne">
-          <div><label>Date de publication</label><input type="date" id="a-date" value="${article ? article.datePublication : new Date().toISOString().slice(0, 10)}"></div>
-          <div><label>Temps de lecture (minutes)</label><input type="number" id="a-minutes" min="1" value="${article ? article.minutesLecture : 5}"></div>
-        </div>
-        <div class="ligne">
-          <div><label>Image d'illustration</label><input type="text" id="a-image" placeholder="/images/… ou téléverser →" value="${ech(article ? article.image : '')}"></div>
-          <div><label>Téléverser une image</label><input type="file" id="a-fichier" accept="image/*"></div>
-        </div>
-        <label>Texte alternatif de l'image</label>
-        <input type="text" id="a-alt" value="${ech(fr ? fr.altImage : '')}">
-        <label>Chapô (accroche affichée sous le titre)</label>
-        <textarea id="a-chapo">${ech(fr ? fr.chapo : '')}</textarea>
+      <div class="editeur">
+        <div class="carte">
+          <label>Titre</label>
+          <input type="text" id="a-titre" value="${ech(fr ? fr.titre : '')}">
+          <div class="ligne">
+            <div><label>Catégorie</label>
+              <select id="a-categorie">
+                ${categories.map((c) => `<option value="${c.id}" ${article && article.categorieId === c.id ? 'selected' : ''}>${ech(c.noms.fr)}</option>`).join('')}
+              </select></div>
+            <div><label>Date de publication</label><input type="date" id="a-date" value="${article ? article.datePublication : new Date().toISOString().slice(0, 10)}"></div>
+          </div>
+          <div class="ligne">
+            <div><label>Temps de lecture (minutes)</label><input type="number" id="a-minutes" min="1" value="${article ? article.minutesLecture : 5}"></div>
+            <div><label>Uploader une image</label><input type="file" id="a-fichier" accept="image/*"></div>
+          </div>
+          <label>Image d'illustration (ou chemin /images/…)</label>
+          <input type="text" id="a-image" placeholder="/images/…" value="${ech(article ? article.image : '')}">
+          <label>Chapô (accroche affichée sous le titre)</label>
+          <textarea id="a-chapo">${ech(fr ? fr.chapo : '')}</textarea>
 
-        <label>Corps de l'article</label>
-        <div class="note">Chaque section a un intertitre optionnel et des paragraphes (un paragraphe par ligne vide). Les blocs « bouton » créent un lien vers une page du site.</div>
-        <div id="a-blocs"></div>
-        <div style="margin-top:12px">
-          <button class="btn btn-clair btn-petit" onclick="Admin.ajouterBloc('section')">+ Section</button>
-          <button class="btn btn-clair btn-petit" onclick="Admin.ajouterBloc('cta')">+ Bouton (CTA)</button>
+          <label>Corps de l'article</label>
+          <div class="note">Chaque section a un intertitre optionnel et des paragraphes (un paragraphe par ligne vide). Les blocs « bouton » créent un lien vers une page du site.</div>
+          <div id="a-blocs"></div>
+          <div style="margin-top:12px">
+            <button class="btn btn-clair btn-petit" onclick="Admin.ajouterBloc('section')">+ Section</button>
+            <button class="btn btn-clair btn-petit" onclick="Admin.ajouterBloc('cta')">+ Bouton (CTA)</button>
+          </div>
+
+          <label>Langues de publication</label>
+          <div class="note">L'article est rédigé en français ; il sera traduit automatiquement vers les langues cochées et affiché sur ces versions du site.</div>
+          <div class="langues">
+            <label class="fixe">🇫🇷 Français (source)</label>
+            ${LANGUES.map((l) => `<label><input type="checkbox" class="a-lang" value="${l.code}" ${languesActives.includes(l.code) ? 'checked' : ''}> ${l.drapeau} ${l.label}</label>`).join('')}
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:28px">
+            <button class="btn btn-clair" onclick="Admin.sauverArticle(${id ?? 'null'}, false)">Enregistrer en brouillon</button>
+            <button class="btn btn-cyan" onclick="Admin.sauverArticle(${id ?? 'null'}, true)">Publier sur le site</button>
+          </div>
         </div>
 
-        <label>Langues de publication</label>
-        <div class="note">L'article est rédigé en français ; il sera traduit automatiquement vers les langues cochées et affiché sur ces versions du site.</div>
-        <div class="langues">
-          <label class="fixe">🇫🇷 Français (source)</label>
-          ${LANGUES.map((l) => `<label><input type="checkbox" class="a-lang" value="${l.code}" ${languesActives.includes(l.code) ? 'checked' : ''}> ${l.label}</label>`).join('')}
-        </div>
-
-        <div style="display:flex;gap:12px;margin-top:28px">
-          <button class="btn btn-clair" onclick="Admin.sauverArticle(${id ?? 'null'}, false)">Enregistrer en brouillon</button>
-          <button class="btn btn-cyan" onclick="Admin.sauverArticle(${id ?? 'null'}, true)">Publier sur le site</button>
+        <div class="visionneuse">
+          <div class="titre-v">Aperçu de l'article sur le site</div>
+          <div class="v-page" id="a-apercu"></div>
         </div>
       </div>`;
 
-    brancherUpload('a-fichier', 'a-image');
+    brancherUpload('a-fichier', 'a-image', apercu);
     corps.forEach((bloc) => ajouterBloc(bloc.ctaLabel !== undefined ? 'cta' : 'section', bloc));
-  }
-
-  function majSlug() {
-    const slug = $('a-slug');
-    if (!slug.dataset.manuel) slug.value = slugifier($('a-titre').value);
+    contenu().addEventListener('input', apercu);
+    apercu();
   }
 
   function ajouterBloc(type, donnees) {
@@ -262,7 +308,7 @@ const Admin = (() => {
         <input type="text" class="b-h" value="${ech(donnees ? donnees.h || '' : '')}">
         <label>Paragraphes</label>
         <textarea class="b-p" rows="5">${ech(donnees && donnees.p ? donnees.p.join('\n\n') : '')}</textarea>
-        <div class="outils"><button class="lien-outil" onclick="this.closest('.bloc').remove()">Supprimer le bloc</button></div>`;
+        <div class="outils"><button class="lien-outil" onclick="this.closest('.bloc').remove(); Admin.apercu()">Supprimer le bloc</button></div>`;
     } else {
       bloc.innerHTML = `
         <label>Texte du bouton</label>
@@ -272,9 +318,10 @@ const Admin = (() => {
             <select class="b-cta-nav">${NAV_CIBLES.map((n) => `<option value="${n}" ${donnees && donnees.ctaNav === n ? 'selected' : ''}>${n || '(accueil)'}</option>`).join('')}</select></div>
           <div><label>Ancre (optionnel)</label><input type="text" class="b-cta-anchor" value="${ech(donnees ? donnees.ctaAnchor || '' : '')}"></div>
         </div>
-        <div class="outils"><button class="lien-outil" onclick="this.closest('.bloc').remove()">Supprimer le bloc</button></div>`;
+        <div class="outils"><button class="lien-outil" onclick="this.closest('.bloc').remove(); Admin.apercu()">Supprimer le bloc</button></div>`;
     }
     zone.appendChild(bloc);
+    apercu();
   }
 
   function lireCorps() {
@@ -295,35 +342,92 @@ const Admin = (() => {
     }).filter((b) => (b.p && b.p.length) || b.h || b.ctaLabel);
   }
 
+  /** Visionneuse : rendu de l'article tel qu'il apparaîtra sur le site. */
+  function apercu() {
+    const cible = $('a-apercu');
+    if (!cible || !$('a-titre')) return;
+    const titre = $('a-titre').value.trim();
+    const image = $('a-image').value.trim();
+    const chapo = $('a-chapo').value.trim();
+    const minutes = $('a-minutes').value || '5';
+    const categorie = $('a-categorie').selectedOptions[0] ? $('a-categorie').selectedOptions[0].textContent : '';
+    const d = $('a-date').value ? new Date($('a-date').value + 'T12:00:00') : new Date();
+    const dateFr = d.getDate() + ' ' + MOIS[d.getMonth()] + ' ' + d.getFullYear();
+    const corps = lireCorps();
+
+    if (!titre && !chapo && corps.length === 0) {
+      cible.innerHTML = '<div class="v-vide">Commencez à rédiger : l\'aperçu se met à jour en direct.</div>';
+      return;
+    }
+    let premierP = true;
+    const corpsHtml = corps.map((b) => {
+      if (b.ctaLabel !== undefined) {
+        return b.ctaLabel ? `<span class="v-cta">${ech(b.ctaLabel)}</span>` : '';
+      }
+      let html = b.h ? `<div class="v-h">${ech(b.h)}</div>` : '';
+      html += (b.p || []).map((p) => {
+        const cls = premierP ? 'v-p lettrine' : 'v-p';
+        premierP = false;
+        return `<p class="${cls}">${ech(p)}</p>`;
+      }).join('');
+      return html;
+    }).join('');
+
+    cible.innerHTML = `
+      ${image ? `<img class="v-img" src="${ech(image)}" alt="" onerror="this.style.display='none'">` : ''}
+      <div class="v-corps">
+        <div class="v-meta">
+          ${categorie ? `<span class="v-cat">${ech(categorie)}</span>` : ''}
+          <span class="v-date">${dateFr} · ${ech(minutes)} min</span>
+        </div>
+        ${titre ? `<h2 class="v-titre">${ech(titre)}</h2>` : ''}
+        ${chapo ? `<p class="v-chapo">${ech(chapo)}</p>` : ''}
+        ${corpsHtml}
+      </div>`;
+  }
+
   async function sauverArticle(id, publier) {
     const corps = lireCorps();
+    const titre = $('a-titre').value.trim();
     const requete = {
-      slug: $('a-slug').value.trim() || slugifier($('a-titre').value),
+      slug: slugEnEdition || slugifier(titre),
       categorieId: Number($('a-categorie').value),
       datePublication: $('a-date').value,
       minutesLecture: Number($('a-minutes').value) || 1,
       image: $('a-image').value.trim(),
       source: {
-        titre: $('a-titre').value.trim(),
+        titre,
         chapo: $('a-chapo').value.trim(),
-        altImage: $('a-alt').value.trim(),
+        // alt généré automatiquement à partir du titre
+        altImage: titre,
         corps,
       },
       langues: Array.from(document.querySelectorAll('.a-lang:checked')).map((c) => c.value),
     };
-    if (!requete.source.titre || !requete.image || !requete.source.chapo || !requete.source.altImage || corps.length === 0) {
-      return message('Titre, image, alt, chapô et au moins un bloc de contenu sont requis', true);
+    if (!requete.source.titre || !requete.image || !requete.source.chapo || corps.length === 0) {
+      return message('Titre, image, chapô et au moins un bloc de contenu sont requis', true);
     }
+    const languesChoisies = LANGUES.filter((l) => requete.langues.includes(l.code));
+    montrerProgression(
+      publier ? 'Publication en cours…' : 'Enregistrement en cours…',
+      languesChoisies.length
+        ? 'L\'article est enregistré puis traduit automatiquement. Ne fermez pas la page.'
+        : 'L\'article est en cours d\'enregistrement.',
+      languesChoisies);
     try {
-      message(requete.langues.length ? 'Enregistrement et traduction en cours…' : 'Enregistrement…');
       const r = await api(id ? '/admin/articles/' + id : '/admin/articles', {
         method: id ? 'PUT' : 'POST',
         body: JSON.stringify(requete),
       });
       if (publier) await api(`/admin/articles/${r.article.id}/publier`, { method: 'POST' });
-      message(r.avertissement || (publier ? 'Article publié sur le site' : 'Brouillon enregistré'), !!r.avertissement);
+      cacherProgression();
+      message(r.avertissement || (publier ? 'Article publié sur le site ✓' : 'Brouillon enregistré ✓'), !!r.avertissement);
       onglet('articles');
-    } catch (e) { message(e.message, true); }
+    } catch (e) {
+      $('progression').classList.remove('on');
+      clearInterval(montrerProgression._t);
+      message(e.message, true);
+    }
   }
 
   /* =============================================================
@@ -364,24 +468,34 @@ const Admin = (() => {
   async function creerCategorie() {
     const nom = $('c-nom').value.trim();
     if (!nom) return;
+    montrerProgression('Création de la catégorie…', 'Traduction automatique du nom dans les autres langues.', LANGUES);
     try {
-      message('Création et traduction…');
       await api('/admin/categories', { method: 'POST', body: JSON.stringify({ nomFr: nom }) });
-      message('Catégorie créée');
+      cacherProgression();
+      message('Catégorie créée ✓');
       vueCategories();
-    } catch (e) { message(e.message, true); }
+    } catch (e) {
+      $('progression').classList.remove('on');
+      clearInterval(montrerProgression._t);
+      message(e.message, true);
+    }
   }
 
   async function renommerCategorie(id) {
     const categorie = categories.find((c) => c.id === id);
     const nom = prompt('Nouveau nom (français) :', categorie.noms.fr);
     if (!nom || !nom.trim()) return;
+    montrerProgression('Mise à jour de la catégorie…', 'Traduction automatique du nom dans les autres langues.', LANGUES);
     try {
-      message('Mise à jour et traduction…');
       await api('/admin/categories/' + id, { method: 'PUT', body: JSON.stringify({ nomFr: nom.trim() }) });
-      message('Catégorie mise à jour');
+      cacherProgression();
+      message('Catégorie mise à jour ✓');
       vueCategories();
-    } catch (e) { message(e.message, true); }
+    } catch (e) {
+      $('progression').classList.remove('on');
+      clearInterval(montrerProgression._t);
+      message(e.message, true);
+    }
   }
 
   async function supprimerCategorie(id) {
@@ -451,8 +565,8 @@ const Admin = (() => {
         <label>Description</label>
         <textarea id="e-desc" placeholder="Visite du campus, simulateurs et rencontres avec les équipes.">${ech(e ? e.description : '')}</textarea>
         <div class="ligne">
-          <div><label>Image</label><input type="text" id="e-image" placeholder="/images/… ou téléverser →" value="${ech(e ? e.image : '')}"></div>
-          <div><label>Téléverser une image</label><input type="file" id="e-fichier" accept="image/*"></div>
+          <div><label>Image (ou chemin /images/…)</label><input type="text" id="e-image" placeholder="/images/…" value="${ech(e ? e.image : '')}"></div>
+          <div><label>Uploader une image</label><input type="file" id="e-fichier" accept="image/*"></div>
         </div>
         <div style="display:flex;gap:12px;margin-top:28px">
           <button class="btn btn-clair" onclick="Admin.sauverEvenement(${id ?? 'null'}, false)">Enregistrer en brouillon</button>
@@ -476,16 +590,24 @@ const Admin = (() => {
         || !requete.description || !requete.image) {
       return message('Tous les champs sont requis', true);
     }
+    montrerProgression(
+      publier ? 'Publication de l\'événement…' : 'Enregistrement de l\'événement…',
+      'L\'événement est traduit automatiquement dans les 5 autres langues. Ne fermez pas la page.',
+      LANGUES);
     try {
-      message('Enregistrement et traduction en cours…');
       const r = await api(id ? '/admin/evenements/' + id : '/admin/evenements', {
         method: id ? 'PUT' : 'POST',
         body: JSON.stringify(requete),
       });
       if (publier) await api(`/admin/evenements/${r.id}/publier`, { method: 'POST' });
-      message(r.avertissement || (publier ? 'Événement publié sur le site' : 'Brouillon enregistré'), !!r.avertissement);
+      cacherProgression();
+      message(r.avertissement || (publier ? 'Événement publié sur le site ✓' : 'Brouillon enregistré ✓'), !!r.avertissement);
       onglet('evenements');
-    } catch (e) { message(e.message, true); }
+    } catch (e) {
+      $('progression').classList.remove('on');
+      clearInterval(montrerProgression._t);
+      message(e.message, true);
+    }
   }
 
   async function basculerEvenement(id, publier) {
@@ -506,16 +628,10 @@ const Admin = (() => {
   }
 
   /* ---------- Init ---------- */
-  document.addEventListener('DOMContentLoaded', () => {
-    const slug = document.body; // délégation : slug modifié à la main → ne plus l'écraser
-    slug.addEventListener('input', (e) => {
-      if (e.target.id === 'a-slug') e.target.dataset.manuel = '1';
-    });
-    demarrer();
-  });
+  document.addEventListener('DOMContentLoaded', demarrer);
 
   return {
-    connecter, deconnecter, onglet, majSlug, ajouterBloc,
+    connecter, deconnecter, onglet, ajouterBloc, apercu,
     editerArticle, sauverArticle, basculerArticle, supprimerArticle,
     creerCategorie, renommerCategorie, supprimerCategorie,
     editerEvenement, sauverEvenement, basculerEvenement, supprimerEvenement,

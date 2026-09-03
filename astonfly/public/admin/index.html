@@ -33,18 +33,22 @@
   aside .logo span { color: var(--cyan); }
   aside .sous { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.45);
     padding: 0 10px 10px; font-family: 'Archivo', sans-serif; font-weight: 700; }
-  aside nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none;
+  aside nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
     border: 0; color: rgba(255,255,255,.78); font-size: 14.5px; font-weight: 600; padding: 12px 14px; border-radius: 12px;
-    cursor: pointer; margin-bottom: 4px; transition: all .15s ease; }
-  aside nav button:hover { background: rgba(255,255,255,.08); color: #fff; }
+    cursor: pointer; margin-bottom: 5px; transition: all .15s ease; }
+  /* Dégradé très léger, différent pour chaque segment, pour les distinguer */
+  #nav-articles   { background: linear-gradient(135deg, rgba(0,174,239,.14), rgba(0,174,239,.05)); }
+  #nav-categories { background: linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.03)); }
+  #nav-evenements { background: linear-gradient(135deg, rgba(241,196,0,.12), rgba(241,196,0,.03)); }
+  aside nav button:hover { color: #fff; filter: brightness(1.35); }
   aside nav button.actif { background: linear-gradient(135deg, var(--cyan), var(--bleu)); color: #fff;
-    box-shadow: 0 10px 22px -10px rgba(0,174,239,.7); }
+    box-shadow: 0 10px 22px -10px rgba(0,174,239,.7); filter: none; }
   aside .bas { margin-top: auto; padding: 10px; }
   aside .bas button { background: none; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.8);
     border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
   aside .bas button:hover { border-color: #fff; color: #fff; }
 
-  main { flex: 1; padding: 34px 40px 60px; max-width: 1060px; }
+  main { flex: 1; padding: 34px 40px 60px; min-width: 0; }
   main h1 { font-size: 26px; letter-spacing: -.5px; margin: 0; }
   .entete { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 
@@ -97,6 +101,55 @@
   .apercu-img { height: 44px; width: 66px; object-fit: cover; border-radius: 8px; border: 1px solid var(--bordure); }
   .actions-td { white-space: nowrap; text-align: right; }
   .actions-td .btn { margin-left: 6px; }
+
+  /* ---- Éditeur d'article : formulaire + visionneuse ---- */
+  .editeur { display: grid; grid-template-columns: minmax(430px, 1fr) minmax(380px, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 1180px) { .editeur { grid-template-columns: 1fr; } }
+  .visionneuse { position: sticky; top: 24px; }
+  .visionneuse .titre-v { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .16em;
+    text-transform: uppercase; color: #9BAEBE; margin-bottom: 10px; }
+  .v-page { background: #fff; border: 1px solid #E7EEF4; border-radius: 22px; overflow: hidden;
+    box-shadow: 0 20px 40px -28px rgba(8,32,79,.18); max-height: calc(100vh - 100px); overflow-y: auto; }
+  .v-img { width: 100%; height: 220px; object-fit: cover; display: block; background: #EAF1F7; }
+  .v-corps { padding: 26px 30px 30px; }
+  .v-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .v-cat { background: #EAF6FD; color: var(--bleu); font-family: 'Archivo', sans-serif; font-weight: 700;
+    font-size: 11.5px; padding: 4px 12px; border-radius: 999px; }
+  .v-date { font-size: 12.5px; color: var(--muted); }
+  .v-titre { font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 23px; line-height: 1.2;
+    letter-spacing: -.5px; color: var(--marine); margin: 0 0 10px; }
+  .v-chapo { font-size: 14.5px; line-height: 1.65; color: var(--muted); margin: 0 0 18px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--bordure); }
+  .v-h { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 17px; color: var(--marine); margin: 20px 0 8px; }
+  .v-p { font-size: 14px; line-height: 1.7; color: var(--texte); margin: 0 0 12px; }
+  .v-p.lettrine::first-letter { font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 40px; float: left;
+    line-height: .85; margin: 3px 8px 0 0; color: var(--bleu); }
+  .v-cta { display: inline-block; background: linear-gradient(135deg, var(--cyan), var(--bleu)); color: #fff;
+    font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 13.5px; padding: 11px 20px; border-radius: 999px;
+    margin-top: 6px; }
+  .v-vide { padding: 40px 24px; text-align: center; color: #9BAEBE; font-size: 13.5px; }
+
+  /* ---- Progression de publication / traduction ---- */
+  #progression { position: fixed; inset: 0; background: rgba(8,36,60,.55); backdrop-filter: blur(3px);
+    display: none; align-items: center; justify-content: center; z-index: 100; }
+  #progression.on { display: flex; }
+  .prog-carte { background: #fff; border-radius: 22px; padding: 36px 44px; width: 420px; text-align: center;
+    box-shadow: 0 40px 90px -30px rgba(4,20,40,.8); }
+  .prog-anneau { width: 54px; height: 54px; margin: 0 auto 18px; border-radius: 50%;
+    border: 4px solid #EAF6FD; border-top-color: var(--cyan); animation: prog-tourne 1s linear infinite; }
+  @keyframes prog-tourne { to { transform: rotate(360deg); } }
+  .prog-carte h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.3px; }
+  .prog-carte .prog-sous { font-size: 13.5px; color: var(--muted); margin: 0 0 18px; }
+  .prog-langues { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+  .prog-langue { display: flex; align-items: center; gap: 10px; font-size: 14px; padding: 9px 14px;
+    border: 1px solid var(--bordure); border-radius: 12px; color: var(--muted); transition: all .25s ease; }
+  .prog-langue .etat { margin-left: auto; font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 11.5px; }
+  .prog-langue.encours { border-color: var(--cyan); background: #EAF6FD; color: var(--marine); }
+  .prog-langue.encours .etat { color: var(--bleu); }
+  .prog-langue.encours .etat::after { content: ''; animation: prog-points 1.2s steps(4) infinite; }
+  @keyframes prog-points { 0% { content: ''; } 25% { content: ' .'; } 50% { content: ' ..'; } 75% { content: ' ...'; } }
+  .prog-langue.fait { border-color: #BFE8D2; background: #F0FBF5; color: var(--marine); }
+  .prog-langue.fait .etat { color: #1E8E5A; }
 </style>
 </head>
 <body>
@@ -132,6 +185,15 @@
 </div>
 
 <div id="message"></div>
+
+<div id="progression">
+  <div class="prog-carte">
+    <div class="prog-anneau"></div>
+    <h2 id="prog-titre">Publication en cours…</h2>
+    <p class="prog-sous" id="prog-sous">Merci de patienter, ne fermez pas la page.</p>
+    <div class="prog-langues" id="prog-langues"></div>
+  </div>
+</div>
 
 <script src="/admin/admin.js"></script>
 </body>
