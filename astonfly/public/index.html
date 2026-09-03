@@ -9825,7 +9825,29 @@ class Component extends DCLogic {
       this._urlBeforeThanks = null;
     } catch (e) {}
   }
-  componentDidMount() {
+  _cmsCharger() {
+    var self = this;
+    var lang = this._seoLang || 'fr';
+    try {
+      fetch('/api/v1/public/articles?lang=' + lang)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (liste) {
+          if (!liste || !liste.length) return;
+          var slugs = {};
+          liste.forEach(function (p) { slugs[p.slug] = true; });
+          self.posts = liste.concat(self.posts.filter(function (p) { return !slugs[p.slug]; }));
+          liste.forEach(function (p) { if (p.cat && self.postCats.indexOf(p.cat) === -1) self.postCats.push(p.cat); });
+          self.setState({});
+        }).catch(function () {});
+      fetch('/api/v1/public/events?lang=' + lang)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (liste) {
+          if (liste && liste.length) { self.events = liste; self.setState({}); }
+        }).catch(function () {});
+    } catch (e) {}
+  }
+
+  componentDidMount() { this._cmsCharger();
     try {
       var h = (window.location.hash || '').replace('#', '');
       var routes = { cgv: 'cgv', mentions: 'mentions', confidentialite: 'confidentialite' };

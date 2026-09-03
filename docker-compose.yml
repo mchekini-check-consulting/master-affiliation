@@ -147,11 +147,70 @@ services:
     container_name: prepa-technique
     restart: unless-stopped
 
+  # ==========================================================
+  # Astonfly — site vitrine + admin (articles, catégories, événements)
+  #   reverse-proxy -> astonfly:80 -> (/api) astonfly-back:8080
+  #                                -> astonfly-db:5432
+  # ==========================================================
+
+  # --- Base de données -------------------------------------
+  astonfly-db:
+    image: postgres:16-alpine
+    container_name: astonfly-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: astonfly
+      POSTGRES_USER: astonfly
+      POSTGRES_PASSWORD: ${ASTONFLY_DB_PASSWORD:-changeme}
+    networks:
+      - astonfly-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U astonfly -d astonfly"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - astonfly-db-data:/var/lib/postgresql/data
+
+  # --- Backend Spring Boot (admin + contenus dynamiques) -----
+  astonfly-back:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/astonfly-back:${ASTONFLY_BACK_TAG:-latest}
+    build: ./astonfly/back
+    container_name: astonfly-back
+    restart: unless-stopped
+    environment:
+      DB_HOST: astonfly-db
+      DB_PORT: "5432"
+      DB_NAME: astonfly
+      DB_USERNAME: astonfly
+      DB_PASSWORD: ${ASTONFLY_DB_PASSWORD:-changeme}
+      ADMIN_EMAIL: ${ASTONFLY_ADMIN_EMAIL:-me.chekini@gmail.com}
+      ADMIN_PASSWORD: ${ASTONFLY_ADMIN_PASSWORD:-test}
+      MEDIA_DIR: /data/media
+      # Traduction automatique des contenus : clé maintenue dans le .env du
+      # serveur par la pipeline (secret GitHub OPENAI_API_KEY). Sans elle, le
+      # contenu reste en français avec un avertissement dans l'admin.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      # Images téléversées depuis l'admin
+      - astonfly-media:/data/media
+    networks:
+      - astonfly-net
+    depends_on:
+      astonfly-db:
+        condition: service_healthy
+
+  # --- Front nginx (site statique + admin, proxifie /api) ----
   astonfly:
     image: ghcr.io/mchekini-check-consulting/master-affiliation/astonfly:${ASTONFLY_TAG:-latest}
     build: ./astonfly
     container_name: astonfly
     restart: unless-stopped
+    networks:
+      - default        # joignable par le reverse proxy
+      - astonfly-net   # pour proxifier /api vers le backend
+    depends_on:
+      - astonfly-back
 
   # ==========================================================
   # Échecs360 — apprentissage des échecs (monolithe Spring Boot)
@@ -527,6 +586,8 @@ networks:
     name: natura-prep-net
   immo-scrapper-net:
     name: immo-scrapper-net
+  astonfly-net:
+    name: astonfly-net
 
 volumes:
   # Certificats Let's Encrypt (écrits par certbot, lus par le reverse proxy)
@@ -547,6 +608,10 @@ volumes:
   natura-prep-db-data:
   # Données PostgreSQL d'Immo Scrapper
   immo-scrapper-db-data:
+  # Données PostgreSQL d'Astonfly (articles, catégories, événements)
+  astonfly-db-data:
+  # Images téléversées depuis l'admin Astonfly
+  astonfly-media:
   # Données n8n (workflows, credentials chiffrés, clé de chiffrement)
   n8n-data:
 #   fidexil-db-data:                          # persistance : à activer plus tard

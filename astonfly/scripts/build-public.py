@@ -34,6 +34,35 @@ SWITCHER_RE = re.compile(
 SWITCHER_NEW = ("onClick: () => { var p = { FR: '/', EN: '/en/', PT: '/pt/', ES: '/es/', "
                 "IT: '/it/', DE: '/de/' }[l.code] || '/'; window.location.href = p; },")
 
+# Contenus dynamiques (admin) : au montage, la SPA charge les articles et les
+# événements publiés depuis l'API dans la langue de la page. Les contenus codés
+# en dur restent le socle : les articles de l'API viennent devant (un slug API
+# remplace le slug codé en dur), les événements de l'API remplacent la liste
+# d'exemple, et l'échec de l'API (dev local sans back) est silencieux.
+CMS_LOADER = """_cmsCharger() {
+    var self = this;
+    var lang = this._seoLang || 'fr';
+    try {
+      fetch('/api/v1/public/articles?lang=' + lang)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (liste) {
+          if (!liste || !liste.length) return;
+          var slugs = {};
+          liste.forEach(function (p) { slugs[p.slug] = true; });
+          self.posts = liste.concat(self.posts.filter(function (p) { return !slugs[p.slug]; }));
+          liste.forEach(function (p) { if (p.cat && self.postCats.indexOf(p.cat) === -1) self.postCats.push(p.cat); });
+          self.setState({});
+        }).catch(function () {});
+      fetch('/api/v1/public/events?lang=' + lang)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (liste) {
+          if (liste && liste.length) { self.events = liste; self.setState({}); }
+        }).catch(function () {});
+    } catch (e) {}
+  }
+
+  componentDidMount() { this._cmsCharger();"""
+
 ASSET_RE = re.compile(r'(?:images|uploads|models|docs)/[^"\'\\)\s}<>]+')
 # Réécrit les refs relatives en absolues sans toucher aux URLs complètes
 # (https://.../images/...) ni aux data URIs base64 (chars alnum + / = -).
@@ -69,6 +98,7 @@ def rewrite(text):
     text = text.replace("s.src = 'https://astonfly.com/wp-content/uploads/2025/02/Astonfly-Landing-Page.mp4#t=2';",
                         "s.src = '';")
     text = SWITCHER_RE.sub(SWITCHER_NEW, text)
+    text = text.replace("componentDidMount() {", CMS_LOADER, 1)
     return ABS_RE.sub(r'/\1', text)
 
 def main():
@@ -93,6 +123,9 @@ def main():
               ".image-slots.state.json", "campus-map.html", "residences-map.html",
               "residences-map-paris.html", "world-demand-map.html"):
         shutil.copy2(SRC / f, DEST / f)
+
+    # Page d'administration (articles, catégories, événements)
+    shutil.copytree(ROOT / "admin", DEST / "admin")
 
     refs = set()
     for text in variants:

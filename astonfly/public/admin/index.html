@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Admin — Astonfly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --encre: #08243C; --marine: #0F2A43; --cyan: #00AEEF; --bleu: #0A78C6;
+    --texte: #43586B; --muted: #5A6B7D; --bordure: #E2ECF4; --fond: #F7FBFD;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Hanken Grotesk', sans-serif; color: var(--marine); background: var(--fond); }
+  h1, h2, h3, .archivo, button { font-family: 'Archivo', sans-serif; }
+
+  /* ---- Connexion ---- */
+  #login { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(900px 600px at 20% 0%, rgba(0,174,239,.18), rgba(0,174,239,0) 60%), var(--encre); }
+  #login .carte { background: #fff; border-radius: 22px; padding: 38px; width: 380px; box-shadow: 0 40px 80px -40px rgba(4,20,40,.7); }
+  #login h1 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.5px; }
+  #login p { margin: 0 0 22px; color: var(--muted); font-size: 14px; }
+
+  /* ---- Coquille ---- */
+  #app { display: none; min-height: 100vh; }
+  #app.on { display: flex; }
+  aside { width: 250px; flex: none; background: linear-gradient(180deg, #0A2C49, var(--encre)); color: #fff;
+    display: flex; flex-direction: column; padding: 26px 16px; position: sticky; top: 0; height: 100vh; }
+  aside .logo { font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -.5px; padding: 0 10px 22px; }
+  aside .logo span { color: var(--cyan); }
+  aside .sous { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.45);
+    padding: 0 10px 10px; font-family: 'Archivo', sans-serif; font-weight: 700; }
+  aside nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none;
+    border: 0; color: rgba(255,255,255,.78); font-size: 14.5px; font-weight: 600; padding: 12px 14px; border-radius: 12px;
+    cursor: pointer; margin-bottom: 4px; transition: all .15s ease; }
+  aside nav button:hover { background: rgba(255,255,255,.08); color: #fff; }
+  aside nav button.actif { background: linear-gradient(135deg, var(--cyan), var(--bleu)); color: #fff;
+    box-shadow: 0 10px 22px -10px rgba(0,174,239,.7); }
+  aside .bas { margin-top: auto; padding: 10px; }
+  aside .bas button { background: none; border: 1px solid rgba(255,255,255,.25); color: rgba(255,255,255,.8);
+    border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
+  aside .bas button:hover { border-color: #fff; color: #fff; }
+
+  main { flex: 1; padding: 34px 40px 60px; max-width: 1060px; }
+  main h1 { font-size: 26px; letter-spacing: -.5px; margin: 0; }
+  .entete { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+
+  /* ---- Composants ---- */
+  .btn { border: 0; border-radius: 999px; padding: 11px 22px; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform .15s ease; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-cyan { background: linear-gradient(135deg, var(--cyan), var(--bleu)); color: #fff; box-shadow: 0 14px 28px -12px rgba(0,174,239,.7); }
+  .btn-clair { background: #fff; color: var(--bleu); border: 1px solid var(--bordure); }
+  .btn-danger { background: #fff; color: #C0392B; border: 1px solid #F2D4CF; }
+  .btn-petit { padding: 7px 14px; font-size: 12.5px; }
+  .carte { background: #fff; border: 1px solid #E7EEF4; border-radius: 22px; padding: 26px; box-shadow: 0 20px 40px -28px rgba(8,32,79,.18); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-family: 'Archivo', sans-serif; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: #9BAEBE; padding: 0 12px 12px; border-bottom: 1px solid var(--bordure); }
+  td { padding: 13px 12px; border-bottom: 1px solid #EEF4F9; font-size: 14px; vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  .pastille { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; font-family: 'Archivo', sans-serif; }
+  .p-publie { background: #E7F8EF; color: #1E8E5A; }
+  .p-brouillon { background: #FFF4E0; color: #B26A00; }
+  .p-lang { background: #EAF6FD; color: var(--bleu); margin-right: 4px; }
+
+  label { display: block; font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .04em;
+    color: var(--marine); margin: 16px 0 6px; }
+  input[type=text], input[type=date], input[type=number], textarea, select {
+    width: 100%; border: 1px solid var(--bordure); border-radius: 12px; padding: 11px 14px; font-size: 14px;
+    font-family: 'Hanken Grotesk', sans-serif; color: var(--marine); background: #fff; outline: none; }
+  input:focus, textarea:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,174,239,.15); }
+  textarea { resize: vertical; min-height: 80px; }
+  .ligne { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+  .ligne3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 18px; }
+
+  .bloc { border: 1px solid var(--bordure); border-left: 3px solid var(--cyan); border-radius: 14px; padding: 6px 16px 16px; margin-top: 12px; background: #FBFDFF; }
+  .bloc .outils { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+  .lien-outil { background: none; border: 0; color: var(--muted); font-size: 12px; cursor: pointer; font-weight: 600; }
+  .lien-outil:hover { color: #C0392B; }
+
+  .langues { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .langues label { display: inline-flex; align-items: center; gap: 7px; margin: 0; border: 1px solid var(--bordure);
+    border-radius: 999px; padding: 8px 16px; cursor: pointer; font-size: 13px; background: #fff; }
+  .langues label:has(input:checked) { border-color: var(--cyan); background: #EAF6FD; color: var(--bleu); }
+  .langues label.fixe { background: #EAF6FD; border-color: #9FD9F6; color: var(--bleu); cursor: default; }
+
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  #message { position: fixed; bottom: 24px; right: 24px; max-width: 420px; background: var(--encre); color: #fff;
+    border-radius: 14px; padding: 14px 20px; font-size: 14px; box-shadow: 0 24px 48px -20px rgba(4,20,40,.8);
+    opacity: 0; transform: translateY(8px); transition: all .25s ease; pointer-events: none; z-index: 50; }
+  #message.on { opacity: 1; transform: none; }
+  #message.erreur { background: #7C2D22; }
+  .vide { text-align: center; color: var(--muted); padding: 36px 0; font-size: 14.5px; }
+  .apercu-img { height: 44px; width: 66px; object-fit: cover; border-radius: 8px; border: 1px solid var(--bordure); }
+  .actions-td { white-space: nowrap; text-align: right; }
+  .actions-td .btn { margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <form class="carte" onsubmit="return Admin.connecter(event)">
+    <h1>ASTONFLY<span style="color:var(--cyan)">.</span> Admin</h1>
+    <p>Espace d'administration du site vitrine</p>
+    <label>E-mail</label>
+    <input type="text" id="login-email" autocomplete="username" required>
+    <label>Mot de passe</label>
+    <input type="password" id="login-mdp" autocomplete="current-password" required
+      style="width:100%;border:1px solid var(--bordure);border-radius:12px;padding:11px 14px;font-size:14px;font-family:'Hanken Grotesk',sans-serif;">
+    <div id="login-erreur" style="color:#C0392B;font-size:13px;min-height:18px;margin-top:8px"></div>
+    <button class="btn btn-cyan" style="width:100%;margin-top:8px">Se connecter</button>
+  </form>
+</div>
+
+<div id="app">
+  <aside>
+    <div class="logo">ASTONFLY<span>.</span></div>
+    <div class="sous">Administration</div>
+    <nav>
+      <button id="nav-articles" class="actif" onclick="Admin.onglet('articles')">📝 Articles de blog</button>
+      <button id="nav-categories" onclick="Admin.onglet('categories')">🏷️ Catégories</button>
+      <button id="nav-evenements" onclick="Admin.onglet('evenements')">📅 Événements</button>
+    </nav>
+    <div class="bas">
+      <button onclick="Admin.deconnecter()">Se déconnecter</button>
+    </div>
+  </aside>
+  <main id="contenu"></main>
+</div>
+
+<div id="message"></div>
+
+<script src="/admin/admin.js"></script>
+</body>
+</html>
