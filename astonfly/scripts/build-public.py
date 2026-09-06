@@ -127,6 +127,10 @@ def main():
     # Page d'administration (articles, catégories, événements)
     shutil.copytree(ROOT / "admin", DEST / "admin")
 
+    # Rapport d'audit QA (fichier autonome), servi sous /audit
+    (DEST / "audit").mkdir()
+    shutil.copy2(ROOT / "rapport-astonfly-standalone.html", DEST / "audit" / "index.html")
+
     refs = set()
     for text in variants:
         refs.update(ASSET_RE.findall(text))
