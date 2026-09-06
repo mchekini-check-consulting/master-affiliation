@@ -307,26 +307,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 28px 24px 60px; }
     </div>
   </section>
 
-  <!-- Filtres -->
-  <section class="filters" aria-label="Filtres">
-    <div class="filter-row">
-      <input type="search" id="search" placeholder="Rechercher un bug (titre, description, page…)" aria-label="Recherche">
-    </div>
-    <div class="filter-row">
-      <div class="filter-group" id="filter-severite" data-label="Sévérité"></div>
-      <div class="filter-group" id="filter-categorie" data-label="Catégorie"></div>
-      <div class="filter-group" id="filter-device" data-label="Device"></div>
-      <button id="reset-filters" class="reset-btn">Réinitialiser</button>
-    </div>
-    <p class="result-count" id="result-count"></p>
-  </section>
-
   <!-- Liste des bugs -->
   <section id="bug-list" class="bug-list" aria-live="polite"></section>
 
-  <!-- Avis sur le design -->
+  <!-- Quelques avis / propositions -->
   <section class="design-review">
-    <h2>Avis sur le design</h2>
+    <h2>Quelques avis / propositions</h2>
     <div class="design-cards">
       <article class="design-card">
         <h3>Le hero</h3>
@@ -813,41 +799,6 @@ window.SCREENSHOT_DATA = {"screenshots/bug-devis-echec-soumission.png":"data:ima
   // ---------- Filtres ----------
   const state = { severite: new Set(), categorie: new Set(), device: new Set(), search: '' };
 
-  function buildChips(containerId, values, key, extraClass) {
-    const wrap = document.getElementById(containerId);
-    values.forEach(v => {
-      const chip = document.createElement('button');
-      chip.className = 'chip' + (extraClass ? ' ' + extraClass + '-' + v : '');
-      chip.textContent = v;
-      chip.setAttribute('aria-pressed', 'false');
-      chip.addEventListener('click', () => {
-        if (state[key].has(v)) state[key].delete(v); else state[key].add(v);
-        chip.classList.toggle('active');
-        chip.setAttribute('aria-pressed', state[key].has(v));
-        render();
-      });
-      wrap.appendChild(chip);
-    });
-  }
-
-  const severites = ['critique', 'majeur', 'mineur'];
-  const categories = [...new Set(bugs.map(b => b.categorie))].sort();
-  const devices = [...new Set(bugs.map(b => b.device))].sort();
-  buildChips('filter-severite', severites, 'severite', 'sev');
-  buildChips('filter-categorie', categories, 'categorie');
-  buildChips('filter-device', devices, 'device');
-
-  document.getElementById('search').addEventListener('input', e => {
-    state.search = e.target.value.trim().toLowerCase();
-    render();
-  });
-
-  document.getElementById('reset-filters').addEventListener('click', () => {
-    state.severite.clear(); state.categorie.clear(); state.device.clear(); state.search = '';
-    document.getElementById('search').value = '';
-    document.querySelectorAll('.chip.active').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-pressed', 'false'); });
-    render();
-  });
 
   function matches(b) {
     if (state.severite.size && !state.severite.has(b.severite)) return false;
@@ -866,8 +817,6 @@ window.SCREENSHOT_DATA = {"screenshots/bug-devis-echec-soumission.png":"data:ima
 
   function render() {
     const filtered = bugs.filter(matches).sort((a, b) => sevOrder[a.severite] - sevOrder[b.severite] || a.id.localeCompare(b.id));
-    document.getElementById('result-count').textContent =
-      filtered.length + ' bug' + (filtered.length > 1 ? 's' : '') + ' affiché' + (filtered.length > 1 ? 's' : '') + ' sur ' + bugs.length;
     list.innerHTML = '';
     if (!filtered.length) {
       list.innerHTML = '<p class="no-result">Aucun bug ne correspond aux filtres sélectionnés.</p>';
