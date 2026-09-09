@@ -197,7 +197,7 @@ export default function FormationsSection() {
             Découvrir notre Catalogue
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08] mb-4"
+            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-4"
             style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
             Explorer nos{' '}

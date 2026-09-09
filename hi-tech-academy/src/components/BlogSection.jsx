@@ -34,7 +34,7 @@ export default function BlogSection() {
             Blog & Actualités
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08]"
+            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15]"
             style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             
             Nos Derniers{' '}

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight, Award, BadgeCheck, Check, ChevronLeft, FileText, Landmark,
+  ArrowRight, Award, BadgeCheck, Check, FileText, Landmark,
   ShieldCheck, Sparkles, Users, X,
 } from 'lucide-react';
 import {
@@ -14,33 +14,21 @@ import Footer from '@/components/Footer';
 import { formations, getFormationById } from '@/data/formations';
 import { getVenteById } from '@/data/ventes';
 import PageNotFound from '@/lib/PageNotFound';
-
-const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
-const bodyFont = { fontFamily: "'Inter', sans-serif" };
+import {
+  INK, NAVY, TEAL, ACCENT, BODY, BODY_DARK, KEYWORD_GRADIENT,
+  SectionHeading, Starfield, Pill, headingFont, bodyFont,
+} from '@/components/design';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
 
-function SectionTitle({ kicker, children }) {
-  return (
-    <div className="text-center mb-10">
-      {kicker && (
-        <span className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3" style={{ color: '#002d74', ...headingFont }}>
-          {kicker}
-        </span>
-      )}
-      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight" style={{ color: '#001a4a', ...headingFont }}>
-        {children}
-      </h2>
-    </div>
-  );
-}
-
-// Page de vente d'une formation (modèle « bénéfice + curiosité ») :
-// accroche, promesse, programme réécrit, cible, CTA — plus la certification
-// Qualiopi et les informations réglementaires officielles.
+// Page de vente d'une formation, dans la grammaire « Onlineformapro » :
+// héro sombre pleine largeur à titre géant centré, carte de faits clés en
+// chevauchement, bandes alternées clair/sombre, pilules — le contenu suit le
+// modèle « bénéfice + curiosité » (accroche, promesse, programme réécrit,
+// cible, CTA) + certification Qualiopi et informations réglementaires.
 export default function FormationVente() {
   const { formationId } = useParams();
   const formation = getFormationById(formationId);
@@ -61,116 +49,81 @@ export default function FormationVente() {
       <TopBar />
       <Header />
 
-      <main className="pt-32 pb-0">
-
-        {/* ---------- Hero : accroche + promesse + CTA ---------- */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-          <Link
-            to="/formations"
-            className="inline-flex items-center gap-1 text-sm font-semibold mb-6"
-            style={{ color: '#6b7a9b', ...headingFont }}>
-            <ChevronLeft className="w-4 h-4" /> Toutes les formations
-          </Link>
-
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
+      <main>
+        {/* ---------- Héro sombre : l'accroche marketing, rien d'autre ---------- */}
+        <section className="relative overflow-hidden" style={{ background: INK }}>
+          <Starfield />
+          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-44 pb-48 text-center">
             <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ background: '#f0f3fa', color: '#005064', ...headingFont }}>
-                  {formation.tag}
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-10">
+                <span
+                  className="text-[11px] font-extrabold uppercase tracking-[0.3em]"
+                  style={{
+                    background: KEYWORD_GRADIENT,
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    ...headingFont,
+                  }}>
+                  {formation.title}
                 </span>
-                <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: '#005064', ...headingFont }}>
+                <span className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-[0.2em]" style={{ color: ACCENT, ...headingFont }}>
                   <BadgeCheck className="w-4 h-4" /> Certifié Qualiopi
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-[3rem] font-extrabold tracking-tight leading-[1.08] mb-5" style={{ color: '#001a4a', ...headingFont }}>
+              <h1
+                className="text-3xl sm:text-5xl lg:text-[3.75rem] font-extrabold tracking-tight leading-[1.14] text-white mb-12"
+                style={headingFont}>
                 {vente.accroche}
               </h1>
-              <p className="text-base leading-relaxed mb-8" style={{ color: '#4a5b7a', ...bodyFont }}>
-                {vente.promesse}
-              </p>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  to={`/inscription/${formation.id}`}
-                  className="flex items-center justify-center gap-2 px-7 py-4 rounded-xl font-bold text-sm text-black transition-all hover:opacity-90 hover:shadow-lg"
-                  style={{ background: '#F8B102', ...headingFont }}>
-                  Demander mon inscription
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <a
-                  href={formation.pdf}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-7 py-4 rounded-xl font-bold text-sm"
-                  style={{ background: 'white', color: '#005064', border: '1.5px solid #005064', ...headingFont }}>
-                  <FileText className="w-4 h-4" />
-                  Programme officiel (PDF)
-                </a>
-              </div>
-              <p className="text-xs mt-4" style={{ color: '#6b7a9b', ...bodyFont }}>
-                Réponse sous 24 h ouvrées · Délai d'accès : 1 jour minimum · {formation.version}
-              </p>
-            </motion.div>
-
-            <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-              <div className="rounded-3xl overflow-hidden" style={{ border: '1px solid #e0e8f4', boxShadow: '0 8px 24px rgba(0,80,100,0.10)' }}>
-                <img src={formation.image} alt={formation.title} className="w-full object-cover" style={{ height: 260 }} />
-                <div className="grid grid-cols-2 gap-px" style={{ background: '#e0e8f4' }}>
-                  {formation.keyFacts.map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="flex items-start gap-2.5 p-4 bg-white">
-                      <Icon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: '#005064' }} />
-                      <div>
-                        <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: '#005064', ...headingFont }}>{label}</p>
-                        <p className="text-xs leading-snug" style={{ color: '#0f2e2f', ...bodyFont }}>{value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Pill as={Link} to={`/inscription/${formation.id}`}>
+                  Demander mon inscription <ArrowRight className="w-4 h-4" />
+                </Pill>
+                <Pill as="a" href={formation.pdf} target="_blank" rel="noopener noreferrer" variant="secondary" dark>
+                  <FileText className="w-4 h-4" /> Programme officiel (PDF)
+                </Pill>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* ---------- Bandeau Qualiopi / financement ---------- */}
-        <section style={{ background: '#001a4a' }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid sm:grid-cols-3 gap-8">
-            {[
-              {
-                icon: BadgeCheck,
-                titre: 'Certification Qualiopi',
-                texte: 'Hi-Tech Academy est un organisme de formation certifié Qualiopi au titre des actions de formation — le gage d’un processus qualité audité.',
-              },
-              {
-                icon: Landmark,
-                titre: 'Finançable par votre OPCO',
-                texte: 'La certification Qualiopi rend cette formation éligible aux financements (OPCO, budget formation de votre entreprise). Nous vous aidons à monter le dossier.',
-              },
-              {
-                icon: Award,
-                titre: 'Acquis évalués et attestés',
-                texte: 'Test de positionnement, évaluations pendant la formation, évaluation finale : vous repartez avec une attestation qui mentionne vos résultats.',
-              },
-            ].map(({ icon: Icon, titre, texte }) => (
-              <div key={titre} className="flex gap-4">
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(248,177,2,0.15)' }}>
-                  <Icon className="w-5 h-5" style={{ color: '#F8B102' }} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm mb-1 text-white" style={headingFont}>{titre}</h3>
-                  <p className="text-xs leading-relaxed" style={{ color: '#c9d6ee', ...bodyFont }}>{texte}</p>
-                </div>
+        {/* ---------- Carte faits clés en chevauchement ---------- */}
+        <section className="bg-white">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 -mt-24 relative z-20 pb-4">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="rounded-3xl overflow-hidden bg-white"
+              style={{ border: '1px solid #e6eaf4', boxShadow: '0 24px 60px rgba(6,7,31,0.25)' }}>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: '#e6eaf4' }}>
+                {formation.keyFacts.map(({ icon: Icon, label, value }) => (
+                  <div key={label} className="flex items-start gap-3 p-5 bg-white">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(0,80,100,0.08)' }}>
+                      <Icon className="w-4 h-4" style={{ color: TEAL }} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-extrabold uppercase tracking-[0.15em]" style={{ color: TEAL, ...headingFont }}>{label}</p>
+                      <p className="text-xs leading-snug mt-0.5" style={{ color: NAVY, ...bodyFont }}>{value}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </motion.div>
           </div>
         </section>
 
         {/* ---------- Programme (bénéfice + curiosité) ---------- */}
-        <section className="py-16 sm:py-20" style={{ background: '#f7f9fd' }}>
+        <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <SectionTitle kicker="Le programme">Ce que vous allez apprendre — et gagner</SectionTitle>
+            <SectionHeading kicker="Le programme" sub={vente.promesse}>
+              Ce que vous allez apprendre — <span style={{ color: TEAL }}>et gagner</span>
+            </SectionHeading>
 
-            <div className="space-y-8">
+            <div className="space-y-7">
               {vente.clusters.map((cluster) => (
                 <motion.div
                   key={cluster.titre}
@@ -178,9 +131,9 @@ export default function FormationVente() {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
-                  className="rounded-3xl p-6 sm:p-8 bg-white"
-                  style={{ border: '1px solid #e0e8f4' }}>
-                  <h3 className="font-bold text-lg mb-5" style={{ color: '#001a4a', ...headingFont }}>
+                  className="rounded-3xl p-6 sm:p-8"
+                  style={{ background: '#f7f9fd', border: '1px solid #e6eaf4' }}>
+                  <h3 className="font-extrabold text-lg sm:text-xl mb-5" style={{ color: NAVY, ...headingFont }}>
                     <span className="mr-2">{cluster.emoji}</span>
                     {cluster.titre}
                   </h3>
@@ -190,8 +143,8 @@ export default function FormationVente() {
                       return (
                         <li key={item} className="flex items-start gap-3">
                           <span
-                            className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5"
-                            style={{ background: '#f0f3fa', color: '#005064', ...headingFont }}>
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold shrink-0 mt-0.5"
+                            style={{ background: ACCENT, color: '#0b0b0b', ...headingFont }}>
                             {itemNumber}
                           </span>
                           <span className="text-sm leading-relaxed" style={{ color: '#33415e', ...bodyFont }}>{item}</span>
@@ -203,19 +156,66 @@ export default function FormationVente() {
               ))}
             </div>
 
-            <p className="text-center text-sm mt-8" style={{ color: '#6b7a9b', ...bodyFont }}>
+            <p className="text-center text-sm mt-9" style={{ color: BODY, ...bodyFont }}>
               Le détail réglementaire complet (séquences, durées, modalités d'évaluation) figure dans le{' '}
-              <a href={formation.pdf} target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: '#005064' }}>
+              <a href={formation.pdf} target="_blank" rel="noopener noreferrer" className="underline font-bold" style={{ color: TEAL }}>
                 programme officiel (PDF)
               </a>.
             </p>
           </div>
         </section>
 
-        {/* ---------- Pourquoi Hi-Tech Academy (arguments marketing) ---------- */}
-        <section className="py-16 sm:py-20 bg-white">
+        {/* ---------- Bande sombre : Qualiopi / financement ---------- */}
+        <section className="relative overflow-hidden py-16 sm:py-20" style={{ background: INK }}>
+          <Starfield />
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+            <SectionHeading
+              dark
+              kicker="Qualité et financement"
+              sub="Une formation certifiée, finançable et évaluée — pas une simple promesse marketing.">
+              Certifié Qualiopi, <span style={{ background: KEYWORD_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>finançable OPCO</span>
+            </SectionHeading>
+            <div className="grid sm:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: BadgeCheck,
+                  titre: 'Certification Qualiopi',
+                  texte: 'Hi-Tech Academy est un organisme de formation certifié Qualiopi au titre des actions de formation — le gage d’un processus qualité audité.',
+                },
+                {
+                  icon: Landmark,
+                  titre: 'Finançable par votre OPCO',
+                  texte: 'La certification Qualiopi rend cette formation éligible aux financements (OPCO, budget formation). Nous montons le dossier avec vous, avec zéro avance possible grâce à la subrogation.',
+                },
+                {
+                  icon: Award,
+                  titre: 'Acquis évalués et attestés',
+                  texte: 'Test de positionnement, évaluations pendant la formation, évaluation finale : vous repartez avec une attestation qui mentionne vos résultats.',
+                },
+              ].map(({ icon: Icon, titre, texte }) => (
+                <div key={titre} className="rounded-3xl p-7" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(248,177,2,0.15)' }}>
+                    <Icon className="w-5 h-5" style={{ color: ACCENT }} />
+                  </div>
+                  <h3 className="font-extrabold text-base mb-2 text-white" style={headingFont}>{titre}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: BODY_DARK, ...bodyFont }}>{texte}</p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-10">
+              <Pill as={Link} to="/financements" variant="secondary" dark>
+                Tout savoir sur les financements <ArrowRight className="w-4 h-4" />
+              </Pill>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- Pourquoi Hi-Tech Academy ---------- */}
+        <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <SectionTitle kicker="Pourquoi nous">Une formation conçue pour que vous réussissiez</SectionTitle>
+            <SectionHeading kicker="Pourquoi nous">
+              Une formation conçue pour que <span style={{ color: TEAL }}>vous réussissiez</span>
+            </SectionHeading>
             <div className="grid sm:grid-cols-2 gap-4">
               {[
                 ...vente.argumentsMarketing.map((texte) => ({ icon: Sparkles, texte })),
@@ -223,8 +223,8 @@ export default function FormationVente() {
                 { icon: ShieldCheck, texte: 'Suivi Qualiopi complet : analyse du besoin, positionnement, évaluations, satisfaction à chaud et à froid' },
                 { icon: BadgeCheck, texte: 'Accessible aux personnes en situation de handicap — référent handicap dédié' },
               ].map(({ icon: Icon, texte }) => (
-                <div key={texte} className="flex items-start gap-3 rounded-2xl p-5" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
-                  <Icon className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#005064' }} />
+                <div key={texte} className="flex items-start gap-3 rounded-2xl p-5" style={{ background: '#f7f9fd', border: '1px solid #e6eaf4' }}>
+                  <Icon className="w-5 h-5 shrink-0 mt-0.5" style={{ color: TEAL }} />
                   <p className="text-sm leading-relaxed" style={{ color: '#33415e', ...bodyFont }}>{texte}</p>
                 </div>
               ))}
@@ -233,26 +233,28 @@ export default function FormationVente() {
         </section>
 
         {/* ---------- Cible ---------- */}
-        <section className="py-16 sm:py-20" style={{ background: '#f7f9fd' }}>
+        <section className="py-16 sm:py-24" style={{ background: '#f7f9fd' }}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <SectionTitle kicker="La bonne formation, pour la bonne personne">Est-elle faite pour vous ?</SectionTitle>
+            <SectionHeading kicker="La bonne formation, pour la bonne personne">
+              Est-elle faite <span style={{ color: TEAL }}>pour vous</span> ?
+            </SectionHeading>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="rounded-3xl p-6 sm:p-8 bg-white" style={{ border: '1px solid #e0e8f4' }}>
-                <h3 className="font-bold text-base mb-5" style={{ color: '#005064', ...headingFont }}>
+              <div className="rounded-3xl p-6 sm:p-8 bg-white" style={{ border: '1px solid #e6eaf4' }}>
+                <h3 className="font-extrabold text-base mb-5" style={{ color: TEAL, ...headingFont }}>
                   ✅ C'est fait pour vous si…
                 </h3>
                 <ul className="space-y-3.5">
                   {vente.cible.pour.map((p) => (
                     <li key={p} className="flex items-start gap-3">
-                      <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: '#005064' }} />
+                      <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: TEAL }} />
                       <span className="text-sm leading-relaxed" style={{ color: '#33415e', ...bodyFont }}>{p}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="rounded-3xl p-6 sm:p-8 bg-white" style={{ border: '1px solid #e0e8f4' }}>
-                <h3 className="font-bold text-base mb-5" style={{ color: '#a12626', ...headingFont }}>
+              <div className="rounded-3xl p-6 sm:p-8 bg-white" style={{ border: '1px solid #e6eaf4' }}>
+                <h3 className="font-extrabold text-base mb-5" style={{ color: '#a12626', ...headingFont }}>
                   ❌ Ce n'est PAS pour vous si…
                 </h3>
                 <ul className="space-y-4">
@@ -266,7 +268,7 @@ export default function FormationVente() {
                           {autre && (
                             <>
                               {' — '}
-                              <Link to={`/formations/${autre.id}`} className="font-semibold underline" style={{ color: '#005064' }}>
+                              <Link to={`/formations/${autre.id}`} className="font-bold underline" style={{ color: TEAL }}>
                                 découvrez plutôt « {autre.title} »
                               </Link>
                             </>
@@ -276,7 +278,7 @@ export default function FormationVente() {
                     );
                   })}
                 </ul>
-                <p className="text-xs mt-5" style={{ color: '#6b7a9b', ...bodyFont }}>
+                <p className="text-xs mt-5" style={{ color: BODY, ...bodyFont }}>
                   Un doute sur votre profil ? Le test de positionnement (non éliminatoire) et un échange avec
                   le formateur valident votre point de départ avant tout engagement.
                 </p>
@@ -286,21 +288,24 @@ export default function FormationVente() {
         </section>
 
         {/* ---------- Informations réglementaires ---------- */}
-        <section className="py-16 sm:py-20 bg-white">
+        <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <SectionTitle kicker="Transparence Qualiopi">Les informations réglementaires complètes</SectionTitle>
-            <div className="rounded-3xl p-6 sm:p-8" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
-              <p className="text-sm mb-4" style={{ color: '#6b7a9b', ...bodyFont }}>
+            <SectionHeading kicker="Transparence Qualiopi">
+              Les informations <span style={{ color: TEAL }}>réglementaires</span> complètes
+            </SectionHeading>
+            <div className="rounded-3xl p-6 sm:p-8" style={{ background: '#f7f9fd', border: '1px solid #e6eaf4' }}>
+              <p className="text-sm mb-4" style={{ color: BODY, ...bodyFont }}>
                 Action de formation concourant au développement des compétences (art. L.6313-1 du Code du travail).
+                {' '}{formation.version} · Réponse sous 24 h ouvrées · Délai d'accès : 1 jour minimum.
               </p>
               <Accordion type="single" collapsible className="w-full">
                 {formation.qualiopiSections.map((s) => (
                   <AccordionItem key={s.id} value={s.id}>
-                    <AccordionTrigger className="text-sm font-semibold text-left" style={{ color: '#002d74', ...headingFont }}>
+                    <AccordionTrigger className="text-sm font-bold text-left" style={{ color: NAVY, ...headingFont }}>
                       {s.title}
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="text-sm leading-relaxed" style={{ color: '#6b7a9b', ...bodyFont }}>{s.content}</div>
+                      <div className="text-sm leading-relaxed" style={{ color: BODY, ...bodyFont }}>{s.content}</div>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
@@ -309,34 +314,24 @@ export default function FormationVente() {
           </div>
         </section>
 
-        {/* ---------- CTA final ---------- */}
-        <section style={{ background: '#001a4a' }}>
+        {/* ---------- CTA final : bande gradient pleine largeur ---------- */}
+        <section style={{ background: 'linear-gradient(120deg, #06071f 0%, #005064 48%, #b7791f 100%)' }}>
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4" style={headingFont}>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-4" style={headingFont}>
               {vente.ctaProjection}
             </h2>
-            <p className="text-sm mb-8" style={{ color: '#c9d6ee', ...bodyFont }}>
+            <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.8)', ...bodyFont }}>
               {vente.ctaUrgence}
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                to={`/inscription/${formation.id}`}
-                className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-sm text-black transition-all hover:opacity-90"
-                style={{ background: '#F8B102', ...headingFont }}>
-                Demander mon inscription
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href={formation.pdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-sm text-white"
-                style={{ border: '1.5px solid rgba(255,255,255,0.4)', ...headingFont }}>
-                <FileText className="w-4 h-4" />
-                Télécharger le programme
-              </a>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Pill as={Link} to={`/inscription/${formation.id}`}>
+                Demander mon inscription <ArrowRight className="w-4 h-4" />
+              </Pill>
+              <Pill as="a" href={formation.pdf} target="_blank" rel="noopener noreferrer" variant="secondary" dark>
+                <FileText className="w-4 h-4" /> Télécharger le programme
+              </Pill>
             </div>
-            <p className="text-xs mt-6" style={{ color: '#8aa0c8', ...bodyFont }}>
+            <p className="text-xs mt-6" style={{ color: 'rgba(255,255,255,0.55)', ...bodyFont }}>
               Organisme certifié Qualiopi · Finançable OPCO · Réponse sous 24 h ouvrées
             </p>
           </div>

@@ -149,7 +149,7 @@ export default function AboutSection() {
 
             {/* Heading */}
             <h2
-              className="text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08] mb-6"
+              className="text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-6"
               style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               Votre Porte d'Entrée vers une Carrière{' '}

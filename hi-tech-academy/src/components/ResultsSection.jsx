@@ -88,7 +88,7 @@ export default function ResultsSection() {
             Nos résultats
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08]"
+            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15]"
             style={{ color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Indicateurs de résultats
           </h2>

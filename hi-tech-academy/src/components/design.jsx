@@ -73,7 +73,7 @@ export function SectionHeading({ kicker, children, sub, dark = false, align = 'c
         </span>
       )}
       <h2
-        className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold leading-[1.08] tracking-tight"
+        className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold leading-[1.15] tracking-tight"
         style={{ color: dark ? 'white' : NAVY, ...headingFont }}>
         {slash && <Slash />}
         {children}

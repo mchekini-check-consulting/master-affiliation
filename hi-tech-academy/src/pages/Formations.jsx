@@ -39,7 +39,7 @@ export default function Formations() {
               Le catalogue
             </span>
             <h1
-              className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08] mb-4"
+              className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-4"
               style={{ color: '#001a4a', ...headingFont }}>
               Des formations qui changent <span style={{ color: '#005064' }}>votre quotidien</span>
             </h1>
