@@ -27,7 +27,7 @@ export default function Blog() {
               Blog & Actualités
             </span>
             <h1
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight"
+              className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15]"
               style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               Tous nos <span style={{ color: '#005064' }}>Articles</span>
             </h1>

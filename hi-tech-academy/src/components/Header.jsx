@@ -7,7 +7,7 @@ import { ACCENT, headingFont } from '@/components/design';
 const navLinks = [
 { label: 'Formations', href: '/formations' },
 { label: 'Financements', href: '/financements' },
-{ label: 'Programmes', href: '/#programmes' },
+{ label: 'Blog', href: '/blog' },
 { label: 'À propos', href: '/#about' },
 { label: 'Contact', href: '/#contact' }];
 
