@@ -47,7 +47,7 @@ export default function FAQSection() {
             FAQ
           </span>
           <h2
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight mb-4"
+            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08] mb-4"
             style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Questions{' '}

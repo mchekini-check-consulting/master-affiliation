@@ -1,9 +1,7 @@
 import React from 'react';
-import { GraduationCap, Code, Users } from 'lucide-react';
 import HeroSection from '@/components/hero/HeroSection';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import MarqueeStrip from '@/components/MarqueeStrip';
 import AboutSection from '@/components/AboutSection';
 import FormationsSection from '@/components/FormationsSection';
 import WhyUsSection from '@/components/WhyUsSection';
@@ -13,46 +11,45 @@ import BlogSection from '@/components/BlogSection';
 import FAQSection from '@/components/FAQSection';
 import CTASection from '@/components/CTASection';
 import ComplaintsSection from '@/components/ComplaintsSection';
-
-const HERO_IMAGES = [
-"/images/cbdcfde73_generated_f57bba76.png",
-"/images/3611d0da4_generated_60e6197e.png",
-"/images/ce6db5335_generated_76fdd024.png"];
-
+import { KEYWORD_GRADIENT } from '@/components/design';
 
 export default function Home() {
   const heroData = {
     title:
     <>
-        Transformez Votre Avenir avec Nos <span className="text-[#f8b102]">Programmes de Formation</span>
+        Des formations intensives{' '}
+        <span
+        style={{
+          background: KEYWORD_GRADIENT,
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent'
+        }}>
+          animées en direct
+        </span>
+        <br />
+        par des experts du terrain
       </>,
 
-    subtitle: "Hi Tech Academy forme la prochaine génération d'ingénieurs logiciels, de data scientists et de leaders technologiques à travers des programmes intensifs et un mentorat d'élite.",
+    subtitle: "Cloud, intelligence artificielle, facturation électronique : Hi Tech Academy fait monter en compétences dirigeants, salariés et développeurs — 100 % à distance, dès 1 participant, avec un suivi Qualiopi complet.",
     actions: [
     {
       text: "Explorer les formations",
       onClick: () => {
-        window.location.href = '#programmes';
+        window.location.href = '/formations';
       }
     },
     {
-      text: "À propos de nous",
+      text: "Financer ma formation",
       onClick: () => {
-        window.location.href = '#about';
+        window.location.href = '/financements';
       }
-    }],
-
-    stats: [
-    { value: "2K+", label: "Étudiants Formés", icon: <GraduationCap className="h-4 w-4" /> },
-    { value: "95%", label: "Taux d'Insertion", icon: <Code className="h-4 w-4" /> },
-    { value: "50+", label: "Mentors Experts", icon: <Users className="h-4 w-4" /> }],
-
-    images: HERO_IMAGES
+    }]
   };
 
   return (
     <div className="min-h-screen" style={{ background: 'white' }}>
-<Header />
+      <Header />
       <HeroSection {...heroData} />
       <AboutSection />
       <FormationsSection />

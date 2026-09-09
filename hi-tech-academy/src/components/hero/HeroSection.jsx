@@ -1,69 +1,83 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { BadgeCheck, Landmark, MonitorPlay, Users } from 'lucide-react';
+import { INK, ACCENT, BODY_DARK, Starfield, Pill, headingFont, bodyFont } from '@/components/design';
 
-const HERO_IMG = "/images/e141141b5_Designsanstitre.jpg";
+// Héro « Onlineformapro » : bande sombre pleine hauteur, starfield discret,
+// titre géant centré avec mot-clé en dégradé, sous-titre, CTAs en pilules et
+// bande de preuves (l'équivalent du bandeau presse d'OFP).
+const PROOFS = [
+  { icon: BadgeCheck, label: 'Certifié Qualiopi' },
+  { icon: Landmark, label: 'Finançable OPCO' },
+  { icon: MonitorPlay, label: '100 % à distance, en direct' },
+  { icon: Users, label: 'Sessions dès 1 participant' },
+];
 
 const HeroSection = ({ title, subtitle, actions }) => {
   return (
-    <section className="relative w-full" style={{ minHeight: '100vh' }}>
-      {/* Background image */}
-      <img
-        src={HERO_IMG}
-        alt="Hero Hi Tech Academy"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
+    <section className="relative w-full overflow-hidden" style={{ background: INK, minHeight: '92vh' }}>
+      <Starfield />
 
+      <div
+        className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center justify-center text-center"
+        style={{ minHeight: '92vh', paddingTop: '7rem', paddingBottom: '4rem' }}>
 
-
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12 flex items-center" style={{ minHeight: '100vh' }}>
         <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 34 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-xl pt-24 pb-16"
-        >
-          {/* Badge */}
-          <div className="mb-6 inline-flex">
-            <span
-              className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
-              style={{ background: 'rgba(248,177,2,0.15)', color: '#F8B102', border: '1px solid rgba(248,177,2,0.35)' }}
-            >
-              ✦ Organisme de formation déclaré
-            </span>
-          </div>
+          className="flex flex-col items-center">
+
+          {/* Eyebrow */}
+          <span
+            className="text-[11px] font-extrabold uppercase tracking-[0.3em] mb-6"
+            style={{ color: ACCENT, ...headingFont }}>
+            Organisme de formation certifié Qualiopi
+          </span>
 
           {/* Title */}
           <h1
-            className="font-bold leading-tight text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-          >
+            className="font-extrabold text-white leading-[1.05] tracking-tight text-4xl sm:text-5xl lg:text-[4.25rem]"
+            style={headingFont}>
             {title}
           </h1>
 
           {/* Subtitle */}
           <p
-            className="mt-5 leading-relaxed text-sm sm:text-base"
-            style={{ color: 'rgba(255,255,255,0.72)', fontFamily: "'Inter', sans-serif" }}
-          >
+            className="mt-7 max-w-2xl leading-relaxed text-sm sm:text-base"
+            style={{ color: BODY_DARK, ...bodyFont }}>
             {subtitle}
           </p>
 
           {/* Actions */}
-          <div className="mt-8 flex flex-wrap gap-3 sm:gap-4">
+          <div className="mt-9 flex flex-wrap justify-center gap-3 sm:gap-4">
             {actions && actions.map((action, i) => (
-              <button
-                key={i}
+              <Pill
+                key={action.text}
+                as="button"
                 onClick={action.onClick}
-                className="h-11 px-6 rounded-lg font-bold text-sm uppercase tracking-widest transition-all duration-200 hover:opacity-90 hover:shadow-lg"
-                style={
-                  i === 0
-                    ? { background: '#F8B102', color: '#000', fontFamily: "'Plus Jakarta Sans', sans-serif" }
-                    : { background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.35)', fontFamily: "'Plus Jakarta Sans', sans-serif" }
-                }
-              >
+                variant={i === 0 ? 'primary' : 'secondary'}
+                dark>
                 {action.text}
-              </button>
+              </Pill>
+            ))}
+          </div>
+
+          {/* Bande de preuves */}
+          <div className="mt-14 flex flex-wrap justify-center gap-3">
+            {PROOFS.map(({ icon: Icon, label }) => (
+              <span
+                key={label}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.14)',
+                  color: 'rgba(255,255,255,0.85)',
+                  ...headingFont,
+                }}>
+                <Icon className="w-4 h-4" style={{ color: ACCENT }} />
+                {label}
+              </span>
             ))}
           </div>
         </motion.div>

@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, FileText, Facebook, Instagram, Linkedin, Youtube, Twitter } from 'lucide-react';
 import MarqueeStrip from '@/components/MarqueeStrip';
+import { formations as catalogue } from '@/data/formations';
 
 const BRAND_COLOR = '#005064';
 const CTA_COLOR = '#F8B102';
 
-const formations = [
-  'Kubernetes – Fondamentaux',
-];
+// Une entrée par formation du catalogue, vers sa page de vente
+const formations = catalogue.map((f) => ({ label: f.title, href: `/formations/${f.id}` }));
 
 const liens = [
   { label: 'Accueil', href: '#' },
   { label: 'À propos', href: '#about' },
-  { label: 'Nos formations', href: '#programmes' },
+  { label: 'Nos formations', href: '/formations' },
+  { label: 'Financer sa formation', href: '/financements' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Déposer une réclamation', href: '#reclamations' },
@@ -52,7 +53,7 @@ export default function Footer() {
   return (
     <footer
       style={{
-        background: '#002f3a',
+        background: '#06071f',
         fontFamily: "'Inter', sans-serif",
         backgroundImage: `url('/images/bfbbe912e_footer-bg-05.png')`,
         backgroundSize: '400px 400px',
@@ -162,16 +163,16 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 sm:space-y-3">
               {formations.map(f => (
-                <li key={f}>
+                <li key={f.href}>
                   <a
-                    href="#programmes"
+                    href={f.href}
                     className="text-white/55 text-xs sm:text-sm hover:text-white transition-colors flex items-center gap-2 group"
                   >
                     <span
                       className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
                       style={{ background: 'rgba(248,177,2,0.4)' }}
                     />
-                    {f}
+                    {f.label}
                   </a>
                 </li>
               ))}

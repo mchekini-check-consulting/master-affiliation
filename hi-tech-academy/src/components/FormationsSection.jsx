@@ -101,6 +101,17 @@ function FormationRow({ formation }) {
             Télécharger le programme (PDF)
           </a>
           <Link
+            to={`/formations/${formation.id}`}
+            className="w-full flex items-center justify-center gap-2 py-3.5 mt-3 rounded-xl font-bold text-sm transition-all"
+            style={{
+              background: '#F8B102',
+              color: '#001a4a',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+            }}>
+            Découvrir la formation
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
             to={`/inscription/${formation.id}`}
             className="w-full flex items-center justify-center gap-2 py-3.5 mt-3 rounded-xl font-bold text-sm transition-all"
             style={{
@@ -186,7 +197,7 @@ export default function FormationsSection() {
             Découvrir notre Catalogue
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4"
+            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08] mb-4"
             style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
             Explorer nos{' '}

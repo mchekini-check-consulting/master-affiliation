@@ -4,12 +4,12 @@ import { ArrowRight, CheckCircle, Zap, Shield } from 'lucide-react';
 
 export default function CTASection() {
   return (
-    <section className="w-full py-10 sm:py-12 md:py-16" style={{ background: 'white' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className="w-full" style={{ background: 'white' }}>
+      <div className="w-full">
         <motion.div
-          className="relative w-full rounded-3xl overflow-hidden min-h-[240px] md:min-h-[280px]"
+          className="relative w-full overflow-hidden min-h-[240px] md:min-h-[280px]"
           style={{
-            background: 'linear-gradient(135deg, #003040 0%, #005064 40%, #007a96 100%)'
+            background: 'linear-gradient(120deg, #06071f 0%, #005064 48%, #b7791f 100%)'
           }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

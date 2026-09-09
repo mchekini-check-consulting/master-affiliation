@@ -76,7 +76,7 @@ export default function TimelineSection() {
             Notre Savoir Faire
           </span>
           <h2
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-white"
+            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08] text-white"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Découvrez Notre Approche{' '}

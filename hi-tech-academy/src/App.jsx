@@ -12,6 +12,9 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import Formations from './pages/Formations';
+import FormationVente from './pages/FormationVente';
+import Financements from './pages/Financements';
 import Inscription from './pages/Inscription';
 import AnalyseBesoin from './pages/AnalyseBesoin';
 import QuestionnaireCommanditaire from './pages/QuestionnaireCommanditaire';
@@ -50,6 +53,9 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<Home />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/formations" element={<Formations />} />
+      <Route path="/formations/:formationId" element={<FormationVente />} />
+      <Route path="/financements" element={<Financements />} />
       <Route path="/inscription/:formationId" element={<Inscription />} />
       <Route path="/inscription/demande/:requestId/questionnaire" element={<AnalyseBesoin />} />
       <Route path="/inscription/demande/:requestId/questionnaire-commanditaire" element={<QuestionnaireCommanditaire />} />

@@ -61,7 +61,7 @@ export default function WhyUsSection() {
               Pourquoi nous Choisir !
             </span>
             <h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-3"
+              className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.08] mb-3"
               style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               Rendre votre Apprentissage{' '}

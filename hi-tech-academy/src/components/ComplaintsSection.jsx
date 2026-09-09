@@ -85,7 +85,7 @@ export default function ComplaintsSection() {
             <MessageSquareWarning className="w-4 h-4" />
             Votre avis compte
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: '#001a4a', ...headingFont }}>
+          <h2 className="text-3xl sm:text-4xl lg:text-[3rem] font-extrabold tracking-tight mb-4" style={{ color: '#001a4a', ...headingFont }}>
             Déposer une <span style={{ color: '#005064' }}>réclamation</span>
           </h2>
           <p className="text-base max-w-xl mx-auto" style={{ color: '#6b7a9b', ...bodyFont }}>
