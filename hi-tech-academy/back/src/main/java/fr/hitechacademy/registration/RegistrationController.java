@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -113,13 +114,14 @@ public class RegistrationController {
                 r.getFinalEvaluation() != null && r.getFinalEvaluation().isSubmitted());
     }
 
-    /** Contenu du test de positionnement — sans les bonnes réponses. */
+    /** Contenu du test de positionnement de la formation — sans les bonnes réponses. */
     @GetMapping("/positioning-test")
-    public Map<String, Object> positioningTestContent() {
+    public Map<String, Object> positioningTestContent(
+            @RequestParam(name = "formation_id", required = false) String formationId) {
         return Map.of(
-                "self_levels", PositioningTestCatalog.SELF_LEVELS,
-                "known_terms", PositioningTestCatalog.KNOWN_TERMS,
-                "questions", PositioningTestCatalog.QUESTIONS.stream()
+                "self_levels", QuizCatalogs.selfLevels(formationId),
+                "known_terms", QuizCatalogs.knownTerms(formationId),
+                "questions", QuizCatalogs.positioningQuestions(formationId).stream()
                         .map(q -> Map.of(
                                 "id", q.id(),
                                 "section", q.section(),
@@ -253,11 +255,12 @@ public class RegistrationController {
                         .orElse(null));
     }
 
-    /** QCM d'évaluation finale — sans le corrigé. */
+    /** QCM d'évaluation finale de la formation — sans le corrigé. */
     @GetMapping("/final-evaluation")
-    public Map<String, Object> finalEvaluationContent() {
+    public Map<String, Object> finalEvaluationContent(
+            @RequestParam(name = "formation_id", required = false) String formationId) {
         return Map.of(
-                "questions", FinalEvaluationCatalog.QUESTIONS.stream()
+                "questions", QuizCatalogs.finalQuestions(formationId).stream()
                         .map(q -> Map.of(
                                 "id", q.id(),
                                 "text", q.text(),
@@ -272,7 +275,7 @@ public class RegistrationController {
                                                       @Valid @RequestBody FinalEvaluationRequest body) {
         RegistrationRequest r = find(id);
         FinalEvaluation fe = r.getFinalEvaluation();
-        gradeFinalEvaluation(fe, body);
+        gradeFinalEvaluation(fe, body, r.getFormationId());
         repository.save(r);
         return Map.of("score", fe.getScore(), "max_score", fe.getMaxScore());
     }
@@ -288,13 +291,13 @@ public class RegistrationController {
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Apprenant introuvable"));
         FinalEvaluation fe = t.getFinalEvaluation();
-        gradeFinalEvaluation(fe, body);
+        gradeFinalEvaluation(fe, body, r.getFormationId());
         repository.save(r);
         return Map.of("score", fe.getScore(), "max_score", fe.getMaxScore());
     }
 
     // Corrige et enregistre la soumission (l'invitation doit avoir été envoyée)
-    private static void gradeFinalEvaluation(FinalEvaluation fe, FinalEvaluationRequest body) {
+    private static void gradeFinalEvaluation(FinalEvaluation fe, FinalEvaluationRequest body, String formationId) {
         if (fe == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "L'évaluation n'a pas été envoyée pour cet apprenant");
@@ -303,7 +306,7 @@ public class RegistrationController {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "L'évaluation a déjà été passée : une seule tentative est autorisée");
         }
-        List<FinalEvaluationCatalog.QcmQuestion> catalog = FinalEvaluationCatalog.QUESTIONS;
+        List<FinalEvaluationCatalog.QcmQuestion> catalog = QuizCatalogs.finalQuestions(formationId);
         if (body.answers().size() != catalog.size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "L'évaluation comporte " + catalog.size() + " questions");
@@ -343,7 +346,7 @@ public class RegistrationController {
         if (r.getPositioningTest() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Le test a déjà été passé pour cette demande");
         }
-        PositioningTest pt = buildPositioningTest(body);
+        PositioningTest pt = buildPositioningTest(body, r.getFormationId());
         pt.setRegistration(r);
         r.setPositioningTest(pt);
         boolean transmitted = completeIfRequiredSurveyDone(r);
@@ -367,15 +370,15 @@ public class RegistrationController {
         if (t.getPositioningTest() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Le test a déjà été passé par cet apprenant");
         }
-        PositioningTest pt = buildPositioningTest(body);
+        PositioningTest pt = buildPositioningTest(body, r.getFormationId());
         pt.setTrainee(t);
         t.setPositioningTest(pt);
         repository.save(r);
     }
 
-    // Corrige le QCM côté serveur à partir du catalogue
-    private static PositioningTest buildPositioningTest(PositioningTestRequest body) {
-        List<PositioningTestCatalog.QcmQuestion> catalog = PositioningTestCatalog.QUESTIONS;
+    // Corrige le QCM côté serveur à partir du catalogue de la formation
+    private static PositioningTest buildPositioningTest(PositioningTestRequest body, String formationId) {
+        List<PositioningTestCatalog.QcmQuestion> catalog = QuizCatalogs.positioningQuestions(formationId);
         if (body.answers().size() != catalog.size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Le test comporte " + catalog.size() + " questions");

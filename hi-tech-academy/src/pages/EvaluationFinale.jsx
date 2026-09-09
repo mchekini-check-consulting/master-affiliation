@@ -34,10 +34,11 @@ export default function EvaluationFinale() {
 
   useEffect(() => {
     document.title = 'Évaluation finale — Hi-Tech Academy';
-    Promise.all([getRegistrationPublic(requestId), getFinalEvaluationContent()])
-      .then(([reg, evalContent]) => {
+    // Le catalogue du QCM dépend de la formation de la demande
+    getRegistrationPublic(requestId)
+      .then((reg) => {
         setRegistration(reg);
-        setContent(evalContent);
+        return getFinalEvaluationContent(reg.formation_id).then(setContent);
       })
       .catch((e) => setLoadError(e.status === 404 ? 'Demande introuvable.' : e.message));
     return () => { document.title = 'Hi-Tech Academy'; };

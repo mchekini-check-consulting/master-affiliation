@@ -6,16 +6,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getRegistrationPublic, submitNeedsAnalysis } from '@/api/backend';
 import { SectionTitle, Stepper, TextAreaField, TextField } from '@/pages/Inscription';
+import { getNeedsLevels } from '@/data/formations';
 
 const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
-
-// Niveaux d'auto-évaluation du questionnaire « Analyse du besoin – V1.0 »
-const LEVELS = [
-  { key: 'levelLinux', label: 'Linux (ligne de commande)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', label: 'Docker / conteneurs', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', label: 'Kubernetes', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
-];
 
 function RadioGroup({ label, options, value, onChange }) {
   return (
@@ -89,13 +83,13 @@ export default function AnalyseBesoin() {
 
   const set = (field) => (value) => setAnswers((a) => ({ ...a, [field]: value }));
 
-  const missing = useMemo(() => {
-    const list = [];
-    if (!answers.levelLinux) list.push('Niveau Linux');
-    if (!answers.levelDocker) list.push('Niveau Docker');
-    if (!answers.levelKubernetes) list.push('Niveau Kubernetes');
-    return list;
-  }, [answers]);
+  // Niveaux d'auto-évaluation du questionnaire « Analyse du besoin » de la formation
+  const LEVELS = getNeedsLevels(registration?.formation_id);
+
+  const missing = useMemo(
+    () => LEVELS.filter(({ key }) => !answers[key]).map(({ label }) => `Niveau ${label}`),
+    [answers, LEVELS]
+  );
 
   const submit = async () => {
     if (missing.length > 0 || submitting) return;

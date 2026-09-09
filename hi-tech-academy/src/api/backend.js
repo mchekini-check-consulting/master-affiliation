@@ -52,8 +52,10 @@ export function submitTrainee(id, payload) {
   return request(`/registrations/${id}/trainees`, { method: 'POST', body: payload });
 }
 
-export function getPositioningTestContent() {
-  return request('/registrations/positioning-test');
+// Catalogue du test de positionnement de la formation (Kubernetes par défaut)
+export function getPositioningTestContent(formationId) {
+  const query = formationId ? `?formation_id=${encodeURIComponent(formationId)}` : '';
+  return request(`/registrations/positioning-test${query}`);
 }
 
 export function submitPositioningTest(id, payload) {
@@ -64,8 +66,10 @@ export function submitTraineePositioningTest(id, traineeId, payload) {
   return request(`/registrations/${id}/trainees/${traineeId}/positioning-test`, { method: 'POST', body: payload });
 }
 
-export function getFinalEvaluationContent() {
-  return request('/registrations/final-evaluation');
+// Catalogue du QCM d'évaluation finale de la formation (Kubernetes par défaut)
+export function getFinalEvaluationContent(formationId) {
+  const query = formationId ? `?formation_id=${encodeURIComponent(formationId)}` : '';
+  return request(`/registrations/final-evaluation${query}`);
 }
 
 export function submitFinalEvaluation(id, payload) {

@@ -37,6 +37,54 @@ const SECTIONS = [
     ],
   },
   {
+    title: 'Formation Facturation électronique & Pennylane',
+    documents: [
+      { title: 'Programme de formation', file: `${BASE}/Programme_Facturation_Electronique_Pennylane_V1.0.pdf`, icon: GraduationCap },
+      { title: 'Déroulé pédagogique', file: `${BASE}/Deroule_pedagogique_Facturation_Pennylane_V1.0.pdf`, icon: LayoutList },
+      { title: 'Support de cours', file: `${BASE}/Support_de_cours_Facturation_Pennylane_V1.0.pdf`, icon: FileText },
+      { title: 'Test de positionnement', file: `${BASE}/Test_positionnement_Facturation_Pennylane.pdf`, icon: SearchCheck },
+      { title: 'Évaluation finale (QCM)', file: `${BASE}/Evaluation_finale_QCM_Facturation_Pennylane.pdf`, icon: ClipboardCheck },
+      { title: 'Tableau croisé objectifs / contenus / évaluations', file: `${BASE}/Tableau_croise_Facturation_Pennylane_V1.0.pdf`, icon: ClipboardList },
+      { title: 'Plaquette commerciale', file: `${BASE}/Plaquette_Facturation_Pennylane_V1.0.pdf`, icon: Presentation },
+    ],
+  },
+  {
+    title: 'Formation IA pour tous',
+    documents: [
+      { title: 'Programme de formation', file: `${BASE}/Programme_IA_Pour_Tous_V1.0.pdf`, icon: GraduationCap },
+      { title: 'Déroulé pédagogique', file: `${BASE}/Deroule_pedagogique_IA_Pour_Tous_V1.0.pdf`, icon: LayoutList },
+      { title: 'Support de cours', file: `${BASE}/Support_de_cours_IA_Pour_Tous_V1.0.pdf`, icon: FileText },
+      { title: 'Test de positionnement', file: `${BASE}/Test_positionnement_IA_Pour_Tous.pdf`, icon: SearchCheck },
+      { title: 'Évaluation finale (QCM)', file: `${BASE}/Evaluation_finale_QCM_IA_Pour_Tous.pdf`, icon: ClipboardCheck },
+      { title: 'Tableau croisé objectifs / contenus / évaluations', file: `${BASE}/Tableau_croise_IA_Pour_Tous_V1.0.pdf`, icon: ClipboardList },
+      { title: 'Plaquette commerciale', file: `${BASE}/Plaquette_IA_Pour_Tous_V1.0.pdf`, icon: Presentation },
+    ],
+  },
+  {
+    title: 'Formation IA for Business',
+    documents: [
+      { title: 'Programme de formation', file: `${BASE}/Programme_IA_For_Business_V1.0.pdf`, icon: GraduationCap },
+      { title: 'Déroulé pédagogique', file: `${BASE}/Deroule_pedagogique_IA_For_Business_V1.0.pdf`, icon: LayoutList },
+      { title: 'Support de cours', file: `${BASE}/Support_de_cours_IA_For_Business_V1.0.pdf`, icon: FileText },
+      { title: 'Test de positionnement', file: `${BASE}/Test_positionnement_IA_For_Business.pdf`, icon: SearchCheck },
+      { title: 'Évaluation finale (QCM)', file: `${BASE}/Evaluation_finale_QCM_IA_For_Business.pdf`, icon: ClipboardCheck },
+      { title: 'Tableau croisé objectifs / contenus / évaluations', file: `${BASE}/Tableau_croise_IA_For_Business_V1.0.pdf`, icon: ClipboardList },
+      { title: 'Plaquette commerciale', file: `${BASE}/Plaquette_IA_For_Business_V1.0.pdf`, icon: Presentation },
+    ],
+  },
+  {
+    title: 'Formation IA for Tech',
+    documents: [
+      { title: 'Programme de formation', file: `${BASE}/Programme_IA_For_Tech_V1.0.pdf`, icon: GraduationCap },
+      { title: 'Déroulé pédagogique', file: `${BASE}/Deroule_pedagogique_IA_For_Tech_V1.0.pdf`, icon: LayoutList },
+      { title: 'Support de cours', file: `${BASE}/Support_de_cours_IA_For_Tech_V1.0.pdf`, icon: FileText },
+      { title: 'Test de positionnement', file: `${BASE}/Test_positionnement_IA_For_Tech.pdf`, icon: SearchCheck },
+      { title: 'Évaluation finale (QCM)', file: `${BASE}/Evaluation_finale_QCM_IA_For_Tech.pdf`, icon: ClipboardCheck },
+      { title: 'Tableau croisé objectifs / contenus / évaluations', file: `${BASE}/Tableau_croise_IA_For_Tech_V1.0.pdf`, icon: ClipboardList },
+      { title: 'Plaquette commerciale', file: `${BASE}/Plaquette_IA_For_Tech_V1.0.pdf`, icon: Presentation },
+    ],
+  },
+  {
     title: 'Contractualisation (modèles)',
     documents: [
       { title: 'Convention de formation professionnelle', file: `${BASE}/Convention_de_formation_professionnelle.pdf`, icon: FileSignature },

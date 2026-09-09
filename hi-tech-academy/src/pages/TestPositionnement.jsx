@@ -11,6 +11,7 @@ import {
   submitTraineePositioningTest,
 } from '@/api/backend';
 import { SectionTitle, Stepper, TextAreaField } from '@/pages/Inscription';
+import { getQuizTexts } from '@/data/formations';
 
 const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
@@ -41,10 +42,11 @@ export default function TestPositionnement() {
 
   useEffect(() => {
     document.title = 'Test de positionnement — Hi-Tech Academy';
-    Promise.all([getRegistrationPublic(requestId), getPositioningTestContent()])
-      .then(([reg, testContent]) => {
+    // Le catalogue des questions dépend de la formation de la demande
+    getRegistrationPublic(requestId)
+      .then((reg) => {
         setRegistration(reg);
-        setContent(testContent);
+        return getPositioningTestContent(reg.formation_id).then(setContent);
       })
       .catch((e) => setLoadError(e.status === 404 ? "Demande d'inscription introuvable." : e.message));
     return () => { document.title = 'Hi-Tech Academy'; };
@@ -59,15 +61,16 @@ export default function TestPositionnement() {
   }, [registration, traineeId, requestId, navigate]);
 
   const isTrainee = Boolean(traineeId);
+  const quizTexts = getQuizTexts(registration?.formation_id);
 
   const missing = useMemo(() => {
     const list = [];
-    if (!selfLevel) list.push('Auto-évaluation Kubernetes');
+    if (!selfLevel) list.push(quizTexts.selfLevelMissing);
     for (const q of content?.questions ?? []) {
       if (answers[q.id] === undefined) list.push(`Question ${q.id}`);
     }
     return list;
-  }, [selfLevel, answers, content]);
+  }, [selfLevel, answers, content, quizTexts]);
 
   const toggleTerm = (term) =>
     setKnownTerms((terms) => (terms.includes(term) ? terms.filter((t) => t !== term) : [...terms, term]));
@@ -188,8 +191,7 @@ export default function TestPositionnement() {
           Test de positionnement
         </h1>
         <p className="text-sm max-w-xl mx-auto" style={{ color: '#6b7a9b', ...bodyFont }}>
-          Ce test vérifie vos prérequis (Linux, Docker), situe votre niveau de départ et permet
-          d'adapter l'animation à vos besoins. <strong>Il n'est pas éliminatoire.</strong>
+          {quizTexts.intro} <strong>Il n'est pas éliminatoire.</strong>
         </p>
       </div>
 
@@ -208,7 +210,7 @@ export default function TestPositionnement() {
 
         <SectionTitle>A. Auto-évaluation</SectionTitle>
         <p className="text-sm font-semibold mb-2" style={{ color: '#001a4a', ...headingFont }}>
-          Comment évaluez-vous votre maîtrise actuelle de Kubernetes ?
+          {quizTexts.selfLevelQuestion}
         </p>
         <div className="space-y-2">
           {content.self_levels.map((level) => (
@@ -260,10 +262,10 @@ export default function TestPositionnement() {
           </React.Fragment>
         ))}
 
-        <SectionTitle>D. Connaissances Kubernetes (facultatif)</SectionTitle>
+        <SectionTitle>D. {quizTexts.knowledgeSection}</SectionTitle>
         <div className="space-y-4">
           <TextAreaField
-            label="Selon vous, à quoi sert Kubernetes ?"
+            label={quizTexts.purposeQuestion}
             value={kubernetesPurpose}
             onChange={setKubernetesPurpose} />
           <div>

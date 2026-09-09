@@ -13,6 +13,7 @@ import {
 } from '@/lib/surveyPdf';
 import PdfViewer from './PdfViewer';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
+import { getNeedsLevels, getQuizTexts } from '@/data/formations';
 import {
   APPLICANT_LABELS, Badge, Card, EmptyState, Field, StatusBadge, ViewHeader,
   bodyFont, formatDate, formatDay, headingFont,
@@ -30,6 +31,7 @@ function NeedsAnalysisModal({ detail, onClose }) {
         name: `${detail.first_name} ${detail.last_name}`,
         context: detail.company_name,
         formationTitle: detail.formation_title,
+        formationId: detail.formation_id,
       })}
       badge={
         <span
@@ -53,18 +55,9 @@ function NeedsAnalysisModal({ detail, onClose }) {
       </SurveySection>
 
       <SurveySection title="3. Niveau de départ (auto-évaluation)">
-        <LevelAnswer
-          question="Linux (ligne de commande)"
-          options={['Débutant', 'Intermédiaire', 'Confirmé']}
-          value={na.level_linux} />
-        <LevelAnswer
-          question="Docker / conteneurs"
-          options={['Débutant', 'Intermédiaire', 'Confirmé']}
-          value={na.level_docker} />
-        <LevelAnswer
-          question="Kubernetes"
-          options={['Aucune notion', 'Notions', 'Déjà utilisé']}
-          value={na.level_kubernetes} />
+        {getNeedsLevels(detail.formation_id).map(({ field, label, options }) => (
+          <LevelAnswer key={field} question={label} options={options} value={na[field]} />
+        ))}
       </SurveySection>
 
       <SurveySection title="4. Attentes et besoins spécifiques">
@@ -133,6 +126,7 @@ function TraineeModal({ detail, trainee, onClose }) {
         name: `${trainee.first_name} ${trainee.last_name}`,
         context: `Salarié de ${detail.company_name}`,
         formationTitle: detail.formation_title,
+        formationId: detail.formation_id,
       })}
       badge={
         <span
@@ -156,18 +150,9 @@ function TraineeModal({ detail, trainee, onClose }) {
       </SurveySection>
 
       <SurveySection title="3. Niveau de départ (auto-évaluation)">
-        <LevelAnswer
-          question="Linux (ligne de commande)"
-          options={['Débutant', 'Intermédiaire', 'Confirmé']}
-          value={trainee.level_linux} />
-        <LevelAnswer
-          question="Docker / conteneurs"
-          options={['Débutant', 'Intermédiaire', 'Confirmé']}
-          value={trainee.level_docker} />
-        <LevelAnswer
-          question="Kubernetes"
-          options={['Aucune notion', 'Notions', 'Déjà utilisé']}
-          value={trainee.level_kubernetes} />
+        {getNeedsLevels(detail.formation_id).map(({ field, label, options }) => (
+          <LevelAnswer key={field} question={label} options={options} value={trainee[field]} />
+        ))}
       </SurveySection>
 
       <SurveySection title="4. Attentes et besoins spécifiques">
@@ -240,6 +225,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
     try {
       const pdfBase64 = buildFinalEvaluationCorrectionPdf(evaluation, {
         formationTitle: detail.formation_title,
+        formationId: detail.formation_id,
       });
       if (traineeId) {
         await adminSendTraineeFinalEvaluationCorrection(auth, id, traineeId, pdfBase64);
@@ -697,6 +683,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           test={detail.positioning_test}
           subjectName={`${detail.first_name} ${detail.last_name}`}
           formationTitle={detail.formation_title}
+          formationId={detail.formation_id}
           onClose={() => setOpenSurvey(null)} />
       )}
       {openTrainee && (
@@ -707,6 +694,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           test={openTraineeTest.positioning_test}
           subjectName={`${openTraineeTest.first_name} ${openTraineeTest.last_name} (salarié de ${detail.company_name})`}
           formationTitle={detail.formation_title}
+          formationId={detail.formation_id}
           onClose={() => setOpenTraineeTest(null)} />
       )}
       {openSurvey === 'finalEval' && detail.final_evaluation?.questions && (
@@ -714,6 +702,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           evaluation={detail.final_evaluation}
           subjectName={`${detail.first_name} ${detail.last_name}`}
           formationTitle={detail.formation_title}
+          formationId={detail.formation_id}
           onClose={() => setOpenSurvey(null)} />
       )}
       {openTraineeFinalEval?.final_evaluation?.questions && (
@@ -721,6 +710,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           evaluation={openTraineeFinalEval.final_evaluation}
           subjectName={`${openTraineeFinalEval.first_name} ${openTraineeFinalEval.last_name} (salarié de ${detail.company_name})`}
           formationTitle={detail.formation_title}
+          formationId={detail.formation_id}
           onClose={() => setOpenTraineeFinalEval(null)} />
       )}
       {certViewerOpen && certificate && (
@@ -736,7 +726,8 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
 
 // --- Réponses au test de positionnement, grand format ------------------
 // subjectName : demandeur (particulier / indépendant) ou salarié
-function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
+function PositioningTestModal({ test, subjectName, formationTitle, formationId, onClose }) {
+  const quizTexts = getQuizTexts(formationId);
   const sections = test.questions.reduce((acc, q) => {
     (acc[q.section] = acc[q.section] ?? []).push(q);
     return acc;
@@ -746,7 +737,7 @@ function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
       title={`Test de positionnement — ${subjectName}`}
       subtitle={formationTitle}
       submittedAt={test.submitted_at}
-      onExportPdf={() => exportPositioningTestPdf(test, { name: subjectName, formationTitle })}
+      onExportPdf={() => exportPositioningTestPdf(test, { name: subjectName, formationTitle, formationId })}
       badge={
         <span
           className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
@@ -756,8 +747,8 @@ function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
       }
       onClose={onClose}>
 
-      <SurveySection title="A. Auto-évaluation Kubernetes">
-        <Answer question="Maîtrise actuelle de Kubernetes (déclarée)" answer={test.self_level} />
+      <SurveySection title="A. Auto-évaluation">
+        <Answer question={quizTexts.selfLevelPdfLabel} answer={test.self_level} />
       </SurveySection>
 
       {Object.entries(sections).map(([sectionTitle, questions]) => (
@@ -768,8 +759,8 @@ function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
         </SurveySection>
       ))}
 
-      <SurveySection title="D. Connaissances Kubernetes (facultatif)">
-        <Answer question="Selon vous, à quoi sert Kubernetes ?" answer={test.kubernetes_purpose} />
+      <SurveySection title={`D. ${quizTexts.knowledgeSection}`}>
+        <Answer question={quizTexts.purposeQuestion} answer={test.kubernetes_purpose} />
         <Answer
           question="Termes connus"
           answer={test.known_terms?.length ? test.known_terms.join(', ') : null} />
@@ -783,13 +774,13 @@ function PositioningTestModal({ test, subjectName, formationTitle, onClose }) {
 }
 
 // --- Résultats de l'évaluation finale, grand format --------------------
-function FinalEvaluationModal({ evaluation, subjectName, formationTitle, onClose }) {
+function FinalEvaluationModal({ evaluation, subjectName, formationTitle, formationId, onClose }) {
   return (
     <SurveyModal
       title={`Évaluation finale — ${subjectName}`}
       subtitle={formationTitle}
       submittedAt={evaluation.submitted_at}
-      onExportPdf={() => exportFinalEvaluationPdf(evaluation, { name: subjectName, formationTitle })}
+      onExportPdf={() => exportFinalEvaluationPdf(evaluation, { name: subjectName, formationTitle, formationId })}
       badge={
         <span
           className="inline-block px-4 py-2 rounded-xl text-sm font-bold"
@@ -804,8 +795,7 @@ function FinalEvaluationModal({ evaluation, subjectName, formationTitle, onClose
         ))}
       </SurveySection>
       <p className="text-xs mb-6" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
-        La partie B (mise en pratique sur AKS) est évaluée par le formateur pendant la session ;
-        le total /20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).
+        {getQuizTexts(formationId).finalPracticalNote}
       </p>
     </SurveyModal>
   );

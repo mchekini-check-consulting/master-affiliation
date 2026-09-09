@@ -6,15 +6,10 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getRegistrationPublic, submitTrainee } from '@/api/backend';
 import { SectionTitle, TextAreaField, TextField } from '@/pages/Inscription';
+import { getNeedsLevels } from '@/data/formations';
 
 const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
-
-const LEVELS = [
-  { key: 'levelLinux', label: 'Linux (ligne de commande)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', label: 'Docker / conteneurs', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', label: 'Kubernetes', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
-];
 
 function RadioGroup({ label, options, value, onChange }) {
   return (
@@ -89,16 +84,19 @@ export default function ApprenantQuestionnaire() {
 
   const set = (field) => (value) => setAnswers((a) => ({ ...a, [field]: value }));
 
+  // Niveaux d'auto-évaluation du questionnaire de la formation
+  const LEVELS = getNeedsLevels(registration?.formation_id);
+
   const missing = useMemo(() => {
     const list = [];
     if (!answers.firstName.trim()) list.push('Prénom');
     if (!answers.lastName.trim()) list.push('Nom');
     if (!answers.email.trim()) list.push('Adresse email');
-    if (!answers.levelLinux) list.push('Niveau Linux');
-    if (!answers.levelDocker) list.push('Niveau Docker');
-    if (!answers.levelKubernetes) list.push('Niveau Kubernetes');
+    for (const { key, label } of LEVELS) {
+      if (!answers[key]) list.push(`Niveau ${label}`);
+    }
     return list;
-  }, [answers]);
+  }, [answers, LEVELS]);
 
   const submit = async () => {
     if (missing.length > 0 || submitting) return;

@@ -57,26 +57,26 @@ async function enrichZipWithDocuments(zip, auth) {
     if (d.needs_analysis) {
       add(`${dir}/Analyse du besoin/${name}_${rid}.pdf`, () => buildNeedsAnalysisPdfBase64(
         d.needs_analysis,
-        { name: fullName, context: d.company_name, formationTitle: d.formation_title },
+        { name: fullName, context: d.company_name, formationTitle: d.formation_title, formationId: d.formation_id },
       ));
     }
     if (d.sponsor_survey) {
       add(`${dir}/Analyse du besoin/Commanditaire_${sanitize(d.company_name, '_')}_${rid}.pdf`,
         () => buildSponsorSurveyPdfBase64(
           d.sponsor_survey,
-          { company: d.company_name, formationTitle: d.formation_title },
+          { company: d.company_name, formationTitle: d.formation_title, formationId: d.formation_id },
         ));
     }
     if (d.positioning_test) {
       add(`${dir}/Test de positionnement/${name}_${rid}.pdf`, () => buildPositioningTestPdfBase64(
         d.positioning_test,
-        { name: fullName, context: d.company_name, formationTitle: d.formation_title },
+        { name: fullName, context: d.company_name, formationTitle: d.formation_title, formationId: d.formation_id },
       ));
     }
     if (d.final_evaluation?.submitted_at) {
       add(`${dir}/Evaluation finale/${name}_${rid}.pdf`, () => buildFinalEvaluationPdfBase64(
         d.final_evaluation,
-        { name: fullName, formationTitle: d.formation_title },
+        { name: fullName, formationTitle: d.formation_title, formationId: d.formation_id },
       ));
     }
 
@@ -86,16 +86,16 @@ async function enrichZipWithDocuments(zip, auth) {
       const tid = shortId(t.id);
       const context = `Salarié de ${d.company_name}`;
       add(`${dir}/Analyse du besoin/${tName}_${tid}.pdf`, () => buildNeedsAnalysisPdfBase64(
-        t, { name: tFullName, context, formationTitle: d.formation_title },
+        t, { name: tFullName, context, formationTitle: d.formation_title, formationId: d.formation_id },
       ));
       if (t.positioning_test) {
         add(`${dir}/Test de positionnement/${tName}_${tid}.pdf`, () => buildPositioningTestPdfBase64(
-          t.positioning_test, { name: tFullName, context, formationTitle: d.formation_title },
+          t.positioning_test, { name: tFullName, context, formationTitle: d.formation_title, formationId: d.formation_id },
         ));
       }
       if (t.final_evaluation?.submitted_at) {
         add(`${dir}/Evaluation finale/${tName}_${tid}.pdf`, () => buildFinalEvaluationPdfBase64(
-          t.final_evaluation, { name: tFullName, formationTitle: d.formation_title },
+          t.final_evaluation, { name: tFullName, formationTitle: d.formation_title, formationId: d.formation_id },
         ));
       }
     }

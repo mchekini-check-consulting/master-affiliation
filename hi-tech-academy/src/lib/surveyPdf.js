@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import { getNeedsLevels, getQuizTexts } from '@/data/formations';
 
 // Export PDF des questionnaires remplis (analyse du besoin, test de
 // positionnement), au format des documents Qualiopi de l'organisme.
@@ -198,11 +199,6 @@ function safeFileName(parts) {
   return parts.join('_').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w-]+/g, '_') + '.pdf';
 }
 
-const LEVEL_LABELS = [
-  ['Linux (ligne de commande)', 'level_linux'],
-  ['Docker / conteneurs', 'level_docker'],
-  ['Kubernetes', 'level_kubernetes'],
-];
 
 /**
  * Exporte une analyse du besoin remplie. `subject` : { name, context (ex.
@@ -237,8 +233,8 @@ function writeNeedsAnalysis(na, subject) {
   w.qa("Objectifs attendus à l'issue de la formation", na.expected_objectives);
 
   w.section('3. Niveau de départ (auto-évaluation)');
-  for (const [label, key] of LEVEL_LABELS) {
-    w.qa(label, na[key]);
+  for (const { label, field } of getNeedsLevels(subject.formationId)) {
+    w.qa(label, na[field]);
   }
 
   w.section('4. Attentes et besoins spécifiques');
@@ -307,13 +303,14 @@ export function buildPositioningTestPdfBase64(test, subject) {
 }
 
 function writePositioningTest(test, subject) {
+  const quizTexts = getQuizTexts(subject.formationId);
   const w = new PdfWriter('TEST DE POSITIONNEMENT', subject.formationTitle);
   w.meta(`Apprenant : ${subject.name}${subject.context ? ` — ${subject.context}` : ''}`);
   w.meta(`Passé le : ${formatDateFr(test.submitted_at)}`);
   w.score(`Note : ${test.score} / ${test.max_score} (test non éliminatoire)`);
 
   w.section('A. Auto-évaluation');
-  w.qa('Maîtrise actuelle de Kubernetes (déclarée)', test.self_level);
+  w.qa(quizTexts.selfLevelPdfLabel, test.self_level);
 
   // Questions groupées par section du catalogue (Prérequis Linux / Docker)
   const sections = test.questions.reduce((acc, q) => {
@@ -329,8 +326,8 @@ function writePositioningTest(test, subject) {
     }
   }
 
-  w.section('D. Connaissances Kubernetes (facultatif)');
-  w.qa('Selon vous, à quoi sert Kubernetes ?', test.kubernetes_purpose);
+  w.section(`D. ${quizTexts.knowledgeSection}`);
+  w.qa(quizTexts.purposeQuestion, test.kubernetes_purpose);
   w.qa('Termes connus', test.known_terms?.length ? test.known_terms.join(', ') : null);
 
   w.section('E. Attentes');
@@ -363,10 +360,7 @@ function writeFinalEvaluation(evaluation, subject) {
     w.qcm(q);
   }
 
-  w.note(
-    "Partie B (mise en pratique sur AKS) évaluée par le formateur pendant la session ; le total "
-    + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
-  );
+  w.note(getQuizTexts(subject.formationId).finalPracticalNote);
 
   return w;
 }
@@ -385,10 +379,7 @@ export function buildFinalEvaluationCorrectionPdf(evaluation, subject) {
     w.qcmAnswerKey(q);
   }
 
-  w.note(
-    "Partie B (mise en pratique sur AKS) évaluée par le formateur pendant la session ; le total "
-    + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
-  );
+  w.note(getQuizTexts(subject.formationId).finalPracticalNote);
 
   return w.toBase64();
 }
