@@ -547,7 +547,7 @@ export const formations = [
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '100 h — séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
-      { icon: Euro, label: 'Tarif', value: '5 900 € HT (7 080 € TTC) / stagiaire — forfait 100 h' },
+      { icon: Euro, label: 'Tarif', value: '6 500 € HT (7 800 € TTC) / stagiaire — forfait 100 h' },
       { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
       { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
