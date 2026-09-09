@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FileText, Users } from 'lucide-react';
 import { adminListRegistrations } from '@/api/backend';
 import { formations } from '@/data/formations';
-import { Badge, Card, ViewHeader, bodyFont, headingFont } from './common';
+import { Badge, ViewHeader, bodyFont, headingFont } from './common';
 
-// Catalogue des formations avec statistiques des demandes reçues.
+// Catalogue des formations en tableau, avec statistiques des demandes reçues.
 export default function FormationsView({ auth, onOpenRequests }) {
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
@@ -40,91 +40,114 @@ export default function FormationsView({ auth, onOpenRequests }) {
   const catalogIds = new Set(formations.map((f) => f.id));
   const orphanStats = [...stats.values()].filter((s) => !catalogIds.has(s.formationId));
 
+  const factOf = (formation, label) =>
+    formation.keyFacts.find((f) => f.label === label)?.value ?? '—';
+
   return (
     <div>
       <ViewHeader
         title="Formations"
         subtitle={`${formations.length} formation${formations.length > 1 ? 's' : ''} au catalogue`} />
 
-      <div className="grid lg:grid-cols-2 gap-5">
-        {formations.map((formation) => {
-          const s = stats.get(formation.id);
-          return (
-            <Card key={formation.id}>
-              <div className="flex gap-4">
-                <img
-                  src={formation.image}
-                  alt={formation.title}
-                  className="w-24 h-24 rounded-xl object-cover shrink-0" />
-                <div className="min-w-0">
-                  <Badge tone="info">{formation.tag}</Badge>
-                  <h3 className="font-bold text-base mt-2" style={{ color: '#001a4a', ...headingFont }}>
-                    {formation.title}
-                  </h3>
-                  <p className="text-xs mt-1" style={{ color: '#6b7a9b', ...bodyFont }}>
-                    {formation.version}
-                  </p>
-                </div>
-              </div>
+      <div className="rounded-2xl overflow-x-auto" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
+        <table className="w-full text-left" style={{ minWidth: 920 }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
+              {['Formation', 'Durée', 'Tarif', 'Demandes', 'En attente', 'Validées', 'Refusées', 'Certificats', ''].map((h, i) => (
+                <th
+                  key={i}
+                  className="px-4 py-3 text-[11px] uppercase tracking-wide font-semibold whitespace-nowrap"
+                  style={{ color: '#6b7a9b', ...headingFont }}>
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {formations.map((formation) => {
+              const s = stats.get(formation.id);
+              return (
+                <tr key={formation.id} style={{ borderBottom: '1px solid #f0f3fa' }}>
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={formation.image}
+                        alt={formation.title}
+                        className="w-11 h-11 rounded-lg object-cover shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold" style={{ color: '#001a4a', ...headingFont }}>
+                          {formation.title}
+                        </p>
+                        <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
+                          {formation.tag} · {formation.version}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3.5 text-xs whitespace-nowrap" style={{ color: '#001a4a', ...bodyFont }}>
+                    {factOf(formation, 'Durée').split(' — ')[0]}
+                  </td>
+                  <td className="px-4 py-3.5 text-xs whitespace-nowrap" style={{ color: '#001a4a', ...bodyFont }}>
+                    {factOf(formation, 'Tarif').split(' / ')[0].split(' — ')[0]}
+                  </td>
+                  <td className="px-4 py-3.5"><Badge tone="info">{s?.total ?? 0}</Badge></td>
+                  <td className="px-4 py-3.5"><Badge tone="warning">{s?.pending ?? 0}</Badge></td>
+                  <td className="px-4 py-3.5"><Badge tone="success">{s?.validated ?? 0}</Badge></td>
+                  <td className="px-4 py-3.5"><Badge>{s?.refused ?? 0}</Badge></td>
+                  <td className="px-4 py-3.5"><Badge>{s?.certificates ?? 0}</Badge></td>
+                  <td className="px-4 py-3.5 whitespace-nowrap">
+                    <div className="flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => onOpenRequests(formation.id)}
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                        style={{ color: '#005064', ...headingFont }}>
+                        <Users className="w-4 h-4" />
+                        Demandes
+                      </button>
+                      <a
+                        href={formation.pdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                        style={{ color: '#005064', ...headingFont }}>
+                        <FileText className="w-4 h-4" />
+                        PDF
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
 
-              <ul className="mt-4 space-y-1.5">
-                {formation.keyFacts.slice(0, 3).map(({ label, value }) => (
-                  <li key={label} className="text-xs" style={{ color: '#0f2e2f', ...bodyFont }}>
-                    <strong style={headingFont}>{label} :</strong> {value}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-4 pt-4 flex flex-wrap items-center gap-2" style={{ borderTop: '1px solid #f0f3fa' }}>
-                <Badge tone="info">{s?.total ?? 0} demande{(s?.total ?? 0) > 1 ? 's' : ''}</Badge>
-                <Badge tone="warning">{s?.pending ?? 0} en attente</Badge>
-                <Badge tone="success">{s?.validated ?? 0} validée{(s?.validated ?? 0) > 1 ? 's' : ''}</Badge>
-                <Badge>{s?.refused ?? 0} refusée{(s?.refused ?? 0) > 1 ? 's' : ''}</Badge>
-                <Badge>{s?.certificates ?? 0} certificat{(s?.certificates ?? 0) > 1 ? 's' : ''}</Badge>
-              </div>
-
-              <div className="mt-4 flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => onOpenRequests(formation.id)}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                  style={{ color: '#005064', ...headingFont }}>
-                  <Users className="w-4 h-4" />
-                  Voir les demandes
-                </button>
-                <a
-                  href={formation.pdf}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                  style={{ color: '#005064', ...headingFont }}>
-                  <FileText className="w-4 h-4" />
-                  Programme (PDF)
-                </a>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
-
-      {orphanStats.length > 0 && (
-        <div className="mt-6">
-          <h3 className="font-bold text-sm mb-3" style={{ color: '#001a4a', ...headingFont }}>
-            Demandes sur des formations hors catalogue
-          </h3>
-          <div className="grid lg:grid-cols-2 gap-5">
             {orphanStats.map((s) => (
-              <Card key={s.formationId} title={s.title}>
-                <div className="flex flex-wrap gap-2">
-                  <Badge tone="info">{s.total} demande{s.total > 1 ? 's' : ''}</Badge>
-                  <Badge tone="warning">{s.pending} en attente</Badge>
-                  <Badge tone="success">{s.validated} validée{s.validated > 1 ? 's' : ''}</Badge>
-                </div>
-              </Card>
+              <tr key={s.formationId} style={{ borderBottom: '1px solid #f0f3fa', background: '#fdf9ef' }}>
+                <td className="px-4 py-3.5">
+                  <p className="text-sm font-semibold" style={{ color: '#001a4a', ...headingFont }}>{s.title}</p>
+                  <p className="text-xs" style={{ color: '#8a5a00', ...bodyFont }}>Formation hors catalogue</p>
+                </td>
+                <td className="px-4 py-3.5 text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>—</td>
+                <td className="px-4 py-3.5 text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>—</td>
+                <td className="px-4 py-3.5"><Badge tone="info">{s.total}</Badge></td>
+                <td className="px-4 py-3.5"><Badge tone="warning">{s.pending}</Badge></td>
+                <td className="px-4 py-3.5"><Badge tone="success">{s.validated}</Badge></td>
+                <td className="px-4 py-3.5"><Badge>{s.refused}</Badge></td>
+                <td className="px-4 py-3.5"><Badge>{s.certificates}</Badge></td>
+                <td className="px-4 py-3.5">
+                  <button
+                    type="button"
+                    onClick={() => onOpenRequests(s.formationId)}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                    style={{ color: '#005064', ...headingFont }}>
+                    <Users className="w-4 h-4" />
+                    Demandes
+                  </button>
+                </td>
+              </tr>
             ))}
-          </div>
-        </div>
-      )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
