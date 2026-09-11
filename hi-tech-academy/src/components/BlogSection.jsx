@@ -29,16 +29,16 @@ export default function BlogSection() {
           
           <span
             className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-4"
-            style={{ color: '#005064', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             
             Blog & Actualités
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15]"
-            style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15]"
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             
             Nos Derniers{' '}
-            <span style={{ color: '#005064' }}>Articles</span>
+            <span style={{ color: '#007f64' }}>Articles</span>
           </h2>
         </motion.div>
 
@@ -65,7 +65,7 @@ export default function BlogSection() {
                 {/* Category Badge */}
                 <div
                 className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-semibold"
-                style={{ backgroundColor: '#F8B102', color: 'black', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                style={{ backgroundColor: '#004c3c', color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 
                   {post.category}
                 </div>
@@ -87,8 +87,8 @@ export default function BlogSection() {
 
                 {/* Title */}
                 <h3
-                className="text-lg font-bold leading-snug group-hover:text-[#005064] transition-colors"
-                style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                className="text-lg font-bold leading-snug group-hover:text-[#007f64] transition-colors"
+                style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 
                   {post.title}
                 </h3>
@@ -96,7 +96,7 @@ export default function BlogSection() {
                 {/* Excerpt */}
                 <p
                 className="text-sm leading-relaxed line-clamp-2"
-                style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+                style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
                 
                   {post.excerpt}
                 </p>
@@ -104,7 +104,7 @@ export default function BlogSection() {
                 {/* Read More Link */}
                 <span
                 className="inline-flex items-center gap-2 text-sm font-semibold transition-all group-hover:gap-3"
-                style={{ color: '#005064', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
                   Lire l'article
                   <ArrowRight className="w-4 h-4" />
@@ -127,7 +127,7 @@ export default function BlogSection() {
             to="/blog"
             className="inline-flex items-center gap-2 h-11 px-6 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:shadow-lg"
             style={{
-              backgroundColor: '#005064',
+              backgroundColor: '#007f64',
               color: 'white',
               fontFamily: "'Plus Jakarta Sans', sans-serif"
             }}>

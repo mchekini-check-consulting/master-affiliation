@@ -42,24 +42,24 @@ export default function FAQSection() {
         <div className="text-center mb-12">
           <span
             className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-            style={{ color: '#005064', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             FAQ
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-4"
-            style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] mb-4"
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Questions{' '}
-            <span style={{ color: '#005064' }}>Fréquentes</span>
+            <span style={{ color: '#007f64' }}>Fréquentes</span>
           </h2>
-          <p className="text-sm" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+          <p className="text-sm" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
             Tout ce que vous devez savoir avant de commencer votre parcours.
           </p>
 
           <div className="flex items-center justify-center gap-3 mt-5">
             <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
-            <div className="w-2 h-2 rounded-full" style={{ background: '#F8B102' }} />
+            <div className="w-2 h-2 rounded-full" style={{ background: '#004c3c' }} />
             <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function FAQSection() {
                 key={i}
                 className="rounded-2xl overflow-hidden"
                 style={{
-                  border: isOpen ? '1.5px solid #005064' : '1.5px solid #e8edf6',
+                  border: isOpen ? '1.5px solid #007f64' : '1.5px solid #e8edf6',
                   transition: 'border-color 0.3s ease',
                 }}
               >
@@ -84,17 +84,17 @@ export default function FAQSection() {
                 >
                   <span
                     className="font-semibold text-sm md:text-base leading-snug"
-                    style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   >
                     {faq.question}
                   </span>
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: isOpen ? '#005064' : '#f0f3fa', transition: 'background 0.3s ease' }}
+                    style={{ background: isOpen ? '#007f64' : '#eafff6', transition: 'background 0.3s ease' }}
                   >
                     {isOpen
                       ? <Minus className="w-4 h-4 text-white" />
-                      : <Plus className="w-4 h-4" style={{ color: '#005064' }} />
+                      : <Plus className="w-4 h-4" style={{ color: '#007f64' }} />
                     }
                   </div>
                 </button>
@@ -110,7 +110,7 @@ export default function FAQSection() {
                     >
                       <p
                         className="px-5 pb-5 text-sm leading-relaxed"
-                        style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}
+                        style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}
                       >
                         {faq.answer}
                       </p>
@@ -124,13 +124,13 @@ export default function FAQSection() {
 
         {/* Bottom CTA */}
         <div className="text-center mt-10">
-          <p className="text-sm mb-4" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+          <p className="text-sm mb-4" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
             Vous avez d'autres questions ?
           </p>
           <a
             href="#contact"
-            className="inline-flex items-center gap-2 h-11 px-7 rounded-xl font-bold text-sm text-black transition-all hover:opacity-90"
-            style={{ backgroundColor: '#F8B102', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="inline-flex items-center gap-2 h-11 px-7 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90"
+            style={{ backgroundColor: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Contactez-nous
           </a>

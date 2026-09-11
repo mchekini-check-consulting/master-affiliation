@@ -83,7 +83,7 @@ export default function HeroImage() {
         <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
           <div className="absolute inset-0 rounded-full" style={{ border: '1.5px solid rgba(255,255,255,0.25)' }} />
           <div className="absolute inset-0 flex items-center justify-center hidden">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg" style={{ background: '#F8B102' }}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg" style={{ background: '#004c3c' }}>
               ✦
             </div>
           </div>

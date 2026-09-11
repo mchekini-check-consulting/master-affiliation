@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Copy, Users } from 'lucide-react';
-import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getRegistrationPublic, submitSponsorSurvey } from '@/api/backend';
@@ -101,8 +100,7 @@ export default function QuestionnaireCommanditaire() {
   };
 
   const shell = (content) => (
-    <div className="min-h-screen" style={{ background: '#f7f9fd' }}>
-      <TopBar />
+    <div className="min-h-screen" style={{ background: '#f7fbf9' }}>
       <Header />
       <main className="pt-32 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">{content}</div>
@@ -113,16 +111,16 @@ export default function QuestionnaireCommanditaire() {
 
   if (loadError) {
     return shell(
-      <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-        <p className="mb-4" style={{ color: '#001a4a', ...headingFont }}>{loadError}</p>
-        <Link to="/" className="underline text-sm" style={{ color: '#005064', ...bodyFont }}>Retour à l'accueil</Link>
+      <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
+        <p className="mb-4" style={{ color: '#004c3c', ...headingFont }}>{loadError}</p>
+        <Link to="/" className="underline text-sm" style={{ color: '#007f64', ...bodyFont }}>Retour à l'accueil</Link>
       </div>
     );
   }
 
   if (!registration) {
     return shell(
-      <p className="text-center text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>
+      <p className="text-center text-sm" style={{ color: '#5f6b66', ...bodyFont }}>Chargement…</p>
     );
   }
 
@@ -139,43 +137,43 @@ export default function QuestionnaireCommanditaire() {
     return shell(
       <>
         <Stepper current={1} />
-        <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-          <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#005064' }} />
-          <h1 className="text-2xl font-bold mb-3" style={{ color: '#001a4a', ...headingFont }}>
+        <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
+          <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#007f64' }} />
+          <h1 className="text-2xl font-bold mb-3" style={{ color: '#004c3c', ...headingFont }}>
             Votre demande a bien été envoyée
           </h1>
-          <p className="text-sm mb-2" style={{ color: '#6b7a9b', ...bodyFont }}>
+          <p className="text-sm mb-2" style={{ color: '#5f6b66', ...bodyFont }}>
             {submitted
               ? 'Merci, vos réponses au questionnaire ont bien été enregistrées.'
               : 'Le questionnaire a déjà été renseigné pour cette demande.'}
           </p>
-          <p className="text-sm mb-6" style={{ color: '#6b7a9b', ...bodyFont }}>
+          <p className="text-sm mb-6" style={{ color: '#5f6b66', ...bodyFont }}>
             La demande d'inscription de <strong>{registration.company_name}</strong> à la formation{' '}
             <strong>{registration.formation_title}</strong> est maintenant transmise et en attente de
             validation. Nous revenons vers vous sous 24 h ouvrées.
           </p>
 
           {/* Lien à partager aux salariés : chacun remplit son analyse du besoin */}
-          <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: '#f0f3fa', border: '1px solid #e0e8f4' }}>
-            <p className="flex items-center gap-2 text-sm font-bold mb-2" style={{ color: '#001a4a', ...headingFont }}>
-              <Users className="w-4 h-4" style={{ color: '#005064' }} />
+          <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: '#eafff6', border: '1px solid #e5e5e5' }}>
+            <p className="flex items-center gap-2 text-sm font-bold mb-2" style={{ color: '#004c3c', ...headingFont }}>
+              <Users className="w-4 h-4" style={{ color: '#007f64' }} />
               Dernière chose : le questionnaire de vos salariés
             </p>
-            <p className="text-sm mb-3" style={{ color: '#6b7a9b', ...bodyFont }}>
+            <p className="text-sm mb-3" style={{ color: '#5f6b66', ...bodyFont }}>
               Chaque salarié inscrit doit remplir son propre questionnaire d'analyse du besoin
               (niveau de départ, attentes — 5 minutes). Transmettez-leur ce lien :
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <code
                 className="flex-1 min-w-0 truncate text-xs px-3 py-2.5 rounded-lg"
-                style={{ background: 'white', color: '#005064', border: '1px solid #e0e8f4' }}>
+                style={{ background: 'white', color: '#007f64', border: '1px solid #e5e5e5' }}>
                 {traineeLink}
               </code>
               <button
                 type="button"
                 onClick={copyTraineeLink}
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-bold shrink-0"
-                style={{ background: '#005064', color: 'white', ...headingFont }}>
+                style={{ background: '#007f64', color: 'white', ...headingFont }}>
                 <Copy className="w-4 h-4" />
                 {linkCopied ? 'Copié !' : 'Copier le lien'}
               </button>
@@ -190,7 +188,7 @@ export default function QuestionnaireCommanditaire() {
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-sm font-bold"
-            style={{ color: '#005064', ...headingFont }}>
+            style={{ color: '#007f64', ...headingFont }}>
             Retour à l'accueil
             <ArrowRight className="w-4 h-4" />
           </Link>
@@ -204,13 +202,13 @@ export default function QuestionnaireCommanditaire() {
       <div className="text-center mb-8">
         <span
           className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-          style={{ color: '#002d74', ...headingFont }}>
+          style={{ color: '#007f64', ...headingFont }}>
           {registration.formation_title}
         </span>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#001a4a', ...headingFont }}>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#004c3c', ...headingFont }}>
           Vos attentes en tant que commanditaire
         </h1>
-        <p className="text-sm max-w-xl mx-auto" style={{ color: '#6b7a9b', ...bodyFont }}>
+        <p className="text-sm max-w-xl mx-auto" style={{ color: '#5f6b66', ...bodyFont }}>
           Vous inscrivez des salariés de <strong>{registration.company_name}</strong> à cette formation.
           Ce court questionnaire nous permet de comprendre vos attentes et d'adapter la session.
         </p>
@@ -225,7 +223,7 @@ export default function QuestionnaireCommanditaire() {
         qu'une fois ce questionnaire complété et envoyé.
       </p>
 
-      <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
+      <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
 
         <SectionTitle>1. Votre projet de formation</SectionTitle>
         <div className="space-y-4">
@@ -281,12 +279,12 @@ export default function QuestionnaireCommanditaire() {
             value={answers.funding}
             onChange={set('funding')}
             options={FUNDING_OPTIONS} />
-          <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#001a4a', ...bodyFont }}>
+          <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#004c3c', ...bodyFont }}>
             <input
               type="checkbox"
               checked={answers.needsAdaptation}
               onChange={(e) => set('needsAdaptation')(e.target.checked)}
-              className="mt-0.5 accent-[#005064]" />
+              className="mt-0.5 accent-[#007f64]" />
             Un ou plusieurs salariés sont en situation de handicap nécessitant un aménagement
           </label>
           {answers.needsAdaptation && (
@@ -317,7 +315,7 @@ export default function QuestionnaireCommanditaire() {
             onClick={submit}
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: '#005064', color: 'white', ...headingFont }}>
+            style={{ background: '#007f64', color: 'white', ...headingFont }}>
             {submitting ? 'Envoi en cours…' : 'Envoyer mes réponses et transmettre ma demande'}
             <ArrowRight className="w-4 h-4" />
           </button>

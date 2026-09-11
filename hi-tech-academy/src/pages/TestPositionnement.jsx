@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, UserPlus } from 'lucide-react';
-import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import {
@@ -103,8 +102,7 @@ export default function TestPositionnement() {
   };
 
   const shell = (children) => (
-    <div className="min-h-screen" style={{ background: '#f7f9fd' }}>
-      <TopBar />
+    <div className="min-h-screen" style={{ background: '#f7fbf9' }}>
       <Header />
       <main className="pt-32 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">{children}</div>
@@ -115,16 +113,16 @@ export default function TestPositionnement() {
 
   if (loadError) {
     return shell(
-      <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-        <p className="mb-4" style={{ color: '#001a4a', ...headingFont }}>{loadError}</p>
-        <Link to="/" className="underline text-sm" style={{ color: '#005064', ...bodyFont }}>Retour à l'accueil</Link>
+      <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
+        <p className="mb-4" style={{ color: '#004c3c', ...headingFont }}>{loadError}</p>
+        <Link to="/" className="underline text-sm" style={{ color: '#007f64', ...bodyFont }}>Retour à l'accueil</Link>
       </div>
     );
   }
 
   if (!registration || !content) {
     return shell(
-      <p className="text-center text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>
+      <p className="text-center text-sm" style={{ color: '#5f6b66', ...bodyFont }}>Chargement…</p>
     );
   }
 
@@ -134,12 +132,12 @@ export default function TestPositionnement() {
     return shell(
       <>
         {!isTrainee && <Stepper current={1} />}
-        <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-          <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#005064' }} />
-          <h1 className="text-2xl font-bold mb-3" style={{ color: '#001a4a', ...headingFont }}>
+        <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
+          <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#007f64' }} />
+          <h1 className="text-2xl font-bold mb-3" style={{ color: '#004c3c', ...headingFont }}>
             {isTrainee ? 'Merci, votre test a bien été enregistré' : 'Votre demande a bien été envoyée'}
           </h1>
-          <p className="text-sm mb-6" style={{ color: '#6b7a9b', ...bodyFont }}>
+          <p className="text-sm mb-6" style={{ color: '#5f6b66', ...bodyFont }}>
             {isTrainee ? (
               <>Vos réponses au questionnaire et au test de positionnement sont enregistrées : le
               formateur adaptera la session « <strong>{registration.formation_title}</strong> » en conséquence.
@@ -155,7 +153,7 @@ export default function TestPositionnement() {
               <Link
                 to={`/inscription/demande/${requestId}/apprenant`}
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold"
-                style={{ background: '#f0f3fa', color: '#005064', border: '1.5px solid #005064', ...headingFont }}>
+                style={{ background: '#eafff6', color: '#007f64', border: '1.5px solid #007f64', ...headingFont }}>
                 <UserPlus className="w-4 h-4" />
                 Questionnaire d'un autre salarié
               </Link>
@@ -163,7 +161,7 @@ export default function TestPositionnement() {
             <Link
               to="/"
               className="inline-flex items-center gap-2 text-sm font-bold"
-              style={{ color: '#005064', ...headingFont }}>
+              style={{ color: '#007f64', ...headingFont }}>
               Retour à l'accueil
               <ArrowRight className="w-4 h-4" />
             </Link>
@@ -184,13 +182,13 @@ export default function TestPositionnement() {
       <div className="text-center mb-8">
         <span
           className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-          style={{ color: '#002d74', ...headingFont }}>
+          style={{ color: '#007f64', ...headingFont }}>
           {registration.formation_title}
         </span>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#001a4a', ...headingFont }}>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#004c3c', ...headingFont }}>
           Test de positionnement
         </h1>
-        <p className="text-sm max-w-xl mx-auto" style={{ color: '#6b7a9b', ...bodyFont }}>
+        <p className="text-sm max-w-xl mx-auto" style={{ color: '#5f6b66', ...bodyFont }}>
           {quizTexts.intro} <strong>Il n'est pas éliminatoire.</strong>
         </p>
       </div>
@@ -206,10 +204,10 @@ export default function TestPositionnement() {
           : "votre demande d'inscription ne sera transmise qu'une fois ce test complété et envoyé."}
       </p>
 
-      <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
+      <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
 
         <SectionTitle>A. Auto-évaluation</SectionTitle>
-        <p className="text-sm font-semibold mb-2" style={{ color: '#001a4a', ...headingFont }}>
+        <p className="text-sm font-semibold mb-2" style={{ color: '#004c3c', ...headingFont }}>
           {quizTexts.selfLevelQuestion}
         </p>
         <div className="space-y-2">
@@ -220,9 +218,9 @@ export default function TestPositionnement() {
               onClick={() => setSelfLevel(level)}
               className="w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all"
               style={{
-                border: selfLevel === level ? '1.5px solid #005064' : '1px solid #e0e8f4',
-                background: selfLevel === level ? '#f0f3fa' : 'white',
-                color: selfLevel === level ? '#005064' : '#6b7a9b',
+                border: selfLevel === level ? '1.5px solid #007f64' : '1px solid #e5e5e5',
+                background: selfLevel === level ? '#eafff6' : 'white',
+                color: selfLevel === level ? '#007f64' : '#5f6b66',
                 ...headingFont,
               }}>
               {level}
@@ -236,7 +234,7 @@ export default function TestPositionnement() {
             <div className="space-y-6">
               {questions.map((q) => (
                 <div key={q.id}>
-                  <p className="text-sm font-semibold mb-2" style={{ color: '#001a4a', ...headingFont }}>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#004c3c', ...headingFont }}>
                     {q.id}. {q.text}
                   </p>
                   <div className="grid sm:grid-cols-2 gap-2">
@@ -247,9 +245,9 @@ export default function TestPositionnement() {
                         onClick={() => setAnswers((a) => ({ ...a, [q.id]: index }))}
                         className="text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
                         style={{
-                          border: answers[q.id] === index ? '1.5px solid #005064' : '1px solid #e0e8f4',
-                          background: answers[q.id] === index ? '#f0f3fa' : 'white',
-                          color: answers[q.id] === index ? '#005064' : '#6b7a9b',
+                          border: answers[q.id] === index ? '1.5px solid #007f64' : '1px solid #e5e5e5',
+                          background: answers[q.id] === index ? '#eafff6' : 'white',
+                          color: answers[q.id] === index ? '#007f64' : '#5f6b66',
                           fontFamily: "'Inter', sans-serif",
                         }}>
                         {option}
@@ -269,7 +267,7 @@ export default function TestPositionnement() {
             value={kubernetesPurpose}
             onChange={setKubernetesPurpose} />
           <div>
-            <p className="text-sm font-semibold mb-2" style={{ color: '#001a4a', ...headingFont }}>
+            <p className="text-sm font-semibold mb-2" style={{ color: '#004c3c', ...headingFont }}>
               Connaissez-vous l'un de ces termes ? (cochez)
             </p>
             <div className="flex flex-wrap gap-2">
@@ -280,9 +278,9 @@ export default function TestPositionnement() {
                   onClick={() => toggleTerm(term)}
                   className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
                   style={{
-                    border: knownTerms.includes(term) ? '1.5px solid #005064' : '1px solid #e0e8f4',
-                    background: knownTerms.includes(term) ? '#f0f3fa' : 'white',
-                    color: knownTerms.includes(term) ? '#005064' : '#6b7a9b',
+                    border: knownTerms.includes(term) ? '1.5px solid #007f64' : '1px solid #e5e5e5',
+                    background: knownTerms.includes(term) ? '#eafff6' : 'white',
+                    color: knownTerms.includes(term) ? '#007f64' : '#5f6b66',
                     ...headingFont,
                   }}>
                   {term}
@@ -314,7 +312,7 @@ export default function TestPositionnement() {
             onClick={submit}
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: '#005064', color: 'white', ...headingFont }}>
+            style={{ background: '#007f64', color: 'white', ...headingFont }}>
             {submitting
               ? 'Envoi en cours…'
               : isTrainee ? 'Envoyer mon test' : 'Envoyer mon test et transmettre ma demande'}

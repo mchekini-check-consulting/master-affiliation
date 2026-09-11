@@ -77,18 +77,18 @@ export default function ResultsSection() {
       ref={ref}
       id="resultats"
       className="w-full py-16 sm:py-20 lg:py-24"
-      style={{ background: 'linear-gradient(135deg, #001a4a 0%, #005064 100%)' }}>
+      style={{ background: 'linear-gradient(135deg, #004c3c 0%, #007f64 100%)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16">
           <span
             className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-            style={{ color: '#F8B102', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Nos résultats
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15]"
+            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15]"
             style={{ color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Indicateurs de résultats
           </h2>
@@ -116,7 +116,7 @@ export default function ResultsSection() {
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6"
                 style={{ background: 'rgba(248,177,2,0.15)' }}>
-                <item.icon className="w-7 h-7" style={{ color: '#F8B102' }} />
+                <item.icon className="w-7 h-7" style={{ color: '#004c3c' }} />
               </div>
 
               <div

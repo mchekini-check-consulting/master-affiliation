@@ -1,27 +1,25 @@
 import React from 'react';
 import Header from '@/components/Header';
-import TopBar from '@/components/TopBar';
 import Footer from '@/components/Footer';
 
 export default function LegalNotices() {
   return (
     <div className="min-h-screen bg-white">
-      <TopBar />
       <Header />
       
       <main className="pt-32 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <h1
             className="text-3xl sm:text-4xl font-bold mb-8"
-            style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Mentions Légales
           </h1>
 
-          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
             
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 1. Éditeur du site
               </h2>
               <p className="mb-2">
@@ -36,7 +34,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 2. Directeur de la publication
               </h2>
               <p>
@@ -45,7 +43,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 3. Hébergement
               </h2>
               <p>
@@ -54,7 +52,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 4. Propriété intellectuelle
               </h2>
               <p>
@@ -63,7 +61,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 5. Responsabilité
               </h2>
               <p>
@@ -72,7 +70,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 6. Liens hypertextes
               </h2>
               <p>

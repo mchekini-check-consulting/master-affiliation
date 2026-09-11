@@ -113,7 +113,7 @@ export default function AboutSection() {
             <div
               className="absolute z-30 top-6 right-0 rounded-2xl px-4 py-3 flex flex-col items-center"
               style={{
-                background: '#F8B102',
+                background: '#004c3c',
                 boxShadow: '0 4px 12px rgba(248,177,2,0.20)'
               }}>
               
@@ -142,25 +142,25 @@ export default function AboutSection() {
             {/* Label */}
             <span
               className="inline-block text-xs font-semibold uppercase tracking-[0.22em] mb-4"
-              style={{ color: '#005064', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               À propos de nous
             </span>
 
             {/* Heading */}
             <h2
-              className="text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-6"
-              style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              className="font-serif-display text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] mb-6"
+              style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               Votre Porte d'Entrée vers une Carrière{' '}
-              <span style={{ color: '#005064' }}>Technologique</span>{' '}
+              <span style={{ color: '#007f64' }}>Technologique</span>{' '}
               Réussie
             </h2>
 
             {/* Body */}
             <p
               className="text-base leading-relaxed mb-8"
-              style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+              style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
               
               Notre organisme de formation est dédié à fournir des programmes de formation de haute qualité dans le domaine des technologies de l'information. Nous nous engageons à aider nos étudiants à atteindre leurs objectifs professionnels grâce à des parcours d'apprentissage adaptés et des formateurs experts.
             </p>
@@ -173,7 +173,7 @@ export default function AboutSection() {
               'Accompagnement carrière jusqu\'à l\'emploi'].
               map((item, i) =>
               <li key={i} className="flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: '#005064' }} />
+                  <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: '#007f64' }} />
                   <span
                   className="text-sm"
                   style={{ color: '#2d4a4e', fontFamily: "'Inter', sans-serif" }}>
@@ -187,8 +187,8 @@ export default function AboutSection() {
             {/* CTA */}
             <a
               href="#programmes"
-              className="inline-flex items-center gap-2 h-13 px-8 py-4 rounded-xl font-bold text-sm text-black transition-all hover:opacity-90 hover:shadow-lg"
-              style={{ backgroundColor: '#F8B102', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              className="inline-flex items-center gap-2 h-13 px-8 py-4 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
+              style={{ backgroundColor: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               Se Lancer !
               <ArrowRight className="w-4 h-4" />

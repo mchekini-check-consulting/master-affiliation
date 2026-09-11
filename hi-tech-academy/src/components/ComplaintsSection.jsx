@@ -13,8 +13,8 @@ const COMPLAINANT_TYPES = [
   { key: 'INDIVIDUAL', label: 'Particulier' },
 ];
 
-const inputClass = 'w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[#005064] bg-white';
-const inputStyle = { borderColor: '#e0e8f4', color: '#001a4a', ...bodyFont };
+const inputClass = 'w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[#007f64] bg-white';
+const inputStyle = { borderColor: '#e5e5e5', color: '#004c3c', ...bodyFont };
 
 const emptyForm = {
   formationId: formations[0]?.id ?? '',
@@ -71,7 +71,7 @@ export default function ComplaintsSection() {
   };
 
   return (
-    <section id="reclamations" className="w-full py-16 sm:py-20" style={{ background: '#f7f9fd' }}>
+    <section id="reclamations" className="w-full py-16 sm:py-20" style={{ background: '#f7fbf9' }}>
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <motion.div
           className="text-center mb-10"
@@ -81,26 +81,26 @@ export default function ComplaintsSection() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
           <span
             className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-            style={{ color: '#002d74', ...headingFont }}>
+            style={{ color: '#007f64', ...headingFont }}>
             <MessageSquareWarning className="w-4 h-4" />
             Votre avis compte
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-[3rem] font-extrabold tracking-tight mb-4" style={{ color: '#001a4a', ...headingFont }}>
-            Déposer une <span style={{ color: '#005064' }}>réclamation</span>
+          <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight mb-4" style={{ color: '#004c3c', ...headingFont }}>
+            Déposer une <span style={{ color: '#007f64' }}>réclamation</span>
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: '#6b7a9b', ...bodyFont }}>
+          <p className="text-base max-w-xl mx-auto" style={{ color: '#5f6b66', ...bodyFont }}>
             Une remarque, un désaccord ou une insatisfaction concernant l'une de nos formations ?
             Faites-le nous savoir : chaque réclamation est enregistrée, accusée de réception et traitée.
           </p>
         </motion.div>
 
         {sent ? (
-          <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-            <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#005064' }} />
-            <h3 className="text-xl font-bold mb-3" style={{ color: '#001a4a', ...headingFont }}>
+          <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
+            <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#007f64' }} />
+            <h3 className="text-xl font-bold mb-3" style={{ color: '#004c3c', ...headingFont }}>
               Votre réclamation a bien été enregistrée
             </h3>
-            <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
+            <p className="text-sm" style={{ color: '#5f6b66', ...bodyFont }}>
               Vous allez recevoir un accusé de réception par email. Une réponse vous sera apportée
               sous 15 jours ouvrés.
             </p>
@@ -109,10 +109,10 @@ export default function ComplaintsSection() {
           <form
             onSubmit={submit}
             className="rounded-3xl p-6 sm:p-8"
-            style={{ background: 'white', border: '1px solid #e0e8f4' }}>
+            style={{ background: 'white', border: '1px solid #e5e5e5' }}>
 
             <label className="block mb-4">
-              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
                 Formation concernée <span style={{ color: '#c2410c' }}>*</span>
               </span>
               <select value={form.formationId} onChange={(e) => set('formationId')(e.target.value)} className={inputClass} style={inputStyle}>
@@ -123,7 +123,7 @@ export default function ComplaintsSection() {
             </label>
 
             <div className="mb-4">
-              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
                 Vous êtes <span style={{ color: '#c2410c' }}>*</span>
               </span>
               <div className="grid grid-cols-3 gap-2">
@@ -134,9 +134,9 @@ export default function ComplaintsSection() {
                     onClick={() => set('complainantType')(key)}
                     className="rounded-xl px-3 py-2.5 text-sm font-semibold transition-all"
                     style={{
-                      border: form.complainantType === key ? '1.5px solid #005064' : '1px solid #e0e8f4',
-                      background: form.complainantType === key ? '#f0f3fa' : 'white',
-                      color: form.complainantType === key ? '#005064' : '#6b7a9b',
+                      border: form.complainantType === key ? '1.5px solid #007f64' : '1px solid #e5e5e5',
+                      background: form.complainantType === key ? '#eafff6' : 'white',
+                      color: form.complainantType === key ? '#007f64' : '#5f6b66',
                       ...headingFont,
                     }}>
                     {label}
@@ -147,7 +147,7 @@ export default function ComplaintsSection() {
 
             {isCompany && (
               <label className="block mb-4">
-                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
                   Nom de l'entreprise
                 </span>
                 <input value={form.companyName} onChange={(e) => set('companyName')(e.target.value)} className={inputClass} style={inputStyle} />
@@ -156,13 +156,13 @@ export default function ComplaintsSection() {
 
             <div className="grid sm:grid-cols-2 gap-4 mb-4">
               <label className="block">
-                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
                   Prénom <span style={{ color: '#c2410c' }}>*</span>
                 </span>
                 <input value={form.firstName} onChange={(e) => set('firstName')(e.target.value)} className={inputClass} style={inputStyle} />
               </label>
               <label className="block">
-                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
                   Nom <span style={{ color: '#c2410c' }}>*</span>
                 </span>
                 <input value={form.lastName} onChange={(e) => set('lastName')(e.target.value)} className={inputClass} style={inputStyle} />
@@ -170,14 +170,14 @@ export default function ComplaintsSection() {
             </div>
 
             <label className="block mb-4">
-              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
                 Adresse email <span style={{ color: '#c2410c' }}>*</span>
               </span>
               <input type="email" value={form.email} onChange={(e) => set('email')(e.target.value)} className={inputClass} style={inputStyle} />
             </label>
 
             <label className="block mb-5">
-              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
                 Votre réclamation <span style={{ color: '#c2410c' }}>*</span>
               </span>
               <textarea
@@ -204,7 +204,7 @@ export default function ComplaintsSection() {
               type="submit"
               disabled={missing.length > 0 || submitting}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: '#005064', color: 'white', ...headingFont }}>
+              style={{ background: '#007f64', color: 'white', ...headingFont }}>
               {submitting ? 'Envoi en cours…' : 'Envoyer ma réclamation'}
               <Send className="w-4 h-4" />
             </button>

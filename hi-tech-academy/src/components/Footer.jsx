@@ -4,8 +4,8 @@ import { Mail, Phone, MapPin, Send, FileText, Facebook, Instagram, Linkedin, You
 import MarqueeStrip from '@/components/MarqueeStrip';
 import { formations as catalogue } from '@/data/formations';
 
-const BRAND_COLOR = '#005064';
-const CTA_COLOR = '#F8B102';
+const BRAND_COLOR = '#007f64';
+const CTA_COLOR = '#004c3c';
 
 // Une entrée par formation du catalogue, vers sa page de vente
 const formations = catalogue.map((f) => ({ label: f.title, href: `/formations/${f.id}` }));
@@ -53,7 +53,7 @@ export default function Footer() {
   return (
     <footer
       style={{
-        background: '#06071f',
+        background: '#00382c',
         fontFamily: "'Inter', sans-serif",
         backgroundImage: `url('/images/bfbbe912e_footer-bg-05.png')`,
         backgroundSize: '400px 400px',
@@ -114,7 +114,7 @@ export default function Footer() {
             <a href="/" className="flex items-center gap-2 mb-4 sm:mb-5">
               <div
                 className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg font-bold text-white text-xs sm:text-sm shrink-0"
-                style={{ background: 'linear-gradient(135deg, #005064, #007a96)' }}
+                style={{ background: '#004c3c' }}
               >
                 HT
               </div>
@@ -267,7 +267,7 @@ export default function Footer() {
                 aria-label={label}
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-gray-500 hover:text-black transition-all duration-200"
                 style={{ background: '#f0f0f0', border: '1px solid #e0e0e0' }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#005064'; e.currentTarget.style.borderColor = BRAND_COLOR; e.currentTarget.style.color = 'white'; }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#007f64'; e.currentTarget.style.borderColor = BRAND_COLOR; e.currentTarget.style.color = 'white'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = '#f0f0f0'; e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.color = '#6b7280'; }}
               >
                 <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

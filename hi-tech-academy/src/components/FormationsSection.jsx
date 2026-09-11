@@ -37,7 +37,7 @@ function FormationRow({ formation }) {
         className="relative flex flex-col rounded-3xl overflow-hidden lg:col-span-2"
         style={{
           background: 'white',
-          border: '1px solid #e0e8f4',
+          border: '1px solid #e5e5e5',
           boxShadow: hovered ?
             '0 8px 24px rgba(0,80,100,0.10)' :
             '0 2px 8px rgba(0,0,0,0.04)',
@@ -52,7 +52,7 @@ function FormationRow({ formation }) {
             className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold"
             style={{
               background: 'rgba(255,255,255,0.85)',
-              color: '#005064',
+              color: '#007f64',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               backdropFilter: 'blur(8px)'
             }}>
@@ -64,22 +64,22 @@ function FormationRow({ formation }) {
         <div className="flex flex-col flex-1 p-6">
           <h3
             className="font-bold text-xl leading-snug mb-3"
-            style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {formation.title}
           </h3>
 
           <p
             className="text-sm leading-relaxed mb-5"
-            style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+            style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
             {formation.description}
           </p>
 
           {/* Infos clés */}
-          <ul className="space-y-3 mb-6 p-4 rounded-2xl" style={{ background: '#f0f3fa' }}>
+          <ul className="space-y-3 mb-6 p-4 rounded-2xl" style={{ background: '#eafff6' }}>
             {formation.keyFacts.map(({ icon: Icon, label, value }) => (
               <li key={label} className="flex items-start gap-2.5">
-                <Icon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: '#005064' }} />
-                <span className="text-xs" style={{ color: '#0f2e2f', fontFamily: "'Inter', sans-serif" }}>
+                <Icon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: '#007f64' }} />
+                <span className="text-xs" style={{ color: '#1f2124', fontFamily: "'Inter', sans-serif" }}>
                   <strong style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{label} :</strong> {value}
                 </span>
               </li>
@@ -93,7 +93,7 @@ function FormationRow({ formation }) {
             rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all"
             style={{
-              background: '#005064',
+              background: '#007f64',
               color: 'white',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}>
@@ -104,8 +104,8 @@ function FormationRow({ formation }) {
             to={`/formations/${formation.id}`}
             className="w-full flex items-center justify-center gap-2 py-3.5 mt-3 rounded-xl font-bold text-sm transition-all"
             style={{
-              background: '#F8B102',
-              color: '#001a4a',
+              background: '#004c3c',
+              color: 'white',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}>
             Découvrir la formation
@@ -115,9 +115,9 @@ function FormationRow({ formation }) {
             to={`/inscription/${formation.id}`}
             className="w-full flex items-center justify-center gap-2 py-3.5 mt-3 rounded-xl font-bold text-sm transition-all"
             style={{
-              background: '#f0f3fa',
-              color: '#005064',
-              border: '1.5px solid #005064',
+              background: '#eafff6',
+              color: '#007f64',
+              border: '1.5px solid #007f64',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}>
             Demander une inscription
@@ -138,17 +138,17 @@ function FormationRow({ formation }) {
         viewport={{ once: true }}
         variants={fadeUp}
         className="lg:col-span-3 rounded-3xl p-6 sm:p-8"
-        style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
+        style={{ background: '#f7fbf9', border: '1px solid #e5e5e5' }}>
 
         <div className="flex items-center gap-2 mb-2">
-          <Accessibility className="w-5 h-5" style={{ color: '#005064' }} />
+          <Accessibility className="w-5 h-5" style={{ color: '#007f64' }} />
           <h3
             className="font-bold text-lg"
-            style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Informations pratiques et réglementaires
           </h3>
         </div>
-        <p className="text-sm mb-4" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+        <p className="text-sm mb-4" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
           Action de formation concourant au développement des compétences (art. L.6313-1 du Code du travail).
         </p>
 
@@ -157,11 +157,11 @@ function FormationRow({ formation }) {
             <AccordionItem key={s.id} value={s.id}>
               <AccordionTrigger
                 className="text-sm font-semibold text-left"
-                style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 {s.title}
               </AccordionTrigger>
               <AccordionContent>
-                <div className="text-sm leading-relaxed" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+                <div className="text-sm leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
                   {s.content}
                 </div>
               </AccordionContent>
@@ -192,20 +192,20 @@ export default function FormationsSection() {
 
           <span
             className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-4"
-            style={{ color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
             Découvrir notre Catalogue
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-4"
-            style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] mb-4"
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
             Explorer nos{' '}
-            <span style={{ color: '#002d74' }}>Formations</span>
+            <span style={{ color: '#007f64' }}>Formations</span>
           </h2>
           <p
             className="max-w-xl mx-auto text-base"
-            style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+            style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
 
             Des actions de formation intensives, 100 % à distance, animées en direct par un formateur expert
             — avec toutes les informations utiles avant votre inscription.
@@ -214,7 +214,7 @@ export default function FormationsSection() {
           {/* Decorative line */}
           <div className="flex items-center justify-center gap-3 mt-6">
             <div className="h-px w-16" style={{ background: '#c0d4d8' }} />
-            <div className="w-2 h-2 rounded-full" style={{ background: '#F8B102' }} />
+            <div className="w-2 h-2 rounded-full" style={{ background: '#004c3c' }} />
             <div className="h-px w-16" style={{ background: '#c0d4d8' }} />
           </div>
         </motion.div>
@@ -236,14 +236,14 @@ export default function FormationsSection() {
 
           <p
             className="text-sm mb-4"
-            style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+            style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
 
             Une question sur nos formations ou votre financement ?
           </p>
           <a
             href="#contact"
             className="inline-flex items-center gap-2 text-sm font-bold transition-all hover:gap-3"
-            style={{ color: '#005064', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
             Parlez à un conseiller
             <ChevronRight className="w-4 h-4" />

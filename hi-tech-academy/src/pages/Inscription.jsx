@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Building2, UserRound, BriefcaseBusiness, ArrowRight } from 'lucide-react';
-import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getFormationById } from '@/data/formations';
@@ -62,13 +61,13 @@ const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 const inputClass =
   'w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors ' +
-  'focus:border-[#005064] bg-white';
-const inputStyle = { borderColor: '#e0e8f4', color: '#001a4a', ...bodyFont };
+  'focus:border-[#007f64] bg-white';
+const inputStyle = { borderColor: '#e5e5e5', color: '#004c3c', ...bodyFont };
 
 export function TextField({ label, value, onChange, required, type = 'text', placeholder }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
         {label} {required && <span style={{ color: '#c2410c' }}>*</span>}
       </span>
       <input
@@ -85,7 +84,7 @@ export function TextField({ label, value, onChange, required, type = 'text', pla
 export function SelectField({ label, value, onChange, options, required, placeholder = '—' }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
         {label} {required && <span style={{ color: '#c2410c' }}>*</span>}
       </span>
       <select
@@ -105,7 +104,7 @@ export function SelectField({ label, value, onChange, options, required, placeho
 export function TextAreaField({ label, value, onChange, rows = 3, placeholder }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
         {label}
       </span>
       <textarea
@@ -121,7 +120,7 @@ export function TextAreaField({ label, value, onChange, rows = 3, placeholder })
 
 export function SectionTitle({ children }) {
   return (
-    <h3 className="font-bold text-base mt-8 mb-4" style={{ color: '#001a4a', ...headingFont }}>
+    <h3 className="font-bold text-base mt-8 mb-4" style={{ color: '#004c3c', ...headingFont }}>
       {children}
     </h3>
   );
@@ -131,7 +130,7 @@ export function SectionTitle({ children }) {
 export function Stepper({ current }) {
   const steps = ['Envoyer ma demande', 'Demande en attente', 'Demande validée'];
   return (
-    <div className="rounded-2xl p-5 mb-8" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
+    <div className="rounded-2xl p-5 mb-8" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
       <div className="grid grid-cols-3 gap-4">
         {steps.map((label, i) => {
           const active = i <= current;
@@ -140,16 +139,16 @@ export function Stepper({ current }) {
               <div
                 className="w-7 h-7 mx-auto rounded-full flex items-center justify-center text-xs font-bold mb-2"
                 style={{
-                  background: active ? '#005064' : '#f0f3fa',
-                  color: active ? 'white' : '#6b7a9b',
+                  background: active ? '#007f64' : '#eafff6',
+                  color: active ? 'white' : '#5f6b66',
                   ...headingFont,
                 }}>
                 {i + 1}
               </div>
-              <p className="text-xs sm:text-sm font-semibold" style={{ color: active ? '#001a4a' : '#6b7a9b', ...headingFont }}>
+              <p className="text-xs sm:text-sm font-semibold" style={{ color: active ? '#004c3c' : '#5f6b66', ...headingFont }}>
                 {label}
               </p>
-              <div className="h-1 rounded-full mt-3" style={{ background: active ? '#005064' : '#e0e8f4' }} />
+              <div className="h-1 rounded-full mt-3" style={{ background: active ? '#007f64' : '#e5e5e5' }} />
             </div>
           );
         })}
@@ -209,11 +208,10 @@ export default function Inscription() {
   if (!formation) {
     return (
       <div className="min-h-screen bg-white">
-        <TopBar />
         <Header />
         <main className="pt-32 pb-20 text-center">
-          <p style={{ color: '#001a4a', ...headingFont }}>Formation introuvable.</p>
-          <Link to="/" className="underline text-sm" style={{ color: '#005064', ...bodyFont }}>Retour à l'accueil</Link>
+          <p style={{ color: '#004c3c', ...headingFont }}>Formation introuvable.</p>
+          <Link to="/" className="underline text-sm" style={{ color: '#007f64', ...bodyFont }}>Retour à l'accueil</Link>
         </main>
         <Footer />
       </div>
@@ -275,8 +273,7 @@ export default function Inscription() {
 
   // --- Formulaire (étape 1) -------------------------------------------
   return (
-    <div className="min-h-screen" style={{ background: '#f7f9fd' }}>
-      <TopBar />
+    <div className="min-h-screen" style={{ background: '#f7fbf9' }}>
       <Header />
       <main className="pt-32 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
@@ -284,18 +281,18 @@ export default function Inscription() {
           <div className="text-center mb-8">
             <span
               className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-              style={{ color: '#002d74', ...headingFont }}>
+              style={{ color: '#007f64', ...headingFont }}>
               {formation.title}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#001a4a', ...headingFont }}>
+            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#004c3c', ...headingFont }}>
               Émettre une demande d'inscription
             </h1>
           </div>
 
           <Stepper current={0} />
 
-          <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
-            <h2 className="font-bold text-lg mb-4" style={{ color: '#001a4a', ...headingFont }}>
+          <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
+            <h2 className="font-bold text-lg mb-4" style={{ color: '#004c3c', ...headingFont }}>
               Mes informations
             </h2>
 
@@ -308,9 +305,9 @@ export default function Inscription() {
                   onClick={() => setMode(key)}
                   className="rounded-xl px-4 py-3.5 text-left text-sm font-semibold transition-all"
                   style={{
-                    border: mode === key ? '1.5px solid #005064' : '1px solid #e0e8f4',
-                    background: mode === key ? '#f0f3fa' : 'white',
-                    color: mode === key ? '#005064' : '#6b7a9b',
+                    border: mode === key ? '1.5px solid #007f64' : '1px solid #e5e5e5',
+                    background: mode === key ? '#eafff6' : 'white',
+                    color: mode === key ? '#007f64' : '#5f6b66',
                     ...headingFont,
                   }}>
                   <Icon className="w-4 h-4 mb-1.5" />
@@ -322,7 +319,7 @@ export default function Inscription() {
             {mode === 'INDEPENDENT' && (
               <p
                 className="text-xs rounded-xl px-4 py-3 mt-3"
-                style={{ background: '#f0f3fa', color: '#005064', ...bodyFont }}>
+                style={{ background: '#eafff6', color: '#007f64', ...bodyFont }}>
                 Vous serez automatiquement ajouté en tant qu'apprenant dans la suite de cette demande
                 d'inscription : la formation est destinée au président / gérant de l'entreprise.
               </p>
@@ -404,12 +401,12 @@ export default function Inscription() {
                     <TextField label="Poste occupé" value={form.currentPosition} onChange={set('currentPosition')} />
                   </div>
                   <TextAreaField label="Notes complémentaires" value={form.notes} onChange={set('notes')} />
-                  <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#001a4a', ...bodyFont }}>
+                  <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#004c3c', ...bodyFont }}>
                     <input
                       type="checkbox"
                       checked={form.needsAdaptation}
                       onChange={(e) => set('needsAdaptation')(e.target.checked)}
-                      className="mt-0.5 accent-[#005064]" />
+                      className="mt-0.5 accent-[#007f64]" />
                     A des besoins d'adaptation (handicap, contraintes...)
                   </label>
                 </div>
@@ -433,11 +430,11 @@ export default function Inscription() {
                 onClick={submit}
                 disabled={missingFields.length > 0 || submitting}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: '#005064', color: 'white', ...headingFont }}>
+                style={{ background: '#007f64', color: 'white', ...headingFont }}>
                 {submitting ? 'Envoi en cours…' : 'Continuer vers le questionnaire'}
                 <ArrowRight className="w-4 h-4" />
               </button>
-              <p className="text-xs text-center mt-3" style={{ color: '#6b7a9b', ...bodyFont }}>
+              <p className="text-xs text-center mt-3" style={{ color: '#5f6b66', ...bodyFont }}>
                 Dernière étape après ce formulaire : un court questionnaire{' '}
                 {mode === 'COMPANY' ? 'sur vos attentes' : "d'analyse du besoin"} (obligatoire).
                 Votre demande ne sera transmise qu'une fois le questionnaire complété.

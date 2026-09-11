@@ -18,7 +18,7 @@ export default function MarqueeStrip() {
   return (
     <div
       className="w-full overflow-hidden py-3 sm:py-4 flex items-center"
-      style={{ backgroundColor: '#F8B102' }}
+      style={{ backgroundColor: '#004c3c' }}
     >
       <motion.div
         className="flex gap-8 sm:gap-12 whitespace-nowrap"

@@ -8,7 +8,6 @@ import {
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from '@/components/ui/accordion';
-import TopBar from '@/components/TopBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import {
@@ -97,27 +96,27 @@ export default function Financements() {
 
   return (
     <div className="min-h-screen bg-white">
-      <TopBar />
       <Header />
 
       <main>
-        {/* ---------- Hero sombre ---------- */}
-        <section className="relative overflow-hidden" style={{ background: INK }}>
-          <Starfield />
+        {/* ---------- Héro dégradé vert clair (thème École) ---------- */}
+        <section
+          className="relative overflow-hidden"
+          style={{ background: 'linear-gradient(115deg, #8fedca 0%, #d8f8ea 32%, #ffffff 60%, #cce2ff 100%)' }}>
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-40 pb-20 text-center">
             <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-              <span className="inline-block text-[11px] font-extrabold uppercase tracking-[0.3em] mb-6" style={{ color: ACCENT, ...headingFont }}>
+              <span
+                className="inline-flex items-center gap-1.5 text-[12px] font-bold px-3.5 py-1.5 rounded-full mb-6"
+                style={{ background: 'white', color: NAVY, border: '1px solid #bff4e8', ...headingFont }}>
+                <span className="inline-block rounded-full" style={{ width: 5, height: 5, background: '#00d1a5' }} />
                 Financements
               </span>
               <h1
-                className="text-4xl sm:text-5xl lg:text-[4rem] font-extrabold tracking-tight leading-[1.05] text-white mb-7"
-                style={headingFont}>
-                Votre formation peut vous coûter{' '}
-                <span style={{ background: KEYWORD_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
-                  0 €
-                </span>
+                className="font-serif-display text-4xl sm:text-5xl lg:text-[4rem] font-bold leading-[1.08] mb-7"
+                style={{ color: '#101418' }}>
+                Votre formation peut vous coûter <span style={{ color: TEAL }}>0 €</span>
               </h1>
-              <p className="max-w-2xl mx-auto text-base leading-relaxed mb-9" style={{ color: BODY_DARK, ...bodyFont }}>
+              <p className="max-w-2xl mx-auto text-base leading-relaxed mb-9" style={{ color: '#2c3440', ...bodyFont }}>
                 Nos formations ne sont pas gratuites — mais vous cotisez déjà chaque mois pour la formation
                 professionnelle. Grâce à la certification Qualiopi de Hi-Tech Academy, ces financements
                 peuvent couvrir jusqu'à 100 % du tarif, sans avance de trésorerie. On vous explique tout,
@@ -125,7 +124,7 @@ export default function Financements() {
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Pill as="a" href="/#contact">Étudier mon financement</Pill>
-                <Pill as={Link} to="/formations" variant="secondary" dark>Voir les formations</Pill>
+                <Pill as={Link} to="/formations" variant="secondary">Voir les formations</Pill>
               </div>
             </motion.div>
           </div>
@@ -165,7 +164,7 @@ export default function Financements() {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   className="rounded-3xl p-7"
-                  style={{ background: '#f7f9fd', border: '1px solid #e6eaf4' }}>
+                  style={{ background: '#f7fbf9', border: '1px solid #e5e5e5' }}>
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(0,80,100,0.08)' }}>
                     <Icon className="w-6 h-6" style={{ color: TEAL }} />
                   </div>
@@ -246,7 +245,7 @@ export default function Financements() {
                   variants={fadeUp}
                   transition={{ delay: i * 0.06 }}
                   className="rounded-3xl p-6"
-                  style={{ background: '#f7f9fd', border: '1px solid #e6eaf4' }}>
+                  style={{ background: '#f7fbf9', border: '1px solid #e5e5e5' }}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: ACCENT }}>
                     <Icon className="w-5 h-5 text-black" />
                   </div>
@@ -259,7 +258,7 @@ export default function Financements() {
         </section>
 
         {/* ---------- Trouver son OPCO ---------- */}
-        <section className="py-16 sm:py-24" style={{ background: '#f7f9fd' }}>
+        <section className="py-16 sm:py-24" style={{ background: '#f7fbf9' }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <SectionHeading
               kicker="L'annuaire des financeurs"
@@ -269,7 +268,7 @@ export default function Financements() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
               {OPCOS.map(({ nom, secteur }) => (
-                <div key={nom} className="flex items-start gap-3 rounded-2xl p-4 bg-white" style={{ border: '1px solid #e6eaf4' }}>
+                <div key={nom} className="flex items-start gap-3 rounded-2xl p-4 bg-white" style={{ border: '1px solid #e5e5e5' }}>
                   <Building2 className="w-4 h-4 mt-1 shrink-0" style={{ color: TEAL }} />
                   <div>
                     <p className="font-extrabold text-sm" style={{ color: NAVY, ...headingFont }}>{nom}</p>
@@ -279,7 +278,7 @@ export default function Financements() {
               ))}
             </div>
 
-            <div className="rounded-3xl p-7 sm:p-9 text-center bg-white" style={{ border: '1px solid #e6eaf4' }}>
+            <div className="rounded-3xl p-7 sm:p-9 text-center bg-white" style={{ border: '1px solid #e5e5e5' }}>
               <Search className="w-8 h-8 mx-auto mb-4" style={{ color: TEAL }} />
               <h3 className="font-extrabold text-xl mb-2" style={{ color: NAVY, ...headingFont }}>
                 Trouvez votre OPCO en moins d'une minute
@@ -298,7 +297,7 @@ export default function Financements() {
             </div>
 
             {/* Indépendants */}
-            <div className="mt-10 rounded-3xl p-7 sm:p-9 bg-white" style={{ border: '1px solid #e6eaf4' }}>
+            <div className="mt-10 rounded-3xl p-7 sm:p-9 bg-white" style={{ border: '1px solid #e5e5e5' }}>
               <h3 className="font-extrabold text-xl mb-3" style={{ color: NAVY, ...headingFont }}>
                 Indépendant, dirigeant non salarié ? Vous avez aussi vos droits.
               </h3>
@@ -312,7 +311,7 @@ export default function Financements() {
                   { nom: 'FIF PL', qui: 'Professions libérales (hors médecins)' },
                   { nom: 'FAFCEA', qui: 'Chefs d’entreprise artisanale' },
                 ].map(({ nom, qui }) => (
-                  <div key={nom} className="rounded-2xl p-4" style={{ background: '#f7f9fd', border: '1px solid #e6eaf4' }}>
+                  <div key={nom} className="rounded-2xl p-4" style={{ background: '#f7fbf9', border: '1px solid #e5e5e5' }}>
                     <p className="font-extrabold text-sm mb-1" style={{ color: TEAL, ...headingFont }}>{nom}</p>
                     <p className="text-xs leading-snug" style={{ color: BODY, ...bodyFont }}>{qui}</p>
                   </div>
@@ -344,9 +343,9 @@ export default function Financements() {
         </section>
 
         {/* ---------- CTA final ---------- */}
-        <section style={{ background: 'linear-gradient(120deg, #06071f 0%, #005064 48%, #b7791f 100%)' }}>
+        <section style={{ background: 'linear-gradient(135deg, #004c3c 0%, #007f64 60%, #00d1a5 100%)' }}>
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-4" style={headingFont}>
+            <h2 className="font-serif-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white mb-4" style={headingFont}>
               Et si votre prochaine formation ne vous coûtait rien ?
             </h2>
             <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.8)', ...bodyFont }}>

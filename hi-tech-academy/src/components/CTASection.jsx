@@ -9,7 +9,7 @@ export default function CTASection() {
         <motion.div
           className="relative w-full overflow-hidden min-h-[240px] md:min-h-[280px]"
           style={{
-            background: 'linear-gradient(120deg, #06071f 0%, #005064 48%, #b7791f 100%)'
+            background: 'linear-gradient(135deg, #004c3c 0%, #007f64 60%, #00d1a5 100%)'
           }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -70,7 +70,7 @@ export default function CTASection() {
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 
                 Commencez votre formation{' '}
-                <span style={{ color: '#F8B102' }}>aujourd'hui !</span>
+                <span style={{ color: '#004c3c' }}>aujourd'hui !</span>
               </h2>
 
               {/* Body */}
@@ -101,7 +101,7 @@ export default function CTASection() {
               <a
                 href="#programmes"
                 className="inline-flex items-center gap-2 h-12 px-7 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:shadow-lg hover:gap-3"
-                style={{ backgroundColor: '#F8B102', color: 'black', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                style={{ backgroundColor: '#004c3c', color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 
                 Explorer les formations
                 <ArrowRight className="w-4 h-4" />

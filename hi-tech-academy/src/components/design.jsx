@@ -1,65 +1,53 @@
 import React from 'react';
 
-// Système de design du site (grammaire « Onlineformapro » adaptée à la marque
-// Hi-Tech Academy) : bandes pleine largeur alternées clair/sombre, titres
-// géants centrés dont un mot-clé est coloré, slash ambre en signature, nav et
-// boutons en pilules. Les couleurs restent celles de la marque (encre, teal,
-// ambre) pour la cohérence avec le logo et les documents Qualiopi.
+// Système de design du site public — thème « École » : palette vert forêt /
+// menthe, dégradés doux du vert au blanc, grands titres serif
+// (Source Serif 4), pilules très arrondies. Les noms d'exports sont conservés
+// d'une itération à l'autre pour ne pas casser les composants ; seules les
+// valeurs changent. L'admin n'utilise pas ce fichier et reste inchangé.
 
-export const INK = '#06071f';        // bandes sombres (héro, footer, CTA)
-export const NAVY = '#001a4a';       // titres sur fond clair
-export const TEAL = '#005064';       // couleur de marque
-export const CYAN = '#00a8c8';       // début du gradient de mot-clé
-export const ACCENT = '#F8B102';     // ambre : CTA, tags, slash (rôle du rouge OFP)
-export const BODY = '#5a6478';       // texte courant sur fond clair
-export const BODY_DARK = '#aab3d0';  // texte courant sur fond sombre
-export const LINE = '#e6eaf4';       // filets et bordures
+export const INK = '#00382c';        // bandes sombres : vert forêt profond
+export const NAVY = '#004c3c';       // titres et textes forts (vert forêt)
+export const TEAL = '#007f64';       // vert de marque (liens, icônes)
+export const CYAN = '#00d1a5';       // émeraude vif (formes, accents)
+export const ACCENT = '#004c3c';     // vert forêt : CTA principaux (pilules)
+export const BODY = '#1f2124';       // texte courant sur fond clair
+export const BODY_DARK = '#d6efe4';  // texte courant sur fond sombre
+export const LINE = '#e5e5e5';       // filets et bordures
+export const MINT = '#dff7ec';       // fonds menthe (cartes, tags)
+export const MINT_LIGHT = '#eafff6'; // menthe très pâle (surfaces)
 
 export const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
-export const bodyFont = { fontFamily: "'Inter', sans-serif" };
+export const serifFont = { fontFamily: "'Source Serif 4', Georgia, serif" };
+export const bodyFont = { fontFamily: "'Roboto', 'Inter', sans-serif" };
 
-// Dégradé appliqué au mot-clé des titres (équivalent du rose→violet OFP)
-export const KEYWORD_GRADIENT = `linear-gradient(92deg, ${CYAN}, #35c9a3 55%, ${ACCENT})`;
+// Dégradés signature du thème (du vert au blanc, pointe de bleu pâle)
+export const HERO_GRADIENT = 'linear-gradient(115deg, #9ff0cf 0%, #dff7ec 28%, #ffffff 55%, #ffffff 68%, #cce2ff 100%)';
+export const GREEN_BAND_GRADIENT = 'linear-gradient(135deg, #bff4e8 0%, #dff7ec 45%, #ffffff 100%)';
+export const KEYWORD_GRADIENT = 'linear-gradient(92deg, #007f64, #00d1a5)';
 
-/** Mot-clé coloré d'un titre : gradient sur fond sombre, teal sur fond clair. */
+/** Mot-clé coloré d'un titre : vert de marque (dégradé léger sur fond sombre). */
 export function Hi({ children, dark = false }) {
   if (dark) {
-    return (
-      <span
-        style={{
-          background: KEYWORD_GRADIENT,
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-        }}>
-        {children}
-      </span>
-    );
+    return <span style={{ color: '#7fe6c3' }}>{children}</span>;
   }
   return <span style={{ color: TEAL }}>{children}</span>;
 }
 
-/** Slash ambre en signature, posé devant les titres alignés à gauche. */
+/** Petit marqueur de kicker « • Le programme » façon pastille menthe. */
 export function Slash() {
   return (
     <span
       aria-hidden="true"
-      className="inline-block mr-4 rounded-sm"
-      style={{
-        width: '0.62em',
-        height: '0.16em',
-        background: ACCENT,
-        transform: 'rotate(-55deg) translateY(-0.28em)',
-        transformOrigin: 'center',
-      }}
+      className="inline-block mr-2 rounded-full"
+      style={{ width: '0.35em', height: '0.35em', background: CYAN, verticalAlign: 'middle' }}
     />
   );
 }
 
 /**
- * Titre de section : très grand, très gras, centré par défaut.
- * `kicker` : sur-titre en majuscules espacées. `dark` : variante fond sombre.
- * `slash` : signature ambre (pour les titres alignés à gauche).
+ * Titre de section : serif, grand, centré par défaut.
+ * `kicker` : pastille menthe « • Sur-titre ». `dark` : variante fond sombre.
  */
 export function SectionHeading({ kicker, children, sub, dark = false, align = 'center', slash = false }) {
   const alignClass = align === 'left' ? 'text-left' : 'text-center';
@@ -67,21 +55,25 @@ export function SectionHeading({ kicker, children, sub, dark = false, align = 'c
     <div className={`${alignClass} mb-12 sm:mb-14`}>
       {kicker && (
         <span
-          className="inline-block text-[11px] font-extrabold uppercase tracking-[0.3em] mb-4"
-          style={{ color: dark ? ACCENT : TEAL, ...headingFont }}>
+          className="inline-flex items-center gap-1.5 text-[12px] font-bold px-3.5 py-1.5 rounded-full mb-5"
+          style={{
+            background: dark ? 'rgba(255,255,255,0.12)' : MINT,
+            color: dark ? '#bff4e8' : NAVY,
+            ...headingFont,
+          }}>
+          <Slash />
           {kicker}
         </span>
       )}
       <h2
-        className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold leading-[1.15] tracking-tight"
-        style={{ color: dark ? 'white' : NAVY, ...headingFont }}>
-        {slash && <Slash />}
+        className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold leading-[1.15]"
+        style={{ color: dark ? 'white' : BODY, ...serifFont }}>
         {children}
       </h2>
       {sub && (
         <p
           className={`${align === 'left' ? '' : 'mx-auto'} max-w-2xl text-base leading-relaxed mt-5`}
-          style={{ color: dark ? BODY_DARK : BODY, ...bodyFont }}>
+          style={{ color: dark ? BODY_DARK : '#4b5563', ...bodyFont }}>
           {sub}
         </p>
       )}
@@ -89,15 +81,19 @@ export function SectionHeading({ kicker, children, sub, dark = false, align = 'c
   );
 }
 
-/** Bouton pilule principal (ambre) ou secondaire (contour). */
+/**
+ * Bouton pilule : primary et forest = vert forêt, secondary = contour.
+ */
 export function Pill({ as: Tag = 'a', dark = false, variant = 'primary', className = '', style = {}, children, ...props }) {
-  const base = 'inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-extrabold text-[13px] uppercase tracking-wider transition-all duration-200 hover:opacity-90 hover:shadow-lg';
+  const base = 'inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-200 hover:opacity-90 hover:shadow-lg';
   const styles =
     variant === 'primary'
-      ? { background: ACCENT, color: '#0b0b0b' }
-      : dark
-        ? { background: 'transparent', color: 'white', border: '1.5px solid rgba(255,255,255,0.4)' }
-        : { background: 'white', color: TEAL, border: `1.5px solid ${TEAL}` };
+      ? { background: ACCENT, color: 'white' }
+      : variant === 'forest'
+        ? { background: NAVY, color: 'white' }
+        : dark
+          ? { background: 'transparent', color: 'white', border: '1.5px solid rgba(255,255,255,0.5)' }
+          : { background: 'white', color: NAVY, border: `1.5px solid ${NAVY}` };
   return (
     <Tag className={`${base} ${className}`} style={{ ...styles, ...headingFont, ...style }} {...props}>
       {children}
@@ -105,7 +101,7 @@ export function Pill({ as: Tag = 'a', dark = false, variant = 'primary', classNa
   );
 }
 
-/** Fond « starfield » des bandes sombres (points lumineux discrets). */
+/** Fond décoratif des bandes : halos organiques menthe/émeraude très doux. */
 export function Starfield() {
   return (
     <div
@@ -113,16 +109,9 @@ export function Starfield() {
       className="absolute inset-0 pointer-events-none"
       style={{
         backgroundImage: `
-          radial-gradient(1.5px 1.5px at 12% 28%, rgba(255,255,255,0.5) 0, transparent 100%),
-          radial-gradient(1px 1px at 26% 68%, rgba(255,255,255,0.35) 0, transparent 100%),
-          radial-gradient(1.5px 1.5px at 38% 18%, rgba(160,220,255,0.4) 0, transparent 100%),
-          radial-gradient(1px 1px at 52% 82%, rgba(255,255,255,0.3) 0, transparent 100%),
-          radial-gradient(2px 2px at 64% 34%, rgba(255,255,255,0.35) 0, transparent 100%),
-          radial-gradient(1px 1px at 78% 62%, rgba(160,220,255,0.35) 0, transparent 100%),
-          radial-gradient(1.5px 1.5px at 88% 22%, rgba(255,255,255,0.4) 0, transparent 100%),
-          radial-gradient(1px 1px at 8% 84%, rgba(255,255,255,0.25) 0, transparent 100%),
-          radial-gradient(1px 1px at 94% 88%, rgba(255,255,255,0.3) 0, transparent 100%),
-          radial-gradient(ellipse 70% 55% at 50% -10%, rgba(0,80,100,0.55) 0, transparent 100%)
+          radial-gradient(ellipse 45% 55% at 8% 12%, rgba(0,209,165,0.18) 0, transparent 70%),
+          radial-gradient(ellipse 40% 50% at 92% 20%, rgba(191,244,232,0.14) 0, transparent 70%),
+          radial-gradient(ellipse 55% 45% at 50% 100%, rgba(0,127,100,0.12) 0, transparent 70%)
         `,
       }}
     />

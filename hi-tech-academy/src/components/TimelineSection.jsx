@@ -64,23 +64,23 @@ export default function TimelineSection() {
   const [active, setActive] = useState(null);
 
   return (
-    <section style={{ background: '#005064' }} className="py-16 px-4 md:px-8">
+    <section style={{ background: '#007f64' }} className="py-16 px-4 md:px-8">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
         <div className="text-center mb-10">
           <span
             className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-            style={{ color: '#F8B102', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Notre Savoir Faire
           </span>
           <h2
-            className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] text-white"
+            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] text-white"
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Découvrez Notre Approche{' '}
-            <span style={{ color: '#F8B102' }}>d'Apprentissage Interactif</span>
+            <span style={{ color: '#004c3c' }}>d'Apprentissage Interactif</span>
           </h2>
           <p className="mt-3 text-sm max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: "'Inter', sans-serif" }}>
             Nous structurons nos formations pour maximiser votre expérience d'apprentissage en 6 étapes clés.
@@ -130,15 +130,15 @@ export default function TimelineSection() {
                       <div className="flex items-start justify-between mb-3">
                         <div
                           className="w-10 h-10 rounded-xl flex items-center justify-center"
-                          style={{ background: isActive ? '#F8B102' : 'rgba(255,255,255,0.12)' }}
+                          style={{ background: isActive ? '#004c3c' : 'rgba(255,255,255,0.12)' }}
                         >
-                          <Icon className="w-5 h-5" style={{ color: isActive ? '#003040' : 'white' }} />
+                          <Icon className="w-5 h-5" style={{ color: isActive ? '#004c3c' : 'white' }} />
                         </div>
                         <span
                           className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
                           style={{
                             background: 'rgba(248,177,2,0.15)',
-                            color: '#F8B102',
+                            color: '#004c3c',
                             fontFamily: "'Plus Jakarta Sans', sans-serif",
                           }}
                         >
@@ -191,7 +191,7 @@ export default function TimelineSection() {
               <div
                 key={i}
                 className="w-2 h-2 rounded-full"
-                style={{ background: i === 0 ? '#F8B102' : 'rgba(255,255,255,0.3)' }}
+                style={{ background: i === 0 ? '#004c3c' : 'rgba(255,255,255,0.3)' }}
               />
             ))}
           </div>
@@ -236,15 +236,15 @@ export default function TimelineSection() {
                 <div className="flex items-start justify-between mb-3">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: isActive ? '#F8B102' : 'rgba(255,255,255,0.12)' }}
+                    style={{ background: isActive ? '#004c3c' : 'rgba(255,255,255,0.12)' }}
                   >
-                    <Icon className="w-5 h-5" style={{ color: isActive ? '#003040' : 'white' }} />
+                    <Icon className="w-5 h-5" style={{ color: isActive ? '#004c3c' : 'white' }} />
                   </div>
                   <span
                     className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
                     style={{
                       background: 'rgba(248,177,2,0.15)',
-                      color: '#F8B102',
+                      color: '#004c3c',
                       fontFamily: "'Plus Jakarta Sans', sans-serif",
                     }}
                   >

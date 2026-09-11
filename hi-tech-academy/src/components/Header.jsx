@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
-import { ACCENT, headingFont } from '@/components/design';
+import { Menu, Phone, X } from 'lucide-react';
+import { NAVY, ACCENT, headingFont } from '@/components/design';
 
-// Barre de navigation pleine largeur (grammaire Onlineformapro) : fond blanc
-// collé en haut, liens compacts en majuscules, CTA en pilule ambre.
+// Barre de navigation du thème « École » : toujours blanche (ombre douce au
+// défilement). Liens sobres, pilule téléphone et pilule « S'inscrire » en
+// vert forêt.
 const navLinks = [
 { label: 'Formations', href: '/formations' },
 { label: 'Financements', href: '/financements' },
@@ -27,40 +28,47 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 z-50 transition-shadow duration-300"
       style={{
         background: 'white',
-        boxShadow: scrolled ? '0 4px 18px rgba(6,7,31,0.12)' : '0 1px 0 rgba(6,7,31,0.06)'
+        boxShadow: scrolled || menuOpen ? '0 4px 18px rgba(0,76,60,0.10)' : '0 1px 0 rgba(0,76,60,0.06)'
       }}>
 
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2 shrink-0">
+        <a href="/" className="flex items-center gap-2.5 shrink-0">
           <div
-            className="flex items-center justify-center w-8 h-8 rounded-lg font-bold text-white text-sm"
-            style={{ background: 'linear-gradient(135deg, #005064, #007a96)', ...headingFont }}>
+            className="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-white text-sm"
+            style={{ background: NAVY, ...headingFont }}>
             HT
           </div>
-          <span className="font-extrabold text-gray-900 text-base tracking-tight" style={headingFont}>
+          <span className="font-bold text-base tracking-tight" style={{ color: NAVY, ...headingFont }}>
             Hi Tech Academy
           </span>
         </a>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-9">
           {navLinks.map((link) =>
           <a
             key={link.label}
             href={link.href}
-            className="text-[12px] font-extrabold uppercase tracking-wider text-gray-800 hover:text-black transition-colors"
-            style={headingFont}>
+            className="text-[14px] font-medium transition-opacity hover:opacity-70"
+            style={{ color: '#1f2124', ...headingFont }}>
               {link.label}
             </a>
           )}
         </nav>
 
         {/* CTA */}
-        <div className="hidden lg:flex items-center">
+        <div className="hidden lg:flex items-center gap-3">
+          <a
+            href="tel:+33751474135"
+            className="flex items-center gap-2 px-5 py-2.5 text-[13px] font-bold text-white rounded-full transition-all hover:opacity-90"
+            style={{ backgroundColor: NAVY, ...headingFont }}>
+            <Phone className="w-3.5 h-3.5" />
+            07 51 47 41 35
+          </a>
           <a
             href="/formations"
-            className="px-6 py-2.5 text-[12px] font-extrabold uppercase tracking-wider text-black rounded-full transition-all duration-200 hover:opacity-90 hover:shadow-lg"
+            className="px-5 py-2.5 text-[13px] font-bold text-white rounded-full transition-all hover:opacity-90"
             style={{ backgroundColor: ACCENT, ...headingFont }}>
             S'inscrire
           </a>
@@ -68,7 +76,8 @@ export default function Header() {
 
         {/* Mobile burger */}
         <button
-          className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+          className="lg:hidden p-2 rounded-lg transition-colors"
+          style={{ color: NAVY }}
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Menu">
           {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -83,17 +92,23 @@ export default function Header() {
           key={link.label}
           href={link.href}
           onClick={() => setMenuOpen(false)}
-          className="text-sm font-bold uppercase tracking-wider text-gray-800"
-          style={headingFont}>
+          className="text-sm font-semibold"
+          style={{ color: '#1f2124', ...headingFont }}>
               {link.label}
             </a>
         )}
           <a
           href="/formations"
           onClick={() => setMenuOpen(false)}
-          className="mt-2 py-3 text-sm font-extrabold uppercase tracking-wider text-black rounded-full flex items-center justify-center"
+          className="mt-2 py-3 text-sm font-bold text-white rounded-full flex items-center justify-center"
           style={{ backgroundColor: ACCENT, ...headingFont }}>
             S'inscrire
+          </a>
+          <a
+          href="tel:+33751474135"
+          className="py-3 text-sm font-bold text-white rounded-full flex items-center justify-center gap-2"
+          style={{ backgroundColor: NAVY, ...headingFont }}>
+            <Phone className="w-4 h-4" /> 07 51 47 41 35
           </a>
         </div>
       }

@@ -56,25 +56,25 @@ export default function WhyUsSection() {
             
             <span
               className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-              style={{ color: '#005064', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               Pourquoi nous Choisir !
             </span>
             <h2
-              className="text-3xl sm:text-4xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.15] mb-3"
-              style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] mb-3"
+              style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               Rendre votre Apprentissage{' '}
-              <span style={{ color: '#005064' }}>plus Agréable</span>
+              <span style={{ color: '#007f64' }}>plus Agréable</span>
             </h2>
-            <p className="text-sm mb-8" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+            <p className="text-sm mb-8" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
               Apprenez plus de compétences, soyez plus compétitif.
             </p>
 
             {/* Decorative line */}
             <div className="flex items-center gap-3 mb-10">
               <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
-              <div className="w-2 h-2 rounded-full" style={{ background: '#F8B102' }} />
+              <div className="w-2 h-2 rounded-full" style={{ background: '#004c3c' }} />
               <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
             </div>
 
@@ -103,16 +103,16 @@ export default function WhyUsSection() {
                         className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                         style={{ background: '#eef1fa' }}>
                         
-                          <feature.icon className="w-5 h-5" style={{ color: '#005064' }} />
+                          <feature.icon className="w-5 h-5" style={{ color: '#007f64' }} />
                         </div>
                         <div>
                           <h3
                           className="font-bold text-sm mb-1"
-                          style={{ color: '#003040', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
                                     {feature.title}
                           </h3>
-                          <p className="text-xs leading-relaxed" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+                          <p className="text-xs leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
                             {feature.description}
                           </p>
                         </div>
@@ -126,12 +126,12 @@ export default function WhyUsSection() {
               
               {/* Scroll indicator dots */}
               <div className="flex items-center justify-center gap-2 mt-4">
-                <div className="w-2 h-2 rounded-full" style={{ background: '#005064' }} />
+                <div className="w-2 h-2 rounded-full" style={{ background: '#007f64' }} />
                 <div className="w-2 h-2 rounded-full" style={{ background: '#c0d4d8' }} />
                 <div className="w-2 h-2 rounded-full" style={{ background: '#c0d4d8' }} />
                 <div className="w-2 h-2 rounded-full" style={{ background: '#c0d4d8' }} />
               </div>
-              <p className="text-center text-xs mt-2" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+              <p className="text-center text-xs mt-2" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
                 Faites défiler pour voir plus
               </p>
             </div>
@@ -152,16 +152,16 @@ export default function WhyUsSection() {
                   className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: '#eef1fa' }}>
                   
-                    <feature.icon className="w-5 h-5" style={{ color: '#005064' }} />
+                    <feature.icon className="w-5 h-5" style={{ color: '#007f64' }} />
                   </div>
                   <div>
                     <h3
                     className="font-bold text-sm mb-1"
-                    style={{ color: '#001a4a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     
                       {feature.title}
                     </h3>
-                    <p className="text-xs leading-relaxed" style={{ color: '#6b7a9b', fontFamily: "'Inter', sans-serif" }}>
+                    <p className="text-xs leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
                       {feature.description}
                     </p>
                   </div>
@@ -216,7 +216,7 @@ export default function WhyUsSection() {
             {/* Floating accent dot */}
             <div
               className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full hidden"
-              style={{ background: '#F8B102' }} />
+              style={{ background: '#004c3c' }} />
             
           </motion.div>
 
