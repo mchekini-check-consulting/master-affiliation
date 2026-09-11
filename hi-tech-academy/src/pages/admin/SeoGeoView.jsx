@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Bot, CalendarClock, Eye, Play, Plus, RefreshCw, RotateCcw, Trash2, X,
+  Bot, CalendarClock, ChevronDown, ChevronRight, Eye, PenLine, Play, Plus, RefreshCw,
+  RotateCcw, Send, Trash2, TrendingDown, TrendingUp, X,
 } from 'lucide-react';
 import {
   adminCreateSeoKeyword, adminDeleteSeoKeyword, adminGetSeoArticle, adminGetSeoConfig,
   adminLaunchSeoRun, adminListSeoArticles, adminListSeoKeywords, adminListSeoRuns,
-  adminRetrySeoKeyword, adminUpdateSeoArticle, adminUpdateSeoConfig,
+  adminListSeoSuggestions, adminPublishSeoArticleNow, adminRetrySeoKeyword,
+  adminUpdateSeoArticle, adminUpdateSeoConfig, adminUpdateSeoSuggestion,
 } from '@/api/backend';
 import { Card, ViewHeader, bodyFont, formatDate, headingFont } from './common';
 
@@ -14,11 +16,52 @@ import { Card, ViewHeader, bodyFont, formatDate, headingFont } from './common';
 // suivi de l'étape en cours, validation et planification des articles.
 
 const KEYWORD_STATUS = {
-  to_process: { label: 'À traiter', background: '#f0f3fa', color: '#005064' },
+  to_process: { label: 'À analyser', background: '#f0f3fa', color: '#005064' },
   processing: { label: 'En cours', background: '#fdf3e2', color: '#8a5a00' },
-  done: { label: 'Traité', background: '#e5f6ec', color: '#116632' },
+  done: { label: 'Analysé', background: '#e5f6ec', color: '#116632' },
   error: { label: 'Erreur', background: '#fdecec', color: '#a12626' },
 };
+
+const SUGGESTION_STATUS = {
+  suggested: { label: 'Proposé', background: '#f0f3fa', color: '#6b7a9b' },
+  selected: { label: 'Sélectionné', background: '#e8f0fe', color: '#2451a6' },
+  writing: { label: 'Rédaction…', background: '#fdf3e2', color: '#8a5a00' },
+  written: { label: 'Rédigé', background: '#e5f6ec', color: '#116632' },
+  error: { label: 'Erreur', background: '#fdecec', color: '#a12626' },
+};
+
+const SUGGESTION_SOURCE = {
+  seed: 'Pilier',
+  gap: 'Gap concurrent',
+  ideas: 'Idées',
+  related: 'Associé',
+};
+
+const INTENT_LABELS = {
+  informational: 'Informationnelle',
+  commercial: 'Commerciale',
+  transactional: 'Transactionnelle',
+  navigational: 'Navigationnelle',
+  unknown: '—',
+};
+
+/** Tendance 12 mois : variation entre le début et la fin de la série. */
+function TrendCell({ trendJson }) {
+  let trend = [];
+  try { trend = JSON.parse(trendJson || '[]'); } catch { /* série illisible */ }
+  if (!Array.isArray(trend) || trend.length < 2 || trend[0] === 0) {
+    return <span style={{ color: '#6b7a9b' }}>—</span>;
+  }
+  const delta = Math.round(((trend.at(-1) - trend[0]) / trend[0]) * 100);
+  if (Math.abs(delta) < 10) return <span style={{ color: '#6b7a9b' }}>stable</span>;
+  const up = delta > 0;
+  return (
+    <span className="inline-flex items-center gap-1 font-semibold" style={{ color: up ? '#116632' : '#a12626' }}>
+      {up ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+      {up ? '+' : ''}{delta} %
+    </span>
+  );
+}
 
 const ARTICLE_STATUS = {
   to_validate: { label: 'À valider', background: '#fdf3e2', color: '#8a5a00' },
@@ -228,7 +271,10 @@ export default function SeoGeoView({ auth }) {
   const [launching, setLaunching] = useState(false);
   const [preview, setPreview] = useState(null);
   const [publishEdits, setPublishEdits] = useState({}); // id -> valeur datetime-local
+  const [expanded, setExpanded] = useState({});         // keywordId -> bool
+  const [suggestionsByKw, setSuggestionsByKw] = useState({}); // keywordId -> liste
   const pollRef = useRef(null);
+  const loadedSuggestionsRef = useRef(new Set());       // piliers dont les suggestions sont chargées
 
   const load = useCallback(async () => {
     try {
@@ -242,6 +288,12 @@ export default function SeoGeoView({ auth }) {
       setKeywords(kws);
       setArticles(arts);
       setRuns(rns);
+      // Rafraîchit aussi les suggestions déjà affichées (statuts en direct)
+      for (const keywordId of loadedSuggestionsRef.current) {
+        adminListSeoSuggestions(auth, keywordId)
+          .then((list) => setSuggestionsByKw((prev) => ({ ...prev, [keywordId]: list })))
+          .catch(() => {});
+      }
       setError(null);
     } catch (e) {
       setError(e.message);
@@ -323,10 +375,56 @@ export default function SeoGeoView({ auth }) {
     }
   };
 
+  // Dépliage d'un pilier : charge ses mots-clés proposés
+  const toggleExpand = async (kw) => {
+    const isOpen = Boolean(expanded[kw.id]);
+    setExpanded((prev) => ({ ...prev, [kw.id]: !isOpen }));
+    if (!isOpen && !suggestionsByKw[kw.id]) {
+      try {
+        const list = await adminListSeoSuggestions(auth, kw.id);
+        loadedSuggestionsRef.current.add(kw.id);
+        setSuggestionsByKw((prev) => ({ ...prev, [kw.id]: list }));
+      } catch (e) {
+        setError(e.message);
+      }
+    }
+  };
+
+  // Cocher / décocher un mot-clé proposé (sélection pour rédaction)
+  const toggleSuggestion = async (suggestion) => {
+    const next = suggestion.status === 'selected' ? 'suggested' : 'selected';
+    setError(null);
+    try {
+      const updated = await adminUpdateSeoSuggestion(auth, suggestion.id, next);
+      setSuggestionsByKw((prev) => ({
+        ...prev,
+        [suggestion.keyword_id]: prev[suggestion.keyword_id]
+          .map((s) => (s.id === suggestion.id ? updated : s)),
+      }));
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const selectedCount = Object.values(suggestionsByKw)
+    .flat()
+    .filter((s) => s.status === 'selected').length;
+
   const setArticleStatus = async (article, status) => {
     setError(null);
     try {
       const updated = await adminUpdateSeoArticle(auth, article.id, { status });
+      setArticles((prev) => prev.map((a) => (a.id === article.id ? updated : a)));
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  // Publication immédiate : l'article est en ligne sur /blog tout de suite
+  const publishNow = async (article) => {
+    setError(null);
+    try {
+      const updated = await adminPublishSeoArticleNow(auth, article.id);
       setArticles((prev) => prev.map((a) => (a.id === article.id ? updated : a)));
     } catch (e) {
       setError(e.message);
@@ -523,74 +621,179 @@ export default function SeoGeoView({ auth }) {
 
         {keywords.length === 0 ? (
           <p className="text-sm" style={{ color: '#6b7a9b', ...bodyFont }}>
-            Aucun mot-clé — ajoutez les requêtes sur lesquelles l'agent doit produire des articles.
+            Aucun mot-clé — ajoutez les requêtes pilier : l'agent proposera ensuite les
+            mots-clés proches avec leurs métriques, et vous choisirez ceux à rédiger.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
-                  <Th>Mot-clé</Th>
+                  <Th>Mot-clé pilier</Th>
                   <Th>Localisation</Th>
                   <Th>Statut</Th>
                   <Th>Ajouté le</Th>
                   <Th>Dernier run</Th>
-                  <Th>Article</Th>
                   <Th className="text-right">Actions</Th>
                 </tr>
               </thead>
               <tbody>
-                {keywords.map((kw) => (
-                  <tr key={kw.id} style={{ borderBottom: '1px solid #f0f3fa' }}>
-                    <Td>
-                      <span className="font-semibold" style={headingFont}>{kw.keyword}</span>
-                      {kw.status === 'error' && kw.error_message && (
-                        <span className="block text-xs mt-0.5" style={{ color: '#a12626' }}>{kw.error_message}</span>
+                {keywords.map((kw) => {
+                  const isOpen = Boolean(expanded[kw.id]);
+                  const list = suggestionsByKw[kw.id];
+                  return (
+                    <React.Fragment key={kw.id}>
+                      <tr style={{ borderBottom: isOpen ? 'none' : '1px solid #f0f3fa' }}>
+                        <Td>
+                          <button
+                            type="button"
+                            onClick={() => toggleExpand(kw)}
+                            className="inline-flex items-center gap-1.5 font-semibold text-left"
+                            title="Voir les mots-clés proposés"
+                            style={{ color: '#001a4a', ...headingFont }}>
+                            {isOpen
+                              ? <ChevronDown className="w-4 h-4 shrink-0" style={{ color: '#005064' }} />
+                              : <ChevronRight className="w-4 h-4 shrink-0" style={{ color: '#6b7a9b' }} />}
+                            {kw.keyword}
+                          </button>
+                          {kw.status === 'error' && kw.error_message && (
+                            <span className="block text-xs mt-0.5 pl-6" style={{ color: '#a12626' }}>{kw.error_message}</span>
+                          )}
+                        </Td>
+                        <Td>{kw.location_code === 2250 ? 'France' : kw.location_code} · {kw.language_code}</Td>
+                        <Td><SeoBadge meta={KEYWORD_STATUS} value={kw.status} /></Td>
+                        <Td>{formatDate(kw.created_at)}</Td>
+                        <Td>{formatDate(kw.last_run_at)}</Td>
+                        <Td className="text-right whitespace-nowrap">
+                          {(kw.status === 'done' || kw.status === 'error') && (
+                            <button
+                              type="button"
+                              onClick={() => retryKeyword(kw)}
+                              title="Relancer l'analyse (repasse à « À analyser »)"
+                              className="inline-flex items-center gap-1 text-xs font-bold mr-3"
+                              style={{ color: '#8a5a00', ...headingFont }}>
+                              <RotateCcw className="w-3.5 h-3.5" />
+                              Réanalyser
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => deleteKeyword(kw)}
+                            title="Supprimer le mot-clé et ses propositions"
+                            className="inline-flex items-center text-xs font-bold"
+                            style={{ color: '#a12626', ...headingFont }}>
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </Td>
+                      </tr>
+
+                      {/* Mots-clés proposés par la recherche : sélection manuelle */}
+                      {isOpen && (
+                        <tr style={{ borderBottom: '1px solid #f0f3fa' }}>
+                          <td colSpan={6} className="px-3 pb-4">
+                            <div className="rounded-xl p-3" style={{ background: '#f7f9fd' }}>
+                              {!list ? (
+                                <p className="text-xs px-1 py-2" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>
+                              ) : list.length === 0 ? (
+                                <p className="text-xs px-1 py-2" style={{ color: '#6b7a9b', ...bodyFont }}>
+                                  {kw.status === 'done'
+                                    ? 'Aucune proposition pour ce pilier.'
+                                    : 'Pas encore de propositions — lancez l\'agent pour analyser ce mot-clé.'}
+                                </p>
+                              ) : (
+                                <table className="w-full border-collapse">
+                                  <thead>
+                                    <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
+                                      <Th>Rédiger</Th>
+                                      <Th>Mot-clé proposé</Th>
+                                      <Th>Volume / mois</Th>
+                                      <Th>Difficulté (KD)</Th>
+                                      <Th>Concurrence</Th>
+                                      <Th>CPC</Th>
+                                      <Th>Intention</Th>
+                                      <Th>Origine</Th>
+                                      <Th>Tendance 12 m</Th>
+                                      <Th>Statut</Th>
+                                      <Th>Article</Th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {list.map((s) => {
+                                      const locked = s.status === 'writing' || s.status === 'written';
+                                      return (
+                                        <tr key={s.id} style={{ borderBottom: '1px solid #eef1f8' }}>
+                                          <Td>
+                                            <input
+                                              type="checkbox"
+                                              checked={s.status === 'selected' || locked}
+                                              disabled={locked}
+                                              onChange={() => toggleSuggestion(s)}
+                                              className="w-4 h-4 accent-[#005064] cursor-pointer disabled:cursor-not-allowed" />
+                                          </Td>
+                                          <Td>
+                                            <span className="font-semibold" style={headingFont}>{s.kw}</span>
+                                            {s.status === 'error' && s.error_message && (
+                                              <span className="block text-xs mt-0.5" style={{ color: '#a12626' }}>{s.error_message}</span>
+                                            )}
+                                          </Td>
+                                          <Td>{s.volume.toLocaleString('fr-FR')}</Td>
+                                          <Td>{s.kd}/100</Td>
+                                          <Td>{Math.round(s.competition * 100)} %</Td>
+                                          <Td>{s.cpc ? `${s.cpc.toFixed(2)} €` : '—'}</Td>
+                                          <Td>{INTENT_LABELS[s.intent] ?? s.intent}</Td>
+                                          <Td>{SUGGESTION_SOURCE[s.source] ?? s.source}</Td>
+                                          <Td><TrendCell trendJson={s.trend_12m} /></Td>
+                                          <Td><SeoBadge meta={SUGGESTION_STATUS} value={s.status} /></Td>
+                                          <Td>
+                                            {s.article_id ? (
+                                              <button
+                                                type="button"
+                                                onClick={() => openPreview(s.article_id)}
+                                                className="inline-flex items-center gap-1 text-xs font-bold underline"
+                                                style={{ color: '#005064', ...headingFont }}>
+                                                <Eye className="w-3.5 h-3.5" />
+                                                Voir
+                                              </button>
+                                            ) : '—'}
+                                          </Td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
                       )}
-                    </Td>
-                    <Td>{kw.location_code === 2250 ? 'France' : kw.location_code} · {kw.language_code}</Td>
-                    <Td><SeoBadge meta={KEYWORD_STATUS} value={kw.status} /></Td>
-                    <Td>{formatDate(kw.created_at)}</Td>
-                    <Td>{formatDate(kw.last_run_at)}</Td>
-                    <Td>
-                      {kw.article_id ? (
-                        <button
-                          type="button"
-                          onClick={() => openPreview(kw.article_id)}
-                          className="inline-flex items-center gap-1 text-xs font-bold underline"
-                          style={{ color: '#005064', ...headingFont }}>
-                          <Eye className="w-3.5 h-3.5" />
-                          Voir l'article
-                        </button>
-                      ) : '—'}
-                    </Td>
-                    <Td className="text-right whitespace-nowrap">
-                      {(kw.status === 'done' || kw.status === 'error') && (
-                        <button
-                          type="button"
-                          onClick={() => retryKeyword(kw)}
-                          title="Relancer (repasse à « À traiter »)"
-                          className="inline-flex items-center gap-1 text-xs font-bold mr-3"
-                          style={{ color: '#8a5a00', ...headingFont }}>
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          Relancer
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => deleteKeyword(kw)}
-                        title="Supprimer le mot-clé"
-                        className="inline-flex items-center text-xs font-bold"
-                        style={{ color: '#a12626', ...headingFont }}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </Td>
-                  </tr>
-                ))}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
+
+        {/* Lancement de la rédaction des mots-clés sélectionnés */}
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: '#f0f3fa' }}>
+          <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
+            Dépliez un pilier analysé, cochez les mots-clés à transformer en articles
+            (<strong>5 à 10 mots-clés proches conseillés</strong> — les recherches sont
+            mutualisées, le coût marginal est faible), puis lancez la rédaction.
+            {selectedCount > 0 && (
+              <strong style={{ color: '#005064' }}> {selectedCount} sélectionné(s).</strong>
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={launch}
+            disabled={!config.agent_enabled || Boolean(activeRun) || launching}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ background: '#005064', color: 'white', ...headingFont }}>
+            <PenLine className="w-4 h-4" />
+            Rédiger les articles sélectionnés
+          </button>
+        </div>
       </Card>
 
       {/* --- Section 2 : planning de publication ----------------------- */}
@@ -678,6 +881,17 @@ export default function SeoGeoView({ auth }) {
                             className="text-xs font-bold mr-3"
                             style={{ color: '#6b7a9b', ...headingFont }}>
                             Attente
+                          </button>
+                        )}
+                        {!published && (
+                          <button
+                            type="button"
+                            onClick={() => publishNow(article)}
+                            title="Publier immédiatement sur le blog, sans attendre le run planifié"
+                            className="inline-flex items-center gap-1 text-xs font-bold mr-3 px-2.5 py-1 rounded-lg"
+                            style={{ background: '#005064', color: 'white', ...headingFont }}>
+                            <Send className="w-3 h-3" />
+                            Publier maintenant
                           </button>
                         )}
                         <button

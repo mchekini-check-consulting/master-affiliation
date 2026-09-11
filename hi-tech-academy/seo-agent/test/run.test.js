@@ -6,13 +6,28 @@ import { createDaemon } from '../src/daemon.js';
 
 // --- API backend mockée -------------------------------------------------
 
-function makeApi({ agentEnabled = true, keywords = [], articlesDue = [], requestedRuns = [] } = {}) {
+function makeApi({ agentEnabled = true, keywords = [], articlesDue = [], requestedRuns = [],
+  selectedSuggestions = [] } = {}) {
   const calls = [];
   const keywordPatches = [];
   const runPatches = [];
   const articlePatches = [];
+  const suggestionPatches = [];
   return {
-    calls, keywordPatches, runPatches, articlePatches,
+    calls, keywordPatches, runPatches, articlePatches, suggestionPatches,
+    async listSuggestions(status) {
+      calls.push(`listSuggestions:${status}`);
+      return status === 'selected' ? selectedSuggestions : [];
+    },
+    async updateSuggestion(id, patch) {
+      calls.push(`updateSuggestion:${id}`);
+      suggestionPatches.push({ id, ...patch });
+      return { id, ...patch };
+    },
+    async replaceSuggestions(keywordId, entries) {
+      calls.push(`replaceSuggestions:${keywordId}:${entries.length}`);
+      return entries;
+    },
     async getConfig() {
       calls.push('getConfig');
       return { agent_enabled: agentEnabled, keywords };
@@ -50,11 +65,11 @@ function makeApi({ agentEnabled = true, keywords = [], articlesDue = [], request
   };
 }
 
+const inactiveOutcome = { implemented: false, reason: 'Chaîne d\'agents inactive — variables manquantes : X' };
 const stubAgents = {
   implemented: false,
-  async processKeyword() {
-    return { implemented: false, reason: 'Agents 1-4 non encore livrés (étapes 4-6) — mot-clé laissé à traiter' };
-  },
+  async researchKeyword() { return inactiveOutcome; },
+  async writeSuggestion() { return inactiveOutcome; },
 };
 
 const noPublisher = { isConfigured: () => false, publishArticle: async () => { throw new Error('non configurée'); } };
@@ -103,7 +118,7 @@ test('seuls les mots-clés to_process sont traités', async () => {
   assert.deepEqual([...touched], ['k3']);
 });
 
-test('chaîne d\'agents réelle : done + article, une erreur ne bloque pas la suite', async () => {
+test('phase recherche : analysés (done) + suggestions, une erreur ne bloque pas la suite', async () => {
   const api = makeApi({ keywords: [
     { id: 'k1', keyword: 'ok', status: 'to_process' },
     { id: 'k2', keyword: 'boom', status: 'to_process' },
@@ -111,10 +126,11 @@ test('chaîne d\'agents réelle : done + article, une erreur ne bloque pas la su
   ] });
   const agents = {
     implemented: true,
-    async processKeyword(ctx, kw) {
-      if (kw.keyword === 'boom') throw new Error('SERP indisponible');
-      return { articleId: `article-${kw.id}` };
+    async researchKeyword(ctx, kw) {
+      if (kw.keyword === 'boom') throw new Error('DataForSEO indisponible');
+      return { suggestionsCount: 42 };
     },
+    async writeSuggestion() { throw new Error('non utilisé ici'); },
   };
   const result = await executeRun(baseDeps(api, { agents }), { trigger: 'manual' });
 
@@ -122,9 +138,64 @@ test('chaîne d\'agents réelle : done + article, une erreur ne bloque pas la su
   const byId = Object.fromEntries(api.keywordPatches.filter((p) => p.status !== 'processing').map((p) => [p.id, p]));
   assert.equal(byId.k1.status, 'done');
   assert.equal(byId.k2.status, 'error');
-  assert.match(byId.k2.error_message, /SERP indisponible/);
+  assert.match(byId.k2.error_message, /DataForSEO indisponible/);
   assert.equal(byId.k3.status, 'done');
   assert.equal(api.runPatches.at(-1).keywords_processed, 2);
+  // le nombre de propositions est annoncé dans l'étape courante
+  assert.ok(api.runPatches.some((p) => /42 mot\(s\)-clé\(s\) proposé\(s\)/.test(p.current_step ?? '')));
+});
+
+test('phase rédaction : un article par suggestion sélectionnée, erreurs isolées', async () => {
+  const api = makeApi({ selectedSuggestions: [
+    { id: 's1', keyword_id: 'k1', kw: 'formation kubernetes cpf', status: 'selected' },
+    { id: 's2', keyword_id: 'k1', kw: 'boom', status: 'selected' },
+    { id: 's3', keyword_id: 'k1', kw: 'apprendre kubernetes', status: 'selected' },
+  ] });
+  const agents = {
+    implemented: true,
+    async researchKeyword() { throw new Error('non utilisé ici'); },
+    async writeSuggestion(ctx, s) {
+      if (s.kw === 'boom') throw new Error('SERP indisponible');
+      return { articleId: `article-${s.id}` };
+    },
+  };
+  const result = await executeRun(baseDeps(api, { agents }), { trigger: 'manual' });
+
+  assert.equal(result.written, 2);
+  const finalById = {};
+  for (const p of api.suggestionPatches) finalById[p.id] = p; // dernier patch gagne
+  assert.equal(finalById.s1.status, 'written');
+  assert.equal(finalById.s1.article_id, 'article-s1');
+  assert.equal(finalById.s2.status, 'error');
+  assert.match(finalById.s2.error_message, /SERP indisponible/);
+  assert.equal(finalById.s3.status, 'written');
+  assert.match(api.runPatches.at(-1).current_step, /2 article\(s\) rédigé\(s\)/);
+});
+
+test('rate limit pendant la rédaction : suggestion rendue à selected', async () => {
+  const api = makeApi({ selectedSuggestions: [
+    { id: 's1', keyword_id: 'k1', kw: 'a', status: 'selected' },
+  ] });
+  const agents = {
+    implemented: true,
+    async researchKeyword() { return { suggestionsCount: 0 }; },
+    async writeSuggestion() {
+      const err = new Error('usage limit');
+      err.retryNextRun = true;
+      throw err;
+    },
+  };
+  const result = await executeRun(baseDeps(api, { agents }), { trigger: 'manual' });
+  assert.equal(result.written, 0);
+  assert.equal(api.suggestionPatches.at(-1).status, 'selected'); // reportée
+  assert.equal(api.runPatches.at(-1).status, 'done');
+});
+
+test('sélection en attente + chaîne inactive : signalé sans rien consommer', async () => {
+  const api = makeApi({ selectedSuggestions: [{ id: 's1', kw: 'a', status: 'selected' }] });
+  await executeRun(baseDeps(api), { trigger: 'manual' }); // stubAgents inactifs
+  assert.equal(api.suggestionPatches.length, 0); // pas touchées
+  assert.ok(api.runPatches.some((p) => /chaîne d'agents inactive/.test(p.current_step ?? '')));
 });
 
 // --- Délai aléatoire -----------------------------------------------------
@@ -194,7 +265,8 @@ test('coût DataForSEO consigné à la clôture : delta du run, pas le cumul', a
   const getCost = () => total;
   const agents = {
     implemented: true,
-    async processKeyword() { total += 0.123; return { articleId: 'a' }; },
+    async researchKeyword() { total += 0.123; return { suggestionsCount: 1 }; },
+    async writeSuggestion() { return { articleId: 'a' }; },
   };
   const apiWithKw = makeApi({ keywords: [{ id: 'k1', keyword: 'a', status: 'to_process' }] });
   await executeRun(baseDeps(apiWithKw, { getCost, agents }), { trigger: 'manual' });
@@ -209,11 +281,12 @@ test('rate limit LLM (retryNextRun) : mot-clé reporté à to_process, pas en er
   const api = makeApi({ keywords: [{ id: 'k1', keyword: 'a', status: 'to_process' }] });
   const agents = {
     implemented: true,
-    async processKeyword() {
+    async researchKeyword() {
       const err = new Error('LLM : usage limit atteint');
       err.retryNextRun = true;
       throw err;
     },
+    async writeSuggestion() { return { articleId: 'a' }; },
   };
   const result = await executeRun(baseDeps(api, { agents }), { trigger: 'manual' });
 

@@ -1,10 +1,18 @@
 # seo-agent — orchestrateur du pipeline SEO/GEO
 
-Pipeline multi-agents de Hi-Tech Academy : veille concurrentielle → analyse
-volumes/concurrence → sélection de mots-clés → rédaction d'articles →
-publication planifiée. Piloté depuis l'onglet **SEO / GEO** de l'admin
-(`/api/admin/seo/*`) ; l'orchestrateur consomme l'API de service
-`/api/seo/*` (token Bearer).
+Pipeline multi-agents de Hi-Tech Academy, en deux phases pilotées par
+l'admin (onglet **SEO / GEO**) :
+
+1. **Recherche** — pour chaque mot-clé pilier « à analyser » : veille
+   concurrentielle (agent 1) + analyse volumes/concurrence (agent 2) →
+   mots-clés proposés avec métriques (volume, KD, concurrence, CPC,
+   intention, tendance 12 mois, origine) déposés en suggestions.
+2. **Rédaction** — l'admin coche 5 à 10 mots-clés proches (recherches
+   mutualisées, coût marginal faible) puis lance la rédaction : un article
+   par sélection (agents 3-4), déposé « à valider ». La formation n'est
+   mise en avant qu'en fin d'article (jamais dans l'introduction).
+
+L'orchestrateur consomme l'API de service `/api/seo/*` (token Bearer).
 
 ## État
 

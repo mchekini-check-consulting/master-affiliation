@@ -1,7 +1,12 @@
-// Chaîne des agents du pipeline : veille (1) → analyse (2) → sélection (3) →
-// rédaction (4) → dépôt de l'article (statut to_validate dans l'admin).
-// Sans identifiants DataForSEO + token LLM, la chaîne reste inactive : les
-// mots-clés sont rendus « à traiter » avec la liste des variables manquantes
+// Chaîne des agents du pipeline, en deux phases pilotées par l'admin :
+//   Recherche  — veille (1) + analyse (2) → mots-clés proposés avec leurs
+//                métriques (volume, KD, concurrence…), déposés en suggestions
+//                pour sélection manuelle dans l'admin.
+//   Rédaction  — pour chaque mot-clé sélectionné : sélection (3) + rédaction
+//                (4) → article to_validate. Les enrichissements de la phase
+//                de recherche sont servis par le cache (30 j) : rédiger 5-10
+//                articles sur des mots-clés proches coûte très peu de plus.
+// Sans identifiants DataForSEO + token LLM, la chaîne reste inactive
 // (zéro consommation).
 
 import { createDataForSeoClient } from '../dataforseo.js';
@@ -35,26 +40,55 @@ export function createAgents(deps = {}) {
   }
   if (missing.length > 0) {
     const reason = `Chaîne d'agents inactive — variables manquantes : ${missing.join(', ')}`;
+    const inactive = async () => ({ implemented: false, reason });
     return {
       implemented: false,
       getCost: () => 0,
-      async processKeyword() {
-        return { implemented: false, reason };
-      },
+      researchKeyword: inactive,
+      writeSuggestion: inactive,
     };
   }
 
-  const dfs = deps.dfs ?? createDataForSeoClient({ cache: deps.cache ?? null });
+  const dfs = deps.dfs ?? createDataForSeoClient({
+    cache: deps.cache ?? null,
+    // Détail du coût de chaque appel dans les logs du conteneur
+    onCost: (cost, path) => log(`DataForSEO ${path} : ${cost.toFixed(4)} $`),
+  });
   const llm = deps.llm ?? createLlm({ log });
   const snapshots = deps.snapshots ?? createMemorySnapshotStore();
 
   const watchAgent = createWatchAgent({ dfs, snapshots, log });
   const analyzeAgent = createAnalyzeAgent({ dfs, log });
+
+  // La veille est propre au site, pas au mot-clé : un seul passage par run
+  // (mémoïsée 30 min) au lieu d'un par mot-clé — ~10 appels Labs économisés
+  // par mot-clé supplémentaire.
+  const WATCH_TTL_MS = 30 * 60 * 1000;
+  let watchMemo = null; // { at, output }
+  async function runWatch(keywordId) {
+    if (watchMemo && Date.now() - watchMemo.at < WATCH_TTL_MS) return watchMemo.output;
+    const output = await watchAgent.watch({ keywordId });
+    watchMemo = { at: Date.now(), output };
+    return output;
+  }
   const selectAgent = createSelectAgent({ llm, log });
   const writeAgent = createWriteAgent({
     dfs, llm, log,
     internalPages: deps.internalPages ?? INTERNAL_PAGES,
   });
+
+  // Agent 1, tolérant aux pannes : sans veille, la suite tourne sans gap
+  async function collectGapKeywords(keywordId, updateStep) {
+    try {
+      await updateStep('Agent 1 — veille concurrentielle');
+      const watch = await runWatch(keywordId);
+      return watch.competitors.flatMap((c) => c.gap_keywords);
+    } catch (err) {
+      if (err.retryNextRun) throw err;
+      log(`veille en échec (${err.message}) — pipeline poursuivi sans gap`);
+      return [];
+    }
+  }
 
   return {
     implemented: true,
@@ -62,24 +96,47 @@ export function createAgents(deps = {}) {
     /** Coût DataForSEO cumulé (le moteur de run consigne le delta par run). */
     getCost: () => dfs.getTotalCost(),
 
-    async processKeyword(ctx, keyword) {
+    /**
+     * Phase recherche : veille + analyse du pilier → dépôt des mots-clés
+     * proposés (avec métriques) pour sélection manuelle dans l'admin.
+     */
+    async researchKeyword(ctx, keyword) {
       const { updateStep } = ctx;
-
-      // Agent 1 — veille. Tolérante aux pannes : sans elle, le pipeline
-      // continue simplement sans mots-clés de gap.
-      let gapKeywords = [];
-      try {
-        await updateStep('Agent 1 — veille concurrentielle');
-        const watch = await watchAgent.watch({ keywordId: keyword.id });
-        gapKeywords = watch.competitors.flatMap((c) => c.gap_keywords);
-      } catch (err) {
-        if (err.retryNextRun) throw err;
-        log(`veille en échec (${err.message}) — pipeline poursuivi sans gap`);
-      }
+      const gapKeywords = await collectGapKeywords(keyword.id, updateStep);
 
       await updateStep('Agent 2 — analyse volumes & concurrence');
       const analysis = await analyzeAgent.analyze(keyword.keyword, {
         keywordId: keyword.id,
+        gapKeywords,
+      });
+
+      await updateStep('Dépôt des mots-clés proposés (sélection dans l\'admin)');
+      await ctx.api.replaceSuggestions(keyword.id, analysis.keywords.map((k) => ({
+        kw: k.kw,
+        volume: k.volume,
+        cpc: k.cpc,
+        competition: k.competition,
+        kd: k.kd,
+        intent: k.intent,
+        trend_12m: k.trend_12m,
+        gap_score: k.gap_score,
+        source: k.source,
+      })));
+      return { suggestionsCount: analysis.keywords.length };
+    },
+
+    /**
+     * Phase rédaction : un mot-clé sélectionné par l'admin devient pilier
+     * d'article — analyse (surtout servie par le cache), sélection du
+     * cluster, rédaction, dépôt to_validate.
+     */
+    async writeSuggestion(ctx, suggestion) {
+      const { updateStep } = ctx;
+      const gapKeywords = await collectGapKeywords(suggestion.keyword_id, updateStep);
+
+      await updateStep(`Agent 2 — cluster autour de « ${suggestion.kw} »`);
+      const analysis = await analyzeAgent.analyze(suggestion.kw, {
+        keywordId: suggestion.keyword_id,
         gapKeywords,
       });
 
@@ -90,7 +147,8 @@ export function createAgents(deps = {}) {
 
       await updateStep('Dépôt de l\'article (à valider dans l\'admin)');
       const created = await ctx.api.createArticle({
-        keyword_id: keyword.id,
+        keyword_id: suggestion.keyword_id,
+        keyword: suggestion.kw,
         title: article.title,
         meta_description: article.meta_description,
         slug: article.slug,

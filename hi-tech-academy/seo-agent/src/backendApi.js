@@ -44,6 +44,20 @@ export function createBackendApi(options = {}) {
       return request('PATCH', `/seo/keywords/${id}`, patch);
     },
 
+    /** Dépôt des mots-clés proposés par la recherche pour un pilier. */
+    replaceSuggestions(keywordId, entries) {
+      return request('PUT', `/seo/keywords/${keywordId}/suggestions`, entries);
+    },
+
+    /** Suggestions par statut — la rédaction consomme status=selected. */
+    listSuggestions(status) {
+      return request('GET', `/seo/suggestions${status ? `?status=${status}` : ''}`);
+    },
+
+    updateSuggestion(id, patch) {
+      return request('PATCH', `/seo/suggestions/${id}`, patch);
+    },
+
     /** Dépôt d'un article rédigé (agent 4) au statut to_validate. */
     createArticle(payload) {
       return request('POST', '/seo/articles', payload);

@@ -320,3 +320,18 @@ export function getPublishedBlogArticles() {
 export function getPublishedBlogArticle(slug) {
   return request(`/blog/articles/${encodeURIComponent(slug)}`);
 }
+
+// Publication immédiate d'un article SEO (sans attendre le run planifié)
+export function adminPublishSeoArticleNow(auth, id) {
+  return request(`/admin/seo/articles/${id}/publish`, { method: 'POST', auth });
+}
+
+// Suggestions de mots-clés d'un pilier (phase recherche → sélection manuelle)
+export function adminListSeoSuggestions(auth, keywordId) {
+  return request(`/admin/seo/keywords/${keywordId}/suggestions`, { auth });
+}
+
+// Sélection / désélection d'un mot-clé proposé (status: selected | suggested)
+export function adminUpdateSeoSuggestion(auth, id, status) {
+  return request(`/admin/seo/suggestions/${id}`, { method: 'PATCH', auth, body: { status } });
+}

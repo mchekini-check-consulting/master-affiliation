@@ -3,9 +3,11 @@
 //      déposé par le bouton « Lancer l'agent » de l'admin
 //   2. lecture de la config ; agent désactivé → run « skipped », zéro appel
 //      DataForSEO et zéro appel LLM
-//   3. traitement des mots-clés to_process par la chaîne d'agents
-//   4. attente aléatoire de 1 à 40 minutes (runs cron uniquement)
-//   5. publication des articles validated dont publish_at est échu
+//   3. phase recherche : mots-clés piliers to_process → veille + analyse →
+//      suggestions déposées avec leurs métriques (sélection manuelle admin)
+//   4. phase rédaction : un article par suggestion « selected » (agents 3-4)
+//   5. attente aléatoire de 1 à 40 minutes (runs cron uniquement)
+//   6. publication des articles validated dont publish_at est échu
 // L'étape courante est remontée en continu dans seo_runs.current_step,
 // affichée en direct dans l'onglet SEO / GEO de l'admin.
 
@@ -47,30 +49,31 @@ export async function executeRun(deps, { trigger = 'cron', runId = null } = {}) 
       return { skipped: true, processed: 0, published: 0 };
     }
 
-    // 3. Mots-clés à traiter
+    const agentCtx = { api, log, updateStep: (step) => patch({ current_step: step }) };
+
+    // 3. Phase recherche : piliers to_process → suggestions à sélectionner
     const toProcess = config.keywords.filter((k) => k.status === 'to_process');
     let processed = 0;
     for (const [index, keyword] of toProcess.entries()) {
       await patch({
-        current_step: `Traitement du mot-clé (${index + 1}/${toProcess.length})`,
+        current_step: `Recherche de mots-clés (${index + 1}/${toProcess.length})`,
         current_keyword: keyword.keyword,
       });
       await api.updateKeyword(keyword.id, { status: 'processing' });
       try {
-        const outcome = await agents.processKeyword({
-          api,
-          log,
-          updateStep: (step) => patch({ current_step: step }),
-        }, keyword);
+        const outcome = await agents.researchKeyword(agentCtx, keyword);
 
         if (outcome?.implemented === false) {
-          // Chaîne d'agents pas encore livrée : rendre le mot-clé à traiter
+          // Chaîne d'agents inactive : rendre le mot-clé à traiter
           await api.updateKeyword(keyword.id, { status: 'to_process', last_run_at: iso() });
           await patch({ current_step: outcome.reason });
         } else {
           await api.updateKeyword(keyword.id, { status: 'done', last_run_at: iso() });
           processed++;
-          await patch({ keywords_processed: processed });
+          await patch({
+            keywords_processed: processed,
+            current_step: `Analyse terminée : ${outcome.suggestionsCount} mot(s)-clé(s) proposé(s) pour « ${keyword.keyword} » — sélectionnez ceux à rédiger`,
+          });
         }
       } catch (err) {
         if (err.retryNextRun) {
@@ -91,6 +94,40 @@ export async function executeRun(deps, { trigger = 'cron', runId = null } = {}) 
           error_message: String(err.message ?? err).slice(0, 2000),
           last_run_at: iso(),
         });
+      }
+    }
+
+    // 4. Phase rédaction : un article par suggestion sélectionnée par l'admin
+    let written = 0;
+    const selected = await api.listSuggestions('selected');
+    if (selected.length > 0 && agents.implemented === false) {
+      await patch({ current_step: `${selected.length} mot(s)-clé(s) sélectionné(s) en attente — chaîne d'agents inactive` });
+    } else {
+      for (const [index, suggestion] of selected.entries()) {
+        await patch({
+          current_step: `Rédaction (${index + 1}/${selected.length}) : « ${suggestion.kw} »`,
+          current_keyword: suggestion.kw,
+        });
+        await api.updateSuggestion(suggestion.id, { status: 'writing' });
+        try {
+          const { articleId } = await agents.writeSuggestion(agentCtx, suggestion);
+          await api.updateSuggestion(suggestion.id, { status: 'written', article_id: articleId });
+          written++;
+        } catch (err) {
+          if (err.retryNextRun) {
+            log(`rédaction « ${suggestion.kw} » reportée au run suivant : ${err.message}`);
+            await api.updateSuggestion(suggestion.id, {
+              status: 'selected',
+              error_message: `Reportée au run suivant (rate limit LLM)`.slice(0, 1000),
+            });
+            continue;
+          }
+          log(`rédaction « ${suggestion.kw} » en erreur : ${err.message}`);
+          await api.updateSuggestion(suggestion.id, {
+            status: 'error',
+            error_message: String(err.message ?? err).slice(0, 1000),
+          });
+        }
       }
     }
 
@@ -124,7 +161,7 @@ export async function executeRun(deps, { trigger = 'cron', runId = null } = {}) 
 
     const summary = {
       status: 'done',
-      current_step: 'Terminé',
+      current_step: `Terminé — ${processed} analyse(s), ${written} article(s) rédigé(s), ${published} publié(s)`,
       keywords_processed: processed,
       articles_published: published,
       finished_at: iso(),
@@ -132,7 +169,7 @@ export async function executeRun(deps, { trigger = 'cron', runId = null } = {}) 
     const cost = getCost ? getCost() - costStart : null;
     if (typeof cost === 'number' && cost > 0) summary.cost_usd = Math.round(cost * 10000) / 10000;
     await patch(summary);
-    return { skipped: false, processed, published };
+    return { skipped: false, processed, written, published };
   } catch (err) {
     // Clôture en erreur — sans masquer l'erreur d'origine si l'API est down
     await api.updateRun(run.id, {

@@ -4,6 +4,7 @@ import fr.hitechacademy.seo.SeoDtos.ArticleDetailView;
 import fr.hitechacademy.seo.SeoDtos.ArticleView;
 import fr.hitechacademy.seo.SeoDtos.KeywordView;
 import fr.hitechacademy.seo.SeoDtos.RunView;
+import fr.hitechacademy.seo.SeoDtos.SuggestionView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
@@ -52,13 +53,19 @@ public class SeoAdminController {
     private final SeoKeywordRepository keywords;
     private final SeoArticleRepository articles;
     private final SeoRunRepository runs;
+    private final SeoKeywordSuggestionRepository suggestions;
+    private final String baseUrl;
 
     public SeoAdminController(SeoConfigRepository configs, SeoKeywordRepository keywords,
-                              SeoArticleRepository articles, SeoRunRepository runs) {
+                              SeoArticleRepository articles, SeoRunRepository runs,
+                              SeoKeywordSuggestionRepository suggestions,
+                              @org.springframework.beans.factory.annotation.Value("${app.base-url}") String baseUrl) {
         this.configs = configs;
         this.keywords = keywords;
         this.articles = articles;
         this.runs = runs;
+        this.suggestions = suggestions;
+        this.baseUrl = baseUrl.replaceAll("/+$", "");
     }
 
     // --- Configuration ------------------------------------------------
@@ -107,7 +114,49 @@ public class SeoAdminController {
     @DeleteMapping("/keywords/{id}")
     @Transactional
     public void deleteKeyword(@PathVariable UUID id) {
-        keywords.delete(findKeyword(id));
+        SeoKeyword keyword = findKeyword(id);
+        suggestions.deleteByKeywordId(keyword.getId());
+        keywords.delete(keyword);
+    }
+
+    // --- Suggestions : la sélection manuelle des mots-clés à rédiger ----
+
+    /** Propositions de la phase de recherche pour un pilier (tri par volume). */
+    @GetMapping("/keywords/{id}/suggestions")
+    @Transactional(readOnly = true)
+    public List<SuggestionView> listSuggestions(@PathVariable UUID id) {
+        return suggestions.findByKeywordIdOrderByVolumeDesc(findKeyword(id).getId()).stream()
+                .map(SuggestionView::from)
+                .toList();
+    }
+
+    public record UpdateSuggestionRequest(SeoSuggestionStatus status) {
+    }
+
+    /**
+     * Sélection / désélection d'un mot-clé proposé. L'admin ne pose que
+     * suggested ou selected (writing/written appartiennent à l'orchestrateur) ;
+     * re-sélectionner une proposition en erreur relance sa rédaction.
+     */
+    @PatchMapping("/suggestions/{id}")
+    @Transactional
+    public SuggestionView updateSuggestion(@PathVariable UUID id,
+                                           @RequestBody UpdateSuggestionRequest body) {
+        SeoKeywordSuggestion suggestion = suggestions.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Suggestion introuvable"));
+        if (body.status() == null
+                || !(body.status() == SeoSuggestionStatus.SUGGESTED || body.status() == SeoSuggestionStatus.SELECTED)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Statut invalide : seuls suggested et selected sont autorisés.");
+        }
+        if (suggestion.getStatus() == SeoSuggestionStatus.WRITING
+                || suggestion.getStatus() == SeoSuggestionStatus.WRITTEN) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cette proposition est en cours de rédaction ou déjà rédigée.");
+        }
+        suggestion.setStatus(body.status());
+        if (body.status() == SeoSuggestionStatus.SELECTED) suggestion.setErrorMessage(null);
+        return SuggestionView.from(suggestions.save(suggestion));
     }
 
     /** Relance : repasse le mot-clé à to_process pour le prochain run. */
@@ -152,6 +201,31 @@ public class SeoAdminController {
         if (body.publishAt() != null) {
             article.setPublishAt(body.publishAt());
         }
+        return ArticleView.from(articles.save(article));
+    }
+
+    /**
+     * Publication immédiate depuis l'admin, sans attendre le run planifié :
+     * l'article passe à published tout de suite et est servi par l'API
+     * publique du blog au rafraîchissement suivant.
+     */
+    @PostMapping("/articles/{id}/publish")
+    @Transactional
+    public ArticleView publishArticleNow(@PathVariable UUID id) {
+        SeoArticle article = findArticle(id);
+        if (article.getStatus() == SeoArticleStatus.PUBLISHED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cet article est déjà publié.");
+        }
+        if (article.getSlug() == null || article.getSlug().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Article sans slug : publication impossible.");
+        }
+        Instant now = Instant.now();
+        article.setStatus(SeoArticleStatus.PUBLISHED);
+        if (article.getPublishAt() == null) {
+            article.setPublishAt(now);
+        }
+        article.setPublishedAt(now);
+        article.setCmsUrl(baseUrl + "/blog/" + article.getSlug());
         return ArticleView.from(articles.save(article));
     }
 

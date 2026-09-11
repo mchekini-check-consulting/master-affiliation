@@ -83,54 +83,111 @@ function makeLlm() {
   };
 }
 
-test('chaîne complète : article déposé avec audit et mots-clés de gap intégrés', async () => {
+test('phase recherche : suggestions déposées avec métriques, gap inclus, zéro LLM', async () => {
   const agents = createAgents({
     dfs: makeDfs(),
-    llm: makeLlm(),
+    llm: { async generateJson() { throw new Error('le LLM ne doit pas être appelé en recherche'); } },
     snapshots: createMemorySnapshotStore(),
   });
   assert.equal(agents.implemented, true);
   assert.equal(agents.getCost(), 0.05);
 
-  const posted = [];
+  const replaced = [];
   const steps = [];
   const ctx = {
-    api: { async createArticle(payload) { posted.push(payload); return { id: 'article-1', ...payload }; } },
+    api: {
+      async replaceSuggestions(keywordId, entries) { replaced.push({ keywordId, entries }); return entries; },
+      async createArticle() { throw new Error('pas d\'article en phase recherche'); },
+    },
     updateStep: (s) => steps.push(s),
     log: () => {},
   };
 
-  const result = await agents.processKeyword(ctx, { id: 'kw-1', keyword: 'formation kubernetes' });
+  const result = await agents.researchKeyword(ctx, { id: 'kw-1', keyword: 'formation kubernetes' });
+
+  assert.equal(replaced.length, 1);
+  assert.equal(replaced[0].keywordId, 'kw-1');
+  assert.equal(result.suggestionsCount, replaced[0].entries.length);
+  const kws = replaced[0].entries.map((e) => e.kw);
+  assert.equal(kws[0], 'formation kubernetes'); // le pilier en tête
+  assert.ok(kws.includes('kubernetes certification prix')); // le gap de la veille
+  const seed = replaced[0].entries[0];
+  assert.equal(seed.volume, 300);
+  assert.equal(seed.kd, 35);
+  assert.equal(seed.intent, 'commercial');
+  assert.equal(seed.source, 'seed');
+  assert.ok(steps.some((s) => s.includes('Agent 1')));
+  assert.ok(steps.some((s) => s.includes('Agent 2')));
+});
+
+test('phase rédaction : la suggestion sélectionnée devient un article (mot-clé affiché = la suggestion)', async () => {
+  const agents = createAgents({
+    dfs: makeDfs(),
+    llm: makeLlm(),
+    snapshots: createMemorySnapshotStore(),
+  });
+
+  const posted = [];
+  const steps = [];
+  const ctx = {
+    api: {
+      async replaceSuggestions() { throw new Error('pas de dépôt en phase rédaction'); },
+      async createArticle(payload) { posted.push(payload); return { id: 'article-1', ...payload }; },
+    },
+    updateStep: (s) => steps.push(s),
+    log: () => {},
+  };
+
+  const result = await agents.writeSuggestion(ctx,
+      { id: 's1', keyword_id: 'kw-1', kw: 'formation kubernetes cpf', status: 'selected' });
 
   assert.equal(result.articleId, 'article-1');
-  assert.equal(posted.length, 1);
   const article = posted[0];
   assert.equal(article.keyword_id, 'kw-1');
-  assert.match(article.title, /^Formation Kubernetes/);
+  assert.equal(article.keyword, 'formation kubernetes cpf'); // la suggestion, pas le pilier
   assert.equal(article.slug, 'formation-kubernetes-financement');
   assert.equal(article.audit_score, 91);
   assert.equal(article.schema_org['@graph'][1]['@type'], 'FAQPage');
 
-  // les 4 agents sont passés, dans l'ordre
+  // les 4 agents passent, dans l'ordre
   const order = ['Agent 1', 'Agent 2', 'Agent 3', 'Agent 4', 'Dépôt'];
   const firstIndex = order.map((label) => steps.findIndex((s) => s.includes(label)));
   assert.ok(firstIndex.every((i) => i >= 0), `étapes vues : ${steps.join(' | ')}`);
   assert.deepEqual([...firstIndex].sort((a, b) => a - b), firstIndex);
 });
 
-test('veille en échec : le pipeline continue sans gap', async () => {
+test('veille mutualisée : un seul passage pour plusieurs recherches du même run', async () => {
+  const dfs = makeDfs();
+  let watchCalls = 0;
+  const original = dfs.competitorsDomain;
+  dfs.competitorsDomain = async (...args) => { watchCalls++; return original(...args); };
+
+  const agents = createAgents({ dfs, llm: makeLlm(), snapshots: createMemorySnapshotStore() });
+  const ctx = {
+    api: { async replaceSuggestions(id, entries) { return entries; } },
+    updateStep: () => {},
+    log: () => {},
+  };
+  await agents.researchKeyword(ctx, { id: 'kw-1', keyword: 'formation kubernetes' });
+  await agents.researchKeyword(ctx, { id: 'kw-2', keyword: 'formation ia' });
+
+  assert.equal(watchCalls, 1); // la veille n'a tourné qu'une fois
+});
+
+test('veille en échec : la recherche continue sans gap', async () => {
   const dfs = makeDfs();
   dfs.competitorsDomain = async () => { throw new Error('DataForSEO 50000'); };
   const agents = createAgents({ dfs, llm: makeLlm(), snapshots: createMemorySnapshotStore() });
 
-  const posted = [];
+  const replaced = [];
   const ctx = {
-    api: { async createArticle(p) { posted.push(p); return { id: 'article-2' }; } },
+    api: { async replaceSuggestions(id, entries) { replaced.push(entries); return entries; } },
     updateStep: () => {},
     log: () => {},
   };
-  const result = await agents.processKeyword(ctx, { id: 'kw-1', keyword: 'formation kubernetes' });
-  assert.equal(result.articleId, 'article-2');
+  const result = await agents.researchKeyword(ctx, { id: 'kw-1', keyword: 'formation kubernetes' });
+  assert.ok(result.suggestionsCount > 0);
+  assert.ok(!replaced[0].some((e) => e.source === 'gap')); // pas de gap, pas d'échec
 });
 
 test('variables manquantes : chaîne inactive, zéro consommation', async () => {
@@ -141,10 +198,12 @@ test('variables manquantes : chaîne inactive, zéro consommation', async () => 
   try {
     const agents = createAgents({});
     assert.equal(agents.implemented, false);
-    const out = await agents.processKeyword({}, { keyword: 'x' });
-    assert.equal(out.implemented, false);
-    assert.match(out.reason, /DATAFORSEO_LOGIN/);
-    assert.match(out.reason, /CLAUDE_CODE_OAUTH_TOKEN/);
+    const research = await agents.researchKeyword({}, { keyword: 'x' });
+    assert.equal(research.implemented, false);
+    assert.match(research.reason, /DATAFORSEO_LOGIN/);
+    assert.match(research.reason, /CLAUDE_CODE_OAUTH_TOKEN/);
+    const writing = await agents.writeSuggestion({}, { kw: 'x' });
+    assert.equal(writing.implemented, false);
   } finally {
     Object.assign(process.env, saved);
   }

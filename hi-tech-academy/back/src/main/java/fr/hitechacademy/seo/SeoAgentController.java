@@ -5,6 +5,7 @@ import fr.hitechacademy.seo.SeoDtos.ArticleDetailView;
 import fr.hitechacademy.seo.SeoDtos.ArticleView;
 import fr.hitechacademy.seo.SeoDtos.KeywordView;
 import fr.hitechacademy.seo.SeoDtos.RunView;
+import fr.hitechacademy.seo.SeoDtos.SuggestionView;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,12 +41,26 @@ public class SeoAgentController {
     public record UpdateKeywordRequest(SeoKeywordStatus status, Instant lastRunAt, String errorMessage) {
     }
 
-    /** Sortie de l'agent 4 : les champs structurés arrivent en JSON natif. */
-    public record CreateArticleRequest(@NotNull UUID keywordId, @NotBlank String title,
+    /**
+     * Sortie de l'agent 4 : les champs structurés arrivent en JSON natif.
+     * `keyword` (optionnel) : mot-clé affiché — pour les articles issus d'une
+     * suggestion, c'est la suggestion et non le pilier.
+     */
+    public record CreateArticleRequest(@NotNull UUID keywordId, String keyword, @NotBlank String title,
                                        String metaDescription, String slug, JsonNode hnOutline,
                                        @NotBlank String bodyMd, JsonNode internalLinks, JsonNode faq,
                                        JsonNode schemaOrg, Integer auditScore, JsonNode auditIssues,
                                        Instant publishAt) {
+    }
+
+    /** Mot-clé proposé par la phase de recherche (contrat de l'agent 2). */
+    public record SuggestionEntry(@NotBlank String kw, Integer volume, Double cpc, Double competition,
+                                  Integer kd, String intent,
+                                  @com.fasterxml.jackson.annotation.JsonProperty("trend_12m") JsonNode trend12m,
+                                  Double gapScore, String source) {
+    }
+
+    public record UpdateSuggestionRequest(SeoSuggestionStatus status, UUID articleId, String errorMessage) {
     }
 
     public record UpdateArticleRequest(SeoArticleStatus status, String cmsUrl, Instant publishedAt) {
@@ -63,13 +79,16 @@ public class SeoAgentController {
     private final SeoKeywordRepository keywords;
     private final SeoArticleRepository articles;
     private final SeoRunRepository runs;
+    private final SeoKeywordSuggestionRepository suggestions;
 
     public SeoAgentController(SeoConfigRepository configs, SeoKeywordRepository keywords,
-                              SeoArticleRepository articles, SeoRunRepository runs) {
+                              SeoArticleRepository articles, SeoRunRepository runs,
+                              SeoKeywordSuggestionRepository suggestions) {
         this.configs = configs;
         this.keywords = keywords;
         this.articles = articles;
         this.runs = runs;
+        this.suggestions = suggestions;
     }
 
     // --- Config + mots-clés (lecture au début de chaque run) -----------
@@ -108,7 +127,8 @@ public class SeoAgentController {
 
         SeoArticle article = new SeoArticle();
         article.setKeywordId(keyword.getId());
-        article.setKeyword(keyword.getKeyword());
+        article.setKeyword(body.keyword() != null && !body.keyword().isBlank()
+                ? body.keyword().trim() : keyword.getKeyword());
         article.setTitle(body.title().trim());
         article.setMetaDescription(body.metaDescription());
         article.setSlug(body.slug());
@@ -122,9 +142,78 @@ public class SeoAgentController {
         article.setPublishAt(body.publishAt());
         article = articles.save(article);
 
-        keyword.setArticleId(article.getId());
-        keywords.save(keyword);
+        // Plusieurs articles peuvent naître d'un même pilier (suggestions) :
+        // le pilier garde le lien vers son premier article
+        if (keyword.getArticleId() == null) {
+            keyword.setArticleId(article.getId());
+            keywords.save(keyword);
+        }
         return ArticleDetailView.from(article);
+    }
+
+    // --- Suggestions de mots-clés (phase recherche → sélection admin) ---
+
+    /** Dépôt des propositions d'un pilier : remplace les non-rédigées. */
+    @PutMapping("/keywords/{id}/suggestions")
+    @Transactional
+    public List<SuggestionView> replaceSuggestions(@PathVariable UUID id,
+                                                   @Valid @RequestBody List<SuggestionEntry> entries) {
+        SeoKeyword keyword = keywords.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mot-clé introuvable"));
+
+        // Ne pas écraser le travail en cours : sélections et articles restent
+        List<SeoKeywordSuggestion> existing = suggestions.findByKeywordIdOrderByVolumeDesc(keyword.getId());
+        var kept = existing.stream()
+                .filter(s -> s.getStatus() != SeoSuggestionStatus.SUGGESTED)
+                .toList();
+        var keptKws = kept.stream().map(s -> s.getKw().toLowerCase()).collect(java.util.stream.Collectors.toSet());
+        suggestions.deleteAll(existing.stream()
+                .filter(s -> s.getStatus() == SeoSuggestionStatus.SUGGESTED)
+                .toList());
+
+        for (SuggestionEntry entry : entries) {
+            if (keptKws.contains(entry.kw().trim().toLowerCase())) continue;
+            SeoKeywordSuggestion s = new SeoKeywordSuggestion();
+            s.setKeywordId(keyword.getId());
+            s.setKw(entry.kw().trim());
+            s.setVolume(entry.volume() != null ? entry.volume() : 0);
+            s.setCpc(entry.cpc() != null ? entry.cpc() : 0);
+            s.setCompetition(entry.competition() != null ? entry.competition() : 0);
+            s.setKd(entry.kd() != null ? entry.kd() : 0);
+            s.setIntent(entry.intent() != null ? entry.intent() : "unknown");
+            s.setTrend12m(toJsonText(entry.trend12m()));
+            s.setGapScore(entry.gapScore() != null ? entry.gapScore() : 0);
+            s.setSource(entry.source() != null ? entry.source() : "ideas");
+            suggestions.save(s);
+        }
+        return suggestions.findByKeywordIdOrderByVolumeDesc(keyword.getId()).stream()
+                .map(SuggestionView::from)
+                .toList();
+    }
+
+    /** Suggestions par statut — la rédaction consomme ?status=selected. */
+    @GetMapping("/suggestions")
+    @Transactional(readOnly = true)
+    public List<SuggestionView> listSuggestions(
+            @RequestParam(name = "status", required = false) String statusParam) {
+        SeoSuggestionStatus status = parseStatus(statusParam, SeoSuggestionStatus::fromJson);
+        List<SeoKeywordSuggestion> found = status != null
+                ? suggestions.findByStatusOrderByCreatedAtAsc(status)
+                : suggestions.findAll();
+        return found.stream().map(SuggestionView::from).toList();
+    }
+
+    /** Progression de la rédaction : writing → written (+ article) / error. */
+    @PatchMapping("/suggestions/{id}")
+    @Transactional
+    public SuggestionView updateSuggestion(@PathVariable UUID id,
+                                           @RequestBody UpdateSuggestionRequest body) {
+        SeoKeywordSuggestion suggestion = suggestions.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Suggestion introuvable"));
+        if (body.status() != null) suggestion.setStatus(body.status());
+        if (body.articleId() != null) suggestion.setArticleId(body.articleId());
+        if (body.errorMessage() != null) suggestion.setErrorMessage(body.errorMessage());
+        return SuggestionView.from(suggestions.save(suggestion));
     }
 
     /** Articles à publier : GET /seo/articles?status=validated&publish_before=<iso>. */

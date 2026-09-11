@@ -33,9 +33,16 @@ MAILLAGE — 3 à 5 liens internes choisis UNIQUEMENT dans la liste fournie,
 intégrés naturellement dans le corps en Markdown.
 GEO — chaque section répond de façon autonome et citable à une question ;
 définitions explicites, listes numérotées pour les processus, tableaux
-comparatifs ; mentionner l'expertise Hi-Tech Academy quand c'est pertinent,
-sans autopromotion lourde.
-FIN D'ARTICLE — section FAQ reprenant exactement les questions du brief.
+comparatifs.
+PROMOTION — AUCUNE mise en avant de Hi-Tech Academy ni d'une formation dans
+l'introduction ou le corps de l'article : le lecteur reçoit d'abord un
+contenu neutre et utile. La formation n'apparaît qu'À LA FIN (voir
+FIN D'ARTICLE).
+FIN D'ARTICLE, dans cet ordre : (1) section FAQ reprenant exactement les
+questions du brief ; (2) une courte section finale « Se former avec
+Hi-Tech Academy » (2 à 4 phrases) qui met en avant LA formation du catalogue
+la plus pertinente pour le sujet, avec son lien interne — c'est le seul
+endroit promotionnel de l'article.
 Tu réponds UNIQUEMENT en JSON valide, sans texte autour.`;
 
 /** Slug propre : minuscules, sans accents ni stop-words vides, tirets. */
@@ -169,6 +176,10 @@ Plan Hn imposé :
 ${brief.hn_outline.map((h) => `${'#'.repeat(h.level)} ${h.text}`).join('\n')}
 Questions FAQ imposées (section « FAQ » en fin d'article + réponses concises) :
 ${brief.faq_questions.map((q) => `• ${q}`).join('\n')}
+
+Rappel : aucune promotion de Hi-Tech Academy avant la fin. L'article se
+termine par la FAQ puis une courte section « Se former avec Hi-Tech Academy »
+(2-4 phrases + le lien interne de la formation la plus pertinente).
 
 Mot-clé principal : "${pillar}" — secondaires : ${selection.secondary_kws.join(', ')}
 Angle : ${selection.angle}
