@@ -188,10 +188,40 @@ test('run manuel réclamé : updateRun(runId → running) au lieu de createRun',
   assert.ok(api.runPatches[0].started_at);
 });
 
-test('coût DataForSEO consigné à la clôture (getCost)', async () => {
+test('coût DataForSEO consigné à la clôture : delta du run, pas le cumul', async () => {
   const api = makeApi();
-  await executeRun(baseDeps(api, { getCost: () => 0.123 }), { trigger: 'manual' });
-  assert.equal(api.runPatches.at(-1).cost_usd, 0.123);
+  let total = 1.5; // coût déjà accumulé par les runs précédents (client partagé)
+  const getCost = () => total;
+  const agents = {
+    implemented: true,
+    async processKeyword() { total += 0.123; return { articleId: 'a' }; },
+  };
+  const apiWithKw = makeApi({ keywords: [{ id: 'k1', keyword: 'a', status: 'to_process' }] });
+  await executeRun(baseDeps(apiWithKw, { getCost, agents }), { trigger: 'manual' });
+  assert.equal(apiWithKw.runPatches.at(-1).cost_usd, 0.123);
+
+  // run sans aucune consommation → pas de champ cost_usd
+  await executeRun(baseDeps(api, { getCost }), { trigger: 'manual' });
+  assert.equal(api.runPatches.at(-1).cost_usd, undefined);
+});
+
+test('rate limit LLM (retryNextRun) : mot-clé reporté à to_process, pas en erreur', async () => {
+  const api = makeApi({ keywords: [{ id: 'k1', keyword: 'a', status: 'to_process' }] });
+  const agents = {
+    implemented: true,
+    async processKeyword() {
+      const err = new Error('LLM : usage limit atteint');
+      err.retryNextRun = true;
+      throw err;
+    },
+  };
+  const result = await executeRun(baseDeps(api, { agents }), { trigger: 'manual' });
+
+  assert.equal(result.processed, 0);
+  const final = api.keywordPatches.at(-1);
+  assert.equal(final.status, 'to_process'); // reporté, pas error
+  assert.match(final.error_message, /Reporté au run suivant/);
+  assert.equal(api.runPatches.at(-1).status, 'done'); // le run se termine normalement
 });
 
 test('échec pendant le run : clôture en error puis propagation', async () => {

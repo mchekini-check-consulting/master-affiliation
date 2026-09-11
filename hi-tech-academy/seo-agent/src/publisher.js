@@ -1,16 +1,25 @@
-// Publication CMS des articles validés (étape 7). Tant qu'elle n'est pas
-// livrée, isConfigured() vaut false : l'orchestrateur laisse les articles
-// au statut validated et le consigne dans le journal du run.
+// Publication des articles validés. Le « CMS » est le site lui-même : les
+// articles publiés (statut published) sont servis par l'API publique du
+// backend (GET /api/blog/articles) et rendus par la SPA sur /blog/<slug>.
+// Publier = fournir l'URL publique ; le moteur de run fait ensuite passer
+// l'article à published via PATCH /api/seo/articles/{id} (le backend refuse
+// toute re-publication : idempotence).
 
-export function createPublisher() {
+export function createPublisher(options = {}) {
+  const {
+    baseUrl = process.env.SEO_PUBLIC_BASE_URL ?? 'https://hi-tech-academy.fr',
+  } = options;
+
   return {
     isConfigured() {
-      return false;
+      return true;
     },
 
-    /** Publie l'article sur le blog du site et renvoie son URL publique. */
-    async publishArticle(_article) {
-      throw new Error('Publication CMS non implémentée (étape 7).');
+    async publishArticle(article) {
+      if (!article?.slug) {
+        throw new Error(`Article ${article?.id ?? '?'} sans slug : publication impossible.`);
+      }
+      return `${baseUrl.replace(/\/+$/, '')}/blog/${article.slug}`;
     },
   };
 }

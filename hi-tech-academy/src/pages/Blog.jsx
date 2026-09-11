@@ -1,15 +1,46 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { blogPosts } from '@/data/blogPosts';
+import { getPublishedBlogArticles } from '@/api/backend';
+
+// Couverture par défaut des articles publiés par le pipeline SEO
+export const SEO_ARTICLE_COVER = '/images/c3290df03_feature-2.webp';
+export const SEO_ARTICLE_CATEGORY = 'Guide';
+
+/** Article SEO publié (API) → carte au format des articles codés en dur. */
+export function seoArticleToPost(article) {
+  const published = article.published_at ? new Date(article.published_at) : null;
+  return {
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.meta_description ?? '',
+    date: published
+      ? published.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '',
+    dateISO: article.published_at ? article.published_at.slice(0, 10) : '',
+    readTime: `${article.reading_minutes ?? 1} min`,
+    image: SEO_ARTICLE_COVER,
+    category: SEO_ARTICLE_CATEGORY,
+  };
+}
 
 export default function Blog() {
+  const [seoPosts, setSeoPosts] = useState([]);
+
   useEffect(() => {
     document.title = 'Blog — Hi-Tech Academy';
+    // Articles publiés par le pipeline SEO, devant les articles codés en dur
+    getPublishedBlogArticles()
+      .then((articles) => setSeoPosts(articles.map(seoArticleToPost)))
+      .catch(() => {}); // API indisponible : le blog statique reste servi
     return () => { document.title = 'Hi-Tech Academy'; };
   }, []);
+
+  const seoSlugs = new Set(seoPosts.map((p) => p.slug));
+  const allPosts = [...seoPosts, ...blogPosts.filter((p) => !seoSlugs.has(p.slug))];
 
   return (
     <div className="min-h-screen bg-white">
@@ -32,7 +63,7 @@ export default function Blog() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
+            {allPosts.map((post) => (
               <Link key={post.slug} to={`/blog/${post.slug}`} className="group block">
                 <div className="relative overflow-hidden rounded-2xl mb-5 aspect-[4/3]">
                   <img

@@ -25,6 +25,7 @@ export async function executeRun(deps, { trigger = 'cron', runId = null } = {}) 
   } = deps;
 
   const iso = () => now().toISOString();
+  const costStart = getCost?.() ?? 0; // coût par run = delta du cumul client
 
   // 1. Journal : réclamer le run demandé, ou en ouvrir un nouveau
   const run = runId
@@ -72,6 +73,17 @@ export async function executeRun(deps, { trigger = 'cron', runId = null } = {}) 
           await patch({ keywords_processed: processed });
         }
       } catch (err) {
+        if (err.retryNextRun) {
+          // Rate limit LLM (quota partagé avec l'usage interactif) :
+          // report du mot-clé au run suivant, pas un échec
+          log(`mot-clé « ${keyword.keyword} » reporté au run suivant : ${err.message}`);
+          await api.updateKeyword(keyword.id, {
+            status: 'to_process',
+            error_message: `Reporté au run suivant (rate limit LLM) : ${err.message}`.slice(0, 2000),
+            last_run_at: iso(),
+          });
+          continue;
+        }
         // Un mot-clé en échec ne bloque pas les suivants
         log(`mot-clé « ${keyword.keyword} » en erreur : ${err.message}`);
         await api.updateKeyword(keyword.id, {
@@ -117,8 +129,8 @@ export async function executeRun(deps, { trigger = 'cron', runId = null } = {}) 
       articles_published: published,
       finished_at: iso(),
     };
-    const cost = getCost?.();
-    if (typeof cost === 'number' && cost > 0) summary.cost_usd = cost;
+    const cost = getCost ? getCost() - costStart : null;
+    if (typeof cost === 'number' && cost > 0) summary.cost_usd = Math.round(cost * 10000) / 10000;
     await patch(summary);
     return { skipped: false, processed, published };
   } catch (err) {

@@ -21,8 +21,21 @@ publication planifiée. Piloté depuis l'onglet **SEO / GEO** de l'admin
       12 mois) au contrat strict de `src/contracts.js` ; jeu de référence de
       20 mots-clés (`reference/keywords.json`) évaluable en réel avec
       `node scripts/evaluate-agent2.mjs` (identifiants DataForSEO requis)
-- [ ] Étapes 5-7 — agents 3 et 4, agent 1, publication CMS
-      (stubs `src/agents/index.js` et `src/publisher.js`)
+- [x] Étape 5 — agent 3 « sélection & clustering » (`src/agents/select.js`,
+      LLM court : secondaires + angle, garde-fous côté code) et agent 4
+      « rédaction » (`src/agents/write.js` : SERP Standard + parsing top 10 →
+      brief → draft → auto-audit, une correction si score < 80, schema.org
+      généré côté code) ; client LLM `src/llm.js` (Claude Agent SDK,
+      CLAUDE_CODE_OAUTH_TOKEN, JSON validé avec relance, rate limit →
+      report du mot-clé au run suivant)
+- [x] Étape 6 — agent 1 « veille concurrentielle » (`src/agents/watch.js` :
+      concurrents, top pages, gap → agent 2 ; snapshots Postgres
+      `seo_watch_snapshots`, deltas = nouvelles URLs d'un run à l'autre)
+- [x] Étape 7 — publication : le CMS est le site lui-même — API publique
+      `GET /api/blog/articles[/{slug}]` (backend) + pages /blog de la SPA
+      (fusion devant les articles codés en dur, rendu Markdown, JSON-LD
+      Article + FAQPage) ; `src/publisher.js` fournit l'URL publique et le
+      moteur de run fait passer l'article à published (idempotent)
 
 ## Wrapper DataForSEO (`src/dataforseo.js`)
 
@@ -58,8 +71,11 @@ const volumes = await dfs.searchVolume(['formation kubernetes', 'formation ia'])
 |---|---|
 | `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` | Identifiants API DataForSEO (auth Basic) |
 | `SEO_AGENT_TOKEN` | Token de service vers `/api/seo/*` (le même que côté backend) |
-| `CLAUDE_CODE_OAUTH_TOKEN` | Auth LLM par abonnement (`claude setup-token`) — étape 3 ; ne jamais définir `ANTHROPIC_API_KEY` en parallèle |
-| `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USERNAME` / `DB_PASSWORD` | Postgres (cache `dfs_cache`) — mêmes valeurs que le backend |
+| `CLAUDE_CODE_OAUTH_TOKEN` | Auth LLM par abonnement (`claude setup-token`) ; ne jamais définir `ANTHROPIC_API_KEY` en parallèle |
+| `DB_HOST` / `DB_PORT` / `DB_NAME` / `DB_USERNAME` / `DB_PASSWORD` | Postgres (cache `dfs_cache` + snapshots de veille) — mêmes valeurs que le backend |
+| `SEO_LLM_MODEL` (optionnel) | Modèle Claude des agents 3-4 (défaut : `claude-sonnet-4-6`) |
+| `SEO_SITE_DOMAIN` (optionnel) | Domaine surveillé par la veille (défaut : `hi-tech-academy.fr`) |
+| `SEO_PUBLIC_BASE_URL` (optionnel) | Base des URLs publiées (défaut : `https://hi-tech-academy.fr`) |
 
 En production, ces valeurs vivent dans `/opt/master-affiliation/.env.secrets`
 (non versionné, survit aux déploiements).

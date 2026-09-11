@@ -311,3 +311,12 @@ export function adminListSeoRuns(auth) {
 export function adminLaunchSeoRun(auth) {
   return request('/admin/seo/runs/launch', { method: 'POST', auth });
 }
+
+// --- Blog public (articles SEO publiés) ------------------------------
+export function getPublishedBlogArticles() {
+  return request('/blog/articles');
+}
+
+export function getPublishedBlogArticle(slug) {
+  return request(`/blog/articles/${encodeURIComponent(slug)}`);
+}

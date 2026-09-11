@@ -1,14 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, Clock, ArrowLeft, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageNotFound from '@/lib/PageNotFound';
+import MarkdownContent from '@/lib/markdown';
 import { getPostBySlug, blogPosts } from '@/data/blogPosts';
+import { getPublishedBlogArticle } from '@/api/backend';
+import { SEO_ARTICLE_CATEGORY, SEO_ARTICLE_COVER, seoArticleToPost } from '@/pages/Blog';
 
 export default function BlogPost() {
   const { slug } = useParams();
-  const post = getPostBySlug(slug);
+  const staticPost = getPostBySlug(slug);
+
+  // Article du pipeline SEO : cherché via l'API publique quand le slug
+  // n'existe pas dans les articles codés en dur
+  const [seoArticle, setSeoArticle] = useState(null);
+  const [seoState, setSeoState] = useState(staticPost ? 'skipped' : 'loading');
+
+  useEffect(() => {
+    if (staticPost) return undefined;
+    let cancelled = false;
+    setSeoState('loading');
+    getPublishedBlogArticle(slug)
+      .then((article) => { if (!cancelled) { setSeoArticle(article); setSeoState('found'); } })
+      .catch(() => { if (!cancelled) setSeoState('not-found'); });
+    return () => { cancelled = true; };
+  }, [slug, staticPost]);
+
+  const post = staticPost ?? (seoArticle && {
+    ...seoArticleToPost(seoArticle),
+    image: SEO_ARTICLE_COVER,
+    category: SEO_ARTICLE_CATEGORY,
+    content: <MarkdownContent md={seoArticle.body_md} />,
+  });
 
   useEffect(() => {
     if (post) {
@@ -17,10 +42,34 @@ export default function BlogPost() {
     return () => { document.title = 'Hi-Tech Academy'; };
   }, [post]);
 
+  // Données structurées Article + FAQPage (JSON-LD) des articles SEO
+  useEffect(() => {
+    if (!seoArticle?.schema_org) return undefined;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(seoArticle.schema_org);
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, [seoArticle]);
+
+  if (!staticPost && seoState === 'loading') {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <main className="pt-32 pb-20 text-center">
+          <p className="text-sm" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>Chargement…</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (!post) {
     return <PageNotFound />;
   }
 
+  // La FAQ est déjà dans le corps Markdown de l'article ; le tableau faq de
+  // l'API ne sert qu'aux données structurées (FAQPage) injectées ci-dessus.
   const others = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 2);
 
   return (
@@ -141,6 +190,26 @@ export default function BlogPost() {
           font-size: 1.35rem;
           font-weight: 700;
           margin: 2rem 0 0.75rem;
+        }
+        .article-content h3 {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          color: #004c3c;
+          font-size: 1.1rem;
+          font-weight: 700;
+          margin: 1.5rem 0 0.5rem;
+        }
+        .article-content ul, .article-content ol {
+          margin: 0 0 1.25rem;
+          padding-left: 1.5rem;
+        }
+        .article-content ul { list-style: disc; }
+        .article-content ol { list-style: decimal; }
+        .article-content li { margin-bottom: 0.4rem; }
+        .article-content code {
+          background: #eafff6;
+          padding: 0.1rem 0.35rem;
+          border-radius: 0.3rem;
+          font-size: 0.9em;
         }
         .article-content strong {
           color: #007f64;
