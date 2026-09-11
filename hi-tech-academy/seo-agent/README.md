@@ -15,8 +15,14 @@ publication planifiée. Piloté depuis l'onglet **SEO / GEO** de l'admin
       court-circuit total si `agent_enabled=false`, attente aléatoire
       1-40 min avant publication (cron uniquement), journal `seo_runs`
       avec étape courante affichée en direct dans l'admin
-- [ ] Étapes 4-7 — agents 2, 3, 4, 1 (stub `src/agents/`) et publication
-      CMS (stub `src/publisher.js`)
+- [x] Étape 4 — agent 2 « analyse volumes & concurrence »
+      (`src/agents/analyze.js`) : univers seed + gap (agent 1) + ideas +
+      related, enrichi (volume, CPC, compétition, KD, intention, tendance
+      12 mois) au contrat strict de `src/contracts.js` ; jeu de référence de
+      20 mots-clés (`reference/keywords.json`) évaluable en réel avec
+      `node scripts/evaluate-agent2.mjs` (identifiants DataForSEO requis)
+- [ ] Étapes 5-7 — agents 3 et 4, agent 1, publication CMS
+      (stubs `src/agents/index.js` et `src/publisher.js`)
 
 ## Wrapper DataForSEO (`src/dataforseo.js`)
 

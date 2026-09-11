@@ -1,0 +1,25 @@
+{
+  "description": "Jeu de référence de 20 mots-clés pour évaluer les sorties de l'agent 2 (scripts/evaluate-agent2.mjs). Couvre les 5 formations du catalogue et les requêtes de financement.",
+  "keywords": [
+    { "kw": "formation kubernetes", "theme": "kubernetes" },
+    { "kw": "formation kubernetes cpf", "theme": "kubernetes" },
+    { "kw": "certification kubernetes cka", "theme": "kubernetes" },
+    { "kw": "apprendre kubernetes", "theme": "kubernetes" },
+    { "kw": "formation docker", "theme": "devops" },
+    { "kw": "formation devops", "theme": "devops" },
+    { "kw": "formation intelligence artificielle", "theme": "ia" },
+    { "kw": "formation ia", "theme": "ia" },
+    { "kw": "formation chatgpt entreprise", "theme": "ia" },
+    { "kw": "formation prompt engineering", "theme": "ia" },
+    { "kw": "formation ia générative", "theme": "ia" },
+    { "kw": "formation ia pour dirigeants", "theme": "ia-business" },
+    { "kw": "formation pennylane", "theme": "facturation" },
+    { "kw": "facturation électronique 2026", "theme": "facturation" },
+    { "kw": "formation facturation électronique", "theme": "facturation" },
+    { "kw": "logiciel facturation électronique obligatoire", "theme": "facturation" },
+    { "kw": "formation financée opco", "theme": "financement" },
+    { "kw": "opco formation salarié", "theme": "financement" },
+    { "kw": "financement formation professionnelle", "theme": "financement" },
+    { "kw": "reconversion développeur", "theme": "carrière" }
+  ]
+}
