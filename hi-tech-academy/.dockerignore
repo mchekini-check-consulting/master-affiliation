@@ -6,3 +6,7 @@ back
 # Documents de travail non servis par le site (les PDF publics sont dans public/documents)
 documents_source
 documents_finaux
+# Orchestrateur SEO : conteneur séparé (seo-agent/), exclu de l'image du front
+seo-agent
+# Pages d'exemple du thème (référence design, non servies)
+ecole-francaise

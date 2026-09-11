@@ -1,0 +1,15 @@
+{
+  "name": "seo-agent",
+  "private": true,
+  "type": "module",
+  "description": "Orchestrateur du pipeline SEO/GEO Hi-Tech Academy — agents, wrapper DataForSEO, publication planifiée",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  }
+}
