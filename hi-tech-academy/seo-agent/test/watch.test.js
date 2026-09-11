@@ -91,6 +91,20 @@ test('deltas : premier run sans nouveautés, le second remonte les nouvelles URL
   assert.deepEqual(run2.competitors[0].new_urls_since_last_run, ['https://a.fr/p3']);
 });
 
+test('les plateformes génériques ne sont pas des concurrents (youtube, wikipedia…)', async () => {
+  const dfs = makeDfs({ competitors: [
+    { domain: 'youtube.com', metrics: { organic: { etv: 99999 } } },
+    { domain: 'fr.wikipedia.org', metrics: { organic: { etv: 88888 } } },
+    { domain: 'www.linkedin.com', metrics: { organic: { etv: 77777 } } },
+    { domain: 'concurrent-serieux.fr', metrics: { organic: { etv: 100 } } },
+  ] });
+  const agent = createWatchAgent({
+    dfs, snapshots: createMemorySnapshotStore(), siteDomain: 'hi-tech-academy.fr',
+  });
+  const out = await agent.watch({});
+  assert.deepEqual(out.competitors.map((c) => c.domain), ['concurrent-serieux.fr']);
+});
+
 test('maxCompetitors borne la cartographie', async () => {
   const many = Array.from({ length: 10 }, (_, i) =>
     ({ domain: `c${i}.fr`, metrics: { organic: { etv: 100 - i } } }));

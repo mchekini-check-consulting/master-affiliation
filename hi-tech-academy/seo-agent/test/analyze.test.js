@@ -2,7 +2,7 @@
 // et du contrat JSON strict de sa sortie.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAnalyzeAgent } from '../src/agents/analyze.js';
+import { createAnalyzeAgent, relevanceFilter } from '../src/agents/analyze.js';
 import { validateAgent2Output } from '../src/contracts.js';
 
 // --- Wrapper DataForSEO mocké -------------------------------------------
@@ -77,33 +77,33 @@ test('sortie au contrat : seed en tête, champs enrichis', async () => {
 
 test('dédoublonnage : un candidat déjà vu garde sa première source', async () => {
   const dfs = makeDfs({
-    ideas: ['Formation Kubernetes', 'formation k8s'], // doublon du seed (casse différente)
-    related: ['formation k8s'],                        // doublon d'ideas
-    volumes: { 'formation kubernetes': { search_volume: 10 }, 'formation k8s': { search_volume: 5 } },
+    ideas: ['Formation Kubernetes', 'kubernetes débutant'], // doublon du seed (casse différente)
+    related: ['kubernetes débutant'],                        // doublon d'ideas
+    volumes: { 'formation kubernetes': { search_volume: 10 }, 'kubernetes débutant': { search_volume: 5 } },
   });
   const agent = createAnalyzeAgent({ dfs });
   const output = await agent.analyze('formation kubernetes');
 
   assert.equal(output.keywords.length, 2);
   assert.equal(output.keywords[0].source, 'seed');
-  assert.equal(output.keywords[1].kw, 'formation k8s');
+  assert.equal(output.keywords[1].kw, 'kubernetes débutant');
   assert.equal(output.keywords[1].source, 'ideas'); // ideas avant related
 });
 
 test('mots-clés de gap (agent 1) : source gap et gap_score conservés', async () => {
   const dfs = makeDfs({ volumes: {
-    seed: { search_volume: 1 }, 'gap simple': { search_volume: 2 }, 'gap scoré': { search_volume: 3 },
+    seed: { search_volume: 1 }, 'seed simple': { search_volume: 2 }, 'seed scoré': { search_volume: 3 },
   } });
   const agent = createAnalyzeAgent({ dfs });
   const output = await agent.analyze('seed', {
-    gapKeywords: ['gap simple', { kw: 'gap scoré', gap_score: 42.5 }],
+    gapKeywords: ['seed simple', { kw: 'seed scoré', gap_score: 42.5 }],
   });
 
   const byKw = Object.fromEntries(output.keywords.map((e) => [e.kw, e]));
-  assert.equal(byKw['gap simple'].source, 'gap');
-  assert.equal(byKw['gap simple'].gap_score, 0);
-  assert.equal(byKw['gap scoré'].source, 'gap');
-  assert.equal(byKw['gap scoré'].gap_score, 42.5);
+  assert.equal(byKw['seed simple'].source, 'gap');
+  assert.equal(byKw['seed simple'].gap_score, 0);
+  assert.equal(byKw['seed scoré'].source, 'gap');
+  assert.equal(byKw['seed scoré'].gap_score, 42.5);
 });
 
 test('trend_12m : monthly_searches (récent → ancien) rendu chronologique', async () => {
@@ -136,7 +136,7 @@ test('données manquantes : défauts sûrs (0 / unknown / tendance vide)', async
 
 test('maxCandidates borne l\'univers enrichi (maîtrise du coût)', async () => {
   const dfs = makeDfs({
-    ideas: Array.from({ length: 50 }, (_, i) => `idée ${i}`),
+    ideas: Array.from({ length: 50 }, (_, i) => `seed idée ${i}`),
     volumes: { seed: { search_volume: 1 } },
   });
   const agent = createAnalyzeAgent({ dfs, maxCandidates: 10 });
@@ -148,10 +148,10 @@ test('maxCandidates borne l\'univers enrichi (maîtrise du coût)', async () => 
 
 test('maxResults borne la sortie mais garde toujours le seed', async () => {
   const dfs = makeDfs({
-    ideas: Array.from({ length: 20 }, (_, i) => `idée ${i}`),
+    ideas: Array.from({ length: 20 }, (_, i) => `seed idée ${i}`),
     volumes: Object.fromEntries([
       ['seed', { search_volume: 0 }], // seed sans volume : gardé quand même
-      ...Array.from({ length: 20 }, (_, i) => [`idée ${i}`, { search_volume: 1000 - i }]),
+      ...Array.from({ length: 20 }, (_, i) => [`seed idée ${i}`, { search_volume: 1000 - i }]),
     ]),
   });
   const agent = createAnalyzeAgent({ dfs, maxResults: 5 });
@@ -159,7 +159,7 @@ test('maxResults borne la sortie mais garde toujours le seed', async () => {
 
   assert.equal(output.keywords.length, 5);
   assert.equal(output.keywords[0].kw, 'seed');
-  assert.equal(output.keywords[1].kw, 'idée 0'); // plus gros volume ensuite
+  assert.equal(output.keywords[1].kw, 'seed idée 0'); // plus gros volume ensuite
 });
 
 test('paramètres transmis au wrapper : limit ideas/related, profondeur', async () => {
@@ -178,6 +178,63 @@ test('paramètres transmis au wrapper : limit ideas/related, profondeur', async 
 test('mot-clé pilier manquant → erreur', async () => {
   const agent = createAnalyzeAgent({ dfs: makeDfs() });
   await assert.rejects(() => agent.analyze('   '), /pilier manquant/);
+});
+
+// --- Filtre de pertinence ---------------------------------------------------
+
+test('relevanceFilter : les hors-sujet sont écartés, les variantes gardées', () => {
+  const relevant = relevanceFilter('formation sur le raf');
+  // « formation » est générique : le terme distinctif requis est « raf »
+  assert.equal(relevant('youtube'), false);
+  assert.equal(relevant('formation excel'), false);
+  assert.equal(relevant('fiche métier raf'), true);
+  assert.equal(relevant('responsable administratif et financier raf'), true);
+  assert.equal(relevant('salaire raf'), true);
+
+  const kube = relevanceFilter('formation kubernetes cpf');
+  assert.equal(kube('apprendre kubernetes'), true);
+  assert.equal(kube('certification kubernetes cka'), true); // racine kube- partagée
+  assert.equal(kube('formation cpf comptabilité'), false);  // cpf est générique
+  assert.equal(kube('meilleure formation en ligne'), false);
+});
+
+test('relevanceFilter : pilier 100 % générique → repli sur tous ses termes', () => {
+  const relevant = relevanceFilter('formation cpf');
+  assert.equal(relevant('formation éligible cpf'), true);
+  assert.equal(relevant('youtube'), false);
+});
+
+test('l\'univers de candidats est filtré : hors-sujet ideas et gap écartés', async () => {
+  const dfs = makeDfs({
+    ideas: ['youtube', 'formation raf à distance', 'recette de cuisine'],
+    related: ['salaire raf débutant'],
+    volumes: {
+      'formation sur le raf': { search_volume: 90 },
+      'formation raf à distance': { search_volume: 50 },
+      'salaire raf débutant': { search_volume: 30 },
+      'missions du raf': { search_volume: 20 },
+    },
+  });
+  const agent = createAnalyzeAgent({ dfs });
+  const output = await agent.analyze('formation sur le raf', {
+    gapKeywords: [{ kw: 'missions du raf', gap_score: 5 }, { kw: 'linkedin connexion', gap_score: 99 }],
+  });
+
+  const kws = output.keywords.map((k) => k.kw);
+  assert.deepEqual(kws, [
+    'formation sur le raf', 'formation raf à distance', 'salaire raf débutant', 'missions du raf',
+  ]);
+  // seuls les mots-clés pertinents ont été enrichis (coût maîtrisé)
+  const enriched = dfs.calls.find((c) => c.fn === 'searchVolume').kws;
+  assert.ok(!enriched.includes('youtube'));
+  assert.ok(!enriched.includes('linkedin connexion'));
+});
+
+test('keyword_ideas est appelé en variantes proches (closely_variants)', async () => {
+  const dfs = makeDfs({ volumes: { seed: { search_volume: 1 } } });
+  const agent = createAnalyzeAgent({ dfs });
+  await agent.analyze('seed');
+  assert.equal(dfs.calls.find((c) => c.fn === 'keywordIdeas').params.closely_variants, true);
 });
 
 // --- Contrat ---------------------------------------------------------------

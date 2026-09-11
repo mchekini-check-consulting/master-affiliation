@@ -18,6 +18,21 @@ const DEFAULTS = {
 /** etv organique d'un item DataForSEO Labs, quelle que soit sa forme. */
 const organicEtv = (metrics) => metrics?.organic?.etv ?? metrics?.etv ?? 0;
 
+/**
+ * Plateformes génériques : elles rankent sur tout, ce ne sont pas des
+ * concurrents éditoriaux — les garder polluerait le gap (mots-clés sans
+ * rapport avec nos sujets) et donc les suggestions de l'agent 2.
+ */
+const GENERIC_PLATFORMS = [
+  'youtube.com', 'google.com', 'wikipedia.org', 'linkedin.com', 'facebook.com',
+  'instagram.com', 'tiktok.com', 'x.com', 'twitter.com', 'reddit.com',
+  'amazon.fr', 'amazon.com', 'fnac.com', 'leboncoin.fr', 'indeed.com',
+  'indeed.fr', 'glassdoor.fr', 'glassdoor.com', 'udemy.com', 'coursera.org',
+];
+
+const isGenericPlatform = (domain) =>
+  GENERIC_PLATFORMS.some((g) => domain === g || domain.endsWith(`.${g}`));
+
 export function createWatchAgent(options) {
   const { dfs, snapshots, log = () => {} } = options;
   const config = { ...DEFAULTS, ...options };
@@ -35,7 +50,7 @@ export function createWatchAgent(options) {
             domain: c?.domain ?? c?.target ?? null,
             visibilityScore: Math.round(organicEtv(c?.metrics ?? c?.full_domain_metrics) * 100) / 100,
           }))
-          .filter((c) => c.domain && c.domain !== site)
+          .filter((c) => c.domain && c.domain !== site && !isGenericPlatform(c.domain))
           .slice(0, config.maxCompetitors);
 
       const previous = await snapshots.getLatest(site); // null au premier run

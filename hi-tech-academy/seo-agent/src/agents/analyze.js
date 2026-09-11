@@ -18,6 +18,51 @@ const DEFAULTS = {
   maxResults: 100,    // taille max de la sortie (le seed est toujours gardé)
 };
 
+// --- Filtre de pertinence : un candidat doit partager un terme distinctif
+// avec le pilier. Sans lui, keyword_ideas (qui ratisse par catégorie) et le
+// gap de la veille (calculé au niveau du site) injectent des mots-clés hors
+// sujet (« youtube »…) qui écrasent le pilier au tri par volume. ------------
+
+const STOPWORDS = new Set([
+  'le', 'la', 'les', 'de', 'du', 'des', 'un', 'une', 'et', 'en', 'au', 'aux',
+  'sur', 'pour', 'dans', 'par', 'avec', 'sans', 'est', 'que', 'qui', 'quoi',
+  'comment', 'quel', 'quelle', 'quels', 'quelles', 'ce', 'cette', 'ces', 'se',
+  'son', 'sa', 'ses', 'mon', 'ma', 'mes', 'votre', 'vos',
+]);
+
+/** Termes trop transverses pour distinguer un sujet (communs à tout le catalogue). */
+const GENERIC_TOKENS = new Set([
+  'formation', 'formations', 'cours', 'apprendre', 'devenir', 'metier',
+  'emploi', 'salaire', 'definition', 'guide', 'tuto', 'tutoriel', 'tutoriels',
+  'certification', 'certifiante', 'diplome', 'gratuit', 'gratuite', 'ligne',
+  'distance', 'cpf', 'opco', 'prix', 'tarif', 'avis', 'meilleure', 'meilleur',
+]);
+
+const tokenize = (text) => String(text)
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t.length > 1 && !STOPWORDS.has(t));
+
+/** Correspondance souple : égalité, ou même racine (préfixe de 4 lettres). */
+const tokensMatch = (a, b) => a === b
+    || (a.length >= 4 && b.length >= 4 && a.slice(0, 4) === b.slice(0, 4));
+
+/**
+ * Prédicat de pertinence lié à un pilier : le candidat doit contenir au
+ * moins un terme distinctif du pilier (hors termes génériques) — repli sur
+ * tous les termes si le pilier n'en a pas (ex. pilier « formation cpf »).
+ */
+export function relevanceFilter(pillar) {
+  const pillarTokens = tokenize(pillar);
+  const distinctive = pillarTokens.filter((t) => !GENERIC_TOKENS.has(t));
+  const required = distinctive.length > 0 ? distinctive : pillarTokens;
+  return (candidate) => {
+    const candidateTokens = tokenize(candidate);
+    return required.some((t) => candidateTokens.some((c) => tokensMatch(c, t)));
+  };
+}
+
 /** monthly_searches Google Ads (récent → ancien) → 12 valeurs chronologiques. */
 function toTrend12m(monthlySearches) {
   if (!Array.isArray(monthlySearches)) return [];
@@ -42,11 +87,18 @@ export function createAnalyzeAgent(options) {
       if (!seed) throw new Error('Agent 2 : mot-clé pilier manquant.');
 
       // 1. Univers de candidats — premier arrivé premier servi dans l'ordre
-      //    de priorité : seed, gap (agent 1), ideas, related
+      //    de priorité : seed, gap (agent 1), ideas, related. Tout candidat
+      //    non-seed passe le filtre de pertinence (hors-sujet écartés).
+      const isRelevant = relevanceFilter(seed);
       const candidates = new Map(); // kw minuscule -> { kw, source, gapScore }
+      let dropped = 0;
       const add = (kw, source, gapScore = 0) => {
         const text = String(kw ?? '').trim();
         if (!text) return;
+        if (source !== 'seed' && !isRelevant(text)) {
+          dropped++;
+          return;
+        }
         const key = text.toLowerCase();
         if (!candidates.has(key)) candidates.set(key, { kw: text, source, gapScore });
       };
@@ -58,7 +110,9 @@ export function createAnalyzeAgent(options) {
       }
 
       const [ideas, related] = await Promise.all([
-        dfs.keywordIdeas([seed], { limit: config.ideasLimit }),
+        // closely_variants : variantes proches du seed uniquement (sans quoi
+        // keyword_ideas élargit à toute la catégorie)
+        dfs.keywordIdeas([seed], { limit: config.ideasLimit, closely_variants: true }),
         dfs.relatedKeywords(seed, { depth: config.relatedDepth, limit: config.relatedLimit }),
       ]);
       for (const item of ideas) add(item?.keyword, 'ideas');
@@ -66,7 +120,8 @@ export function createAnalyzeAgent(options) {
 
       const universe = [...candidates.values()].slice(0, config.maxCandidates);
       const kws = universe.map((c) => c.kw);
-      log(`agent 2 : ${kws.length} candidats pour « ${seed} » (gap ${gapKeywords.length}, ideas ${ideas.length}, related ${related.length})`);
+      log(`agent 2 : ${kws.length} candidats pour « ${seed} » ` +
+          `(gap ${gapKeywords.length}, ideas ${ideas.length}, related ${related.length}, hors-sujet écartés ${dropped})`);
 
       // 2. Enrichissement batché (volume/CPC, KD, intention)
       const [volumes, difficulties, intents] = await Promise.all([
