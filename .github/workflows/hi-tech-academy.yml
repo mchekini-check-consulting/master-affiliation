@@ -1,6 +1,7 @@
 # Pipeline du projet hi-tech-academy : ne se déclenche que si hi-tech-academy/ change sur main.
-# Fullstack : build des 2 images (front + back) puis redémarrage des services
-# du projet uniquement (la BDD est créée au premier déploiement).
+# Fullstack : build des 3 images (front + back + orchestrateur SEO) puis
+# redémarrage des services du projet uniquement (la BDD est créée au premier
+# déploiement).
 name: hi-tech-academy
 
 on:
@@ -22,9 +23,11 @@ jobs:
     strategy:
       matrix:
         component:
-          # Le front vit à la racine du dossier, le back dans back/
+          # Le front vit à la racine du dossier, le back dans back/,
+          # l'orchestrateur SEO dans seo-agent/
           - { image: hi-tech-academy, context: ./hi-tech-academy }
           - { image: hi-tech-academy-back, context: ./hi-tech-academy/back }
+          - { image: hi-tech-academy-seo-agent, context: ./hi-tech-academy/seo-agent }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,8 +80,8 @@ jobs:
             # Retry : les images tout juste poussées peuvent mettre quelques
             # secondes à être disponibles sur GHCR
             for i in 1 2 3 4 5; do
-              docker compose pull hi-tech-academy hi-tech-academy-back && break
+              docker compose pull hi-tech-academy hi-tech-academy-back hi-tech-academy-seo-agent && break
               echo "pull raté (tentative $i), nouvel essai dans 15s..." && sleep 15
             done
-            docker compose up -d hi-tech-academy-db hi-tech-academy-back hi-tech-academy
+            docker compose up -d hi-tech-academy-db hi-tech-academy-back hi-tech-academy hi-tech-academy-seo-agent
             docker image prune -f

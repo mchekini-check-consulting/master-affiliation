@@ -121,6 +121,34 @@ services:
       hi-tech-academy-db:
         condition: service_healthy
 
+  # --- Orchestrateur SEO/GEO (démon : cron 00 h / 12 h + runs manuels) ---
+  hi-tech-academy-seo-agent:
+    image: ghcr.io/mchekini-check-consulting/master-affiliation/hi-tech-academy-seo-agent:${HI_TECH_ACADEMY_SEO_AGENT_TAG:-latest}
+    build: ./hi-tech-academy/seo-agent
+    container_name: hi-tech-academy-seo-agent
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Paris
+      SEO_API_BASE: http://hi-tech-academy-back:8080/api
+      # Postgres : cache DataForSEO (table dfs_cache), même base que le backend
+      DB_HOST: hi-tech-academy-db
+      DB_PORT: "5432"
+      DB_NAME: hi_tech_academy
+      DB_USERNAME: hi_tech_academy
+      DB_PASSWORD: ${HI_TECH_ACADEMY_DB_PASSWORD:-changeme}
+    # .env.secrets : SEO_AGENT_TOKEN, DATAFORSEO_LOGIN / DATAFORSEO_PASSWORD,
+    # CLAUDE_CODE_OAUTH_TOKEN (auth LLM par abonnement, jamais ANTHROPIC_API_KEY)
+    env_file:
+      - path: ./.env.secrets
+        required: false
+    networks:
+      - hi-tech-academy-net
+    depends_on:
+      hi-tech-academy-db:
+        condition: service_healthy
+      hi-tech-academy-back:
+        condition: service_started
+
   # --- Frontend React (nginx interne, proxifie /api) ---------
   hi-tech-academy:
     image: ghcr.io/mchekini-check-consulting/master-affiliation/hi-tech-academy:${HI_TECH_ACADEMY_TAG:-latest}

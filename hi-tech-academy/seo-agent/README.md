@@ -9,8 +9,14 @@ publication planifiée. Piloté depuis l'onglet **SEO / GEO** de l'admin
 ## État
 
 - [x] Étape 2 — wrapper `dataforseo` + cache + tests mockés (`npm test`)
-- [ ] Étape 3 — orchestrateur (cron 00:00/12:00, verrou, délai aléatoire)
-- [ ] Étapes 4-7 — agents 2, 3, 4, 1 et publication CMS
+- [x] Étape 3 — orchestrateur : démon conteneurisé (`src/main.js`) avec cron
+      interne 00 h / 12 h (TZ Europe/Paris), prise en charge des runs manuels
+      « requested » du bouton admin, verrou `runs.lock` (stale 3 h),
+      court-circuit total si `agent_enabled=false`, attente aléatoire
+      1-40 min avant publication (cron uniquement), journal `seo_runs`
+      avec étape courante affichée en direct dans l'admin
+- [ ] Étapes 4-7 — agents 2, 3, 4, 1 (stub `src/agents/`) et publication
+      CMS (stub `src/publisher.js`)
 
 ## Wrapper DataForSEO (`src/dataforseo.js`)
 
