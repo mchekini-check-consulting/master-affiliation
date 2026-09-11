@@ -260,3 +260,54 @@ export async function adminImportBackup(auth, file) {
   }
   return response.json();
 }
+
+// --- SEO / GEO (pipeline d'articles) ---------------------------------
+export function adminGetSeoConfig(auth) {
+  return request('/admin/seo/config', { auth });
+}
+
+export function adminUpdateSeoConfig(auth, agentEnabled) {
+  return request('/admin/seo/config', { method: 'PATCH', auth, body: { agent_enabled: agentEnabled } });
+}
+
+export function adminListSeoKeywords(auth) {
+  return request('/admin/seo/keywords', { auth });
+}
+
+export function adminCreateSeoKeyword(auth, keyword) {
+  return request('/admin/seo/keywords', { method: 'POST', auth, body: { keyword } });
+}
+
+export function adminDeleteSeoKeyword(auth, id) {
+  return request(`/admin/seo/keywords/${id}`, { method: 'DELETE', auth });
+}
+
+export function adminRetrySeoKeyword(auth, id) {
+  return request(`/admin/seo/keywords/${id}/retry`, { method: 'POST', auth });
+}
+
+export function adminListSeoArticles(auth) {
+  return request('/admin/seo/articles', { auth });
+}
+
+// Détail complet (corps Markdown) pour la prévisualisation
+export function adminGetSeoArticle(auth, id) {
+  return request(`/admin/seo/articles/${id}`, { auth });
+}
+
+// Valider / rejeter / mettre en attente, ou déplacer publish_at
+export function adminUpdateSeoArticle(auth, id, { status, publishAt } = {}) {
+  const body = {};
+  if (status !== undefined) body.status = status;
+  if (publishAt !== undefined) body.publish_at = publishAt;
+  return request(`/admin/seo/articles/${id}`, { method: 'PATCH', auth, body });
+}
+
+export function adminListSeoRuns(auth) {
+  return request('/admin/seo/runs', { auth });
+}
+
+// Bouton « Lancer l'agent » : dépose une demande de run pour l'orchestrateur
+export function adminLaunchSeoRun(auth) {
+  return request('/admin/seo/runs/launch', { method: 'POST', auth });
+}

@@ -111,6 +111,7 @@ services:
       MAIL_USERNAME: ${HI_TECH_ACADEMY_MAIL_USERNAME:-contact@hi-techacademy.fr}
     # Secrets locaux au serveur (fichier non versionné, survit aux
     # déploiements) : contient MAIL_PASSWORD=<mot de passe d'application>
+    # et SEO_AGENT_TOKEN=<token de service de l'orchestrateur SEO>
     env_file:
       - path: ./.env.secrets
         required: false

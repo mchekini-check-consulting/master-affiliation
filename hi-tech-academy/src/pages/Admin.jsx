@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, DatabaseBackup, FolderOpen, GraduationCap, Inbox, LogOut, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, UsersRound } from 'lucide-react';
+import { Award, DatabaseBackup, FolderOpen, GraduationCap, Inbox, LogOut, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
 import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
 import { bodyFont, headingFont } from '@/pages/admin/common';
 import RequestsView from '@/pages/admin/RequestsView';
@@ -11,6 +11,7 @@ import DocumentsView from '@/pages/admin/DocumentsView';
 import ComplaintsView from '@/pages/admin/ComplaintsView';
 import AuditQualiopiView from '@/pages/admin/AuditQualiopiView';
 import VeilleView from '@/pages/admin/VeilleView';
+import SeoGeoView from '@/pages/admin/SeoGeoView';
 import BackupView from '@/pages/admin/BackupView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
@@ -102,6 +103,7 @@ const NAV_ITEMS = [
   { key: 'billing', label: 'Devis & Factures', icon: ReceiptText },
   { key: 'complaints', label: 'Réclamations', icon: MessageSquareWarning },
   { key: 'veille', label: 'Veille', icon: Rss },
+  { key: 'seo', label: 'SEO / GEO', icon: TrendingUp },
   { key: 'documents', label: 'Documents Qualiopi', icon: FolderOpen },
   { key: 'audit', label: 'Audit Qualiopi', icon: ShieldCheck },
   { key: 'backup', label: 'Sauvegardes', icon: DatabaseBackup },
@@ -231,6 +233,9 @@ export default function Admin() {
           )}
           {view === 'veille' && (
             <VeilleView auth={auth} />
+          )}
+          {view === 'seo' && (
+            <SeoGeoView auth={auth} />
           )}
           {view === 'audit' && (
             <AuditQualiopiView />
