@@ -368,10 +368,16 @@ export function adminDeleteCrmActivity(auth, id) {
   return request(`/admin/crm/activities/${id}`, { method: 'DELETE', auth });
 }
 
-// Lead « livre IA offert » (fin des articles de blog) — email et/ou téléphone
-export function submitBookLead({ email, phone, articleSlug }) {
+// Lead « livre IA offert » (fin des articles de blog) — prénom/nom + email
+export function submitBookLead({ firstName, lastName, email, phone, articleSlug }) {
   return request('/leads/book', {
     method: 'POST',
-    body: { email: email || null, phone: phone || null, article_slug: articleSlug || null },
+    body: {
+      first_name: firstName || null,
+      last_name: lastName || null,
+      email: email || null,
+      phone: phone || null,
+      article_slug: articleSlug || null,
+    },
   });
 }

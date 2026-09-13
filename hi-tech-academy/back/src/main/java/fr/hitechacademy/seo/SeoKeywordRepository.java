@@ -11,4 +11,6 @@ public interface SeoKeywordRepository extends JpaRepository<SeoKeyword, UUID> {
 
     boolean existsByKeywordIgnoreCaseAndLocationCodeAndLanguageCode(
             String keyword, int locationCode, String languageCode);
+
+    boolean existsByStatus(SeoKeywordStatus status);
 }

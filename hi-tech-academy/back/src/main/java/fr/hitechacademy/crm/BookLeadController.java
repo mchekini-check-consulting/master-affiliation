@@ -26,7 +26,8 @@ public class BookLeadController {
     private static final Pattern PHONE = Pattern.compile("^\\+?[0-9 .()-]{6,20}$");
     private static final String SOURCE = "Livre IA (blog)";
 
-    public record BookLeadRequest(String email, String phone, String articleSlug) {
+    public record BookLeadRequest(String firstName, String lastName, String email, String phone,
+                                  String articleSlug) {
     }
 
     public record BookLeadResponse(boolean ok) {
@@ -46,8 +47,13 @@ public class BookLeadController {
     @PostMapping("/book")
     @Transactional
     public BookLeadResponse submit(@RequestBody BookLeadRequest body) {
+        String firstName = clean(body.firstName());
+        String lastName = clean(body.lastName());
         String email = clean(body.email());
         String phone = clean(body.phone());
+        if (firstName == null || lastName == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Renseignez votre prénom et votre nom.");
+        }
         if (email == null && phone == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Renseignez au moins un email ou un numéro de téléphone.");
@@ -69,8 +75,8 @@ public class BookLeadController {
 
         CrmContact contact = existing.orElseGet(() -> {
             CrmContact created = new CrmContact();
-            created.setFirstName("Prospect");
-            created.setLastName(email != null ? email.substring(0, email.indexOf('@')) : phone);
+            created.setFirstName(firstName);
+            created.setLastName(lastName);
             created.setEmail(email);
             created.setPhone(phone);
             created.setSource(SOURCE);
@@ -79,10 +85,15 @@ public class BookLeadController {
             return contacts.save(created);
         });
 
-        // Compléter les coordonnées manquantes d'un contact existant
+        // Contact déjà connu : compléter les coordonnées manquantes, et
+        // remplacer les anciens noms génériques (« Prospect ») par les vrais
         if (existing.isPresent()) {
             if (contact.getEmail() == null && email != null) contact.setEmail(email);
             if (contact.getPhone() == null && phone != null) contact.setPhone(phone);
+            if ("Prospect".equalsIgnoreCase(contact.getFirstName())) {
+                contact.setFirstName(firstName);
+                contact.setLastName(lastName);
+            }
         }
         contact.setUpdatedAt(Instant.now());
         contacts.save(contact);

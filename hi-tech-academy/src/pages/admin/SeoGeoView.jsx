@@ -645,6 +645,7 @@ export default function SeoGeoView({ auth }) {
               <thead>
                 <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
                   <Th>Mot-clé pilier</Th>
+                  <Th>Propositions</Th>
                   <Th>Localisation</Th>
                   <Th>Statut</Th>
                   <Th>Ajouté le</Th>
@@ -673,6 +674,22 @@ export default function SeoGeoView({ auth }) {
                           </button>
                           {kw.status === 'error' && kw.error_message && (
                             <span className="block text-xs mt-0.5 pl-6" style={{ color: '#a12626' }}>{kw.error_message}</span>
+                          )}
+                        </Td>
+                        <Td>
+                          {kw.suggestions_count > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleExpand(kw)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold"
+                              style={{ background: '#e8f0fe', color: '#2451a6', ...headingFont }}>
+                              {kw.suggestions_count} mot{kw.suggestions_count > 1 ? 's' : ''}-clé{kw.suggestions_count > 1 ? 's' : ''} proposé{kw.suggestions_count > 1 ? 's' : ''}
+                              {expanded[kw.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                            </button>
+                          ) : (
+                            <span className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
+                              {kw.status === 'to_process' ? 'après le run' : '—'}
+                            </span>
                           )}
                         </Td>
                         <Td>{kw.location_code === 2250 ? 'France' : kw.location_code} · {kw.language_code}</Td>
@@ -705,15 +722,17 @@ export default function SeoGeoView({ auth }) {
                       {/* Mots-clés proposés par la recherche : sélection manuelle */}
                       {isOpen && (
                         <tr style={{ borderBottom: '1px solid #f0f3fa' }}>
-                          <td colSpan={6} className="px-3 pb-4">
+                          <td colSpan={7} className="px-3 pb-4">
                             <div className="rounded-xl p-3" style={{ background: '#f7f9fd' }}>
                               {!list ? (
                                 <p className="text-xs px-1 py-2" style={{ color: '#6b7a9b', ...bodyFont }}>Chargement…</p>
                               ) : list.length === 0 ? (
                                 <p className="text-xs px-1 py-2" style={{ color: '#6b7a9b', ...bodyFont }}>
                                   {kw.status === 'done'
-                                    ? 'Aucune proposition pour ce pilier.'
-                                    : 'Pas encore de propositions — lancez l\'agent pour analyser ce mot-clé.'}
+                                    ? 'Aucune proposition pour ce pilier — cliquez « Réanalyser » puis « Lancer l\'agent ».'
+                                    : kw.status === 'to_process'
+                                      ? 'Pas encore de propositions — cliquez « Lancer l\'agent » pour analyser ce mot-clé.'
+                                      : 'Analyse en cours — les propositions arrivent à la fin du run.'}
                                 </p>
                               ) : (
                                 <table className="w-full border-collapse">

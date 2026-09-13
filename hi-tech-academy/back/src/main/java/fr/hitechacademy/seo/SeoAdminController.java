@@ -88,10 +88,21 @@ public class SeoAdminController {
 
     // --- Mots-clés -----------------------------------------------------
 
+    /** Vue admin d'un pilier : le mot-clé + le nombre de propositions déposées. */
+    public record AdminKeywordView(UUID id, String keyword, int locationCode, String languageCode,
+                                   SeoKeywordStatus status, String errorMessage, UUID articleId,
+                                   java.time.Instant createdAt, java.time.Instant lastRunAt,
+                                   long suggestionsCount) {
+    }
+
     @GetMapping("/keywords")
     @Transactional(readOnly = true)
-    public List<KeywordView> listKeywords() {
-        return keywords.findAllByOrderByCreatedAtDesc().stream().map(KeywordView::from).toList();
+    public List<AdminKeywordView> listKeywords() {
+        return keywords.findAllByOrderByCreatedAtDesc().stream()
+                .map(k -> new AdminKeywordView(k.getId(), k.getKeyword(), k.getLocationCode(),
+                        k.getLanguageCode(), k.getStatus(), k.getErrorMessage(), k.getArticleId(),
+                        k.getCreatedAt(), k.getLastRunAt(), suggestions.countByKeywordId(k.getId())))
+                .toList();
     }
 
     @PostMapping("/keywords")
@@ -253,6 +264,13 @@ public class SeoAdminController {
         }
         if (runs.existsByStatusIn(Set.of(SeoRunStatus.REQUESTED, SeoRunStatus.RUNNING))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Un run est déjà en cours ou en attente.");
+        }
+        // Un run sans travail serait silencieux : mieux vaut le dire tout de suite
+        if (!keywords.existsByStatus(SeoKeywordStatus.TO_PROCESS)
+                && !suggestions.existsByStatus(SeoSuggestionStatus.SELECTED)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Rien à traiter : ajoutez un mot-clé pilier, cliquez « Réanalyser » sur un pilier "
+                            + "existant, ou cochez des mots-clés proposés à rédiger.");
         }
         SeoRun run = new SeoRun();
         run.setTrigger(SeoRunTrigger.MANUAL);

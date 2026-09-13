@@ -12,4 +12,8 @@ public interface SeoKeywordSuggestionRepository extends JpaRepository<SeoKeyword
     List<SeoKeywordSuggestion> findByStatusOrderByCreatedAtAsc(SeoSuggestionStatus status);
 
     void deleteByKeywordId(UUID keywordId);
+
+    long countByKeywordId(UUID keywordId);
+
+    boolean existsByStatus(SeoSuggestionStatus status);
 }
