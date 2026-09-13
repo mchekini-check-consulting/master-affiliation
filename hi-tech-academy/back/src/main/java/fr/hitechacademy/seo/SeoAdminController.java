@@ -121,11 +121,13 @@ public class SeoAdminController {
 
     // --- Suggestions : la sélection manuelle des mots-clés à rédiger ----
 
-    /** Propositions de la phase de recherche pour un pilier (tri par volume). */
+    /** Propositions d'un pilier, triées par score d'opportunité décroissant. */
     @GetMapping("/keywords/{id}/suggestions")
     @Transactional(readOnly = true)
     public List<SuggestionView> listSuggestions(@PathVariable UUID id) {
         return suggestions.findByKeywordIdOrderByVolumeDesc(findKeyword(id).getId()).stream()
+                .sorted(java.util.Comparator.comparingDouble(
+                        (SeoKeywordSuggestion s) -> s.getScore() != null ? -s.getScore() : 0.0))
                 .map(SuggestionView::from)
                 .toList();
     }

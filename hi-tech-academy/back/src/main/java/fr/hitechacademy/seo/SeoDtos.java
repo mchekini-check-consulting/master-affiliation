@@ -48,12 +48,13 @@ public final class SeoDtos {
     public record SuggestionView(UUID id, UUID keywordId, String kw, int volume, double cpc,
                                  double competition, int kd, String intent,
                                  @com.fasterxml.jackson.annotation.JsonProperty("trend_12m") String trend12m,
-                                 double gapScore, String source, SeoSuggestionStatus status,
+                                 double gapScore, String source, Double score, SeoSuggestionStatus status,
                                  UUID articleId, String errorMessage, Instant createdAt) {
         public static SuggestionView from(SeoKeywordSuggestion s) {
             return new SuggestionView(s.getId(), s.getKeywordId(), s.getKw(), s.getVolume(), s.getCpc(),
                     s.getCompetition(), s.getKd(), s.getIntent(), s.getTrend12m(), s.getGapScore(),
-                    s.getSource(), s.getStatus(), s.getArticleId(), s.getErrorMessage(), s.getCreatedAt());
+                    s.getSource(), s.getScore(), s.getStatus(), s.getArticleId(), s.getErrorMessage(),
+                    s.getCreatedAt());
         }
     }
 

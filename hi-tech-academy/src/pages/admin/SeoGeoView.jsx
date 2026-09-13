@@ -32,10 +32,25 @@ const SUGGESTION_STATUS = {
 
 const SUGGESTION_SOURCE = {
   seed: 'Pilier',
+  llm: 'Claude (site)',
   gap: 'Gap concurrent',
   ideas: 'Idées',
   related: 'Associé',
 };
+
+/** Score d'opportunité 0-100 : vert = à saisir, ambre = correct, gris = faible. */
+function ScoreBadge({ score }) {
+  if (score == null) return <span style={{ color: '#6b7a9b' }}>—</span>;
+  const color = score >= 45 ? '#116632' : score >= 25 ? '#8a5a00' : '#6b7a9b';
+  const background = score >= 45 ? '#e5f6ec' : score >= 25 ? '#fdf3e2' : '#f0f3fa';
+  return (
+    <span
+      className="inline-block min-w-[44px] text-center px-2 py-1 rounded-lg text-xs font-bold"
+      style={{ background, color, ...headingFont }}>
+      {Math.round(score)}
+    </span>
+  );
+}
 
 const INTENT_LABELS = {
   informational: 'Informationnelle',
@@ -706,6 +721,7 @@ export default function SeoGeoView({ auth }) {
                                     <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
                                       <Th>Rédiger</Th>
                                       <Th>Mot-clé proposé</Th>
+                                      <Th>Score</Th>
                                       <Th>Volume / mois</Th>
                                       <Th>Difficulté (KD)</Th>
                                       <Th>Concurrence</Th>
@@ -736,6 +752,7 @@ export default function SeoGeoView({ auth }) {
                                               <span className="block text-xs mt-0.5" style={{ color: '#a12626' }}>{s.error_message}</span>
                                             )}
                                           </Td>
+                                          <Td><ScoreBadge score={s.score} /></Td>
                                           <Td>{s.volume.toLocaleString('fr-FR')}</Td>
                                           <Td>{s.kd}/100</Td>
                                           <Td>{Math.round(s.competition * 100)} %</Td>
@@ -777,9 +794,10 @@ export default function SeoGeoView({ auth }) {
         {/* Lancement de la rédaction des mots-clés sélectionnés */}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3" style={{ background: '#f0f3fa' }}>
           <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
-            Dépliez un pilier analysé, cochez les mots-clés à transformer en articles
-            (<strong>5 à 10 mots-clés proches conseillés</strong> — les recherches sont
-            mutualisées, le coût marginal est faible), puis lancez la rédaction.
+            Dépliez un pilier analysé : Claude propose les mots-clés à partir du site,
+            DataForSEO les valide, et ils sont <strong>triés par score d'opportunité</strong>
+            {' '}(volume élevé, concurrence et difficulté faibles). Cochez ceux à transformer
+            en articles (<strong>5 à 10 conseillés</strong>), puis lancez la rédaction.
             {selectedCount > 0 && (
               <strong style={{ color: '#005064' }}> {selectedCount} sélectionné(s).</strong>
             )}

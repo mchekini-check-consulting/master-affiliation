@@ -53,11 +53,11 @@ public class SeoAgentController {
                                        Instant publishAt) {
     }
 
-    /** Mot-clé proposé par la phase de recherche (contrat de l'agent 2). */
+    /** Mot-clé proposé par la phase de recherche (contrat de l'agent 2 + score d'opportunité). */
     public record SuggestionEntry(@NotBlank String kw, Integer volume, Double cpc, Double competition,
                                   Integer kd, String intent,
                                   @com.fasterxml.jackson.annotation.JsonProperty("trend_12m") JsonNode trend12m,
-                                  Double gapScore, String source) {
+                                  Double gapScore, String source, Double score) {
     }
 
     public record UpdateSuggestionRequest(SeoSuggestionStatus status, UUID articleId, String errorMessage) {
@@ -184,6 +184,7 @@ public class SeoAgentController {
             s.setTrend12m(toJsonText(entry.trend12m()));
             s.setGapScore(entry.gapScore() != null ? entry.gapScore() : 0);
             s.setSource(entry.source() != null ? entry.source() : "ideas");
+            s.setScore(entry.score());
             suggestions.save(s);
         }
         return suggestions.findByKeywordIdOrderByVolumeDesc(keyword.getId()).stream()

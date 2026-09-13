@@ -49,6 +49,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Réclamation publique
                         .requestMatchers(HttpMethod.POST, "/complaints").permitAll()
+                        // Lead « livre IA offert » (fin des articles de blog)
+                        .requestMatchers(HttpMethod.POST, "/leads/book").permitAll()
                         // Parcours public : dépôt d'une demande puis questionnaire d'analyse du besoin
                         .requestMatchers(HttpMethod.POST, "/registrations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/registrations/*/public").permitAll()

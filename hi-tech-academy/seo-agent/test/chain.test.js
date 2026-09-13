@@ -47,6 +47,11 @@ function makeDfs() {
   };
 }
 
+// Réponse de brainstorm (phase recherche) : requêtes proposées par Claude
+const BRAINSTORM = {
+  keywords: Array.from({ length: 12 }, (_, i) => `requête ia numéro ${i}`),
+};
+
 const LLM_RESPONSES = [
   // agent 3 — sélection
   { secondary_kws: ['formation kubernetes en ligne', 'apprendre kubernetes'],
@@ -72,8 +77,8 @@ const LLM_RESPONSES = [
   { score: 91, issues: [] },
 ];
 
-function makeLlm() {
-  const responses = [...LLM_RESPONSES];
+function makeQueueLlm(queue) {
+  const responses = [...queue];
   return {
     async generateJson(prompt, { validate }) {
       const next = responses.shift();
@@ -83,10 +88,12 @@ function makeLlm() {
   };
 }
 
-test('phase recherche : suggestions déposées avec métriques, gap inclus, zéro LLM', async () => {
+const makeLlm = () => makeQueueLlm(LLM_RESPONSES);
+
+test('phase recherche : Claude propose depuis le site, DataForSEO valide, score calculé', async () => {
   const agents = createAgents({
     dfs: makeDfs(),
-    llm: { async generateJson() { throw new Error('le LLM ne doit pas être appelé en recherche'); } },
+    llm: makeQueueLlm([BRAINSTORM]),
     snapshots: createMemorySnapshotStore(),
   });
   assert.equal(agents.implemented, true);
@@ -108,16 +115,38 @@ test('phase recherche : suggestions déposées avec métriques, gap inclus, zér
   assert.equal(replaced.length, 1);
   assert.equal(replaced[0].keywordId, 'kw-1');
   assert.equal(result.suggestionsCount, replaced[0].entries.length);
-  const kws = replaced[0].entries.map((e) => e.kw);
+  const entries = replaced[0].entries;
+  const kws = entries.map((e) => e.kw);
   assert.equal(kws[0], 'formation kubernetes'); // le pilier en tête
   assert.ok(kws.includes('kubernetes certification prix')); // le gap de la veille
-  const seed = replaced[0].entries[0];
+  // les requêtes de Claude sont là, sans passer le filtre lexical
+  assert.ok(kws.includes('requête ia numéro 0'));
+  assert.equal(entries.find((e) => e.kw === 'requête ia numéro 0').source, 'llm');
+  // score d'opportunité présent sur toutes les entrées
+  assert.ok(entries.every((e) => typeof e.score === 'number' && e.score >= 0 && e.score <= 100));
+  const seed = entries[0];
   assert.equal(seed.volume, 300);
   assert.equal(seed.kd, 35);
-  assert.equal(seed.intent, 'commercial');
   assert.equal(seed.source, 'seed');
-  assert.ok(steps.some((s) => s.includes('Agent 1')));
-  assert.ok(steps.some((s) => s.includes('Agent 2')));
+  assert.ok(steps.some((s) => s.includes('Claude — proposition')));
+  assert.ok(steps.some((s) => s.includes('validation DataForSEO')));
+});
+
+test('brainstorm en échec : la recherche continue avec les seuls candidats DataForSEO', async () => {
+  const agents = createAgents({
+    dfs: makeDfs(),
+    llm: { async generateJson() { throw new Error('LLM indisponible'); } },
+    snapshots: createMemorySnapshotStore(),
+  });
+  const replaced = [];
+  const ctx = {
+    api: { async replaceSuggestions(id, entries) { replaced.push(entries); return entries; } },
+    updateStep: () => {},
+    log: () => {},
+  };
+  const result = await agents.researchKeyword(ctx, { id: 'kw-1', keyword: 'formation kubernetes' });
+  assert.ok(result.suggestionsCount > 0);
+  assert.ok(!replaced[0].some((e) => e.source === 'llm'));
 });
 
 test('phase rédaction : la suggestion sélectionnée devient un article (mot-clé affiché = la suggestion)', async () => {
@@ -162,7 +191,7 @@ test('veille mutualisée : un seul passage pour plusieurs recherches du même ru
   const original = dfs.competitorsDomain;
   dfs.competitorsDomain = async (...args) => { watchCalls++; return original(...args); };
 
-  const agents = createAgents({ dfs, llm: makeLlm(), snapshots: createMemorySnapshotStore() });
+  const agents = createAgents({ dfs, llm: makeQueueLlm([BRAINSTORM, BRAINSTORM]), snapshots: createMemorySnapshotStore() });
   const ctx = {
     api: { async replaceSuggestions(id, entries) { return entries; } },
     updateStep: () => {},
@@ -177,7 +206,7 @@ test('veille mutualisée : un seul passage pour plusieurs recherches du même ru
 test('veille en échec : la recherche continue sans gap', async () => {
   const dfs = makeDfs();
   dfs.competitorsDomain = async () => { throw new Error('DataForSEO 50000'); };
-  const agents = createAgents({ dfs, llm: makeLlm(), snapshots: createMemorySnapshotStore() });
+  const agents = createAgents({ dfs, llm: makeQueueLlm([BRAINSTORM]), snapshots: createMemorySnapshotStore() });
 
   const replaced = [];
   const ctx = {

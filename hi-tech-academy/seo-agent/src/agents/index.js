@@ -13,7 +13,8 @@ import { createDataForSeoClient } from '../dataforseo.js';
 import { createLlm } from '../llm.js';
 import { createMemorySnapshotStore } from '../snapshots.js';
 import { createWatchAgent } from './watch.js';
-import { createAnalyzeAgent } from './analyze.js';
+import { createBrainstormAgent } from './brainstorm.js';
+import { createAnalyzeAgent, opportunityScore } from './analyze.js';
 import { createSelectAgent } from './select.js';
 import { createWriteAgent } from './write.js';
 
@@ -58,6 +59,7 @@ export function createAgents(deps = {}) {
   const snapshots = deps.snapshots ?? createMemorySnapshotStore();
 
   const watchAgent = createWatchAgent({ dfs, snapshots, log });
+  const brainstormAgent = createBrainstormAgent({ llm, log });
   const analyzeAgent = createAnalyzeAgent({ dfs, log });
 
   // La veille est propre au site, pas au mot-clé : un seul passage par run
@@ -104,13 +106,25 @@ export function createAgents(deps = {}) {
       const { updateStep } = ctx;
       const gapKeywords = await collectGapKeywords(keyword.id, updateStep);
 
-      await updateStep('Agent 2 — analyse volumes & concurrence');
+      // Claude propose les requêtes à partir du site et du pilier — panne
+      // tolérée : DataForSEO (ideas/related filtrés) prend alors le relais
+      let llmCandidates = [];
+      try {
+        await updateStep('Claude — proposition de mots-clés à partir du site');
+        llmCandidates = await brainstormAgent.generate(keyword.keyword, { gapKeywords });
+      } catch (err) {
+        if (err.retryNextRun) throw err;
+        log(`brainstorm en échec (${err.message}) — recherche poursuivie sans candidats LLM`);
+      }
+
+      await updateStep('Agent 2 — validation DataForSEO (volume, difficulté, concurrence)');
       const analysis = await analyzeAgent.analyze(keyword.keyword, {
         keywordId: keyword.id,
         gapKeywords,
+        extraCandidates: llmCandidates,
       });
 
-      await updateStep('Dépôt des mots-clés proposés (sélection dans l\'admin)');
+      await updateStep('Dépôt des mots-clés proposés, triés par score d\'opportunité');
       await ctx.api.replaceSuggestions(keyword.id, analysis.keywords.map((k) => ({
         kw: k.kw,
         volume: k.volume,
@@ -121,6 +135,7 @@ export function createAgents(deps = {}) {
         trend_12m: k.trend_12m,
         gap_score: k.gap_score,
         source: k.source,
+        score: opportunityScore(k),
       })));
       return { suggestionsCount: analysis.keywords.length };
     },

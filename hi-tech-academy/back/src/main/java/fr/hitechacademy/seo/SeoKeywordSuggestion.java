@@ -56,6 +56,13 @@ public class SeoKeywordSuggestion {
     @Column(nullable = false)
     private double gapScore = 0;
 
+    /**
+     * Score d'opportunité 0-100 calculé par l'agent : volume élevé,
+     * concurrence et difficulté faibles. Nullable : colonne ajoutée après
+     * les premières lignes (ddl-auto=update).
+     */
+    private Double score;
+
     /** Origine : seed | ideas | related | gap. */
     @Column(nullable = false, length = 10)
     private String source = "ideas";
@@ -101,6 +108,9 @@ public class SeoKeywordSuggestion {
 
     public double getGapScore() { return gapScore; }
     public void setGapScore(double gapScore) { this.gapScore = gapScore; }
+
+    public Double getScore() { return score; }
+    public void setScore(Double score) { this.score = score; }
 
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }

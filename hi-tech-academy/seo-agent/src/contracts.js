@@ -2,7 +2,7 @@
 // réception ; une sortie invalide est rejetée avec la liste des écarts
 // (et relancée côté agents LLM).
 
-const AGENT2_SOURCES = new Set(['seed', 'ideas', 'related', 'gap']);
+const AGENT2_SOURCES = new Set(['seed', 'ideas', 'related', 'gap', 'llm']);
 const AGENT2_INTENTS = new Set([
   'informational', 'navigational', 'commercial', 'transactional', 'unknown',
 ]);

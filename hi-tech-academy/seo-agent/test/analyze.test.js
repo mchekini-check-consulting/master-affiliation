@@ -198,6 +198,34 @@ test('relevanceFilter : les hors-sujet sont écartés, les variantes gardées', 
   assert.equal(kube('meilleure formation en ligne'), false);
 });
 
+test('relevanceFilter : « Comparateur Modèles IA » — le sujet prime sur le nom-outil', () => {
+  const relevant = relevanceFilter('Comparateur Modèles IA');
+  // « comparateur » et « modèles » sont des noms-outils faibles : le terme
+  // fort requis est « ia » (ou ses synonymes)
+  assert.equal(relevant('comparateur de prix'), false);
+  assert.equal(relevant('comparateur essence'), false);
+  assert.equal(relevant('idealo comparateur de prix'), false);
+  assert.equal(relevant('comparateur liste'), false);
+  assert.equal(relevant('comparateur ia'), true);
+  assert.equal(relevant('meilleurs modèles intelligence artificielle'), true); // synonyme d'« ia »
+  assert.equal(relevant('chatgpt vs claude comparatif ai'), true);
+});
+
+test('relevanceFilter : synonymes du domaine (k8s, facture/facturation)', () => {
+  const kube = relevanceFilter('formation kubernetes');
+  assert.equal(kube('cluster k8s débutant'), true);
+  const facture = relevanceFilter('facturation électronique pennylane');
+  assert.equal(facture('facture électronique obligatoire 2026'), true); // facture ~ facturation
+  assert.equal(facture('pennylane tarifs'), true);
+  assert.equal(facture('logiciel de paie'), false);
+});
+
+test('relevanceFilter : pilier sans terme fort → majorité des termes faibles', () => {
+  const relevant = relevanceFilter('comparateur logiciels'); // 2 termes faibles
+  assert.equal(relevant('comparateur de logiciels gratuits'), true); // les 2
+  assert.equal(relevant('comparateur de prix'), false); // 1 seul
+});
+
 test('relevanceFilter : pilier 100 % générique → repli sur tous ses termes', () => {
   const relevant = relevanceFilter('formation cpf');
   assert.equal(relevant('formation éligible cpf'), true);

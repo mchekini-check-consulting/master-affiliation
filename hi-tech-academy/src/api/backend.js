@@ -367,3 +367,11 @@ export function adminCreateCrmActivity(auth, contactId, { type, content }) {
 export function adminDeleteCrmActivity(auth, id) {
   return request(`/admin/crm/activities/${id}`, { method: 'DELETE', auth });
 }
+
+// Lead « livre IA offert » (fin des articles de blog) — email et/ou téléphone
+export function submitBookLead({ email, phone, articleSlug }) {
+  return request('/leads/book', {
+    method: 'POST',
+    body: { email: email || null, phone: phone || null, article_slug: articleSlug || null },
+  });
+}
