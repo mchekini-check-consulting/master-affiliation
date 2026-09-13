@@ -309,16 +309,37 @@ export default function BlogPost() {
           border-radius: 0.35rem;
           font-size: 0.9em;
         }
+        .article-content .table-wrapper {
+          overflow-x: auto;
+          margin: 1.6rem 0;
+          border-radius: 0.9rem;
+          border: 1px solid #dff7ec;
+        }
         .article-content table {
           width: 100%;
           border-collapse: collapse;
-          margin: 0 0 1.4rem;
           font-size: 0.95rem;
+        }
+        .article-content .table-wrapper table {
+          margin: 0;
+        }
+        .article-content tbody tr:nth-child(even) {
+          background: #f9fefb;
+        }
+        .article-content blockquote p {
+          margin: 0;
+        }
+        .article-content hr {
+          border: none;
+          border-top: 1px solid #dff7ec;
+          margin: 2.5rem auto;
+          width: 120px;
         }
         .article-content th, .article-content td {
           border: 1px solid #dff7ec;
-          padding: 0.6rem 0.9rem;
+          padding: 0.65rem 1rem;
           text-align: left;
+          vertical-align: top;
         }
         .article-content th {
           background: #eafff6;

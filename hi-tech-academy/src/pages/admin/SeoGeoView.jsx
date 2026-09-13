@@ -164,16 +164,37 @@ function renderInline(text, keyPrefix) {
   });
 }
 
+const isTableLine = (line) => /^\s*\|.*\|\s*$/.test(line);
+const splitCells = (line) => line.trim().replace(/^\|/, '').replace(/\|$/, '')
+    .split('|').map((cell) => cell.trim());
+const isSeparatorRow = (cells) => cells.length > 0 && cells.every((c) => /^:?-{3,}:?$/.test(c));
+
 function MarkdownPreview({ md }) {
   const blocks = useMemo(() => {
     const lines = (md ?? '').split('\n');
     const out = [];
     let list = null; // { ordered, items }
+    let table = null; // { header, rows }
     const flushList = () => {
       if (list) { out.push(list); list = null; }
     };
+    const flushTable = () => {
+      if (table) { out.push(table); table = null; }
+    };
     for (const raw of lines) {
       const line = raw.trimEnd();
+      if (isTableLine(line)) {
+        flushList();
+        const cells = splitCells(line);
+        if (!table) table = { type: 'table', header: null, rows: [] };
+        if (isSeparatorRow(cells) && table.rows.length === 1 && !table.header) {
+          table.header = table.rows.pop();
+        } else {
+          table.rows.push(cells);
+        }
+        continue;
+      }
+      flushTable();
       const heading = /^(#{1,4})\s+(.*)$/.exec(line);
       const bullet = /^[-*]\s+(.*)$/.exec(line);
       const ordered = /^\d+[.)]\s+(.*)$/.exec(line);
@@ -196,6 +217,7 @@ function MarkdownPreview({ md }) {
       }
     }
     flushList();
+    flushTable();
     return out;
   }, [md]);
 
@@ -209,6 +231,37 @@ function MarkdownPreview({ md }) {
   return (
     <div style={{ color: '#1a1a2e', ...bodyFont }}>
       {blocks.map((block, i) => {
+        if (block.type === 'table') {
+          return (
+            <div key={i} className="overflow-x-auto mb-4 rounded-xl" style={{ border: '1px solid #e0e8f4' }}>
+              <table className="w-full border-collapse text-sm">
+                {block.header && (
+                  <thead>
+                    <tr>
+                      {block.header.map((cell, j) => (
+                        <th
+                          key={j}
+                          className="px-3 py-2 text-left font-bold"
+                          style={{ background: '#f0f3fa', color: '#001a4a', borderBottom: '1px solid #e0e8f4', ...headingFont }}>
+                          {renderInline(cell, `${i}-h${j}`)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                )}
+                <tbody>
+                  {block.rows.map((row, j) => (
+                    <tr key={j} style={{ borderBottom: '1px solid #f0f3fa' }}>
+                      {row.map((cell, k) => (
+                        <td key={k} className="px-3 py-2 align-top">{renderInline(cell, `${i}-${j}-${k}`)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
         if (block.type === 'list') {
           const Tag = block.orderedList ? 'ol' : 'ul';
           return (
