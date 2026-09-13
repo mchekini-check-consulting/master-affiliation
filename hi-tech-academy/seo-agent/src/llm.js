@@ -30,6 +30,10 @@ export function createLlm(options = {}) {
     model = DEFAULT_MODEL,
     maxAttempts = 3,        // tentatives en cas de rate limit / erreur transitoire
     retryBaseMs = 30_000,   // backoff : 30 s puis 60 s
+    // Garde-fou : un appel qui dépasse ce délai est abandonné et le mot-clé
+    // reporté au run suivant (une génération saine prend 1 à 5 min ; le
+    // throttling de quota peut monter à ~15 min)
+    timeoutMs = Number(process.env.SEO_LLM_TIMEOUT_MS ?? 20 * 60_000),
     sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     queryImpl = null,       // injection de test ; sinon Claude Agent SDK
     log = () => {},
@@ -50,22 +54,46 @@ export function createLlm(options = {}) {
         ...(system ? { systemPrompt: system } : {}),
       },
     });
-    for await (const message of stream) {
-      if (message.type === 'result') {
-        if (message.subtype === 'success' && !message.is_error) {
-          return message.result ?? '';
+
+    const consume = async () => {
+      for await (const message of stream) {
+        if (message.type === 'result') {
+          if (message.subtype === 'success' && !message.is_error) {
+            return message.result ?? '';
+          }
+          throw new Error(`LLM : ${message.subtype}${message.result ? ` — ${message.result}` : ''}`);
         }
-        throw new Error(`LLM : ${message.subtype}${message.result ? ` — ${message.result}` : ''}`);
       }
+      throw new Error('LLM : flux terminé sans message de résultat.');
+    };
+
+    let timer;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        const err = new Error(`LLM : délai dépassé (${Math.round(timeoutMs / 60_000)} min) — appel abandonné`);
+        err.retryNextRun = true; // report au run suivant, pas un échec définitif
+        reject(err);
+      }, timeoutMs);
+    });
+    try {
+      return await Promise.race([consume(), timeout]);
+    } finally {
+      clearTimeout(timer);
+      // Meilleur effort : arrêter le sous-processus si l'appel est abandonné
+      stream?.interrupt?.().catch?.(() => {});
+      stream?.return?.().catch?.(() => {});
     }
-    throw new Error('LLM : flux terminé sans message de résultat.');
   }
 
   async function generate(prompt, { system } = {}) {
+    const startedAt = Date.now();
     for (let attempt = 0; ; attempt++) {
       try {
-        return await callOnce(prompt, system);
+        const result = await callOnce(prompt, system);
+        log(`LLM : réponse en ${Math.round((Date.now() - startedAt) / 1000)} s`);
+        return result;
       } catch (err) {
+        if (err.retryNextRun) throw err; // timeout : ne pas réessayer ici
         const rateLimited = RATE_LIMIT_PATTERN.test(String(err.message));
         if (attempt + 1 >= maxAttempts) {
           if (rateLimited) err.retryNextRun = true; // report au run suivant

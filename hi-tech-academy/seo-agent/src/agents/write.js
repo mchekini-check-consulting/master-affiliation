@@ -102,6 +102,55 @@ const median = (values) => {
   return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 };
 
+// --- Format de sortie de la rédaction : Markdown balisé, pas de JSON --------
+// Un article de 1 500 mots à l'intérieur d'une chaîne JSON casse trop souvent
+// (échappements, troncatures) et coûte une régénération complète. Le format
+// balisé se parse au rasoir et tolère les sorties longues.
+
+const DRAFT_FORMAT = `Réponds EXACTEMENT dans ce format, sans JSON et sans texte autour :
+===ARTICLE===
+(l'article complet en Markdown, H1 inclus)
+===FAQ===
+Q: première question
+R: réponse concise
+Q: deuxième question
+R: réponse concise
+(3 à 5 paires Q/R, celles du brief)
+===LIENS===
+(les liens internes réellement utilisés dans l'article, un par ligne, ex. /financements)`;
+
+/** Parse la sortie balisée de la rédaction ; lève avec la raison précise. */
+export function parseDraft(text) {
+  const section = (name) => {
+    const match = new RegExp(`===${name}===\\s*([\\s\\S]*?)(?:===|$)`).exec(text);
+    return match ? match[1].trim() : null;
+  };
+
+  const bodyMd = section('ARTICLE');
+  if (!bodyMd || bodyMd.length < 500) {
+    throw new Error('section ===ARTICLE=== manquante ou trop courte (minimum 500 caractères)');
+  }
+
+  const faqRaw = section('FAQ') ?? '';
+  const faq = [];
+  const pairRe = /Q\s*:\s*([\s\S]*?)\nR\s*:\s*([\s\S]*?)(?=\nQ\s*:|$)/g;
+  for (const match of faqRaw.matchAll(pairRe)) {
+    const q = match[1].trim();
+    const a = match[2].trim();
+    if (q && a) faq.push({ q, a });
+  }
+  if (faq.length < 3) {
+    throw new Error(`section ===FAQ=== incomplète : ${faq.length} paire(s) Q/R lisible(s), 3 minimum`);
+  }
+
+  const internalLinks = (section('LIENS') ?? '')
+      .split('\n')
+      .map((line) => line.trim().replace(/^[-•*]\s*/, ''))
+      .filter((line) => line.startsWith('/'));
+
+  return { body_md: bodyMd, faq: faq.slice(0, 5), internal_links: internalLinks };
+}
+
 // --- Agent -----------------------------------------------------------------
 
 export function createWriteAgent(options) {
@@ -189,27 +238,27 @@ Pages internes Hi-Tech Academy disponibles pour le maillage (3 à 5 liens,
 uniquement dans cette liste) :
 ${internalPages.map((p) => `• ${p.url} — ${p.label}`).join('\n') || '(aucune)'}
 
-Réponds uniquement avec cet objet JSON :
-{"body_md": "# ... (article complet en Markdown, H1 inclus)",
- "faq": [{"q": "...", "a": "..."}],
- "internal_links": ["/chemin-1", "/chemin-2"]}`;
-      const validateDraft = (out) => {
-        if (typeof out.body_md !== 'string' || out.body_md.trim().length < 500) {
-          throw new Error('body_md doit faire au moins 500 caractères');
+${DRAFT_FORMAT}`;
+
+      // Rédaction en format balisé, une relance si la sortie est illisible
+      const generateDraft = async (prompt) => {
+        let lastError = null;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const withFeedback = attempt === 0 ? prompt
+              : `${prompt}\n\nTa sortie précédente était invalide : ${lastError.message}.\n`
+                + 'Recommence en respectant EXACTEMENT le format demandé (===ARTICLE===, ===FAQ===, ===LIENS===).';
+          const text = await llm.generate(withFeedback, { system: WRITER_SYSTEM });
+          try {
+            return parseDraft(text);
+          } catch (err) {
+            lastError = err;
+            log(`brouillon invalide (tentative ${attempt + 1}) : ${err.message}`);
+          }
         }
-        if (!Array.isArray(out.faq) || out.faq.length < 3
-            || out.faq.some((f) => !f?.q?.trim?.() || !f?.a?.trim?.())) {
-          throw new Error('faq doit contenir au moins 3 paires { q, a } non vides');
-        }
-        if (!Array.isArray(out.internal_links)) {
-          throw new Error('internal_links doit être un tableau');
-        }
-        return out;
+        throw new Error(`Agent 4 : brouillon invalide après relance — ${lastError.message}`);
       };
-      let draft = await llm.generateJson(draftPrompt, {
-        system: WRITER_SYSTEM,
-        validate: validateDraft,
-      });
+
+      let draft = await generateDraft(draftPrompt);
 
       // 5. Auto-audit, puis une itération de correction si score < seuil
       await updateStep('Agent 4 — auto-audit de l\'article');
@@ -238,11 +287,10 @@ Réponds uniquement avec : {"score": 87, "issues": ["..."]}`,
       if (audit.score < config.auditThreshold) {
         await updateStep(`Agent 4 — correction (audit ${audit.score}/100)`);
         log(`audit ${audit.score} < ${config.auditThreshold}, itération de correction`);
-        draft = await llm.generateJson(
+        draft = await generateDraft(
             `${draftPrompt}\n\nTa première version a obtenu ${audit.score}/100.
 Problèmes à corriger impérativement :\n${audit.issues.map((i) => `• ${i}`).join('\n')}
-Réponds avec le même format JSON, article corrigé.`,
-            { system: WRITER_SYSTEM, validate: validateDraft });
+Réponds dans le même format balisé, article corrigé.`);
         audit = await auditOnce(draft.body_md);
       }
 

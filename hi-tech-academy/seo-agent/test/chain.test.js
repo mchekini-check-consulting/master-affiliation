@@ -65,17 +65,28 @@ const LLM_RESPONSES = [
       { level: 2, text: 'Financer avec son OPCO' },
     ],
     faq_questions: ['Quel prérequis ?', 'Quel prix ?', 'Quelle durée ?'] },
-  // agent 4 — draft
-  { body_md: `# Formation Kubernetes\n\n${'Réponse directe et contenu utile. '.repeat(30)}\n\n## Financer avec son OPCO\n\n[Guide](/financements)`,
-    faq: [
-      { q: 'Quel prérequis ?', a: 'Linux et Docker.' },
-      { q: 'Quel prix ?', a: '1 000 € HT, finançable OPCO.' },
-      { q: 'Quelle durée ?', a: '7 heures.' },
-    ],
-    internal_links: ['/financements'] },
   // agent 4 — audit
   { score: 91, issues: [] },
 ];
+
+// agent 4 — draft (format balisé, via generate)
+const DRAFT_TEXT = `===ARTICLE===
+# Formation Kubernetes
+
+${'Réponse directe et contenu utile. '.repeat(30)}
+
+## Financer avec son OPCO
+
+[Guide](/financements)
+===FAQ===
+Q: Quel prérequis ?
+R: Linux et Docker.
+Q: Quel prix ?
+R: 1 000 € HT, finançable OPCO.
+Q: Quelle durée ?
+R: 7 heures.
+===LIENS===
+/financements`;
 
 function makeQueueLlm(queue) {
   const responses = [...queue];
@@ -84,6 +95,9 @@ function makeQueueLlm(queue) {
       const next = responses.shift();
       if (next === undefined) throw new Error('plus de réponses LLM mockées');
       return validate(next);
+    },
+    async generate() {
+      return DRAFT_TEXT;
     },
   };
 }

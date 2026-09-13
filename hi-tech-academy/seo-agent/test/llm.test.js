@@ -95,6 +95,21 @@ test('rate limit persistant : erreur marquée retryNextRun (report du mot-clé)'
   }
 });
 
+test('timeout : appel abandonné, erreur marquée retryNextRun, pas de retry', async () => {
+  const queryImpl = () => (async function* () {
+    await new Promise(() => {}); // sous-processus qui ne répond jamais
+    yield { type: 'result' };
+  })();
+  const llm = createLlm({ queryImpl, timeoutMs: 50 });
+  try {
+    await llm.generate('prompt');
+    assert.fail('aurait dû lever');
+  } catch (err) {
+    assert.match(err.message, /délai dépassé/);
+    assert.equal(err.retryNextRun, true);
+  }
+});
+
 test('erreur non-rate-limit : pas de retry, pas de retryNextRun', async () => {
   const { queryImpl, calls } = makeQuery([new Error('invalid request')]);
   const llm = createLlm({ queryImpl, sleep: async () => {} });
