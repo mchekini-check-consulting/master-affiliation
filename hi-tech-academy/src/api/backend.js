@@ -335,3 +335,35 @@ export function adminListSeoSuggestions(auth, keywordId) {
 export function adminUpdateSeoSuggestion(auth, id, status) {
   return request(`/admin/seo/suggestions/${id}`, { method: 'PATCH', auth, body: { status } });
 }
+
+// --- CRM (kanban de suivi des prospects) ------------------------------
+export function adminListCrmContacts(auth) {
+  return request('/admin/crm/contacts', { auth });
+}
+
+export function adminCreateCrmContact(auth, payload) {
+  return request('/admin/crm/contacts', { method: 'POST', auth, body: payload });
+}
+
+// Mise à jour d'une fiche — un changement de stage trace l'historique
+export function adminUpdateCrmContact(auth, id, payload) {
+  return request(`/admin/crm/contacts/${id}`, { method: 'PATCH', auth, body: payload });
+}
+
+export function adminDeleteCrmContact(auth, id) {
+  return request(`/admin/crm/contacts/${id}`, { method: 'DELETE', auth });
+}
+
+export function adminListCrmActivities(auth, contactId) {
+  return request(`/admin/crm/contacts/${contactId}/activities`, { auth });
+}
+
+export function adminCreateCrmActivity(auth, contactId, { type, content }) {
+  return request(`/admin/crm/contacts/${contactId}/activities`, {
+    method: 'POST', auth, body: { type, content },
+  });
+}
+
+export function adminDeleteCrmActivity(auth, id) {
+  return request(`/admin/crm/activities/${id}`, { method: 'DELETE', auth });
+}
