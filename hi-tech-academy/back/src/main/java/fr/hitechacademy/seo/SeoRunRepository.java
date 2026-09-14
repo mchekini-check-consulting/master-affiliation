@@ -13,4 +13,6 @@ public interface SeoRunRepository extends JpaRepository<SeoRun, UUID> {
     List<SeoRun> findByStatusOrderByCreatedAtAsc(SeoRunStatus status);
 
     boolean existsByStatusIn(Collection<SeoRunStatus> statuses);
+
+    List<SeoRun> findByStatusIn(Collection<SeoRunStatus> statuses);
 }

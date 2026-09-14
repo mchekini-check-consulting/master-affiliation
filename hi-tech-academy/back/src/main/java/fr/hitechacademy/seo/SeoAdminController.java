@@ -262,6 +262,21 @@ public class SeoAdminController {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "L'agent est désactivé : activez « Recherche agent activée » avant de lancer un run.");
         }
+        // Filet de sécurité : un run « en cours » depuis plus de 3 h est un
+        // fantôme (orchestrateur arrêté brutalement) — le clore plutôt que de
+        // bloquer le bouton pour toujours
+        Instant staleBefore = Instant.now().minus(java.time.Duration.ofHours(3));
+        List<SeoRun> active = runs.findByStatusIn(Set.of(SeoRunStatus.REQUESTED, SeoRunStatus.RUNNING));
+        for (SeoRun run : active) {
+            Instant lastActivity = run.getStartedAt() != null ? run.getStartedAt() : run.getCreatedAt();
+            if (lastActivity.isBefore(staleBefore)) {
+                run.setStatus(SeoRunStatus.ERROR);
+                run.setError("Run interrompu (aucune activité depuis plus de 3 h)");
+                run.setCurrentStep("Interrompu");
+                run.setFinishedAt(Instant.now());
+                runs.save(run);
+            }
+        }
         if (runs.existsByStatusIn(Set.of(SeoRunStatus.REQUESTED, SeoRunStatus.RUNNING))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Un run est déjà en cours ou en attente.");
         }

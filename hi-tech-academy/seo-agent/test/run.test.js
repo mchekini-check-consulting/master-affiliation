@@ -2,12 +2,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { executeRun } from '../src/run.js';
-import { createDaemon } from '../src/daemon.js';
+import { createDaemon, recoverOrphanedWork } from '../src/daemon.js';
 
 // --- API backend mockée -------------------------------------------------
 
 function makeApi({ agentEnabled = true, keywords = [], articlesDue = [], requestedRuns = [],
-  selectedSuggestions = [] } = {}) {
+  selectedSuggestions = [], runningRuns = [], writingSuggestions = [] } = {}) {
   const calls = [];
   const keywordPatches = [];
   const runPatches = [];
@@ -17,7 +17,9 @@ function makeApi({ agentEnabled = true, keywords = [], articlesDue = [], request
     calls, keywordPatches, runPatches, articlePatches, suggestionPatches,
     async listSuggestions(status) {
       calls.push(`listSuggestions:${status}`);
-      return status === 'selected' ? selectedSuggestions : [];
+      if (status === 'selected') return selectedSuggestions;
+      if (status === 'writing') return writingSuggestions;
+      return [];
     },
     async updateSuggestion(id, patch) {
       calls.push(`updateSuggestion:${id}`);
@@ -43,6 +45,7 @@ function makeApi({ agentEnabled = true, keywords = [], articlesDue = [], request
     },
     async listRuns(status) {
       calls.push(`listRuns:${status}`);
+      if (status === 'running') return runningRuns;
       return requestedRuns;
     },
     async updateKeyword(id, patch) {
@@ -344,6 +347,43 @@ test('démon : un seul run cron par créneau 00 h / 12 h', async () => {
   clock = new Date('2026-09-12T00:01:00');
   await daemon.tick(); // minuit le lendemain → nouveau run
   assert.equal(api.calls.filter((c) => c === 'createRun:cron').length, 2);
+});
+
+test('récupération post-crash : runs fantômes clos, rédactions et analyses remises en file', async () => {
+  const api = makeApi({
+    runningRuns: [{ id: 'run-fantome', status: 'running' }],
+    writingSuggestions: [{ id: 's-writing', kw: 'a', status: 'writing' }],
+    keywords: [
+      { id: 'k-processing', keyword: 'b', status: 'processing' },
+      { id: 'k-ok', keyword: 'c', status: 'done' },
+    ],
+  });
+  const total = await recoverOrphanedWork(api);
+
+  assert.equal(total, 3);
+  assert.equal(api.runPatches[0].status, 'error');
+  assert.match(api.runPatches[0].error, /interrompu/i);
+  assert.ok(api.runPatches[0].finished_at);
+  assert.equal(api.suggestionPatches[0].id, 's-writing');
+  assert.equal(api.suggestionPatches[0].status, 'selected'); // rien n'est perdu
+  assert.deepEqual(api.keywordPatches.map((p) => [p.id, p.status]), [['k-processing', 'to_process']]);
+});
+
+test('démon : la récupération tourne au premier tick, une seule fois', async () => {
+  const api = makeApi({
+    agentEnabled: false,
+    runningRuns: [{ id: 'run-fantome', status: 'running' }],
+  });
+  const daemon = createDaemon(
+      { api, agents: stubAgents, publisher: noPublisher, sleep: async () => {}, rng: () => 0.5, log: () => {} },
+      { lockPath: tmpLock(), now: () => new Date('2026-09-14T10:00:00'), log: () => {} });
+
+  await daemon.tick();
+  await daemon.tick();
+
+  // le run fantôme n'est clos qu'une fois (premier tick)
+  assert.equal(api.runPatches.filter((p) => p.status === 'error').length, 1);
+  assert.equal(api.calls.filter((c) => c === 'listRuns:running').length, 1);
 });
 
 test('démon : le verrou empêche une exécution concurrente', async () => {
