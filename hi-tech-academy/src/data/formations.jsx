@@ -13,7 +13,7 @@ export const formations = [
     description:
       "Maîtrisez le déploiement d'applications conteneurisées avec Kubernetes en une journée : architecture d'un cluster, Pods et Deployments, Services (survol d'Ingress), ConfigMaps et Secrets — avec travaux pratiques sur un cluster Azure (AKS) réel.",
     image: '/images/0002848c7_istock-2177184303.jpg',
-    version: 'Programme V1.0 du 21/06/2026',
+    version: 'Programme V1.0',
     pdf: '/documents/Programme_Kubernetes_Fondamentaux_V1.0.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '7 h — 1 journée (9 h–12 h 30 / 13 h 30–17 h)' },
@@ -143,7 +143,7 @@ export const formations = [
       "Comprenez la réforme de la facturation électronique (e-invoicing, e-reporting, calendrier 2026-2027), mettez votre entreprise en conformité et maîtrisez Pennylane au quotidien — factures conformes, fournisseurs, banque, trésorerie, collaboration avec votre cabinet — avec ateliers pratiques en environnement de démonstration.",
     title: 'Facturation électronique & Pennylane',
     image: '/images/facturation-electronique-pennylane.jpg',
-    version: 'Programme V1.0 du 09/09/2026',
+    version: 'Programme V1.0',
     pdf: '/documents/Programme_Facturation_Electronique_Pennylane_V1.0.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '14 h — 2 jours (9 h–12 h 30 / 13 h 30–17 h)' },
