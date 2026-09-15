@@ -276,7 +276,7 @@ export const formations = [
     description:
       "Utilisez l'IA efficacement au quotidien, même en partant de zéro : comprendre les modèles (ChatGPT, Claude, Gemini…), maîtriser le prompting, gagner du temps sur vos e-mails, documents et recherches, créer images, vidéos, sites et présentations, et automatiser vos tâches avec les agents — 80 heures 100 % pratiques, sans prérequis.",
     image: '/images/ia-pour-tous.jpg',
-    version: 'Programme V1.0 du 09/09/2026',
+    version: 'Programme V1.0',
     pdf: '/documents/Programme_IA_Pour_Tous_V1.0.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '80 h — séances à distance (planning défini à l’inscription)' },
@@ -409,7 +409,7 @@ export const formations = [
     description:
       "Construisez un business opéré par des Agents IA, de l'idée aux premiers clients : trouver et valider une idée, créer marque, site, offre et CRM sans développeur, vendre avec des agents de prospection et de contenu, automatiser support et administratif, piloter le tout dans le respect du RGPD et de l'AI Act — 100 heures avec un projet fil rouge : un micro-business réel lancé pendant la formation.",
     image: '/images/ia-for-business.jpg',
-    version: 'Programme V1.0 du 09/09/2026',
+    version: 'Programme V1.0',
     pdf: '/documents/Programme_IA_For_Business_V1.0.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '100 h — séances à distance (planning défini à l’inscription)' },
@@ -542,7 +542,7 @@ export const formations = [
     description:
       "Concevez, construisez et déployez des applications IA de niveau production : fondamentaux LLM côté ingénierie, intégration d'APIs et SDKs, RAG du premier pipeline au RAG agentique, agents et MCP (consommer et construire), evals, sécurité et observabilité, travail en équipe augmentée (Claude Code, spec-driven development, CI/CD) — 100 heures en environnements pré-configurés, avec un projet final déployé et évalué (RAG + MCP + evals).",
     image: '/images/ee46959d2_course-04.webp',
-    version: 'Programme V1.0 du 09/09/2026',
+    version: 'Programme V1.0',
     pdf: '/documents/Programme_IA_For_Tech_V1.0.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '100 h — séances à distance (planning défini à l’inscription)' },
