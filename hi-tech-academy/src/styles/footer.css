@@ -1,0 +1,62 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   Pied de page (src/components/Footer.jsx) — registre institutionnel.
+   Aplat marine #000c5b, texte blanc / #dbebff, accents #9cbdff, filets
+   #002d74. Trois étages : en-tête (nom + contact), colonnes de liens,
+   certification + enregistrement ; puis la barre légale.
+   ══════════════════════════════════════════════════════════════════════════ */
+.ftr { position: relative; color: #ffffff; background: #000c5b; }
+.ftr__inner { width: var(--canvas); margin: 0 auto; padding: 72px 0 48px; }
+
+/* ── En-tête ────────────────────────────────────────────────────────────── */
+.ftr__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px 48px; padding-bottom: 40px; border-bottom: 1px solid #002d74; }
+.ftr__logo { display: block; color: #ffffff; margin: 0 0 20px; }
+.ftr__name { margin: 0; color: #ffffff; font: 700 clamp(32px, 3.4vw, 48px)/1.05 var(--font-heading); letter-spacing: -.02em; }
+.ftr__claim { margin: 12px 0 0; color: #9cbdff; font: 500 var(--text-body-lg)/1.4 var(--font-body); }
+.ftr__contact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; font: 500 var(--text-body-base)/1.4 var(--font-body); font-style: normal; color: #dbebff; }
+.ftr__contact a { color: #ffffff; text-decoration: none; }
+.ftr__contact a:hover { text-decoration: underline; }
+
+/* ── Colonnes de liens ──────────────────────────────────────────────────── */
+.ftr__nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px clamp(24px, 3vw, 64px); padding: 48px 0; border-bottom: 1px solid #002d74; }
+.ftr__column h2 { margin: 0 0 20px; color: #9cbdff; font: 600 var(--text-body-sm)/1.3 var(--font-body); }
+.ftr__column ul { margin: 0; padding: 0; list-style: none; }
+.ftr__column li + li { margin-top: 12px; }
+/* Le bouton « Gestion des cookies » partage l'aspect des liens de colonne. */
+.ftr__column a, .ftr__column button { display: inline-flex; align-items: center; gap: 8px; color: #dbebff; font: 500 var(--text-body-base)/1.45 var(--font-body); text-decoration: none; transition: color .2s; }
+.ftr__column button { padding: 0; border: 0; background: none; cursor: pointer; text-align: left; }
+.ftr__column a:hover, .ftr__column button:hover { color: #ffffff; text-decoration: underline; }
+.ftr__column a svg { width: 16px; height: 16px; }
+
+/* ── Certification ──────────────────────────────────────────────────────── */
+/* Le visuel officiel est posé sur une plaque blanche : c'est un document
+   réglementaire, on ne le recolore pas et on ne le pose pas sur du sombre. */
+.ftr__cert { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); align-items: center; gap: 24px 48px; padding-top: 40px; }
+.ftr__cert-badge { display: block; padding: 14px 18px; border-radius: 8px; background: #ffffff; }
+.ftr__cert-badge img { display: block; width: 100%; height: auto; }
+.ftr__cert-text { margin: 0; max-width: 60ch; color: #dbebff; font: 400 var(--text-body-sm)/1.55 var(--font-body); }
+
+/* ── Barre légale ───────────────────────────────────────────────────────── */
+.ftr__legal { border-top: 1px solid #002d74; }
+.ftr__legal-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; width: var(--canvas); margin: 0 auto; padding: 22px 0; color: #9cbdff; font: 500 var(--text-body-sm)/1.4 var(--font-body); }
+.ftr__legal-inner p { margin: 0; }
+.ftr__socials { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ftr__socials a { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #002d74; border-radius: 50%; color: #ffffff; transition: background-color .2s, border-color .2s; }
+.ftr__socials a:hover { background: #002d74; border-color: #9cbdff; }
+.ftr__socials svg { width: 18px; height: 18px; }
+
+/* ── Tablette ───────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .ftr__inner { padding: 56px 0 40px; }
+  .ftr__nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ftr__cert { grid-template-columns: minmax(0, 1fr); }
+  .ftr__cert-badge { max-width: 440px; }
+}
+
+/* ── Mobile ─────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .ftr__inner { padding: 48px 0 32px; }
+  .ftr__head { flex-direction: column; align-items: flex-start; }
+  .ftr__contact { flex-direction: column; align-items: flex-start; }
+  .ftr__nav { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 40px 0; }
+  .ftr__legal-inner { flex-direction: column; align-items: flex-start; }
+}

@@ -35,3 +35,6 @@ documents_source/
 
 # Documents finaux Qualiopi (non publiés, à usage interne)
 documents_finaux/
+
+# Originaux d'images (sources non servies par le site)
+_sources-images/

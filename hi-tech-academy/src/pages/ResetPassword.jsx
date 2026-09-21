@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Loader2, AlertTriangle } from "lucide-react";
+import { Lock, CircleNotch as Loader2, Warning as AlertTriangle } from '@phosphor-icons/react';
 import AuthLayout from "@/components/AuthLayout";
 
 export default function ResetPassword() {

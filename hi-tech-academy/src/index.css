@@ -1,9 +1,404 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-/* Thème « École » : les grands titres du site public passent en serif.
-   !important pour prendre le pas sur les fontFamily inline des composants
-   (l'admin n'utilise jamais cette classe et reste inchangé). */
-.font-serif-display { font-family: 'Source Serif 4', Georgia, serif !important; letter-spacing: -0.01em; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   SYSTÈME TYPOGRAPHIQUE — site public
+   Titres : DM Sans. Corps et interface : Inter. Caveat reste
+   réservée aux accroches manuscrites décoratives.
+   Échelle Major Third (ratio 1.25), base 16 px, rythme sur grille de 8 px
+   (elle-même multiple de la grille de 4 px des espacements).
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Gabarit du site — UNE seule largeur de contenu, partagée par le header,
+     le héro et toutes les sections. Elle doit rester égale à `max-w-site` de
+     tailwind.config.js (1400 px + 2 × 24 px). Avant, le header tenait 1600 px,
+     le héro 1600 et deux sections 1500 : rien ne s'alignait, et sur les
+     largeurs intermédiaires la colonne de texte du héro passait sous la photo.
+     Les sections CSS utilisent `--canvas`, les composants Tailwind
+     `max-w-site` — les deux valent la même chose. */
+  --site-w: 1400px;
+  --site-gutter: 48px;              /* 2 × 24 px */
+  --canvas: min(100% - var(--site-gutter), var(--site-w));
+  --canvas-left: calc((100% - var(--canvas)) / 2);
+
+  --font-heading: 'DM Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-display: 'DM Sans', sans-serif;
+  --font-hand: 'Caveat', cursive;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Tailles — desktop */
+  --text-display: 3.5rem;   /* 56 px — titre de page formation */
+  --text-hero: 3rem;        /* 48 px */
+  --text-h1: 2.25rem;       /* 36 px */
+  --text-h2-lg: 2rem;       /* 32 px — titre de section du gabarit formation */
+  --text-h2: 1.75rem;       /* 28 px */
+  --text-h3: 1.375rem;      /* 22 px */
+  --text-h4: 1.125rem;      /* 18 px */
+  --text-h5: 1rem;          /* 16 px */
+  --text-body-lg: 1.125rem; /* 18 px */
+  --text-base: 1rem;        /* 16 px */
+  --text-sm: 0.875rem;      /* 14 px */
+  --text-xs: 0.75rem;       /* 12 px */
+
+  /* Interlignages */
+  --lh-tight: 1.15;
+  --lh-heading: 1.25;
+  --lh-body: 1.5;
+  --lh-relaxed: 1.6;
+
+  /* Interlettrages : négatif sur les grandes tailles uniquement */
+  --ls-hero: -0.02em;
+  --ls-h1: -0.02em;
+  --ls-h2: -0.01em;
+  --ls-normal: 0;
+
+  /* Couleurs de texte — gris VERDÂTRES (charte maison), jamais les Slate
+     bleutés : le guide impose le principe « pas de noir pur », pas ses hex. */
+  --ink-strong: #243037;
+  --ink: #243037;
+  --ink-muted: #5f6568;
+  --ink-faint: #8c8c8c;
+}
+
+/* Mobile : on descend d'un cran sur les titres, jamais sur le corps (16 px
+   minimum pour éviter le zoom automatique et garder la lisibilité). */
+@media (max-width: 767px) {
+  :root {
+    --text-display: 2.5rem; /* 40 px */
+    --text-hero: 2.25rem;  /* 36 px */
+    --text-h1: 1.75rem;    /* 28 px */
+    --text-h2-lg: 1.625rem; /* 26 px */
+    --text-h2: 1.375rem;   /* 22 px */
+    --text-h3: 1.125rem;   /* 18 px */
+  }
+}
+
+/* ── Rendu du texte ────────────────────────────────────────────────────────
+   Posé sur `html` pour que tout en hérite, y compris les portails React
+   (modales, toasts) qui sortent de l'arbre du <body>.
+
+   `-webkit-font-smoothing` / `-moz-osx-font-smoothing` ne concernent que
+   macOS et iOS : ils y désactivent le lissage sous-pixel, trop gras avec des
+   polices fines. Sur Windows ils sont ignorés — ce qui donne des textes nets
+   ici, ce sont les trois réglages suivants.
+
+   `font-synthesis: none` : interdit au navigateur de FABRIQUER un gras ou un
+   italique absent en épaississant le tracé. C'est la première cause de texte
+   baveux. Nos deux familles chargent 400/500/600/700(/800), tout poids
+   demandé hors de cette liste serait synthétisé.
+
+   `text-rendering: optimizeLegibility` a été retiré volontairement : il est
+   connu pour déclencher des bugs de rendu et des ralentissements sur de longs
+   documents. Le crénage et les ligatures sont demandés explicitement à la
+   place, ce qui donne le même bénéfice sans l'effet de bord. */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-synthesis: none;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures contextual;
+  font-optical-sizing: auto;
+}
+
+body { font-family: var(--font-body); font-size: var(--text-base); line-height: var(--lh-body); color: var(--ink-strong); }
+
+/* Ne JAMAIS promouvoir du texte sur une couche GPU (`will-change: transform`,
+   `translateZ(0)`, `filter`) : il y est rastérisé à part, souvent sur des
+   coordonnées non entières, ce qui le rend flou. C'est un « truc de perf »
+   répandu qui dégrade la netteté. */
+
+/* Hiérarchie par défaut. Règle d'espacement : la marge AU-DESSUS d'un titre
+   vaut le double de celle en dessous — c'est elle qui rattache visuellement un
+   titre au contenu qu'il introduit plutôt qu'à celui qui le précède. */
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); color: var(--ink-strong); }
+h1 { font-size: var(--text-h1); font-weight: 700; line-height: 1.2; letter-spacing: var(--ls-h1); }
+h2 { font-size: var(--text-h2); font-weight: 700; line-height: var(--lh-heading); letter-spacing: var(--ls-h2); }
+h3 { font-size: var(--text-h3); font-weight: 600; line-height: 1.3; }
+h4 { font-size: var(--text-h4); font-weight: 600; line-height: 1.35; }
+h5, h6 { font-size: var(--text-h5); font-weight: 600; line-height: 1.4; }
+
+/* Coupures de ligne. `balance` répartit un titre également sur ses lignes
+   (fini les titres bancals d'un mot sur la seconde ligne) ; `pretty` empêche
+   un mot seul de tomber en dernière ligne d'une description. Les deux sont
+   ignorés au-delà de quelques lignes, donc sans effet sur le texte long. */
+h1, h2, h3, h4, h5, h6 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+/* Les valeurs qui changent (compteurs animés, prix) sur des chiffres de
+   largeur fixe : sinon la mise en page sautille à chaque incrément. */
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Longueur de ligne : 65–75 caractères. Au-delà, l'œil perd la ligne suivante. */
+.measure { max-width: 68ch; }
+.measure-narrow { max-width: 56ch; }
+
+/* Barre d'ancres de la page formation : défilement horizontal sans ascenseur
+   visible (le débordement reste perceptible au geste et au clavier). */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Grands titres du site public. !important pour prendre le pas sur les
+   fontFamily inline des composants (l'admin n'utilise jamais cette classe). */
+.font-serif-display { font-family: var(--font-display) !important; letter-spacing: var(--ls-h1); }
+
+/* Gabarit de l'éventail de cartes (src/components/ui/card-fan-carousel.jsx) :
+   les cartes sont empilées au centre, GSAP les déploie en éventail. */
+.fan-layout { height: 22rem; }
+.fan-card {
+  position: absolute;
+  width: 10rem;
+  aspect-ratio: 5 / 7;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  border: 1px solid #e5e5e5;
+  will-change: transform;
+}
+
+/* Section des profils — visuels laissés vides pour import ultérieur */
+.audience-section { position: relative; overflow: hidden; padding: 96px 0; color: #000c5b; background: #ffffff; }/* Deux vraies colonnes de grille. La version initiale posait la colonne des
+   cartes en `position: absolute` : la hauteur de la section ne venait plus que
+   de la colonne texte, plus courte, donc les cartes débordaient et l'`overflow:
+   hidden` de la section les coupait. La grille rend la hauteur au contenu. */
+.audience-section__inner { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 27fr) minmax(0, 71fr); gap: 48px; align-items: start; width: var(--canvas); margin: 0 auto; }.audience-section__intro { position: relative; padding-top: 32px; }/* Maquette : « Des parcours adaptés » en noir, « à chaque profil » en vert —
+   conforme à la règle « titres en noir, le vert reste un accent ». */
+.audience-section__intro h2 { margin: 0 0 24px; color: #243037; font: 700 clamp(36px, 3.4vw, 48px)/1.15 var(--font-heading); letter-spacing: -.015em; }.audience-section__intro h2 span { color: #000c5b; }.audience-lead { max-width: 100%; margin: 0; color: #5f6568; font: 400 var(--text-base)/1.5 var(--font-body); }/* Les trois chiffres tiennent TOUJOURS sur une seule ligne : `nowrap`, gouttière
+   et tailles fluides. Chaque bloc partage la largeur à parts égales (`flex: 1 1 0`
+   + `min-width: 0`) et rétrécit au lieu de passer à la ligne. */
+.audience-stats { display: flex; flex-wrap: nowrap; gap: clamp(8px, 1.4vw, 24px); margin-top: 32px; }.audience-stats > div { flex: 1 1 0; min-width: 0; }.audience-stats span { display: grid; place-items: center; width: clamp(32px, 3vw, 44px); height: clamp(32px, 3vw, 44px); margin-bottom: 8px; border-radius: 12px; color: #000c5b; background: #dbebff; }.audience-stats span svg { width: clamp(16px, 1.5vw, 22px); height: clamp(16px, 1.5vw, 22px); }.audience-stats b { display: block; color: #000c5b; font: 700 clamp(16px, 1.6vw, 22px)/1.3 var(--font-heading); }.audience-stats small { display: block; margin-top: 4px; color: #5f6568; font: 400 clamp(9px, .85vw, 12px)/1.33 var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.audience-section__profiles { min-width: 0; }.audience-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }/* Colonne flex : les CTA des trois cartes s'alignent quel que soit le nombre
+   de lignes de la description (maquette). */
+.audience-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(207,238,228,.95); border-radius: 24px; background: rgba(255,255,255,.9); box-shadow: 0 6px 18px -10px rgba(0,12,91,.16); }/* Emplacement photo : l'accroche manuscrite est posée en haut à droite comme
+   sur la maquette. Remplacer le bloc par un <img> une fois les visuels reçus. */
+.audience-card__image { position: relative; height: 208px; background: linear-gradient(145deg, #dbebff, #f0f7ff); }.audience-card__image.professional { background: linear-gradient(145deg, #dfedff, #f0f7ff); }.audience-card__image.business { background: linear-gradient(145deg, #dbebff, #f0f7ff); }
+/* Photo de carte : elle remplit l'emplacement. Le voile ne couvre que le
+   haut, juste ce qu'il faut pour que l'accroche manuscrite blanche reste
+   lisible quel que soit le cadrage — un voile plein noierait la photo. */
+.audience-card__image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.audience-card__image.has-photo::after { content: ''; position: absolute; inset: 0 0 auto; height: 56%; background: linear-gradient(180deg, rgba(0,12,91,.66) 0%, rgba(0,12,91,.28) 55%, rgba(0,12,91,0) 100%); }
+.audience-card__image.has-photo .audience-card__scribble { color: #ffffff; }
+.audience-card__scribble { position: absolute; z-index: 2; top: 24px; right: 20px; display: grid; gap: 2px; color: #000c5b; text-align: right; font: 700 17px/1.15 var(--font-hand); transform: rotate(-6deg); }
+/* Le panneau blanc remonte sur la photo, coins arrondis — détail de la maquette. */
+.audience-card__body { position: relative; display: flex; flex: 1; flex-direction: column; margin-top: -24px; padding: 28px 20px 16px; border-radius: 24px 24px 0 0; background: #ffffff; }
+.audience-card__cta { margin-top: auto; }.audience-card__icon { position: absolute; top: -36px; left: 20px; display: grid; place-items: center; width: 56px; height: 56px; border: 6px solid white; border-radius: 16px; color: #000c5b; background: #f0f7ff; }.audience-card__icon.is-lavender { color: #000c5b; background: #dfedff; }.audience-card__icon svg { width: 29px; height: 29px; }.audience-card h3 { margin: 0 0 8px; color: #243037; font: 600 var(--text-h3)/1.3 var(--font-heading); }.audience-card p { min-height: 48px; margin: 0; color: #5f6568; font: 400 var(--text-sm)/1.4 var(--font-body); }.audience-card ul { display: grid; gap: 10px; margin: 20px 0 22px; padding: 0; list-style: none; color: #5f6568; font: 400 var(--text-xs)/1.33 var(--font-body); }.audience-card li { display: flex; align-items: center; gap: 10px; }/* 16 px : l'icône ne doit pas dépasser la ligne de texte (12 px × 1.33 = 16),
+   sinon c'est elle qui impose la hauteur des rangées. */
+.audience-card li svg { width: 16px; height: 16px; flex: none; color: #000c5b; }.audience-card__cta { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 8px 0 20px; border-radius: 999px; color: #000c5b; background: #f0f7ff; font: 600 var(--text-sm)/1 var(--font-body); }.audience-card__cta.is-lavender { color: #000c5b; background: #dfedff; }.audience-card__cta span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: white; background: #000c5b; }.audience-card__cta.is-lavender span { color: #ffffff; background: #0062e1; }.audience-card__cta svg { width: 17px; }
+/* Le libellé est encadré de deux filets, comme sur la maquette. */
+/* Accroche + flèche empilées (`column-reverse` : le texte est au-dessus alors
+   que le SVG vient en premier dans le DOM, où il doit rester pour la lecture).
+   Poussée vers la droite et descendue pour que la pointe de la flèche arrive
+   au ras du bord des cartes. */
+.audience-bottom-note { position: absolute; right: max(8px, calc(var(--canvas-left) - 150px)); top: 20px; display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 4px; margin: 0; color: #000c5b; font: 700 19px/1.3 var(--font-hand); text-align: left; transform: rotate(-5deg); }.audience-bottom-note svg { flex: none; width: 52px; height: 68px; margin-left: 18px; }
+@media (max-width: 1200px) { .audience-section__inner { grid-template-columns: minmax(0, 28fr) minmax(0, 70fr); gap: 32px; }.audience-card__image { height: 190px; }.audience-card__body { padding-inline: 20px; }.audience-card h3 { font-size: 20px; }.audience-card__cta { padding-left: 16px; }}
+@media (max-width: 900px) { .audience-section { padding: 64px 0; }.audience-section__inner { grid-template-columns: minmax(0, 1fr); gap: 0; width: min(100% - 32px, 680px); }.audience-section__intro { padding-top: 0; }.audience-lead { max-width: 600px; }.audience-section__profiles { margin-top: 48px; }.audience-cards { gap: 14px; }.audience-card__image { height: 190px; }.audience-bottom-note { display: none; }}
+@media (max-width: 640px) { .audience-section__intro h2 { margin-top: 25px; font-size: 38px; }.audience-stats small { font-size: 9px; }.audience-cards { grid-template-columns: 1fr; }.audience-card__image { height: 220px; }}
+.fan-card:focus-visible { outline: 3px solid #0066b0; outline-offset: 3px; }
+
+/* Accueil — héro de référence (public/images/hero-academy.png). */
+/* Le visuel est une seule image plein cadre : elle porte le dégradé clair à
+   gauche (sous le texte) et les formes vertes à droite. Le header la survole
+   sans fond, l'image passe donc derrière lui jusqu'en haut de page. */
+/* Le héro occupe la fenêtre entière (100svh) et son rythme vertical est fluide
+   (clamp en vh) pour que tout tienne sans scroll ; `min-height` plutôt que
+   `height` afin qu'une fenêtre courte ou étroite allonge le bloc au lieu de
+   rogner les logos de confiance. */
+/* RYTHME DU HÉRO — grille de 4 px, échelle 4/8/12/16/24/32/40/48/56/64.
+   Toute marge, gouttière et pastille du héro tombe sur un pas de cette échelle ;
+   les clamp() en vh (nécessaires pour tenir en 100svh) ont leurs bornes min et
+   max calées dessus. Rythme vertical croissant selon la hiérarchie :
+   titre 32 → intro 24 → CTA 32 → bénéfices 56 → confiance 40. */
+.academy-hero { position: relative; min-height: calc(100svh - var(--hero-lift, 0px)); overflow: hidden; color: #ffffff; background: #000c5b;
+  /* Gouttière texte↔photo, et largeur de la colonne de texte qui en découle.
+     La photo démarre exactement à `copy + gouttière` : les deux valeurs
+     viennent du même calcul, il ne peut donc ni y avoir de chevauchement ni
+     de bande vide entre les deux, quelle que soit la largeur d'écran. */
+  --hero-gap: 48px;
+  /* 660 px de carrousel + 2 × 16 px de marge intérieure. Valeur MESURÉE sur le
+     composant, pas choisie : carte centrale de 344 px, latérales décalées de
+     245 px et mises à l'échelle 0,78 par la perspective, soit une emprise de
+     2 × (191 + 134) = 650 px, arrondie à 660 (`.hcc`). */
+  --hero-visual: 692px;
+  --hcc-width: 660px;   /* emprise visible du carrousel */
+  /* Retrait du carrousel par rapport au bord droit du cadre.
+     À 0, le bord droit de la carte de droite tombe sur le bord du cadre —
+     c'est-à-dire sur la même verticale que le bouton « S'inscrire » du header,
+     dont le bord droit coïncide avec le cadre à toutes les largeurs
+     (`max-w-site` moins `px-6` = `--canvas-left + --canvas`).
+     L'augmenter pousse le carrousel vers la gauche ; le jeu disponible vaut
+     `--hero-visual - 660`, au-delà il faut élargir `--hero-visual`, ce qui
+     reprend la place sur la colonne de texte et non sur la gouttière. */
+  --hcc-inset: 0px;
+  /* Opacité du fond de marque. 0.3 = « opacité à 30 % ». Si l'intention était
+     « réduite DE 30 % », passer à 0.7 — c'est la seule valeur à changer. */
+  --hero-backdrop-opacity: .3;
+  /* Base inclinée plutôt que droite : hauteur du biseau, mesurée depuis le bas.
+     0 rend la base plate ; augmenter accentue la pente. Le côté bas est la
+     droite — inverser les deux `calc()` du `clip-path` pour pencher l'inverse. */
+  --hero-slant: 22px;
+  /* Remontée de toute la base : le héro s'arrête un peu avant le bas de l'écran. */
+  --hero-lift: 56px;
+}
+/* La base n'est ni droite ni coupée net : un masque SVG la creuse en arc vers
+   le bas, avec un reste d'inclinaison gauche→droite. `preserveAspectRatio:
+   none` étire la courbe sur toute la largeur quelle que soit la taille de
+   l'écran ; les unités du viewBox sont donc des pourcentages du cadre.
+   La flèche de l'arc vaut ~4 % de la hauteur, d'où `--hero-slant` rendu en
+   marge basse pour que la rangée « confiance » ne passe pas sous la découpe. */
+/* `.vente-hero` (page formation) partage la même base que l'accueil : arc,
+   inclinaison et ombre interne. Ses variables sont posées dans .vente-hero. */
+.academy-hero, .vente-hero {
+  --hero-curve: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0 H100 V95 C75 101 35 99 0 96 Z' fill='%23fff'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--hero-curve); mask-image: var(--hero-curve);
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  padding-bottom: var(--hero-slant);
+}
+/* Ombre interne à la base. Un `box-shadow: inset` suivrait le rectangle et non
+   l'arc : c'est donc un dégradé posé au-dessus du contenu, que le masque
+   découpe avec le reste — l'assombrissement épouse ainsi la courbe. */
+.academy-hero::after, .vente-hero::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 96px;
+  z-index: 6;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,.42) 100%);
+}
+
+/* Fond de marque : tracés fins et mots-clés, posés sur l'aplat #000c5b. Couche
+   purement décorative (`aria-hidden` par nature, c'est un pseudo-élément), en
+   retrait derrière le contenu — `__inner` est en z-index 1, le carrousel en 4. */
+.academy-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--hero-backdrop-opacity);
+  /* `contain`, pas `cover`. L'image est une bande de 2103 × 748 (2,81:1) posée
+     sur un héro d'environ 2,1:1 : en `cover` elle était agrandie à ~2560 px de
+     large, donc suréchantillonnée et rognée de ses décors latéraux — d'où
+     l'impression d'étirement. En `contain` elle garde ses proportions et
+     s'affiche à sa taille naturelle ou en dessous, donc nette.
+     Les bandes laissées libres montrent le fond du héro (#000c5b), que l'image
+     porte elle-même en #01105f : l'écart est invisible, il n'y a pas de
+     raccord perceptible. */
+  /* Image de fond retirée : le héro garde son seul aplat #000c5b.
+     Pour la remettre, rétablir ici :
+     background: url('/images/hero-backdrop.png') center / contain no-repeat; */
+  background: none;
+}
+/* Sur un écran de téléphone, le héro est en portrait : cette bande très large
+   n'y a plus aucun sens, elle se réduirait à un filet au milieu. On la retire
+   et l'aplat suffit. */
+@media (max-width: 767px) {
+  .academy-hero::before { background-image: none; }
+}
+/* ⚠ PIÈGE À NE PAS REFAIRE — `--canvas` et `--canvas-left` contiennent un
+   `100%`. Une variable CSS est substituée TEXTUELLEMENT : ce `100%` est
+   re-résolu dans le contexte de chaque élément qui l'utilise, pas dans celui
+   où la variable est définie. Elles ne sont donc valides que sur un élément
+   dont le bloc conteneur fait toute la largeur de la page (`.academy-hero`,
+   `.audience-section`…). À l'intérieur du héro, on n'utilise que des LONGUEURS
+   et des `100%` locaux, dont la référence est explicite dans chaque règle. */
+/* Le héro n'a plus de photo : il repose sur le seul aplat #000c5b. La colonne
+   de droite ne porte donc que le carrousel. */
+.academy-hero__visual { position: absolute; inset: 0; pointer-events: none; }
+/* Le héro partage le gabarit commun (`--canvas` = 1400 px + 2 × 24 px), comme
+   le header et toutes les sections : le logo, le H1 du héro et les titres des
+   sections suivantes tombent sur la même verticale. */
+.academy-hero__inner { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: calc(100svh - var(--hero-lift, 0px) - var(--hero-slant)); width: var(--canvas); margin: 0 auto; padding-top: clamp(112px, 16vh, 152px); padding-bottom: clamp(24px, 4vh, 48px); }
+/* Colonne de texte = le cadre moins la colonne visuelle et la gouttière. Ici
+   `100%` vaut la largeur de `.academy-hero__inner`, c'est-à-dire le cadre :
+   la référence est locale et sans ambiguïté. La longueur de ligne est traitée
+   séparément sur le paragraphe (voir `__intro`), parce que c'est lui qui porte
+   le 19 px. */
+.academy-hero__copy { width: calc(100% - var(--hero-visual) - var(--hero-gap)); }
+/* Interlignage serré comme sur la maquette : il libère la hauteur qui part
+   ensuite dans les espacements entre blocs. */
+/* Palier Hero de l'échelle : 48 px desktop → 36 px mobile, graisse 800,
+   interlignage 1.15, interlettrage −0.02em. Le clamp reste fluide entre les
+   deux bornes de l'échelle plutôt que de sauter au breakpoint. */
+/* `color` explicite, et pas seulement l'héritage depuis `.academy-hero` : la
+   règle globale `h1, h2, …{ color: var(--ink-strong) }` pose une couleur sur
+   l'élément lui-même, ce qui bat toujours une valeur héritée. Sans cette ligne
+   le titre reste gris foncé sur le fond marine. */
+.academy-hero h1 { margin: clamp(16px, 3vh, 32px) 0 clamp(16px, 2.6vh, 24px); color: #ffffff; font: 700 clamp(36px, 3.4vw, 48px)/1.15 var(--font-heading); letter-spacing: -.015em; }
+/* Seul accent vert du bloc texte : le vert reste un signal, pas un fond sonore. */
+.academy-hero h1 span { color: #9cbdff; }
+.academy-hero__intro { max-width: 68ch; margin: 0; color: #dbebff; font: 400 21px/1.5 var(--font-body); }
+/* Les fragments porteurs passent en blanc plein : c'est le contraste qui les
+   met en avant, pas une graisse lourde qui alourdirait le paragraphe. */
+.academy-hero__intro strong { color: #ffffff; font-weight: 600; }
+.academy-hero__actions { display: flex; align-items: center; gap: 32px; margin-top: clamp(16px, 3.2vh, 32px); }
+/* CTA secondaire : libellé neutre, pastille de lecture en violet (accent déjà
+   utilisé sur le site) pour ne pas concurrencer le bouton primaire. */
+.academy-hero__video { display: inline-flex; align-items: center; gap: 12px; padding: 0; color: #ffffff; background: transparent; border: 0; font: 600 15px var(--font-body); cursor: pointer; transition: color .25s; }
+.academy-hero__video:hover { color: #9cbdff; }
+.academy-hero__video > span { display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid #0062e1; border-radius: 50%; padding-left: 2px; color: #ffffff; background: #0062e1; transition: background-color .25s, color .25s, border-color .25s; }
+.academy-hero__video:hover > span { color: #ffffff; background: #004a94; border-color: #004a94; }
+.academy-hero__benefits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.2vh, 24px) 24px; margin-top: clamp(28px, 5vh, 56px); }
+.academy-hero__benefit { display: flex; align-items: center; gap: 16px; min-width: 0; }
+/* Icône simple, sans pastille colorée : un trait fin suffit, le rendu reste
+   sobre et éditorial plutôt que « carte d'app ». */
+.academy-hero__benefit > span { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border: 1px solid #9cbdff; border-radius: 50%; background: #9cbdff; color: #000c5b; }
+.academy-hero__benefit strong, .academy-hero__benefit small { display: block; font-family: var(--font-body); }
+.academy-hero__benefit strong { font-size: 15px; font-weight: 600; }.academy-hero__benefit small { margin-top: 4px; color: #9cbdff; font-size: 12px; }
+.academy-hero__trust { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px clamp(40px, 5vw, 80px); margin-top: auto; padding-top: clamp(24px, 3.2vh, 32px); border-top: 1px solid #002d74; color: #dbebff; }
+.hero-trust-logo { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+/* Hauteur de rendu commune : c'est elle qui aligne optiquement des logos de
+   proportions différentes. `object-fit: contain` évite toute déformation. */
+.hero-trust-logo img { display: block; height: 40px; width: auto; max-width: 160px; object-fit: contain; }
+.hero-trust-logo__nom { display: block; color: #ffffff; font: 600 17px/1.2 var(--font-body); letter-spacing: .01em; }
+.hero-trust-logo small { display: block; color: #9cbdff; font: 400 11px/1.3 var(--font-body); }
+/* Colonne visuelle : son bord gauche est posé à `bord droit du cadre moins sa
+   propre largeur`, et elle saigne jusqu'au bord droit de la fenêtre pour que la
+   photo reste plein bord. `50%` et `--canvas` sont ici résolus contre
+   `.academy-hero`, qui fait toute la largeur : le calcul est juste. */
+.academy-hero__visual { left: calc(50% + var(--canvas) / 2 - var(--hero-visual)); right: 0; width: auto; height: 100%; top: 0; }
+/* ── Palier intermédiaire (desktop étroit) : on élargit la colonne de texte
+      avant de basculer en une seule colonne. ── */
+/* ── Tablette et mobile : une seule colonne. Le texte d'abord, puis l'image
+      de fond en bandeau 4/3. ── */
+@media (max-width: 1279px) {
+  .academy-hero { min-height: 0; }
+  .academy-hero__inner,
+  .academy-hero__visual { left: auto; right: auto; width: min(100% - 48px, 680px); margin-inline: auto; max-width: none; }
+  .academy-hero__inner { min-height: 0; padding: 108px 0 0; }
+  .academy-hero__copy { width: 100%; }
+  .academy-hero h1 { margin: 16px 0 16px; font-size: clamp(34px, 5.8vw, 50px); }
+  .academy-hero__intro { font-size: 18px; }
+  .academy-hero__actions { margin-top: 24px; gap: 24px; }
+  .academy-hero__benefits { gap: 20px 24px; margin-top: 32px; }
+  .academy-hero__trust { margin-top: 40px; padding-top: 24px; gap: 24px 40px; }
+
+  /* Le bloc visuel repasse dans le flux, sous le texte. */
+  .academy-hero__visual { position: relative; inset: auto; height: auto; margin-top: 40px; margin-bottom: 48px; pointer-events: auto; }
+  /* Plus de photo pour porter la hauteur : le carrousel revient dans le flux,
+     sinon `__visual` s'écraserait à 0 et le bloc se superposerait au texte. */
+  .hcc { position: relative; top: auto; left: auto; right: auto; width: min(100%, var(--hcc-width)); margin-inline: auto; transform: none; }
+
+}
+
+@media (max-width: 640px) {
+  .academy-hero__inner,
+  .academy-hero__visual { width: calc(100% - 32px); }
+  .academy-hero__inner { padding-top: 96px; }
+  .academy-hero__intro { font-size: 17px; }
+  .academy-hero__actions { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .academy-hero__benefits { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .academy-hero__benefit > span { width: 40px; height: 40px; }
+  .academy-hero__trust { gap: 20px 32px; }
+}
+@media (min-width: 640px) { .fan-layout { height: 26rem; } .fan-card { width: 12rem; } }
+@media (min-width: 1024px) { .fan-layout { height: 30rem; } .fan-card { width: 15rem; } }
+/* Variante agrandie (size="lg") */
+@media (min-width: 1024px) { .fan-layout--lg { height: 21rem; } .fan-layout--lg .fan-card { width: 11.5rem; } }
+@media (min-width: 1280px) { .fan-layout--lg { height: 23.5rem; } .fan-layout--lg .fan-card { width: 13.5rem; } }
+@media (prefers-reduced-motion: reduce) { .fan-card { transition: none !important; } }
 
 @tailwind base;
 @tailwind components;
@@ -36,9 +431,9 @@
     --chart-4: 186 80% 25%;
     --chart-5: 186 60% 35%;
     --radius: 0.75rem;
-    --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 214 32% 91%;
@@ -86,6 +481,103 @@
   }
 }
 
+/* Catalogue de formations */
+/* Section catalogue sur fond sombre : l'image porte la marque et couvre toute
+   la bande. Tout ce qui est POSÉ dessus passe en clair (blanc / #dfedff) ;
+   les cartes gardent leur fond blanc et leurs textes sombres. Le violet
+   profond de l'image est la déclinaison foncée de l'accent #0062e1. */
+/* L'image fait 1958 × 803 (format 2,44:1) alors que la section est presque
+   carrée : en `cover`, le navigateur l'agrandissait pour couvrir la hauteur et
+   rognait les deux tiers de la largeur — toutes les mentions latérales
+   disparaissaient. On fixe donc la LARGEUR (100% auto) : l'image est entière,
+   sans déformation, et le reste de la hauteur est comblé par #000c5b, qui est
+   la couleur même de ses bords (#2d024c en bas, #2f024d en haut) — le raccord
+   ne se voit pas. */
+/* ===== Catalogue de la page d'accueil =====
+   Tout est sur la grille de 4 px et l'echelle typographique du site. La
+   version precedente empilait des valeurs arbitraires (33, 13, 15, 17, 25,
+   38, 41, 43, 51, 58 px) et des tailles hors echelle (10, 13, 15, 20 px) :
+   c'est cette absence de systeme qui se lisait comme un rendu automatique. */
+/* Bleu de rappel (#002d74) et non le #000c5b du héro : deux aplats sombres
+   identiques à quelques écrans d'intervalle fatiguent l'œil et effacent la
+   séparation entre les sections. Même famille, une marche plus claire — les
+   textes #ffffff / #dbebff / #9cbdff y gardent tous un contraste AA. */
+.catalogue-section { position: relative; overflow: hidden; padding: 64px 0; color: #ffffff; background-color: #002d74; }
+.catalogue-section__inner { position: relative; z-index: 1; width: var(--canvas); margin: 0 auto; }
+
+/* ---- en-tete ---- */
+.catalogue-header { position: relative; text-align: center; }
+.catalogue-eyebrow { display: inline-flex; align-items: center; gap: 12px; margin: 0; color: #9cbdff; font: 600 var(--text-xs)/1.33 var(--font-body); text-transform: uppercase; letter-spacing: .18em; }
+.catalogue-eyebrow i { width: 32px; height: 2px; background: #9cbdff; }
+.catalogue-header h2 { margin: 16px 0 12px; color: #ffffff; font: 700 var(--text-hero)/1.15 var(--font-heading); letter-spacing: -.02em; }
+.catalogue-header h2 span { color: #9cbdff; }
+/* La description est centree : elle a besoin d'une largeur de lecture, sinon
+   elle s'etale sur les 1400 px du cadre. */
+.catalogue-header > p:not(.catalogue-eyebrow):not(.catalogue-handwriting) { max-width: 68ch; margin: 0 auto; color: #dbebff; font: 400 var(--text-body-lg)/1.55 var(--font-body); }
+/* Accroche manuscrite, en haut a droite de l'en-tete. En BLANC PLEIN sur
+   l'aplat marine : c'est le seul endroit du site ou Caveat porte du texte, et
+   son contraste maximal en fait le point d'accroche de la section.
+   La fleche part du texte et descend vers les cartes. */
+/* `transform-origin: bottom right`, verifie au navigateur. Avec l'origine en
+   HAUT a droite, la rotation anti-horaire faisait pivoter le bas du bloc vers
+   l'exterieur : 21 px mesures hors du cadre de 1400. Avec l'origine en BAS a
+   droite, c'est le haut qui pivote vers l'interieur et le bord droit reste
+   exactement sur le cadre.
+   L'inclinaison passe de -8 a -6 deg : Caveat est deja une ecriture
+   penchee, au-dela l'empilement des deux inclinaisons se voit. */
+.catalogue-handwriting { position: absolute; top: 24px; right: 0; color: #ffffff; text-align: right; font: 700 28px/1.25 var(--font-hand); transform: rotate(-6deg); transform-origin: bottom right; pointer-events: none; }
+/* `margin-left` accroche la queue de la courbe sous la fin de la derniere
+   ligne de texte ; c'est le seul reglage a toucher pour recaler la fleche
+   horizontalement. Pas de `transform` ici : la rotation du parent suffit,
+   et deux rotations empilees rendaient la direction impossible a prevoir. */
+/* `margin-left: auto` plutot qu'une valeur en dur : la queue de la courbe
+   se cale toute seule sous la fin de la derniere ligne, quelle que soit la
+   largeur reellement rendue par Caveat — que l'on ne peut pas calculer. */
+.catalogue-handwriting svg { display: block; width: 88px; height: 104px; margin: 4px 0 0 auto; }
+
+/* ---- filtres ---- */
+.catalogue-filters { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; margin: 32px 0; }
+/* 44 px : la cible tactile minimale de la charte. L'ancienne valeur, 42 px,
+   passait juste en dessous. */
+.catalogue-filters button { display: inline-flex; align-items: center; height: 44px; padding: 0 24px; border: 1px solid #9cbdff; border-radius: 999px; color: #ffffff; background: transparent; font: 500 var(--text-sm)/1 var(--font-body); cursor: pointer; transition: color .2s, background-color .2s, border-color .2s; }
+.catalogue-filters button:hover { border-color: #ffffff; background: #002d74; }
+.catalogue-filters button.is-active { color: #000c5b; border-color: #ffffff; background: #ffffff; }
+
+/* ---- cartes ---- */
+.catalogue-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+/* Rayon unique de 8 px, et l'image affleure le bord : pas de vignette
+   arrondie flottant dans une carte arrondie (cf. regle « deux formes »). */
+.catalogue-card { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid #dbebff; border-radius: 8px; background: #ffffff; }
+.catalogue-card__image { position: relative; height: 184px; overflow: hidden; background: #f0f7ff; }
+.catalogue-card__image img { width: 100%; height: 100%; object-fit: cover; }
+.catalogue-card__tag { position: absolute; z-index: 1; top: 12px; left: 12px; display: inline-flex; align-items: center; padding: 6px 12px; border: 1px solid #dbebff; border-radius: 999px; color: #243037; background: #ffffff; font: 600 var(--text-xs)/1.33 var(--font-body); }
+.catalogue-card__body { display: flex; flex: 1; flex-direction: column; padding: 20px; }
+/* Deux lignes au maximum, avec coupure propre. `white-space: nowrap` tronquait
+   « Facturation electronique & Pennylane » au milieu d'un mot. */
+.catalogue-card h3 { display: -webkit-box; margin: 0; overflow: hidden; color: #243037; font: 600 var(--text-h4)/1.35 var(--font-heading); -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.catalogue-card__body > p { display: -webkit-box; margin: 8px 0 16px; overflow: hidden; color: #5f6568; font: 400 var(--text-sm)/1.5 var(--font-body); -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.catalogue-card__meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: auto; padding-bottom: 16px; border-bottom: 1px solid #dbebff; }
+.catalogue-card__meta span { display: inline-flex; align-items: center; gap: 8px; color: #002d74; white-space: nowrap; font: 500 var(--text-xs)/1.33 var(--font-body); }
+.catalogue-card__link { display: flex; justify-content: space-between; align-items: center; min-height: 44px; margin-top: 8px; color: #000c5b; font: 600 var(--text-sm) var(--font-body); }
+.catalogue-card__link svg { transition: transform .2s; }
+.catalogue-card__link:hover svg { transform: translateX(4px); }
+
+/* ---- pied de section ---- */
+.catalogue-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-top: 40px; padding-top: 32px; border-top: 1px solid #002d74; }
+.catalogue-promises { display: flex; flex-wrap: wrap; align-items: center; gap: 32px; }
+.catalogue-promises > span { display: flex; align-items: center; gap: 16px; color: #ffffff; }
+/* Filet en #002d74 : la charte interdit le blanc en opacite, l'ancienne valeur
+   etait rgba(255,255,255,.4). */
+.catalogue-promises > span + span { padding-left: 32px; border-left: 1px solid #002d74; }
+.catalogue-promises svg { flex: none; color: #9cbdff; }
+.catalogue-promises b { color: #ffffff; font: 600 var(--text-sm)/1.4 var(--font-body); }
+.catalogue-promises small { display: block; margin-top: 4px; color: #9cbdff; font: 400 var(--text-xs)/1.33 var(--font-body); }
+.catalogue-footer__cta { display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0 28px; border-radius: 999px; color: #000c5b; background: #ffffff; white-space: nowrap; font: 600 var(--text-base)/1 var(--font-body); transition: background-color .2s; }
+.catalogue-footer__cta:hover { background: #dbebff; }
+
+@media (max-width: 1250px) { .catalogue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.catalogue-card__image { height: 200px; }.catalogue-footer { align-items: flex-start; flex-direction: column; }.catalogue-handwriting { transform: scale(.8) rotate(-8deg); transform-origin: top right; } }
+@media (max-width: 720px) { .catalogue-section { padding: 48px 0; }.catalogue-handwriting { display: none; }.catalogue-section__inner { width: min(100% - 32px, 620px); }.catalogue-filters { justify-content: flex-start; gap: 8px; }.catalogue-filters button { padding: 0 16px; }.catalogue-grid { grid-template-columns: 1fr; }.catalogue-card__image { height: 200px; }.catalogue-promises { align-items: flex-start; flex-direction: column; gap: 16px; }.catalogue-promises > span + span { padding-left: 0; border-left: 0; }.catalogue-footer__cta { width: 100%; justify-content: center; } }
+
 
 
 @layer base {
@@ -94,6 +586,93 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body;
+    @apply text-foreground font-body;
+    /* Fond du site : blanc pur, uniforme sur toutes les pages. */
+    background: #ffffff;
+    min-height: 100vh;
   }
 }
+
+/* ── Carrousel de formations du héro (HeroCourseCarousel.jsx) ──────────────
+   Reprise de la maquette : carte centrale entière, deux cartes latérales
+   réduites et rognées par les bords. Les positions sont animées par
+   framer-motion côté composant ; le CSS ne pose que la forme. */
+/* Le carrousel est centré dans la colonne droite, mais cette colonne est
+   elle-même décalée à droite : on le ramène vers le centre optique de la page. */
+/* Décalage en pixels entiers plutôt qu'en `vw` : `calc(-50% - 2vw)` donnait
+   38,4 px à 1920 de large, et une translation fractionnaire rend flou tout le
+   texte des cartes qu'elle contient. */
+.hcc { position: absolute; z-index: 4; top: 50%; left: calc(var(--hero-visual) - var(--hcc-width) - var(--hcc-inset)); right: auto; width: var(--hcc-width); transform: translateY(-50%); pointer-events: auto; }
+/* Scène en perspective : les cartes latérales sont en retrait réel (translateZ),
+   pas simplement rétrécies. Le navigateur trie alors l'affichage par profondeur,
+   donc celle qui revient au centre passe devant en glissant, sans à-coup. */
+/* Accroche manuscrite + flèche courbe pointant vers le carrousel. C'est
+   désormais la seule du site : celle du catalogue a été retirée. */
+/* Décalée vers la droite (`right` négatif) : la flèche descendait sur la carte
+   de droite du carrousel, elle tombe maintenant dans la marge. */
+.hcc__hint { position: absolute; z-index: 5; right: -110px; bottom: calc(100% - 78px); margin: 0; color: #ffffff; text-align: right; font: 700 27px/1.15 var(--font-hand); transform: rotate(-9deg); pointer-events: none; }
+/* Flèche sous l'accroche, sans rotation : elle descend vers les cartes. Elle
+   est calée au-dessus du haut de la scène (`bottom` du parent) pour ne jamais
+   empiéter sur la carte de droite. */
+.hcc__hint svg { display: block; width: 70px; height: 56px; margin: 6px 26px 0 auto; transform: none; }
+
+.hcc__stage { position: relative; height: 368px; perspective: 1200px; perspective-origin: 50% 50%; transform-style: preserve-3d; }
+
+/* Toutes les cartes ont la même taille ; `scale` (piloté par framer-motion)
+   réduit les latérales. `left: 50%` + `x: -50%` les centre, l'animation ajoutant
+   son propre décalage horizontal par-dessus. */
+.hcc-card { position: absolute; top: 0; left: 50%; margin-left: -172px; width: 344px; height: 100%; overflow: hidden; padding: 0; border-radius: 8px; background: #ffffff; border: 1px solid #dbebff; }
+/* Ombre douce et très diffuse : elle détache la carte du fond clair sans
+   ramener le relief marqué qu'on a retiré du reste de la home. */
+.hcc-card { box-shadow: 0 6px 18px -10px rgba(0,12,91,.16); }
+.hcc-card.is-active { box-shadow: 0 18px 40px -20px rgba(0,12,91,.28); }
+
+.hcc-card__media { position: relative; height: 200px; overflow: hidden; background: #f0f7ff; }
+.hcc-card__media img { width: 100%; height: 100%; object-fit: cover; }
+/* Pastille de catégorie en haut à gauche, pastille de durée en bas à droite. */
+.hcc-card__tag, .hcc-card__time { position: absolute; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #ffffff; border: 1px solid #dbebff; color: #243037; font: 600 12px var(--font-body); white-space: nowrap; }
+.hcc-card__tag { top: 12px; left: 12px; }
+.hcc-card__tag svg { width: 16px; height: 16px; color: #002d74; }
+/* Code couleur des catégories : l'icône seule ne peut plus porter la
+   distinction (les paliers verts se ressemblent trop en 14 px), c'est donc la
+   pastille entière qui est teintée. Le texte reste sombre dans les 4 cas, ce
+   qui garantit le contraste — notamment sur la lavande, qui ne supporte ni
+   texte blanc ni texte vert. */
+.hcc-card__time { right: 12px; bottom: 12px; }
+.hcc-card__time svg { width: 16px; height: 16px; color: #002d74; }
+
+/* Titre en encre forte, description en gris secondaire : la hiérarchie se fait
+   par le contraste, pas par la taille. */
+.hcc-card__body { padding: 20px; }
+.hcc-card__body h3 { margin: 0; color: #243037; font: 600 16px/1.35 var(--font-heading); }
+.hcc-card__body p { margin: 8px 0 0; color: #5f6568; font: 400 14px/1.5 var(--font-body); }
+.hcc-card__body a { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; color: #002d74; font: 600 14px var(--font-body); }
+.hcc-card__body a svg { width: 16px; height: 16px; transition: transform .2s; }
+.hcc-card__body a:hover svg { transform: translateX(3px); }
+
+.hcc__controls { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 24px; }
+.hcc__controls > button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #dbebff; border-radius: 50%; color: #000c5b; background: #ffffff; cursor: pointer; transition: background-color .2s, color .2s; }
+.hcc__controls > button:hover { color: #ffffff; background: #000c5b; border-color: #000c5b; }
+.hcc__controls > button svg { width: 16px; height: 16px; }
+.hcc__controls > div { display: flex; align-items: center; gap: 8px; }
+/* Puce active : pastille allongée, comme sur la maquette. */
+.hcc__controls > div button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: #dbebff; cursor: pointer; transition: width .3s, background-color .3s; }
+.hcc__controls > div button.is-active { width: 24px; background: #000c5b; }
+
+@media (max-width: 1279px) {
+  .academy-hero__visual { min-height: 0; }
+  .hcc { position: relative; top: auto; left: auto; width: 100%; margin-left: 0; transform: none; }
+  /* En colonne, l'accroche repasse dans le flux au-dessus du carrousel. */
+  .hcc__hint { position: static; margin: 0 0 14px; text-align: center; transform: none; }
+  .hcc__hint svg { display: none; }
+}
+
+@media (max-width: 640px) {
+  .hcc__stage { height: 396px; }
+  .hcc-card { width: min(100%, 320px); }
+}
+
+
+/* Héro de la page formation : mêmes réglages de base que l'accueil. La
+   couleur de fond vient de la formation (`--vente-fond`, voir ventes.js). */
+.vente-hero { position: relative; overflow: hidden; --hero-slant: 22px; background: var(--vente-fond, #000c5b); }

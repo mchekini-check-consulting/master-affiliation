@@ -35,6 +35,13 @@ export default [
       "unused-imports": pluginUnusedImports,
     },
     rules: {
+      // `pluginJs.configs.recommended` est étalé plus haut, mais cet objet
+      // `rules` REMPLACE le sien : ses règles n'étaient donc pas actives.
+      // `no-undef` est rétablie explicitement — c'est elle qui attrape un
+      // identifiant utilisé sans être importé (un jeton de `design.jsx`, une
+      // icône lucide). Vite compile sans broncher dans ce cas et la page
+      // devient blanche au chargement : le lint est le seul filet.
+      "no-undef": "error",
       "no-unused-vars": "off",
       "react/jsx-uses-vars": "error",
       "react/jsx-uses-react": "error",

@@ -1,19 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle as CheckCircle2 } from '@phosphor-icons/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getRegistrationPublic, submitNeedsAnalysis } from '@/api/backend';
 import { SectionTitle, Stepper, TextAreaField, TextField } from '@/pages/Inscription';
 import { getNeedsLevels } from '@/data/formations';
 
-const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
+const headingFont = { fontFamily: "'Inter', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 function RadioGroup({ label, options, value, onChange }) {
   return (
     <div>
-      <p className="text-sm font-semibold mb-2" style={{ color: '#004c3c', ...headingFont }}>{label}</p>
+      <p className="text-sm font-semibold mb-2" style={{ color: '#000c5b', ...headingFont }}>{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => (
           <button
@@ -22,9 +22,9 @@ function RadioGroup({ label, options, value, onChange }) {
             onClick={() => onChange(option)}
             className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
             style={{
-              border: value === option ? '1.5px solid #007f64' : '1px solid #e5e5e5',
-              background: value === option ? '#eafff6' : 'white',
-              color: value === option ? '#007f64' : '#5f6b66',
+              border: value === option ? '1.5px solid #000c5b' : '1px solid #e5e5e5',
+              background: value === option ? '#f0f7ff' : 'white',
+              color: value === option ? '#000c5b' : '#5f6568',
               ...headingFont,
             }}>
             {option}
@@ -62,7 +62,7 @@ export default function AnalyseBesoin() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    document.title = "Analyse du besoin — Hi-Tech Academy";
+    document.title = "Analyse du besoin : Hi-Tech Academy";
     getRegistrationPublic(requestId)
       .then(setRegistration)
       .catch((e) => setLoadError(e.status === 404 ? "Demande d'inscription introuvable." : e.message));
@@ -122,7 +122,7 @@ export default function AnalyseBesoin() {
   };
 
   const shell = (content) => (
-    <div className="min-h-screen" style={{ background: '#f7fbf9' }}>
+    <div className="min-h-screen" style={{ background: '#f0f7ff' }}>
       <Header />
       <main className="pt-32 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">{content}</div>
@@ -134,22 +134,22 @@ export default function AnalyseBesoin() {
   if (loadError) {
     return shell(
       <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <p className="mb-4" style={{ color: '#004c3c', ...headingFont }}>{loadError}</p>
-        <Link to="/" className="underline text-sm" style={{ color: '#007f64', ...bodyFont }}>Retour à l'accueil</Link>
+        <p className="mb-4" style={{ color: '#000c5b', ...headingFont }}>{loadError}</p>
+        <Link to="/" className="underline text-sm" style={{ color: '#000c5b', ...bodyFont }}>Retour à l'accueil</Link>
       </div>
     );
   }
 
   if (!registration) {
     return shell(
-      <p className="text-center text-sm" style={{ color: '#5f6b66', ...bodyFont }}>Chargement…</p>
+      <p className="text-center text-sm" style={{ color: '#5f6568', ...bodyFont }}>Chargement…</p>
     );
   }
 
   // Analyse faite mais test manquant : redirection en cours (effet ci-dessus)
   if (registration.has_needs_analysis && !registration.has_positioning_test) {
     return shell(
-      <p className="text-center text-sm" style={{ color: '#5f6b66', ...bodyFont }}>Chargement…</p>
+      <p className="text-center text-sm" style={{ color: '#5f6568', ...bodyFont }}>Chargement…</p>
     );
   }
 
@@ -158,23 +158,23 @@ export default function AnalyseBesoin() {
       <>
         <Stepper current={1} />
         <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-          <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#007f64' }} />
-          <h1 className="text-2xl font-bold mb-3" style={{ color: '#004c3c', ...headingFont }}>
+          <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: '#000c5b' }} />
+          <h1 className="text-2xl font-bold mb-3" style={{ color: '#243037', ...headingFont }}>
             Votre demande a bien été envoyée
           </h1>
-          <p className="text-sm mb-2" style={{ color: '#5f6b66', ...bodyFont }}>
+          <p className="text-sm mb-2" style={{ color: '#5f6568', ...bodyFont }}>
             {submitted
               ? 'Merci, vos réponses au questionnaire ont bien été enregistrées.'
               : 'Le questionnaire a déjà été renseigné pour cette demande.'}
           </p>
-          <p className="text-sm mb-6" style={{ color: '#5f6b66', ...bodyFont }}>
+          <p className="text-sm mb-6" style={{ color: '#5f6568', ...bodyFont }}>
             Votre demande d'inscription à la formation <strong>{registration.formation_title}</strong> est
             maintenant transmise et en attente de validation. Nous revenons vers vous sous 24 h ouvrées.
           </p>
           <Link
             to="/"
             className="inline-flex items-center gap-2 text-sm font-bold"
-            style={{ color: '#007f64', ...headingFont }}>
+            style={{ color: '#000c5b', ...headingFont }}>
             Retour à l'accueil
             <ArrowRight className="w-4 h-4" />
           </Link>
@@ -188,13 +188,13 @@ export default function AnalyseBesoin() {
       <div className="text-center mb-8">
         <span
           className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-          style={{ color: '#007f64', ...headingFont }}>
+          style={{ color: '#000c5b', ...headingFont }}>
           {registration.formation_title}
         </span>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#004c3c', ...headingFont }}>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#243037', ...headingFont }}>
           Analyse du besoin
         </h1>
-        <p className="text-sm max-w-xl mx-auto" style={{ color: '#5f6b66', ...bodyFont }}>
+        <p className="text-sm max-w-xl mx-auto" style={{ color: '#5f6568', ...bodyFont }}>
           Ce questionnaire recueille et analyse votre besoin, en lien avec votre entreprise et/ou votre
           financeur, afin de valider les objectifs et d'adapter la formation.
         </p>
@@ -256,12 +256,12 @@ export default function AnalyseBesoin() {
             label="Avez-vous un cas d'usage précis à traiter pendant la formation ?"
             value={answers.specificUseCase}
             onChange={set('specificUseCase')} />
-          <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#004c3c', ...bodyFont }}>
+          <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#000c5b', ...bodyFont }}>
             <input
               type="checkbox"
               checked={answers.needsAdaptation}
               onChange={(e) => set('needsAdaptation')(e.target.checked)}
-              className="mt-0.5 accent-[#007f64]" />
+              className="mt-0.5 accent-[#000c5b]" />
             Êtes-vous en situation de handicap nécessitant un aménagement de la formation ?
           </label>
           {answers.needsAdaptation && (
@@ -291,7 +291,7 @@ export default function AnalyseBesoin() {
             onClick={submit}
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: '#007f64', color: 'white', ...headingFont }}>
+            style={{ background: '#000c5b', color: 'white', ...headingFont }}>
             {submitting ? 'Envoi en cours…' : 'Continuer vers le test de positionnement'}
             <ArrowRight className="w-4 h-4" />
           </button>

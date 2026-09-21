@@ -56,8 +56,9 @@ public class MailService {
                 ? r.getCompanyName() + " (référent : " + r.getFirstName() + " " + r.getLastName() + ")"
                 : r.getFirstName() + " " + r.getLastName();
 
+        boolean devis = r.isQuoteRequest();
         String body = """
-                Une nouvelle demande d'inscription vient d'être transmise.
+                %s
 
                 Formation : %s
                 Demandeur : %s
@@ -65,20 +66,24 @@ public class MailService {
                 Email : %s
                 Téléphone : %s
 
-                Le questionnaire obligatoire a été renseigné. Consultez la demande
+                %s Consultez la demande
                 et validez-la ou refusez-la depuis l'espace admin :
                 https://hi-tech-academy.fr/admin
 
                 — Notification automatique Hi-Tech Academy""";
 
         send(adminRecipient,
-                "Nouvelle demande d'inscription — " + r.getFormationTitle(),
+                (devis ? "Nouvelle demande de devis — " : "Nouvelle demande d'inscription — ") + r.getFormationTitle(),
                 body.formatted(
+                        devis ? "Une nouvelle demande de devis vient d'être déposée depuis la page formation."
+                              : "Une nouvelle demande d'inscription vient d'être transmise.",
                         r.getFormationTitle(),
                         applicant,
                         applicantLabel(r.getApplicantType()),
                         r.getEmail(),
-                        r.getPhone()));
+                        r.getPhone(),
+                        devis ? "Le demandeur souhaite recevoir un devis : rappelez-le sous 24 h ouvrées."
+                              : "Le questionnaire obligatoire a été renseigné."));
     }
 
     /** Demande validée ou refusée : informe le demandeur. */
@@ -257,38 +262,6 @@ public class MailService {
                             d.getValidUntil().format(dateFormat)),
                     pdf, filename);
         }
-    }
-
-    /**
-     * Envoie le livre offert « IA et Opportunités » (lien de téléchargement)
-     * au lecteur qui a laissé son email en fin d'article de blog.
-     */
-    @Async
-    public void sendBookOffer(String to) {
-        String body = """
-                Bonjour,
-
-                Merci de votre intérêt ! Voici votre exemplaire offert de notre livre
-                « IA et Opportunités — Transformer les défis d'aujourd'hui en succès
-                de demain » :
-
-                %s/documents/IA-et-opportunites-partie1.pdf
-
-                Des idées concrètes, des opportunités réelles : nous espérons qu'il
-                vous donnera l'envie de passer à la pratique. Pour aller plus loin,
-                nos formations (IA, Kubernetes, facturation électronique) sont
-                certifiées Qualiopi et finançables par votre OPCO :
-
-                %s/formations
-
-                Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
-
-                Bonne lecture,
-                Mahdi CHEKINI
-                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
-        send(to,
-                "Votre livre offert — IA et Opportunités",
-                body.formatted(baseUrl, baseUrl));
     }
 
     /** Nouvelle réclamation déposée sur le site : notifie l'organisme. */

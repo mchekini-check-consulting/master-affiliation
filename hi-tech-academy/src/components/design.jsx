@@ -1,40 +1,55 @@
 import React from 'react';
 
-// Système de design du site public — thème « École » : palette vert forêt /
-// menthe, dégradés doux du vert au blanc, grands titres serif
-// (Source Serif 4), pilules très arrondies. Les noms d'exports sont conservés
+// Système de design du site public — thème « École » : palette bleu marine,
+// aplats francs du bleu au blanc, titres en DM Sans, corps
+// et interface en Inter, pilules très arrondies. Les noms d'exports sont conservés
 // d'une itération à l'autre pour ne pas casser les composants ; seules les
 // valeurs changent. L'admin n'utilise pas ce fichier et reste inchangé.
 
-export const INK = '#00382c';        // bandes sombres : vert forêt profond
-export const NAVY = '#004c3c';       // titres et textes forts (vert forêt)
-export const TEAL = '#007f64';       // vert de marque (liens, icônes)
-export const CYAN = '#00d1a5';       // émeraude vif (formes, accents)
-export const ACCENT = '#004c3c';     // vert forêt : CTA principaux (pilules)
-export const BODY = '#1f2124';       // texte courant sur fond clair
-export const BODY_DARK = '#d6efe4';  // texte courant sur fond sombre
-export const LINE = '#e5e5e5';       // filets et bordures
-export const MINT = '#dff7ec';       // fonds menthe (cartes, tags)
-export const MINT_LIGHT = '#eafff6'; // menthe très pâle (surfaces)
+// Palette de marque (4 couleurs identitaires) :
+//   #000c5b (primaire) · #9cbdff (surfaces) · #0062e1 (accent) · #f0f7ff (fonds)
+// + 2 paliers techniques dérivés du primaire, indispensables aux états et aux
+//   filets (l'écart de luminance entre #000c5b et #9cbdff est trop grand pour
+//   qu'un survol ou une bordure s'y loge) : #002d74 · #0066b0
+export const INK = '#000c5b';        // bandes sombres : primaire
+export const NAVY = '#000c5b';       // titres et textes forts (primaire)
+export const TEAL = '#002d74';       // liens et icônes (6,9:1 sur blanc)
+export const CYAN = '#0066b0';       // formes et accents décoratifs uniquement
+export const ACCENT = '#000c5b';     // bleu marine : CTA principaux (pilules)
+export const LILAC = '#0062e1';      // accent : APLATS SEULEMENT, texte #ffffff
+export const BODY = '#243037';       // texte courant sur fond clair
+export const BODY_MUTED = '#5f6568'; // texte secondaire (gris neutre)
+export const BODY_DARK = '#f0f7ff';  // texte courant sur fond sombre
+export const LINE = '#dbebff';       // filets et bordures
+export const MINT = '#9cbdff';       // fonds bleu clair (cartes, tags)
+export const MINT_LIGHT = '#f0f7ff'; // bleu très pâle (surfaces)
 
-export const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
-export const serifFont = { fontFamily: "'Source Serif 4', Georgia, serif" };
-export const bodyFont = { fontFamily: "'Roboto', 'Inter', sans-serif" };
+// Duo typographique : DM Sans pour les TITRES, Inter pour le corps
+// et toute l'interface. Les noms d'exports sont historiques et ne changent pas
+// pour ne casser aucun composant : `serifFont` = police de titres (elle n'a
+// plus rien d'une serif), `headingFont` = police d'interface (nav, boutons,
+// badges), `bodyFont` = corps de texte. Préférer les variables CSS
+// --font-heading / --font-body dans les feuilles de style.
+export const headingFont = { fontFamily: "'Inter', sans-serif" };
+export const serifFont = { fontFamily: "'DM Sans', sans-serif" };
+export const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
-// Dégradés signature du thème (du vert au blanc, pointe de bleu pâle)
-export const HERO_GRADIENT = 'linear-gradient(115deg, #9ff0cf 0%, #dff7ec 28%, #ffffff 55%, #ffffff 68%, #cce2ff 100%)';
-export const GREEN_BAND_GRADIENT = 'linear-gradient(135deg, #bff4e8 0%, #dff7ec 45%, #ffffff 100%)';
-export const KEYWORD_GRADIENT = 'linear-gradient(92deg, #007f64, #00d1a5)';
+// Dégradés signature du thème : une seule diagonale, du vert menthe (haut
+// gauche) vers le blanc (bas droite), pour finir sur la couleur de la section
+// suivante sans rupture.
+export const HERO_GRADIENT = 'linear-gradient(120deg, #9cbdff 0%, #dbebff 24%, #f0f7ff 48%, #ffffff 78%, #ffffff 100%)';
+export const GREEN_BAND_GRADIENT = 'linear-gradient(135deg, #9cbdff 0%, #f0f7ff 45%, #ffffff 100%)';
+export const KEYWORD_GRADIENT = 'linear-gradient(92deg, #002d74, #0066b0)';
 
-/** Mot-clé coloré d'un titre : vert de marque (dégradé léger sur fond sombre). */
+/** Mot-clé coloré d'un titre : bleu de marque (accent sur fond sombre). */
 export function Hi({ children, dark = false }) {
   if (dark) {
-    return <span style={{ color: '#7fe6c3' }}>{children}</span>;
+    return <span style={{ color: '#9cbdff' }}>{children}</span>;
   }
   return <span style={{ color: TEAL }}>{children}</span>;
 }
 
-/** Petit marqueur de kicker « • Le programme » façon pastille menthe. */
+/** Petit marqueur de kicker « • Le programme » façon pastille bleue. */
 export function Slash() {
   return (
     <span
@@ -55,10 +70,10 @@ export function SectionHeading({ kicker, children, sub, dark = false, align = 'c
     <div className={`${alignClass} mb-12 sm:mb-14`}>
       {kicker && (
         <span
-          className="inline-flex items-center gap-1.5 text-[12px] font-bold px-3.5 py-1.5 rounded-full mb-5"
+          className="inline-flex items-center gap-1.5 text-caption font-bold px-3.5 py-1.5 rounded-full mb-5"
           style={{
             background: dark ? 'rgba(255,255,255,0.12)' : MINT,
-            color: dark ? '#bff4e8' : NAVY,
+            color: dark ? '#9cbdff' : NAVY,
             ...headingFont,
           }}>
           <Slash />
@@ -66,14 +81,14 @@ export function SectionHeading({ kicker, children, sub, dark = false, align = 'c
         </span>
       )}
       <h2
-        className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold leading-[1.15]"
+        className="font-serif-display text-hero"
         style={{ color: dark ? 'white' : BODY, ...serifFont }}>
         {children}
       </h2>
       {sub && (
         <p
           className={`${align === 'left' ? '' : 'mx-auto'} max-w-2xl text-base leading-relaxed mt-5`}
-          style={{ color: dark ? BODY_DARK : '#4b5563', ...bodyFont }}>
+          style={{ color: dark ? BODY_DARK : BODY_MUTED, ...bodyFont }}>
           {sub}
         </p>
       )}
@@ -85,7 +100,7 @@ export function SectionHeading({ kicker, children, sub, dark = false, align = 'c
  * Bouton pilule : primary et forest = vert forêt, secondary = contour.
  */
 export function Pill({ as: Tag = 'a', dark = false, variant = 'primary', className = '', style = {}, children, ...props }) {
-  const base = 'inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-200 hover:opacity-90 hover:shadow-lg';
+  const base = 'inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-200 hover:opacity-90';
   const styles =
     variant === 'primary'
       ? { background: ACCENT, color: 'white' }
@@ -109,9 +124,9 @@ export function Starfield() {
       className="absolute inset-0 pointer-events-none"
       style={{
         backgroundImage: `
-          radial-gradient(ellipse 45% 55% at 8% 12%, rgba(0,209,165,0.18) 0, transparent 70%),
-          radial-gradient(ellipse 40% 50% at 92% 20%, rgba(191,244,232,0.14) 0, transparent 70%),
-          radial-gradient(ellipse 55% 45% at 50% 100%, rgba(0,127,100,0.12) 0, transparent 70%)
+          radial-gradient(ellipse 45% 55% at 8% 12%, rgba(79,154,130,0.18) 0, transparent 70%),
+          radial-gradient(ellipse 40% 50% at 92% 20%, rgba(151,217,196,0.14) 0, transparent 70%),
+          radial-gradient(ellipse 55% 45% at 50% 100%, rgba(29,101,81,0.12) 0, transparent 70%)
         `,
       }}
     />

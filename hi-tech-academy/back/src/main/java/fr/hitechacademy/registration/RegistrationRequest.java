@@ -99,6 +99,10 @@ public class RegistrationRequest {
     private String diplomaTitle;
     private String currentPosition;
     private boolean needsAdaptation;
+    // Demande de devis depuis la page de vente : pas de questionnaire préalable,
+    // la demande est transmise à l'admin dès son dépôt (statut PENDING).
+    @Column(nullable = false)
+    private boolean quoteRequest;
 
     // --- Questionnaire d'analyse du besoin -----------------------------
     @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -231,6 +235,9 @@ public class RegistrationRequest {
 
     public boolean isNeedsAdaptation() { return needsAdaptation; }
     public void setNeedsAdaptation(boolean needsAdaptation) { this.needsAdaptation = needsAdaptation; }
+
+    public boolean isQuoteRequest() { return quoteRequest; }
+    public void setQuoteRequest(boolean quoteRequest) { this.quoteRequest = quoteRequest; }
 
     public NeedsAnalysis getNeedsAnalysis() { return needsAnalysis; }
     public void setNeedsAnalysis(NeedsAnalysis needsAnalysis) { this.needsAnalysis = needsAnalysis; }

@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  ArrowRight, BadgeCheck, Banknote, Building2, CheckCircle2, ExternalLink,
-  FileSignature, HandCoins, Landmark, PiggyBank, ScrollText, Search, Users,
-} from 'lucide-react';
+import { ArrowRight, SealCheck as BadgeCheck, Money as Banknote, Buildings as Building2, CheckCircle as CheckCircle2, ArrowSquareOut as ExternalLink, Signature as FileSignature, HandCoins, Bank as Landmark, PiggyBank, Scroll as ScrollText, MagnifyingGlass as Search, Users } from '@phosphor-icons/react';
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from '@/components/ui/accordion';
@@ -12,7 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import {
   INK, NAVY, TEAL, ACCENT, BODY, BODY_DARK, KEYWORD_GRADIENT,
-  SectionHeading, Starfield, Pill, headingFont, bodyFont,
+  SectionHeading, Starfield, Pill, headingFont, serifFont, bodyFont,
 } from '@/components/design';
 
 const fadeUp = {
@@ -44,12 +41,12 @@ const ETAPES = [
   {
     icon: ScrollText,
     titre: '2. Devis + programme officiels',
-    texte: 'Nous vous fournissons le devis et le programme détaillé conformes aux exigences des financeurs — les pièces maîtresses de votre dossier.',
+    texte: 'Nous vous fournissons le devis et le programme détaillé conformes aux exigences des financeurs, les pièces maîtresses de votre dossier.',
   },
   {
     icon: FileSignature,
     titre: '3. Le dossier de prise en charge',
-    texte: "Vous déposez la demande sur l'espace en ligne de votre OPCO (ou de votre fonds d'assurance formation) — nous vous guidons à chaque champ.",
+    texte: "Vous déposez la demande sur l'espace en ligne de votre OPCO (ou de votre fonds d'assurance formation), nous vous guidons à chaque champ.",
   },
   {
     icon: BadgeCheck,
@@ -65,15 +62,15 @@ const FAQ = [
   },
   {
     q: "D'où vient l'argent qui finance ma formation ?",
-    r: "De vos propres cotisations. Chaque entreprise verse tous les mois à l'URSSAF la CUFPA (Contribution Unique à la Formation Professionnelle et à l'Alternance). Ces sommes sont mutualisées puis redistribuées, notamment via les OPCO — le système est particulièrement avantageux pour les entreprises de moins de 50 salariés.",
+    r: "De vos propres cotisations. Chaque entreprise verse tous les mois à l'URSSAF la CUFPA (Contribution Unique à la Formation Professionnelle et à l'Alternance). Ces sommes sont mutualisées puis redistribuées, notamment via les OPCO. Le système est particulièrement avantageux pour les entreprises de moins de 50 salariés.",
   },
   {
     q: 'Comment savoir quel est mon OPCO ?',
-    r: "Votre OPCO dépend de votre convention collective (l'IDCC figure sur les bulletins de salaire). L'outil officiel de France compétences vous le donne en quelques clics à partir de votre SIRET ou de votre convention — le lien est ci-dessus. En cas de doute, envoyez-nous votre SIRET et nous vérifions pour vous.",
+    r: "Votre OPCO dépend de votre convention collective (l'IDCC figure sur les bulletins de salaire). L'outil officiel de France compétences vous le donne en quelques clics à partir de votre SIRET ou de votre convention : le lien est ci-dessus. En cas de doute, envoyez-nous votre SIRET et nous vérifions pour vous.",
   },
   {
     q: 'Je suis indépendant ou dirigeant non salarié : ai-je droit à un financement ?',
-    r: "Oui. Les travailleurs non salariés cotisent à un fonds d'assurance formation : AGEFICE pour les dirigeants du commerce et des services, FIF PL pour les professions libérales, FAFCEA pour les artisans. Les plafonds annuels varient selon le fonds et le type de formation — nous vous aidons à constituer la demande.",
+    r: "Oui. Les travailleurs non salariés cotisent à un fonds d'assurance formation : AGEFICE pour les dirigeants du commerce et des services, FIF PL pour les professions libérales, FAFCEA pour les artisans. Les plafonds annuels varient selon le fonds et le type de formation, nous vous aidons à constituer la demande.",
   },
   {
     q: "Pourquoi la certification Qualiopi est-elle indispensable ?",
@@ -81,7 +78,7 @@ const FAQ = [
   },
   {
     q: 'Combien de temps prend une demande de prise en charge ?',
-    r: "Comptez généralement 2 à 4 semaines entre le dépôt du dossier complet et l'accord de l'OPCO — certains dossiers passent en quelques jours. Le délai d'accès à la formation reste d'1 jour minimum une fois le financement sécurisé (ou si vous financez en direct).",
+    r: "Comptez généralement 2 à 4 semaines entre le dépôt du dossier complet et l'accord de l'OPCO. Certains dossiers passent en quelques jours. Le délai d'accès à la formation reste d'1 jour minimum une fois le financement sécurisé (ou si vous financez en direct).",
   },
 ];
 
@@ -90,7 +87,7 @@ const FAQ = [
 // de prise en charge — contenu inspiré des pages financement de Matchers.
 export default function Financements() {
   useEffect(() => {
-    document.title = 'Financements — Hi-Tech Academy';
+    document.title = 'Financements : Hi-Tech Academy';
     return () => { document.title = 'Hi-Tech Academy'; };
   }, []);
 
@@ -102,22 +99,22 @@ export default function Financements() {
         {/* ---------- Héro dégradé vert clair (thème École) ---------- */}
         <section
           className="relative overflow-hidden"
-          style={{ background: 'linear-gradient(115deg, #8fedca 0%, #d8f8ea 32%, #ffffff 60%, #cce2ff 100%)' }}>
+          style={{ background: 'linear-gradient(115deg, #9cbdff 0%, #dbebff 32%, #ffffff 60%, #dbebff 100%)' }}>
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 pt-40 pb-20 text-center">
             <motion.div initial="hidden" animate="visible" variants={fadeUp}>
               <span
-                className="inline-flex items-center gap-1.5 text-[12px] font-bold px-3.5 py-1.5 rounded-full mb-6"
-                style={{ background: 'white', color: NAVY, border: '1px solid #bff4e8', ...headingFont }}>
-                <span className="inline-block rounded-full" style={{ width: 5, height: 5, background: '#00d1a5' }} />
+                className="inline-flex items-center gap-1.5 text-caption font-bold px-3.5 py-1.5 rounded-full mb-6"
+                style={{ background: 'white', color: NAVY, border: '1px solid #dbebff', ...headingFont }}>
+                <span className="inline-block rounded-full" style={{ width: 5, height: 5, background: '#0066b0' }} />
                 Financements
               </span>
               <h1
-                className="font-serif-display text-4xl sm:text-5xl lg:text-[4rem] font-bold leading-[1.08] mb-7"
-                style={{ color: '#101418' }}>
+                className="font-serif-display text-display mb-7"
+                style={{ color: '#243037' }}>
                 Votre formation peut vous coûter <span style={{ color: TEAL }}>0 €</span>
               </h1>
-              <p className="max-w-2xl mx-auto text-base leading-relaxed mb-9" style={{ color: '#2c3440', ...bodyFont }}>
-                Nos formations ne sont pas gratuites — mais vous cotisez déjà chaque mois pour la formation
+              <p className="max-w-2xl mx-auto text-base leading-relaxed mb-9" style={{ color: '#243037', ...bodyFont }}>
+                Nos formations ne sont pas gratuites, mais vous cotisez déjà chaque mois pour la formation
                 professionnelle. Grâce à la certification Qualiopi de Hi-Tech Academy, ces financements
                 peuvent couvrir jusqu'à 100 % du tarif, sans avance de trésorerie. On vous explique tout,
                 et on vous accompagne.
@@ -132,10 +129,10 @@ export default function Financements() {
 
         {/* ---------- D'où vient l'argent ---------- */}
         <section className="py-16 sm:py-24 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-site mx-auto px-4 sm:px-6">
             <SectionHeading
               kicker="Le système, décodé"
-              sub="En France, la formation professionnelle est financée par une cotisation obligatoire, mutualisée au bénéfice des entreprises — surtout celles de moins de 50 salariés. Quand votre formation est prise en charge, c'est la contrepartie de vos cotisations.">
+              sub="En France, la formation professionnelle est financée par une cotisation obligatoire, mutualisée au bénéfice des entreprises, surtout celles de moins de 50 salariés. Quand votre formation est prise en charge, c'est la contrepartie de vos cotisations.">
               D'où vient <span style={{ color: TEAL }}>l'argent</span> ?
             </SectionHeading>
 
@@ -149,12 +146,12 @@ export default function Financements() {
                 {
                   icon: Landmark,
                   titre: 'France compétences, le régulateur',
-                  texte: "Depuis 2019, France compétences assure le financement, la régulation et le contrôle du système de formation professionnelle et d'apprentissage — et répartit les fonds entre les acteurs.",
+                  texte: "Depuis 2019, France compétences assure le financement, la régulation et le contrôle du système de formation professionnelle et d'apprentissage, et répartit les fonds entre les acteurs.",
                 },
                 {
                   icon: Building2,
                   titre: 'Les OPCO, vos financeurs',
-                  texte: "Onze Opérateurs de Compétences agréés par l'État accompagnent les entreprises — en priorité les TPE/PME de moins de 50 salariés — et financent leurs actions de formation.",
+                  texte: "Onze Opérateurs de Compétences agréés par l'État accompagnent les entreprises (en priorité les TPE/PME de moins de 50 salariés) et financent leurs actions de formation.",
                 },
               ].map(({ icon: Icon, titre, texte }) => (
                 <motion.div
@@ -164,11 +161,11 @@ export default function Financements() {
                   viewport={{ once: true }}
                   variants={fadeUp}
                   className="rounded-3xl p-7"
-                  style={{ background: '#f7fbf9', border: '1px solid #e5e5e5' }}>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(0,80,100,0.08)' }}>
+                  style={{ background: '#f0f7ff', border: '1px solid #e5e5e5' }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(0,12,91,0.08)' }}>
                     <Icon className="w-6 h-6" style={{ color: TEAL }} />
                   </div>
-                  <h3 className="font-extrabold text-lg mb-3" style={{ color: NAVY, ...headingFont }}>{titre}</h3>
+                  <h3 className="font-extrabold text-lg mb-3" style={{ color: NAVY, ...serifFont }}>{titre}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: BODY, ...bodyFont }}>{texte}</p>
                 </motion.div>
               ))}
@@ -178,7 +175,7 @@ export default function Financements() {
               className="mt-10 rounded-3xl p-7 sm:p-9 grid sm:grid-cols-2 gap-6 items-center"
               style={{ background: '#fff8e8', border: '1px solid #f3e3b3' }}>
               <div>
-                <h3 className="font-extrabold text-xl mb-2" style={{ color: NAVY, ...headingFont }}>
+                <h3 className="font-extrabold text-xl mb-2" style={{ color: NAVY, ...serifFont }}>
                   Alors pourquoi tant d'entreprises passent à côté ?
                 </h3>
                 <ul className="space-y-2 mt-4">
@@ -202,7 +199,7 @@ export default function Financements() {
 
         {/* ---------- Zéro avance de frais ---------- */}
         <section className="py-16 sm:py-24" style={{ background: INK }}>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-site mx-auto px-4 sm:px-6">
             <SectionHeading
               dark
               kicker="Trésorerie intacte"
@@ -213,12 +210,12 @@ export default function Financements() {
             <div className="grid sm:grid-cols-3 gap-6">
               {[
                 { icon: HandCoins, titre: 'Subrogation de paiement', texte: "L'OPCO verse directement le financement à l'organisme de formation : aucune avance de trésorerie de votre côté." },
-                { icon: Banknote, titre: "Jusqu'à 100 % pris en charge", texte: 'Selon votre branche et votre enveloppe, la prise en charge peut couvrir la totalité du tarif — reste à charge : 0 €.' },
+                { icon: Banknote, titre: "Jusqu'à 100 % pris en charge", texte: 'Selon votre branche et votre enveloppe, la prise en charge peut couvrir la totalité du tarif, reste à charge : 0 €.' },
                 { icon: CheckCircle2, titre: 'Dossier balisé', texte: 'Devis, programme officiel, convention : nous fournissons chaque pièce au bon format, du premier échange à la facturation.' },
               ].map(({ icon: Icon, titre, texte }) => (
-                <div key={titre} className="rounded-3xl p-7" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                <div key={titre} className="rounded-3xl p-7" style={{ background: '#002d74', border: '1px solid #0066b0' }}>
                   <Icon className="w-7 h-7 mb-4" style={{ color: ACCENT }} />
-                  <h3 className="font-extrabold text-base mb-2 text-white" style={headingFont}>{titre}</h3>
+                  <h3 className="font-extrabold text-base mb-2 text-white" style={serifFont}>{titre}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: BODY_DARK, ...bodyFont }}>{texte}</p>
                 </div>
               ))}
@@ -228,10 +225,10 @@ export default function Financements() {
 
         {/* ---------- Les étapes ---------- */}
         <section className="py-16 sm:py-24 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-site mx-auto px-4 sm:px-6">
             <SectionHeading
               kicker="Concrètement"
-              sub="De l'idée à la formation financée, le parcours tient en quatre étapes — et nous sommes à vos côtés à chacune.">
+              sub="De l'idée à la formation financée, le parcours tient en quatre étapes, et nous sommes à vos côtés à chacune.">
               Comment se passe une <span style={{ color: TEAL }}>prise en charge</span> ?
             </SectionHeading>
 
@@ -245,11 +242,11 @@ export default function Financements() {
                   variants={fadeUp}
                   transition={{ delay: i * 0.06 }}
                   className="rounded-3xl p-6"
-                  style={{ background: '#f7fbf9', border: '1px solid #e5e5e5' }}>
+                  style={{ background: '#f0f7ff', border: '1px solid #e5e5e5' }}>
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: ACCENT }}>
                     <Icon className="w-5 h-5 text-black" />
                   </div>
-                  <h3 className="font-extrabold text-base mb-2" style={{ color: NAVY, ...headingFont }}>{titre}</h3>
+                  <h3 className="font-extrabold text-base mb-2" style={{ color: NAVY, ...serifFont }}>{titre}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: BODY, ...bodyFont }}>{texte}</p>
                 </motion.div>
               ))}
@@ -258,8 +255,8 @@ export default function Financements() {
         </section>
 
         {/* ---------- Trouver son OPCO ---------- */}
-        <section className="py-16 sm:py-24" style={{ background: '#f7fbf9' }}>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <section className="py-16 sm:py-24" style={{ background: '#f0f7ff' }}>
+          <div className="max-w-site mx-auto px-4 sm:px-6">
             <SectionHeading
               kicker="L'annuaire des financeurs"
               sub="Chaque entreprise est rattachée à l'un des onze OPCO selon sa convention collective (l'IDCC figure sur vos bulletins de salaire). C'est lui qui instruit votre demande de prise en charge.">
@@ -271,7 +268,7 @@ export default function Financements() {
                 <div key={nom} className="flex items-start gap-3 rounded-2xl p-4 bg-white" style={{ border: '1px solid #e5e5e5' }}>
                   <Building2 className="w-4 h-4 mt-1 shrink-0" style={{ color: TEAL }} />
                   <div>
-                    <p className="font-extrabold text-sm" style={{ color: NAVY, ...headingFont }}>{nom}</p>
+                    <p className="font-bold text-sm" style={{ color: NAVY, ...headingFont }}>{nom}</p>
                     <p className="text-xs leading-snug" style={{ color: BODY, ...bodyFont }}>{secteur}</p>
                   </div>
                 </div>
@@ -280,7 +277,7 @@ export default function Financements() {
 
             <div className="rounded-3xl p-7 sm:p-9 text-center bg-white" style={{ border: '1px solid #e5e5e5' }}>
               <Search className="w-8 h-8 mx-auto mb-4" style={{ color: TEAL }} />
-              <h3 className="font-extrabold text-xl mb-2" style={{ color: NAVY, ...headingFont }}>
+              <h3 className="font-extrabold text-xl mb-2" style={{ color: NAVY, ...serifFont }}>
                 Trouvez votre OPCO en moins d'une minute
               </h3>
               <p className="max-w-xl mx-auto text-sm mb-6" style={{ color: BODY, ...bodyFont }}>
@@ -298,7 +295,7 @@ export default function Financements() {
 
             {/* Indépendants */}
             <div className="mt-10 rounded-3xl p-7 sm:p-9 bg-white" style={{ border: '1px solid #e5e5e5' }}>
-              <h3 className="font-extrabold text-xl mb-3" style={{ color: NAVY, ...headingFont }}>
+              <h3 className="font-extrabold text-xl mb-3" style={{ color: NAVY, ...serifFont }}>
                 Indépendant, dirigeant non salarié ? Vous avez aussi vos droits.
               </h3>
               <p className="text-sm leading-relaxed mb-5" style={{ color: BODY, ...bodyFont }}>
@@ -311,8 +308,8 @@ export default function Financements() {
                   { nom: 'FIF PL', qui: 'Professions libérales (hors médecins)' },
                   { nom: 'FAFCEA', qui: 'Chefs d’entreprise artisanale' },
                 ].map(({ nom, qui }) => (
-                  <div key={nom} className="rounded-2xl p-4" style={{ background: '#f7fbf9', border: '1px solid #e5e5e5' }}>
-                    <p className="font-extrabold text-sm mb-1" style={{ color: TEAL, ...headingFont }}>{nom}</p>
+                  <div key={nom} className="rounded-2xl p-4" style={{ background: '#f0f7ff', border: '1px solid #e5e5e5' }}>
+                    <p className="font-bold text-sm mb-1" style={{ color: TEAL, ...headingFont }}>{nom}</p>
                     <p className="text-xs leading-snug" style={{ color: BODY, ...bodyFont }}>{qui}</p>
                   </div>
                 ))}
@@ -343,20 +340,20 @@ export default function Financements() {
         </section>
 
         {/* ---------- CTA final ---------- */}
-        <section style={{ background: 'linear-gradient(135deg, #004c3c 0%, #007f64 60%, #00d1a5 100%)' }}>
+        <section style={{ background: 'linear-gradient(135deg, #000c5b 0%, #000c5b 60%, #0066b0 100%)' }}>
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
             <h2 className="font-serif-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white mb-4" style={headingFont}>
               Et si votre prochaine formation ne vous coûtait rien ?
             </h2>
-            <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.8)', ...bodyFont }}>
+            <p className="text-sm mb-8" style={{ color: '#f0f7ff', ...bodyFont }}>
               Un échange de 15 minutes suffit pour estimer votre prise en charge. Sans engagement.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Pill as="a" href="/#contact">Étudier mon financement <ArrowRight className="w-4 h-4" /></Pill>
               <Pill as={Link} to="/formations" variant="secondary" dark>Choisir ma formation</Pill>
             </div>
-            <p className="text-xs mt-6" style={{ color: 'rgba(255,255,255,0.55)', ...bodyFont }}>
-              Organisme certifié Qualiopi — actions de formation · Déclaration d'activité n° 11756755575
+            <p className="text-xs mt-6" style={{ color: '#9cbdff', ...bodyFont }}>
+              Organisme certifié Qualiopi : actions de formation · Déclaration d'activité n° 11756755575
             </p>
           </div>
         </section>

@@ -1,140 +1,186 @@
+import PrimaryButton from '@/components/ui/primary-button';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Clock } from 'lucide-react';
+import { ArrowRight, Clock } from '@phosphor-icons/react';
 import { blogPosts } from '@/data/blogPosts';
 
+const FONT = "'Inter', sans-serif";
+const HEADING_FONT = "'DM Sans', sans-serif";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+    transition: { delay: i * 0.12, duration: 0.6, ease: [0.16, 1, 0.3, 1] }
   })
 };
 
+// Carte d'article. Mise en page éditoriale : image en 4/3, étiquette de
+// rubrique posée dans l'angle, numéro d'ordre en filigrane, puis titre,
+// chapô et pied de carte (lien « Lire l'article » + date sur un filet).
+function ArticleCard({ post, index }) {
+  const number = String(index + 1).padStart(2, '0');
+
+  return (
+    <motion.article
+      className="group h-full"
+      custom={index}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={fadeUp}>
+
+      <Link
+        to={`/blog/${post.slug}`}
+        className="flex h-full flex-col overflow-hidden rounded-2xl cursor-pointer"
+        style={{
+          background: '#ffffff',
+          border: '1.5px solid #f0f7ff',
+          transition: 'border-color 0.3s ease, transform 0.3s ease',
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#002d74'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#f0f7ff'; }}>
+
+        {/* Image */}
+        <div className="relative overflow-hidden aspect-[4/3]">
+          <img
+            src={post.image}
+            alt={post.title}
+            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+
+          {/* Rubrique */}
+          <span
+            className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-[0.12em]"
+            style={{ background: '#000c5b', color: '#ffffff', fontFamily: FONT }}>
+            {post.category}
+          </span>
+
+          {/* Durée de lecture */}
+          <span
+            className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold"
+            style={{ background: '#ffffff', color: '#002d74', fontFamily: FONT }}>
+            <Clock size={13} weight="bold" />
+            {post.readTime}
+          </span>
+        </div>
+
+        {/* Contenu */}
+        <div className="flex flex-1 flex-col gap-3 px-5 pt-5 pb-5">
+          <div className="flex items-baseline gap-3">
+            <span
+              className="text-xs font-semibold tabular-nums"
+              style={{ color: '#9cbdff', fontFamily: HEADING_FONT }}>
+              {number}
+            </span>
+            <h3
+              className="text-lg leading-snug transition-colors duration-200 group-hover:text-[#002d74]"
+              style={{ color: '#243037', fontFamily: HEADING_FONT, fontWeight: 700, letterSpacing: '-0.015em' }}>
+              {post.title}
+            </h3>
+          </div>
+
+          <p
+            className="text-sm leading-relaxed line-clamp-3"
+            style={{ color: '#5f6568', fontFamily: FONT }}>
+            {post.excerpt}
+          </p>
+
+          {/* Pied de carte */}
+          <div className="mt-auto pt-4 flex items-center justify-between gap-3"
+            style={{ borderTop: '1px solid #f0f7ff' }}>
+
+            <span
+              className="inline-flex items-center gap-2.5 text-sm font-semibold"
+              style={{ color: '#002d74', fontFamily: FONT }}>
+
+              {/* Pastille à double flèche : la première sort, la seconde entre. */}
+              <span
+                className="relative grid place-items-center w-9 h-9 rounded-full overflow-hidden shrink-0"
+                style={{
+                  background: '#f0f7ff',
+                  transition: 'background 0.3s ease',
+                }}>
+                <ArrowRight
+                  size={16}
+                  weight="bold"
+                  className="transition-all duration-500 ease-in group-hover:translate-x-7 group-hover:opacity-0"
+                  style={{ color: '#002d74' }} />
+                <ArrowRight
+                  size={16}
+                  weight="bold"
+                  className="absolute -translate-x-8 transition-transform duration-500 ease-out group-hover:translate-x-0"
+                  style={{ color: '#002d74' }} />
+              </span>
+              Lire l'article
+            </span>
+
+            <span className="flex items-center gap-2 shrink-0">
+              <span className="h-px w-6" style={{ background: '#dbebff' }} />
+              <time
+                dateTime={post.dateISO}
+                className="text-xs"
+                style={{ color: '#8c8c8c', fontFamily: FONT }}>
+                {post.date}
+              </time>
+            </span>
+          </div>
+        </div>
+      </Link>
+    </motion.article>
+  );
+}
+
 export default function BlogSection() {
   return (
-    <section className="w-full py-16 sm:py-20 md:py-24" style={{ background: 'white' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        
+    <section className="w-full py-16 sm:py-20 md:py-24" style={{ background: 'transparent' }}>
+      <div className="max-w-site mx-auto px-4 sm:px-6">
+
         {/* Header */}
         <motion.div
-          className="text-center mb-16"
+          className="mb-12 flex flex-col gap-6 sm:mb-16 md:flex-row md:items-end md:justify-between"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
-          
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-4"
-            style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            
-            Blog & Actualités
-          </span>
-          <h2
-            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15]"
-            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            
-            Nos Derniers{' '}
-            <span style={{ color: '#007f64' }}>Articles</span>
-          </h2>
+
+          <div>
+            <span
+              className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-4"
+              style={{ color: '#002d74', fontFamily: FONT }}>
+              Blog & Actualités
+            </span>
+            <h2
+              className="text-h2"
+              style={{ color: '#243037', fontFamily: HEADING_FONT, fontWeight: 700, letterSpacing: '-0.015em' }}>
+              Nos Derniers{' '}
+              <span style={{ color: '#002d74' }}>Articles</span>
+            </h2>
+            <p className="mt-4 text-sm max-w-md" style={{ color: '#5f6568', fontFamily: FONT }}>
+              Veille, retours de terrain et repères pratiques pour choisir votre prochaine compétence.
+            </p>
+          </div>
+
         </motion.div>
 
-        {/* Blog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {blogPosts.map((post, i) =>
-          <motion.article
-            key={post.slug}
-            className="group"
-            custom={i}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}>
-
-            <Link to={`/blog/${post.slug}`} className="block cursor-pointer">
-              {/* Image Container */}
-              <div className="relative overflow-hidden rounded-2xl mb-5 aspect-[4/3]">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              
-                {/* Category Badge */}
-                <div
-                className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-semibold"
-                style={{ backgroundColor: '#004c3c', color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                
-                  {post.category}
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="space-y-3">
-                {/* Meta */}
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span style={{ fontFamily: "'Inter', sans-serif" }}>{post.date}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span style={{ fontFamily: "'Inter', sans-serif" }}>{post.readTime}</span>
-                  </div>
-                </div>
-
-                {/* Title */}
-                <h3
-                className="text-lg font-bold leading-snug group-hover:text-[#007f64] transition-colors"
-                style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                
-                  {post.title}
-                </h3>
-
-                {/* Excerpt */}
-                <p
-                className="text-sm leading-relaxed line-clamp-2"
-                style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
-                
-                  {post.excerpt}
-                </p>
-
-                {/* Read More Link */}
-                <span
-                className="inline-flex items-center gap-2 text-sm font-semibold transition-all group-hover:gap-3"
-                style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-
-                  Lire l'article
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
-            </Link>
-            </motion.article>
-          )}
+        {/* Grille */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 items-stretch">
+          {blogPosts.map((post, i) => (
+            <ArticleCard key={post.slug} post={post} index={i} />
+          ))}
         </div>
 
-        {/* View All Button */}
+        {/* CTA */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}>
-          
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 h-11 px-6 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:shadow-lg"
-            style={{
-              backgroundColor: '#007f64',
-              color: 'white',
-              fontFamily: "'Plus Jakarta Sans', sans-serif"
-            }}>
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
 
-            Voir tous les articles
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <PrimaryButton to="/blog" className="mx-auto">Voir tous les articles</PrimaryButton>
         </motion.div>
 
       </div>

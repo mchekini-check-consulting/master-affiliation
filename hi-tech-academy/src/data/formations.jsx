@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Monitor, Euro, Users, CalendarClock, Award } from 'lucide-react';
+import { Clock, Monitor, CurrencyEur as Euro, Users, CalendarCheck as CalendarClock, Certificate as Award } from '@phosphor-icons/react';
 
 // Catalogue des formations. Pour ajouter une formation : ajouter une entrée
 // ici (carte + infos réglementaires Qualiopi + PDF du programme dans
@@ -11,14 +11,18 @@ export const formations = [
     tag: 'Infrastructure & Cloud',
     title: 'Kubernetes – Fondamentaux',
     description:
-      "Maîtrisez le déploiement d'applications conteneurisées avec Kubernetes en une journée : architecture d'un cluster, Pods et Deployments, Services (survol d'Ingress), ConfigMaps et Secrets — avec travaux pratiques sur un cluster Azure (AKS) réel.",
-    image: '/images/0002848c7_istock-2177184303.jpg',
-    version: 'Programme V1.0',
+      "Maîtrisez le déploiement d'applications conteneurisées avec Kubernetes en une journée : architecture d'un cluster, Pods et Deployments, Services (survol d'Ingress), ConfigMaps et Secrets, avec travaux pratiques sur un cluster Azure (AKS) réel.",
+    image: '/images/kubernetes-fondamentaux.jpg',
+    // Visuel d'arrière-plan du héro de la page formation (facultatif) :
+    // illustration détourée sur fond clair, alignée à droite. Sans valeur, le
+    // héro garde son seul dégradé.
+    heroBackground: '/images/hero-kubernetes-fondamentaux.png',
+    version: 'Programme V1.0 du 21/06/2026',
     pdf: '/documents/Programme_Kubernetes_Fondamentaux_V1.0.pdf',
     keyFacts: [
-      { icon: Clock, label: 'Durée', value: '7 h — 1 journée (9 h–12 h 30 / 13 h 30–17 h)' },
+      { icon: Clock, label: 'Durée', value: '7 h, 1 journée (9 h–12 h 30 / 13 h 30–17 h)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
-      { icon: Euro, label: 'Tarif', value: '1 000 € HT (1 200 € TTC) / stagiaire — forfait 7 h' },
+      { icon: Euro, label: 'Tarif', value: '1 000 € HT (1 200 € TTC) / stagiaire, forfait 7 h' },
       { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
       { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
@@ -113,7 +117,7 @@ export const formations = [
               si besoin son réseau de partenaires.
             </p>
             <p className="mb-2">
-              <strong>Référent handicap :</strong> Mahdi CHEKINI — <a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a> — <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>
+              <strong>Référent handicap :</strong> Mahdi CHEKINI (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>, <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>)
             </p>
             <p>
               <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
@@ -140,15 +144,15 @@ export const formations = [
     id: 'facturation-electronique-pennylane',
     tag: 'Gestion & Comptabilité',
     description:
-      "Comprenez la réforme de la facturation électronique (e-invoicing, e-reporting, calendrier 2026-2027), mettez votre entreprise en conformité et maîtrisez Pennylane au quotidien — factures conformes, fournisseurs, banque, trésorerie, collaboration avec votre cabinet — avec ateliers pratiques en environnement de démonstration.",
+      "Comprenez la réforme de la facturation électronique (e-invoicing, e-reporting, calendrier 2026-2027), mettez votre entreprise en conformité et maîtrisez Pennylane au quotidien (factures conformes, fournisseurs, banque, trésorerie, collaboration avec votre cabinet), avec ateliers pratiques en environnement de démonstration.",
     title: 'Facturation électronique & Pennylane',
     image: '/images/facturation-electronique-pennylane.jpg',
-    version: 'Programme V1.0',
+    version: 'Programme V1.0 du 09/09/2026',
     pdf: '/documents/Programme_Facturation_Electronique_Pennylane_V1.0.pdf',
     keyFacts: [
-      { icon: Clock, label: 'Durée', value: '14 h — 2 jours (9 h–12 h 30 / 13 h 30–17 h)' },
+      { icon: Clock, label: 'Durée', value: '14 h, 2 jours (9 h–12 h 30 / 13 h 30–17 h)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
-      { icon: Euro, label: 'Tarif', value: '2 200 € HT (2 640 € TTC) / stagiaire — forfait 14 h' },
+      { icon: Euro, label: 'Tarif', value: '2 200 € HT (2 640 € TTC) / stagiaire, forfait 14 h' },
       { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
       { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
@@ -161,12 +165,12 @@ export const formations = [
           <>
             <p className="mb-2">
               <strong>Public concerné :</strong> dirigeants de TPE/PME, indépendants et micro-entrepreneurs,
-              assistants de gestion — notamment clients de cabinets d'expertise comptable — souhaitant
+              assistants de gestion (notamment clients de cabinets d'expertise comptable) souhaitant
               se préparer à la réforme de la facturation électronique et utiliser Pennylane au quotidien.
             </p>
             <p className="mb-1"><strong>Prérequis :</strong></p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Aucun — formation non technique.</li>
+              <li>Aucun : formation non technique.</li>
               <li>Usage basique d'un ordinateur et d'un navigateur web.</li>
             </ul>
             <p className="mt-2">
@@ -246,7 +250,7 @@ export const formations = [
               si besoin son réseau de partenaires.
             </p>
             <p className="mb-2">
-              <strong>Référent handicap :</strong> Mahdi CHEKINI — <a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a> — <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>
+              <strong>Référent handicap :</strong> Mahdi CHEKINI (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>, <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>)
             </p>
             <p>
               <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
@@ -274,14 +278,14 @@ export const formations = [
     tag: 'Intelligence Artificielle',
     title: 'IA pour tous',
     description:
-      "Utilisez l'IA efficacement au quotidien, même en partant de zéro : comprendre les modèles (ChatGPT, Claude, Gemini…), maîtriser le prompting, gagner du temps sur vos e-mails, documents et recherches, créer images, vidéos, sites et présentations, et automatiser vos tâches avec les agents — 80 heures 100 % pratiques, sans prérequis.",
-    image: '/images/ia-pour-tous.jpg',
-    version: 'Programme V1.0',
+      "Utilisez l'IA efficacement au quotidien, même en partant de zéro : comprendre les modèles (ChatGPT, Claude, Gemini…), maîtriser le prompting, gagner du temps sur vos e-mails, documents et recherches, créer images, vidéos, sites et présentations, et automatiser vos tâches avec les agents. 80 heures 100 % pratiques, sans prérequis.",
+    image: '/images/ia-pour-tous.webp',
+    version: 'Programme V1.0 du 09/09/2026',
     pdf: '/documents/Programme_IA_Pour_Tous_V1.0.pdf',
     keyFacts: [
-      { icon: Clock, label: 'Durée', value: '80 h — séances à distance (planning défini à l’inscription)' },
+      { icon: Clock, label: 'Durée', value: '80 h, séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
-      { icon: Euro, label: 'Tarif', value: '2 500 € HT (3 000 € TTC) / stagiaire — forfait 80 h' },
+      { icon: Euro, label: 'Tarif', value: '2 500 € HT (3 000 € TTC) / stagiaire, forfait 80 h' },
       { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
       { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
@@ -293,12 +297,12 @@ export const formations = [
         content: (
           <>
             <p className="mb-2">
-              <strong>Public concerné :</strong> grand public — entrepreneurs, indépendants, salariés,
-              particuliers — souhaitant utiliser l'IA efficacement au quotidien, même en partant de zéro.
+              <strong>Public concerné :</strong> grand public (entrepreneurs, indépendants, salariés,
+              particuliers) souhaitant utiliser l'IA efficacement au quotidien, même en partant de zéro.
             </p>
             <p className="mb-1"><strong>Prérequis :</strong></p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Aucun — formation non technique.</li>
+              <li>Aucun : formation non technique.</li>
               <li>Usage basique d'un ordinateur et d'un navigateur web.</li>
             </ul>
             <p className="mt-2">
@@ -379,7 +383,7 @@ export const formations = [
               si besoin son réseau de partenaires.
             </p>
             <p className="mb-2">
-              <strong>Référent handicap :</strong> Mahdi CHEKINI — <a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a> — <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>
+              <strong>Référent handicap :</strong> Mahdi CHEKINI (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>, <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>)
             </p>
             <p>
               <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
@@ -407,14 +411,14 @@ export const formations = [
     tag: 'Intelligence Artificielle',
     title: 'IA for Business',
     description:
-      "Construisez un business opéré par des Agents IA, de l'idée aux premiers clients : trouver et valider une idée, créer marque, site, offre et CRM sans développeur, vendre avec des agents de prospection et de contenu, automatiser support et administratif, piloter le tout dans le respect du RGPD et de l'AI Act — 100 heures avec un projet fil rouge : un micro-business réel lancé pendant la formation.",
-    image: '/images/ia-for-business.jpg',
-    version: 'Programme V1.0',
+      "Construisez un business opéré par des Agents IA, de l'idée aux premiers clients : trouver et valider une idée, créer marque, site, offre et CRM sans développeur, vendre avec des agents de prospection et de contenu, automatiser support et administratif, piloter le tout dans le respect du RGPD et de l'AI Act. 100 heures avec un projet fil rouge : un micro-business réel lancé pendant la formation.",
+    image: '/images/ia-for-business.webp',
+    version: 'Programme V1.0 du 09/09/2026',
     pdf: '/documents/Programme_IA_For_Business_V1.0.pdf',
     keyFacts: [
-      { icon: Clock, label: 'Durée', value: '100 h — séances à distance (planning défini à l’inscription)' },
+      { icon: Clock, label: 'Durée', value: '100 h, séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
-      { icon: Euro, label: 'Tarif', value: '3 500 € HT (4 200 € TTC) / stagiaire — forfait 100 h' },
+      { icon: Euro, label: 'Tarif', value: '3 500 € HT (4 200 € TTC) / stagiaire, forfait 100 h' },
       { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
       { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
@@ -431,7 +435,7 @@ export const formations = [
             </p>
             <p className="mb-1"><strong>Prérequis :</strong></p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Aucun — les fondamentaux IA sont couverts au module 1.</li>
+              <li>Aucun : les fondamentaux IA sont couverts au module 1.</li>
               <li>Usage basique d'un ordinateur et d'un navigateur web.</li>
             </ul>
             <p className="mt-2">
@@ -462,7 +466,7 @@ export const formations = [
         title: 'Méthodes et moyens mobilisés',
         content: (
           <ul className="list-disc pl-5 space-y-1">
-            <li>Projet fil rouge : chaque participant lance un micro-business réel pendant la formation — chaque module fait avancer son projet.</li>
+            <li>Projet fil rouge : chaque participant lance un micro-business réel pendant la formation. Chaque module fait avancer son projet.</li>
             <li>Classe virtuelle synchrone Google Meet (caméra, partage d'écran, suivi de connexion).</li>
             <li>Chaque participant manipule les outils (Claude, MCP, n8n, outils de création et CRM) sur son propre poste, avec accompagnement individualisé.</li>
             <li>Support de cours, gabarits (prompts business, landing page, séquences de prospection), fiches outils et plan d'action téléchargeables.</li>
@@ -512,7 +516,7 @@ export const formations = [
               si besoin son réseau de partenaires.
             </p>
             <p className="mb-2">
-              <strong>Référent handicap :</strong> Mahdi CHEKINI — <a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a> — <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>
+              <strong>Référent handicap :</strong> Mahdi CHEKINI (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>, <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>)
             </p>
             <p>
               <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
@@ -540,14 +544,14 @@ export const formations = [
     tag: 'Intelligence Artificielle',
     title: 'IA for Tech',
     description:
-      "Concevez, construisez et déployez des applications IA de niveau production : fondamentaux LLM côté ingénierie, intégration d'APIs et SDKs, RAG du premier pipeline au RAG agentique, agents et MCP (consommer et construire), evals, sécurité et observabilité, travail en équipe augmentée (Claude Code, spec-driven development, CI/CD) — 100 heures en environnements pré-configurés, avec un projet final déployé et évalué (RAG + MCP + evals).",
-    image: '/images/ee46959d2_course-04.webp',
-    version: 'Programme V1.0',
+      "Concevez, construisez et déployez des applications IA de niveau production : fondamentaux LLM côté ingénierie, intégration d'APIs et SDKs, RAG du premier pipeline au RAG agentique, agents et MCP (consommer et construire), evals, sécurité et observabilité, travail en équipe augmentée (Claude Code, spec-driven development, CI/CD). 100 heures en environnements pré-configurés, avec un projet final déployé et évalué (RAG + MCP + evals).",
+    image: '/images/ia-for-tech.webp',
+    version: 'Programme V1.0 du 09/09/2026',
     pdf: '/documents/Programme_IA_For_Tech_V1.0.pdf',
     keyFacts: [
-      { icon: Clock, label: 'Durée', value: '100 h — séances à distance (planning défini à l’inscription)' },
+      { icon: Clock, label: 'Durée', value: '100 h, séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
-      { icon: Euro, label: 'Tarif', value: '6 500 € HT (7 800 € TTC) / stagiaire — forfait 100 h' },
+      { icon: Euro, label: 'Tarif', value: '6 500 € HT (7 800 € TTC) / stagiaire, forfait 100 h' },
       { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
       { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
       { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
@@ -642,7 +646,7 @@ export const formations = [
               si besoin son réseau de partenaires.
             </p>
             <p className="mb-2">
-              <strong>Référent handicap :</strong> Mahdi CHEKINI — <a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a> — <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>
+              <strong>Référent handicap :</strong> Mahdi CHEKINI (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>, <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>)
             </p>
             <p>
               <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
@@ -773,7 +777,7 @@ const iaTechQuizTexts = {
   selfLevelPdfLabel: 'Niveau déclaré en intégration de LLM',
   knowledgeSection: 'Votre stack (facultatif)',
   purposeQuestion: "Décrivez votre stack habituelle et un cas d'usage IA que vous aimeriez construire.",
-  finalPracticalNote: "Partie B (projet final : application agentique déployée — RAG + MCP + evals) évaluée par le formateur ; le total "
+  finalPracticalNote: "Partie B (projet final : application agentique déployée, RAG + MCP + evals) évaluée par le formateur ; le total "
     + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
 };
 

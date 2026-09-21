@@ -85,10 +85,10 @@ export default function FormationsView({ auth, onOpenRequests }) {
                     </div>
                   </td>
                   <td className="px-4 py-3.5 text-xs whitespace-nowrap" style={{ color: '#001a4a', ...bodyFont }}>
-                    {factOf(formation, 'Durée').split(' — ')[0]}
+                    {factOf(formation, 'Durée').split(', ')[0]}
                   </td>
                   <td className="px-4 py-3.5 text-xs whitespace-nowrap" style={{ color: '#001a4a', ...bodyFont }}>
-                    {factOf(formation, 'Tarif').split(' / ')[0].split(' — ')[0]}
+                    {factOf(formation, 'Tarif').split(' / ')[0].split(', ')[0]}
                   </td>
                   <td className="px-4 py-3.5"><Badge tone="info">{s?.total ?? 0}</Badge></td>
                   <td className="px-4 py-3.5"><Badge tone="warning">{s?.pending ?? 0}</Badge></td>

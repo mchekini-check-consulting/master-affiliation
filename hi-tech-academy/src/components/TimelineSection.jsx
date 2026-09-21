@@ -1,292 +1,127 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ClipboardList, Layers, Users, HeadphonesIcon, Briefcase, Award, ChevronLeft, ChevronRight } from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from '@phosphor-icons/react';
+import { NAVY, TEAL, MINT, MINT_LIGHT, LINE, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
-const steps = [
+// « Notre méthode » en six temps. Registre éditorial : une colonne collante
+// à gauche (promesse + photo), les six temps à droite en grande
+// typographie, numérotés parce que c'est une chronologie — la colonne reste
+// épinglée pendant qu'on les fait défiler. La version
+// précédente épinglait trois écrans pleins avec GSAP (~300 vh à traverser) :
+// spectaculaire, mais un visiteur venu d'une publicité ne traverse pas trois
+// écrans pour lire trois paragraphes.
+const TEMPS = [
   {
-    number: '01',
-    tag: 'Étape 1',
-    title: 'Évaluation Personnalisée',
-    description: "Chaque parcours commence par une évaluation des compétences pour personnaliser votre contenu et vous orienter vers les modules les plus pertinents.",
-    icon: ClipboardList,
-    span: 'col-span-2 md:col-span-1',
+    titre: 'Évaluer, puis construire',
+    texte: "Chaque parcours commence par une évaluation des compétences, qui oriente le contenu vers les modules les plus pertinents pour vous. Démonstrations, exercices pratiques et projets réels sont ensuite combinés pour une compréhension solide et une application concrète.",
+    reperes: ['Évaluation personnalisée', 'Modules interactifs'],
   },
   {
-    number: '02',
-    tag: 'Étape 2',
-    title: 'Modules Interactifs',
-    description: "Vidéos, quiz, exercices pratiques et projets réels combinés pour une compréhension approfondie et une application concrète.",
-    icon: Layers,
-    span: 'col-span-2 md:col-span-1',
+    titre: 'Préparer le terrain',
+    texte: "Avant le jour J, tout est prêt : convocation, lien de connexion, accès à votre environnement de travail et vérification technique. Si un aménagement est nécessaire, notre référent handicap le cale avec vous dès l'inscription. Le délai d'accès est d'un jour minimum entre votre demande et le démarrage.",
+    reperes: ['Accès vérifiés avant la session', 'Aménagements possibles'],
   },
   {
-    number: '03',
-    tag: 'Étape 3',
-    title: 'Apprentissage en Groupe',
-    description: "Sessions collaboratives, forums de discussion et projets en équipe pour apprendre comme dans un environnement professionnel.",
-    icon: Users,
-    span: 'col-span-2 md:col-span-2',
+    titre: 'Apprendre entouré',
+    texte: "Sessions en direct, échanges et projets en groupe : on apprend comme dans un environnement professionnel. Le formateur assure un soutien constant pour surmonter les difficultés et garder le rythme tout au long du parcours.",
+    reperes: ['Apprentissage en groupe', 'Accompagnement continu'],
   },
   {
-    number: '04',
-    tag: 'Étape 4',
-    title: 'Accompagnement Continu',
-    description: "Soutien constant de nos formateurs et mentors pour surmonter les défis et rester motivé tout au long de votre parcours.",
-    icon: HeadphonesIcon,
-    span: 'col-span-2 md:col-span-2',
+    titre: 'Pratiquer en conditions réelles',
+    texte: "La théorie ne tient que si elle résiste à la pratique. Chaque participant travaille sur son propre environnement, pour Kubernetes un cluster Azure AKS réel, et affronte les situations qui posent problème en production : un déploiement qui reste en attente, un service qui ne répond pas, une configuration à corriger.",
+    reperes: ['Environnement individuel', 'Cas de production'],
   },
   {
-    number: '05',
-    tag: 'Étape 5',
-    title: 'Projets Réels',
-    description: "Projets pratiques simulant des situations réelles pour vous préparer aux défis professionnels avec confiance.",
-    icon: Briefcase,
-    span: 'col-span-2 md:col-span-1',
+    titre: 'Prouver ses acquis',
+    texte: "Des projets pratiques simulant des situations réelles vous préparent aux défis du poste. Le parcours se termine par une évaluation finale des acquis (QCM et mise en pratique) et une attestation de fin de formation détaillant vos résultats.",
+    reperes: ['Projets réels', 'Évaluation et attestation'],
   },
   {
-    number: '06',
-    tag: 'Étape 6',
-    title: 'Évaluation & Attestation',
-    description: "Évaluation finale des acquis (QCM + mise en pratique) et attestation de fin de formation détaillant les résultats.",
-    icon: Award,
-    span: 'col-span-2 md:col-span-1',
+    titre: 'Garder le lien après',
+    texte: "La formation ne s'arrête pas à la dernière heure. Vous conservez vos supports, un questionnaire de satisfaction recueille votre retour à chaud, et un point à distance permet de mesurer ce que vous avez réellement transposé dans votre poste. Nous restons joignables pour la suite de votre parcours.",
+    reperes: ['Supports conservés', 'Retour à chaud et à froid'],
   },
 ];
 
 export default function TimelineSection() {
-  const [active, setActive] = useState(null);
-
   return (
-    <section style={{ background: '#007f64' }} className="py-16 px-4 md:px-8">
-      <div className="max-w-5xl mx-auto">
+    <section id="methode" className="bg-white py-20 sm:py-28" aria-label="Notre méthode, en six temps">
+      <div className="max-w-site mx-auto px-4 sm:px-6">
+        <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:gap-20 items-start">
+          {/* Colonne collante : promesse + photo */}
+          <div className="lg:sticky lg:top-28">
+            <p className="text-body-sm font-semibold mb-4" style={{ color: TEAL, ...headingFont }}>Notre méthode</p>
+            <h2
+              className="font-serif-display max-w-[14ch]"
+              style={{ fontSize: 'clamp(36px, 4vw, 56px)', lineHeight: 1.05, letterSpacing: '-0.02em', color: '#243037', ...serifFont }}>
+              Opérationnel à la fin. Pas seulement diplômé.
+            </h2>
+            <p className="text-body-lg leading-[1.6] mt-6 max-w-[38ch]" style={{ color: BODY_MUTED, ...bodyFont }}>
+              Six temps, les mêmes pour toutes nos formations : on mesure d'où vous partez, on prépare votre
+              environnement, on vous fait pratiquer en direct, on atteste ce que vous savez faire,
+              et on garde le lien ensuite.
+            </p>
 
-        {/* Header */}
-        <div className="text-center mb-10">
-          <span
-            className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-          >
-            Notre Savoir Faire
-          </span>
-          <h2
-            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] text-white"
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-          >
-            Découvrez Notre Approche{' '}
-            <span style={{ color: '#004c3c' }}>d'Apprentissage Interactif</span>
-          </h2>
-          <p className="mt-3 text-sm max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: "'Inter', sans-serif" }}>
-            Nous structurons nos formations pour maximiser votre expérience d'apprentissage en 6 étapes clés.
-          </p>
-        </div>
-
-        {/* Mobile Carousel */}
-        <div className="md:hidden">
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent>
-              {steps.map((step, i) => {
-                const Icon = step.icon;
-                const isActive = active === i;
-
-                return (
-                  <CarouselItem key={i} className="pl-4">
-                    <motion.div
-                      onClick={() => setActive(isActive ? null : i)}
-                      className="relative cursor-pointer rounded-2xl p-5 flex flex-col justify-between overflow-hidden"
-                      style={{
-                        background: isActive
-                          ? 'rgba(248,177,2,0.15)'
-                          : 'rgba(255,255,255,0.06)',
-                        border: isActive
-                          ? '1.5px solid rgba(248,177,2,0.5)'
-                          : '1.5px solid rgba(255,255,255,0.08)',
-                        minHeight: 180,
-                        transition: 'all 0.3s ease',
-                      }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {/* Ghost number */}
-                      <span
-                        className="absolute right-3 bottom-2 text-7xl font-black leading-none select-none pointer-events-none"
-                        style={{ color: 'rgba(255,255,255,0.04)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                      >
-                        {step.number}
-                      </span>
-
-                      {/* Top row */}
-                      <div className="flex items-start justify-between mb-3">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center"
-                          style={{ background: isActive ? '#004c3c' : 'rgba(255,255,255,0.12)' }}
-                        >
-                          <Icon className="w-5 h-5" style={{ color: isActive ? '#004c3c' : 'white' }} />
-                        </div>
-                        <span
-                          className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
-                          style={{
-                            background: 'rgba(248,177,2,0.15)',
-                            color: '#004c3c',
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          }}
-                        >
-                          {step.tag}
-                        </span>
-                      </div>
-
-                      {/* Title */}
-                      <h3
-                        className="font-bold text-sm text-white leading-snug mb-2 z-10 relative"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                      >
-                        {step.title}
-                      </h3>
-
-                      {/* Description — visible on click */}
-                      <AnimatePresence>
-                        {isActive && (
-                          <motion.p
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                            className="text-xs leading-relaxed z-10 relative overflow-hidden"
-                            style={{ color: 'rgba(255,255,255,0.70)', fontFamily: "'Inter', sans-serif" }}
-                          >
-                            {step.description}
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Tap hint */}
-                      {!isActive && (
-                        <span className="text-[10px] mt-1 z-10 relative" style={{ color: 'rgba(255,255,255,0.30)', fontFamily: "'Inter', sans-serif" }}>
-                          Appuyez pour en savoir plus →
-                        </span>
-                      )}
-                    </motion.div>
-                  </CarouselItem>
-                );
-              })}
-            </CarouselContent>
-            <CarouselPrevious className="left-2" />
-            <CarouselNext className="right-2" />
-          </Carousel>
-          
-          {/* Scroll indicator dots */}
-          <div className="flex items-center justify-center gap-2 mt-4">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="w-2 h-2 rounded-full"
-                style={{ background: i === 0 ? '#004c3c' : 'rgba(255,255,255,0.3)' }}
+            <figure className="relative overflow-hidden m-0 mt-10 hidden lg:block" style={{ borderRadius: 8, aspectRatio: '4 / 3', background: NAVY }}>
+              <img
+                src="/images/timeline-classe-virtuelle.webp"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover"
               />
-            ))}
+              {/* Filtre de marque : un aplat navy en légère opacité posé sur la
+                  photo (pas un dégradé, pas de blanc translucide) — la teinte
+                  unifie la photo avec la palette du site tout en la gardant
+                  lisible sous la légende. */}
+              <div aria-hidden="true" className="absolute inset-0" style={{ background: NAVY, opacity: 0.32 }} />
+              <figcaption className="absolute left-0 right-0 bottom-0 px-5 py-4 text-white" style={{ background: NAVY }}>
+                <span className="block text-body-sm font-semibold" style={{ color: MINT, ...headingFont }}>Classe virtuelle en direct</span>
+                <span className="block text-body-sm mt-1" style={bodyFont}>Chaque participant travaille sur son propre environnement.</span>
+              </figcaption>
+            </figure>
           </div>
-          <p className="text-center text-xs mt-2" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: "'Inter', sans-serif" }}>
-            Faites défiler pour voir les étapes
-          </p>
-        </div>
 
-        {/* Desktop Bento Grid */}
-        <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-3">
-          {steps.map((step, i) => {
-            const Icon = step.icon;
-            const isActive = active === i;
-
-            return (
-              <motion.div
-                key={i}
-                onClick={() => setActive(isActive ? null : i)}
-                className={`relative cursor-pointer rounded-2xl p-5 flex flex-col justify-between overflow-hidden ${step.span}`}
-                style={{
-                  background: isActive
-                    ? 'rgba(248,177,2,0.15)'
-                    : 'rgba(255,255,255,0.06)',
-                  border: isActive
-                    ? '1.5px solid rgba(248,177,2,0.5)'
-                    : '1.5px solid rgba(255,255,255,0.08)',
-                  minHeight: 160,
-                  transition: 'all 0.3s ease',
-                }}
-                whileHover={{ scale: 1.02, background: 'rgba(255,255,255,0.10)' }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {/* Ghost number */}
+          {/* Les six temps */}
+          <ol style={{ borderTop: `1px solid ${LINE}` }}>
+            {TEMPS.map(({ titre, texte, reperes }, i) => (
+              <li
+                key={titre}
+                className="grid grid-cols-[56px_minmax(0,1fr)] sm:grid-cols-[88px_minmax(0,1fr)] gap-x-4 py-8 sm:py-10"
+                style={{ borderBottom: `1px solid ${LINE}` }}>
                 <span
-                  className="absolute right-3 bottom-2 text-7xl font-black leading-none select-none pointer-events-none"
-                  style={{ color: 'rgba(255,255,255,0.04)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                >
-                  {step.number}
+                  className="font-serif-display tabular-nums leading-none pt-1"
+                  style={{ fontSize: 'clamp(28px, 2.6vw, 40px)', letterSpacing: '-0.02em', color: TEAL, ...serifFont }}>
+                  {String(i + 1).padStart(2, '0')}
                 </span>
-
-                {/* Top row */}
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: isActive ? '#004c3c' : 'rgba(255,255,255,0.12)' }}
-                  >
-                    <Icon className="w-5 h-5" style={{ color: isActive ? '#004c3c' : 'white' }} />
-                  </div>
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
-                    style={{
-                      background: 'rgba(248,177,2,0.15)',
-                      color: '#004c3c',
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    }}
-                  >
-                    {step.tag}
-                  </span>
+                <div className="min-w-0">
+                  <h3
+                    className="font-serif-display"
+                    style={{ fontSize: 'clamp(24px, 2.4vw, 34px)', lineHeight: 1.15, letterSpacing: '-0.015em', color: '#243037', ...serifFont }}>
+                    {titre}
+                  </h3>
+                  <p className="text-body-lg leading-[1.6] mt-4 max-w-measure" style={{ color: BODY, ...bodyFont }}>{texte}</p>
+                  <ul className="flex flex-wrap gap-2 mt-5">
+                    {reperes.map((r) => (
+                      <li key={r} className="inline-flex items-center h-8 px-3.5 rounded-full text-body-sm font-medium" style={{ background: MINT_LIGHT, color: NAVY, ...headingFont }}>
+                        {r}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                {/* Title */}
-                <h3
-                  className="font-bold text-sm text-white leading-snug mb-2 z-10 relative"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                >
-                  {step.title}
-                </h3>
-
-                {/* Description — visible on click */}
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.p
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="text-xs leading-relaxed z-10 relative overflow-hidden"
-                      style={{ color: 'rgba(255,255,255,0.70)', fontFamily: "'Inter', sans-serif" }}
-                    >
-                      {step.description}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-
-                {/* Tap hint */}
-                {!isActive && (
-                  <span className="text-[10px] mt-1 z-10 relative" style={{ color: 'rgba(255,255,255,0.30)', fontFamily: "'Inter', sans-serif" }}>
-                    Appuyez pour en savoir plus →
-                  </span>
-                )}
-              </motion.div>
-            );
-          })}
+              </li>
+            ))}
+          </ol>
         </div>
 
+        <div className="flex flex-wrap items-center justify-between gap-6 mt-12 sm:mt-16">
+          <p className="text-h4 max-w-[40ch]" style={{ color: '#243037', ...headingFont }}>
+            La méthode est la même partout. Reste à choisir la formation.
+          </p>
+          <Link to="/formations" className="inline-flex items-center gap-2 text-body-base font-semibold hover:underline" style={{ color: TEAL, ...headingFont }}>
+            Voir les formations <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
     </section>
   );

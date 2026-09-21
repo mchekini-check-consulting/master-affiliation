@@ -1,132 +1,38 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle, Zap, Shield } from 'lucide-react';
+import { Phone } from '@phosphor-icons/react';
+import PrimaryButton from '@/components/ui/primary-button';
+import { NAVY, MINT, headingFont, serifFont, bodyFont } from '@/components/design';
+
+// Dernier appel de la page d'accueil : un seul bandeau marine, une promesse,
+// une action. Compact — c'est un appel à l'action, pas une section de
+// contenu — et détaché du pied de page par le blanc autour.
 
 export default function CTASection() {
   return (
-    <section className="w-full" style={{ background: 'white' }}>
-      <div className="w-full">
-        <motion.div
-          className="relative w-full overflow-hidden min-h-[240px] md:min-h-[280px]"
-          style={{
-            background: 'linear-gradient(135deg, #004c3c 0%, #007f64 60%, #00d1a5 100%)'
-          }}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
-          
-          {/* Animated background particles */}
-          <div className="absolute inset-0 overflow-hidden">
-            {[...Array(5)].map((_, i) =>
-            <motion.div
-              key={i}
-              className="absolute rounded-full"
-              style={{
-                background: 'radial-gradient(ellipse, rgba(248,177,2,0.08) 0%, transparent 70%)',
-                width: 150 + i * 60,
-                height: 150 + i * 60,
-                left: `${10 + i * 20}%`,
-                top: `${15 + i % 3 * 20}%`
-              }}
-              animate={{
-                y: [0, -25, 0],
-                opacity: [0.3, 0.5, 0.3]
-              }}
-              transition={{
-                duration: 4 + i * 0.5,
-                repeat: Infinity,
-                ease: 'easeInOut'
-              }} />
-
-            )}
+    <section id="commencer" className="bg-white py-14 sm:py-20">
+      <div className="max-w-site mx-auto px-4 sm:px-6">
+        <div
+          className="grid lg:grid-cols-[minmax(0,1fr)_auto] gap-8 lg:gap-16 items-center px-7 sm:px-12 py-10 sm:py-12 text-white"
+          style={{ borderRadius: 8, background: NAVY }}>
+          <div>
+            <h2
+              className="font-serif-display text-white max-w-[22ch]"
+              style={{ fontSize: 'clamp(28px, 2.8vw, 40px)', lineHeight: 1.1, letterSpacing: '-0.02em', ...serifFont }}>
+              Votre prochaine compétence commence ici.
+            </h2>
+            <p className="text-body-base leading-[1.55] mt-3 max-w-measure" style={{ color: '#dbebff', ...bodyFont }}>
+              Choisissez votre formation et recevez programme et devis sous 24 h ouvrées. Sessions dès un participant, sans engagement.
+            </p>
           </div>
 
-          {/* Content Container */}
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between px-8 md:px-16 lg:px-20 py-12 md:py-16">
-            
-            {/* Left Content - Text */}
-            <motion.div
-              className="w-full md:w-1/2 lg:w-3/5 mb-8 md:mb-0"
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
-              
-              {/* Label with icon */}
-              
-
-
-
-
-
-
-
-              
-
-              {/* Heading */}
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-white"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                
-                Commencez votre formation{' '}
-                <span style={{ color: '#004c3c' }}>aujourd'hui !</span>
-              </h2>
-
-              {/* Body */}
-              <p
-                className="text-xs sm:text-sm md:text-base leading-relaxed mb-8 text-white/75 max-w-xl"
-                style={{ fontFamily: "'Inter', sans-serif" }}>
-                
-                Montez en compétences avec notre formation Kubernetes animée en direct par un formateur expert, 100 % à distance.
-              </p>
-
-              {/* Trust indicators */}
-              
-
-
-
-
-
-
-
-
-
-
-
-
-              
-
-              {/* CTA Button */}
-              <a
-                href="#programmes"
-                className="inline-flex items-center gap-2 h-12 px-7 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:shadow-lg hover:gap-3"
-                style={{ backgroundColor: '#004c3c', color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                
-                Explorer les formations
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </motion.div>
-
-            {/* Right Image - Positioned at bottom */}
-            <motion.div
-              className="w-full md:w-1/2 lg:w-2/5 flex items-end justify-center md:justify-end"
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}>
-              
-              <img src="/images/b24b26313_nori-student-06.png"
-
-              alt="Étudiant Hi Tech Academy"
-              className="w-full max-w-[280px] md:max-w-[320px] h-auto object-contain drop-shadow-2xl" />
-              
-              
-            </motion.div>
-
+          <div className="flex flex-col items-start lg:items-end gap-3">
+            <PrimaryButton to="/formations" size="lg" inverted>Choisir ma formation</PrimaryButton>
+            <a href="tel:+33751474135" className="inline-flex items-center gap-2 text-body-sm font-semibold hover:underline" style={{ color: MINT, ...headingFont }}>
+              <Phone className="w-4 h-4" /> Ou appelez-nous : 07 51 47 41 35
+            </a>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }

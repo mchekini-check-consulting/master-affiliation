@@ -6,15 +6,20 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
+import BackToTop from './components/BackToTop';
+import CookieConsent from './components/CookieConsent';
+import DevAnnotator from './components/dev/DevAnnotator';
 import Home from './pages/Home';
 import LegalNotices from './pages/LegalNotices';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import CookiePolicy from './pages/CookiePolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import Formations from './pages/Formations';
 import FormationVente from './pages/FormationVente';
 import Financements from './pages/Financements';
+import Reclamations from './pages/Reclamations';
 import Inscription from './pages/Inscription';
 import AnalyseBesoin from './pages/AnalyseBesoin';
 import QuestionnaireCommanditaire from './pages/QuestionnaireCommanditaire';
@@ -56,6 +61,7 @@ const AuthenticatedApp = () => {
       <Route path="/formations" element={<Formations />} />
       <Route path="/formations/:formationId" element={<FormationVente />} />
       <Route path="/financements" element={<Financements />} />
+      <Route path="/reclamations" element={<Reclamations />} />
       <Route path="/inscription/:formationId" element={<Inscription />} />
       <Route path="/inscription/demande/:requestId/questionnaire" element={<AnalyseBesoin />} />
       <Route path="/inscription/demande/:requestId/questionnaire-commanditaire" element={<QuestionnaireCommanditaire />} />
@@ -65,6 +71,7 @@ const AuthenticatedApp = () => {
       <Route path="/admin" element={<Admin />} />
       <Route path="/mentions-legales" element={<LegalNotices />} />
       <Route path="/politique-confidentialite" element={<PrivacyPolicy />} />
+      <Route path="/politique-cookies" element={<CookiePolicy />} />
       <Route path="/conditions-vente" element={<TermsAndConditions />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
@@ -80,8 +87,12 @@ function App() {
         <Router>
           <ScrollToTop />
           <AuthenticatedApp />
+          <BackToTop />
+          <CookieConsent />
         </Router>
         <Toaster />
+        {/* Barre d'annotation, montée en développement uniquement. */}
+        <DevAnnotator />
       </QueryClientProvider>
     </AuthProvider>
   )

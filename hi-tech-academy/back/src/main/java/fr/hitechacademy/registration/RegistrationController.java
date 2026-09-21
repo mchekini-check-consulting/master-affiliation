@@ -89,7 +89,18 @@ public class RegistrationController {
         r.setCurrentPosition(body.currentPosition());
         r.setNeedsAdaptation(Boolean.TRUE.equals(body.needsAdaptation()));
 
+        // Devis : la demande ne passe pas par le questionnaire obligatoire, elle
+        // est transmise à l'admin (et notifiée) dès son dépôt.
+        boolean devis = Boolean.TRUE.equals(body.quoteRequest());
+        r.setQuoteRequest(devis);
+        if (devis) {
+            r.setStatus(RegistrationStatus.PENDING);
+        }
+
         RegistrationRequest saved = repository.save(r);
+        if (devis) {
+            mailService.notifyAdminNewRequest(saved);
+        }
         return new CreatedResponse(saved.getId(), saved.getStatus());
     }
 

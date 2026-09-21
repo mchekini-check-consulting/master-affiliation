@@ -1,35 +1,62 @@
 import React from 'react';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { FilePdf } from '@phosphor-icons/react';
+import { TEAL, LINE, BODY_MUTED, bodyFont } from '@/components/design';
+
+// Bandeau utilitaire, collé en haut de la fenêtre au-dessus de la capsule de
+// navigation. Il est fixe parce qu'il vit dans le `<header>`, lui-même en
+// `position: fixed`.
+//
+// Contenu : trois raccourcis, alignés à droite. Ce ne sont pas des doublons de
+// la navigation principale — « Livret d'accueil » est un PDF qui n'y figure
+// pas, et les deux autres sont les destinations qu'un visiteur cherche en
+// premier. Les coordonnées de contact qui étaient à gauche sont retirées : le
+// téléphone est déjà dans la capsule juste en dessous.
+//
+// Chaque cible existe : les deux routes sont déclarées dans App.jsx, et le PDF
+// est celui que le footer référence déjà.
+const LIENS = [
+  { label: 'Catalogue des formations', to: '/formations' },
+  { label: 'Financer sa formation', to: '/financements' },
+  { label: "Livret d'accueil", href: '/documents/qualiopi/Livret_accueil_V1.0.pdf', pdf: true },
+];
 
 export default function TopBar() {
   return (
-    <div className="w-full bg-white border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between">
-        {/* Left — contact info */}
-        <div className="hidden md:flex items-center gap-6">
-          <a href="tel:+33751474135" className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">
-            <Phone className="w-3 h-3" />
-            07 51 47 41 35
-          </a>
-          <a href="mailto:contact@hi-techacademy.fr" className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">
-            <Mail className="w-3 h-3" />
-            contact@hi-techacademy.fr
-          </a>
-          <span className="hidden lg:flex items-center gap-1.5 text-xs text-gray-500 [font-family:'Inter',sans-serif]">
-            <MapPin className="w-3 h-3" />
-            73 Rue de Reuilly, 75012 Paris
-          </span>
-        </div>
-
-        {/* Right — quick links */}
-        <div className="flex items-center gap-5 ml-auto">
-          <a href="#about" className="text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">À propos</a>
-          <a href="/blog" className="text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">Blog</a>
-          <a href="#contact" className="text-xs text-gray-500 hover:text-gray-800 transition-colors [font-family:'Inter',sans-serif]">Contact</a>
-          
-          
-        </div>
+    <div className="w-full bg-white" style={{ borderBottom: `1px solid ${LINE}` }}>
+      <div className="max-w-site mx-auto px-4 sm:px-6">
+        {/* Défilement horizontal sur écran étroit plutôt qu'un retour à la
+            ligne, qui ferait grandir le bandeau et décalerait tout le header. */}
+        <nav
+          aria-label="Liens utiles"
+          className="h-9 flex items-center justify-end gap-6 overflow-x-auto no-scrollbar"
+          style={{ ...bodyFont }}>
+          {LIENS.map(({ label, to, href, pdf }) => {
+            const classes = 'inline-flex items-center gap-2 h-9 whitespace-nowrap text-body-sm transition-colors hover:text-[#000c5b]';
+            const contenu = (
+              <>
+                {pdf && <FilePdf className="w-4 h-4 shrink-0" style={{ color: TEAL }} />}
+                {label}
+              </>
+            );
+            return href ? (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={classes}
+                style={{ color: BODY_MUTED }}>
+                {contenu}
+              </a>
+            ) : (
+              <Link key={label} to={to} className={classes} style={{ color: BODY_MUTED }}>
+                {contenu}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
-    </div>);
-
+    </div>
+  );
 }

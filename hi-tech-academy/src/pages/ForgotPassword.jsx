@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { Envelope as Mail, ArrowLeft, CircleNotch as Loader2 } from '@phosphor-icons/react';
 import AuthLayout from "@/components/AuthLayout";
 
 export default function ForgotPassword() {

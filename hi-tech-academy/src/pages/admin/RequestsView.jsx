@@ -300,6 +300,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {detail.quote_request && <Badge tone="info">Demande de devis</Badge>}
           <StatusBadge status={detail.status} />
           {detail.status === 'PENDING' && (
             <>
@@ -899,7 +900,8 @@ export default function RequestsView({ auth, selectedId, onSelect, initialFormat
 
   const filtered = useMemo(
     () => (items ?? []).filter((i) =>
-      (statusFilter === 'ALL' || i.status === statusFilter) &&
+      // « Devis » n'est pas un statut : c'est un filtre sur l'origine de la demande.
+      (statusFilter === 'ALL' || (statusFilter === 'DEVIS' ? i.quote_request : i.status === statusFilter)) &&
       (formationFilter === 'ALL' || i.formation_id === formationFilter)),
     [items, statusFilter, formationFilter]
   );
@@ -921,6 +923,7 @@ export default function RequestsView({ auth, selectedId, onSelect, initialFormat
   const FILTERS = [
     { key: 'ALL', label: 'Toutes' },
     { key: 'PENDING', label: 'En attente' },
+    { key: 'DEVIS', label: 'Devis' },
     { key: 'VALIDATED', label: 'Validées' },
     { key: 'REFUSED', label: 'Refusées' },
   ];
@@ -999,8 +1002,9 @@ export default function RequestsView({ auth, selectedId, onSelect, initialFormat
                     {formatDate(item.created_at)}
                   </td>
                   <td className="px-4 py-3.5">
-                    <p className="text-sm font-semibold" style={{ color: '#001a4a', ...headingFont }}>
+                    <p className="text-sm font-semibold flex items-center gap-2" style={{ color: '#001a4a', ...headingFont }}>
                       {item.first_name} {item.last_name}
+                      {item.quote_request && <Badge tone="info">Devis</Badge>}
                     </p>
                     <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
                       {item.company_name || item.email}

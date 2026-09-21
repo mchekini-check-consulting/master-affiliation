@@ -11,19 +11,19 @@ export default function LegalNotices() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <h1
             className="text-3xl sm:text-4xl font-bold mb-8"
-            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: '#243037', fontFamily: "'Inter', sans-serif" }}
           >
             Mentions Légales
           </h1>
 
-          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
+          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6568', fontFamily: "'Inter', sans-serif" }}>
             
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 1. Éditeur du site
               </h2>
               <p className="mb-2">
-                <strong>Hi-Tech Academy</strong> — Organisme de formation<br />
+                <strong>Hi-Tech Academy</strong>, organisme de formation<br />
                 Siège social : 73 Rue de Reuilly, 75012 Paris<br />
                 SIRET : 922 695 648 00027<br />
                 Déclaration d'activité enregistrée sous le n° 11756755575 auprès du préfet de la région
@@ -34,7 +34,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 2. Directeur de la publication
               </h2>
               <p>
@@ -43,7 +43,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 3. Hébergement
               </h2>
               <p>
@@ -52,7 +52,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 4. Propriété intellectuelle
               </h2>
               <p>
@@ -61,7 +61,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 5. Responsabilité
               </h2>
               <p>
@@ -70,7 +70,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 6. Liens hypertextes
               </h2>
               <p>

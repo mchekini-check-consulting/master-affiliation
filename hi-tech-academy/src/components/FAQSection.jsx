@@ -1,141 +1,300 @@
+import PrimaryButton from '@/components/ui/primary-button';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, GraduationCap, Wallet, Lifebuoy, ThumbsUp, ThumbsDown } from '@phosphor-icons/react';
 
-const faqs = [
+// FAQ organisée par thème : un rail de catégories à gauche (colonne sur
+// desktop, ligne défilante sur mobile) et l'accordéon correspondant à droite.
+// Un seul panneau ouvert à la fois, par catégorie.
+const CATEGORIES = [
   {
-    question: "Quels sont les prérequis pour rejoindre la formation Kubernetes ?",
-    answer: "La formation Kubernetes – Fondamentaux nécessite la maîtrise des bases de la ligne de commande Linux et des fondamentaux des conteneurs et de Docker. Ces prérequis sont vérifiés à l'entrée via un test de positionnement, et le programme détaillé les précise.",
+    id: 'formation',
+    label: 'La formation',
+    icon: GraduationCap,
+    items: [
+      {
+        id: 'f1',
+        question: "Quels sont les prérequis pour rejoindre la formation Kubernetes ?",
+        answer: "La formation Kubernetes – Fondamentaux nécessite la maîtrise des bases de la ligne de commande Linux et des fondamentaux des conteneurs et de Docker. Ces prérequis sont vérifiés à l'entrée via un test de positionnement, et le programme détaillé les précise.",
+      },
+      {
+        id: 'f2',
+        question: "Quelle est la durée de la formation ?",
+        answer: "La formation Kubernetes – Fondamentaux dure 7 heures, sur 1 journée : 3 h 30 le matin (9 h 00–12 h 30) et 3 h 30 l'après-midi (13 h 30–17 h 00).",
+      },
+      {
+        id: 'f3',
+        question: "Est-ce que la formation se fait en ligne ou en présentiel ?",
+        answer: "La formation se déroule 100 % à distance, en classe virtuelle synchrone (Google Meet), animée en direct par le formateur, avec des travaux pratiques sur un cluster Kubernetes réel (Azure AKS).",
+      },
+      {
+        id: 'f4',
+        question: "Quel document est délivré à l'issue de la formation ?",
+        answer: "La formation donne lieu à une attestation de fin de formation (art. L.6353-1 du Code du travail) mentionnant les objectifs, la nature, la durée et les résultats de l'évaluation des acquis.",
+      },
+    ],
   },
   {
-    question: "Quel document est délivré à l'issue de la formation ?",
-    answer: "La formation donne lieu à une attestation de fin de formation (art. L.6353-1 du Code du travail) mentionnant les objectifs, la nature, la durée et les résultats de l'évaluation des acquis.",
+    id: 'financement',
+    label: 'Financement',
+    icon: Wallet,
+    items: [
+      {
+        id: 'p1',
+        question: "Qui peut financer ma formation ?",
+        answer: "La plupart de nos participants ne paient pas leur formation eux-mêmes : salarié, votre entreprise mobilise son plan de développement des compétences et son OPCO ; travailleur non salarié, votre fonds de formation (AGEFICE, FIF PL, FAFCEA) prend en charge tout ou partie du coût, dans la limite de son plafond annuel.",
+      },
+      {
+        id: 'p2',
+        question: "Quels documents fournissez-vous pour le dossier ?",
+        answer: "Nous remettons devis, programme et convention de formation au format attendu par votre OPCO ou votre fonds, à votre nom. Vous déposez la demande, nous complétons chaque pièce demandée.",
+      },
+      {
+        id: 'p3',
+        question: "Et si je finance moi-même ?",
+        answer: "Si vous vous formez à titre personnel, le prix affiché est le prix final. Un devis et une convention vous sont remis avant tout engagement, avec délai de rétractation.",
+      },
+    ],
   },
   {
-    question: "Est-ce que la formation se fait en ligne ou en présentiel ?",
-    answer: "La formation se déroule 100 % à distance, en classe virtuelle synchrone (Google Meet), animée en direct par le formateur, avec des travaux pratiques sur un cluster Kubernetes réel (Azure AKS).",
-  },
-  {
-    question: "Quelle est la durée de la formation ?",
-    answer: "La formation Kubernetes – Fondamentaux dure 7 heures, sur 1 journée : 3 h 30 le matin (9 h 00–12 h 30) et 3 h 30 l'après-midi (13 h 30–17 h 00).",
-  },
-  {
-    question: "Sous quel délai puis-je commencer la formation ?",
-    answer: "Le délai d'accès est de 1 jour minimum entre votre demande et le début de la formation (hors délais de prise en charge par un financeur). La session ouvre à partir de 1 participant.",
-  },
-  {
-    question: "La formation est-elle accessible aux personnes en situation de handicap ?",
-    answer: "Oui. Nos formations à distance peuvent être adaptées aux personnes en situation de handicap. Lors de l'inscription, notre référent handicap (Mahdi CHEKINI — contact@hi-techacademy.fr — 07 51 47 41 35) étudie avec vous les aménagements nécessaires.",
+    id: 'acces',
+    label: 'Accès & accompagnement',
+    icon: Lifebuoy,
+    items: [
+      {
+        id: 'a1',
+        question: "Sous quel délai puis-je commencer la formation ?",
+        answer: "Le délai d'accès est de 1 jour minimum entre votre demande et le début de la formation (hors délais de prise en charge par un financeur). La session ouvre à partir de 1 participant.",
+      },
+      {
+        id: 'a2',
+        question: "La formation est-elle accessible aux personnes en situation de handicap ?",
+        answer: "Oui. Nos formations à distance peuvent être adaptées aux personnes en situation de handicap. Lors de l'inscription, notre référent handicap (Mahdi CHEKINI, contact@hi-techacademy.fr, 07 51 47 41 35) étudie avec vous les aménagements nécessaires.",
+      },
+    ],
   },
 ];
 
-export default function FAQSection() {
-  const [openIndex, setOpenIndex] = useState(null);
+const FONT = "'Inter', sans-serif";
+const HEADING_FONT = "'DM Sans', sans-serif";
 
-  const toggle = (i) => setOpenIndex(openIndex === i ? null : i);
+function FeedbackRow() {
+  const [vote, setVote] = useState(null);
+
+  const base =
+    'inline-flex items-center gap-2 h-9 px-3.5 rounded-full text-xs font-semibold transition-colors duration-200 cursor-pointer';
 
   return (
-    <section className="w-full py-16 sm:py-20 px-4 sm:px-6 md:px-8" style={{ background: 'white' }}>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+    <div className="flex flex-wrap items-center gap-2 pt-1">
+      <span className="text-xs mr-1" style={{ color: '#8c8c8c', fontFamily: FONT }}>
+        Cette réponse vous a-t-elle aidé ?
+      </span>
+      <button
+        type="button"
+        onClick={() => setVote('up')}
+        aria-pressed={vote === 'up'}
+        className={base}
+        style={{
+          fontFamily: FONT,
+          border: '1px solid #dbebff',
+          background: vote === 'up' ? '#000c5b' : '#ffffff',
+          color: vote === 'up' ? '#ffffff' : '#002d74',
+        }}
+      >
+        <ThumbsUp className="w-3.5 h-3.5" weight={vote === 'up' ? 'fill' : 'regular'} />
+        Oui
+      </button>
+      <button
+        type="button"
+        onClick={() => setVote('down')}
+        aria-pressed={vote === 'down'}
+        className={base}
+        style={{
+          fontFamily: FONT,
+          border: '1px solid #dbebff',
+          background: vote === 'down' ? '#000c5b' : '#ffffff',
+          color: vote === 'down' ? '#ffffff' : '#002d74',
+        }}
+      >
+        <ThumbsDown className="w-3.5 h-3.5" weight={vote === 'down' ? 'fill' : 'regular'} />
+        Non
+      </button>
+      {vote && (
+        <span className="text-xs" style={{ color: '#5f6568', fontFamily: FONT }}>
+          Merci pour votre retour.
+        </span>
+      )}
+    </div>
+  );
+}
+
+export default function FAQSection() {
+  const [category, setCategory] = useState(CATEGORIES[0].id);
+  const [openId, setOpenId] = useState(CATEGORIES[0].items[0].id);
+
+  const active = CATEGORIES.find((c) => c.id === category) ?? CATEGORIES[0];
+
+  const selectCategory = (c) => {
+    setCategory(c.id);
+    setOpenId(c.items[0].id);
+  };
+
+  return (
+    <section className="w-full py-16 sm:py-20 px-4 sm:px-6 md:px-8" style={{ background: 'transparent' }}>
+      <div className="max-w-5xl mx-auto">
 
         {/* Header */}
         <div className="text-center mb-12">
           <span
             className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-            style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: '#002d74', fontFamily: FONT }}
           >
             FAQ
           </span>
           <h2
-            className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] mb-4"
-            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            className="text-h2 mb-4"
+            style={{ color: '#243037', fontFamily: HEADING_FONT, fontWeight: 700, letterSpacing: '-0.015em' }}
           >
             Questions{' '}
-            <span style={{ color: '#007f64' }}>Fréquentes</span>
+            <span style={{ color: '#002d74' }}>Fréquentes</span>
           </h2>
-          <p className="text-sm" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
-            Tout ce que vous devez savoir avant de commencer votre parcours.
+          <p className="text-sm" style={{ color: '#5f6568', fontFamily: FONT }}>
+            Choisissez un thème, puis ouvrez la question qui vous concerne.
           </p>
 
           <div className="flex items-center justify-center gap-3 mt-5">
-            <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
-            <div className="w-2 h-2 rounded-full" style={{ background: '#004c3c' }} />
-            <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
+            <div className="h-px w-12" style={{ background: '#dbebff' }} />
+            <div className="w-2 h-2 rounded-full" style={{ background: '#000c5b' }} />
+            <div className="h-px w-12" style={{ background: '#dbebff' }} />
           </div>
         </div>
 
-        {/* Items */}
-        <div className="flex flex-col gap-3">
-          {faqs.map((faq, i) => {
-            const isOpen = openIndex === i;
-            return (
-              <div
-                key={i}
-                className="rounded-2xl overflow-hidden"
-                style={{
-                  border: isOpen ? '1.5px solid #007f64' : '1.5px solid #e8edf6',
-                  transition: 'border-color 0.3s ease',
-                }}
-              >
-                <button
-                  onClick={() => toggle(i)}
-                  className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
-                  style={{ background: isOpen ? '#f5f7fc' : 'white', transition: 'background 0.3s ease' }}
-                >
-                  <span
-                    className="font-semibold text-sm md:text-base leading-snug"
-                    style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                  >
-                    {faq.question}
-                  </span>
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: isOpen ? '#007f64' : '#eafff6', transition: 'background 0.3s ease' }}
-                  >
-                    {isOpen
-                      ? <Minus className="w-4 h-4 text-white" />
-                      : <Plus className="w-4 h-4" style={{ color: '#007f64' }} />
-                    }
-                  </div>
-                </button>
+        <div className="flex flex-col gap-6 md:flex-row md:gap-10">
 
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      style={{ overflow: 'hidden', background: '#f5f7fc' }}
-                    >
-                      <p
-                        className="px-5 pb-5 text-sm leading-relaxed"
-                        style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}
-                      >
-                        {faq.answer}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-10">
-          <p className="text-sm mb-4" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
-            Vous avez d'autres questions ?
-          </p>
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 h-11 px-7 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90"
-            style={{ backgroundColor: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+          {/* Rail de catégories */}
+          <div
+            role="tablist"
+            aria-label="Thèmes de la FAQ"
+            className="flex flex-row gap-2 overflow-x-auto md:w-60 md:shrink-0 md:flex-col md:overflow-visible"
           >
-            Contactez-nous
-          </a>
-        </div>
+            {CATEGORIES.map((c) => {
+              const Icon = c.icon;
+              const isActive = c.id === category;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => selectCategory(c)}
+                  className="flex items-center gap-2.5 shrink-0 rounded-xl px-4 py-3 text-left text-sm font-semibold whitespace-nowrap md:whitespace-normal cursor-pointer"
+                  style={{
+                    fontFamily: FONT,
+                    background: isActive ? '#f0f7ff' : '#ffffff',
+                    color: isActive ? '#000c5b' : '#5f6568',
+                    border: isActive ? '1.5px solid #002d74' : '1.5px solid #f0f7ff',
+                    transition: 'background 0.25s ease, color 0.25s ease, border-color 0.25s ease',
+                  }}
+                >
+                  <Icon
+                    className="shrink-0" size={18}
+                    weight={isActive ? 'fill' : 'regular'}
+                    style={{ color: isActive ? '#002d74' : '#8c8c8c' }}
+                  />
+                  {c.label}
+                </button>
+              );
+            })}
+          </div>
 
+          {/* Accordéon */}
+          <div className="min-w-0 flex-1">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col gap-3"
+              >
+                {active.items.map((item) => {
+                  const isOpen = openId === item.id;
+                  return (
+                    <div
+                      key={item.id}
+                      className="rounded-2xl overflow-hidden"
+                      style={{
+                        border: isOpen ? '1.5px solid #002d74' : '1.5px solid #f0f7ff',
+                        transition: 'border-color 0.3s ease',
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setOpenId(isOpen ? null : item.id)}
+                        aria-expanded={isOpen}
+                        className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left cursor-pointer"
+                        style={{ background: isOpen ? '#f0f7ff' : '#ffffff', transition: 'background 0.3s ease' }}
+                      >
+                        <span
+                          className="font-semibold text-sm md:text-base leading-snug"
+                          style={{ color: '#000c5b', fontFamily: FONT }}
+                        >
+                          {item.question}
+                        </span>
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                          style={{ background: isOpen ? '#002d74' : '#f0f7ff', transition: 'background 0.3s ease' }}
+                        >
+                          {isOpen
+                            ? <Minus className="w-4 h-4" style={{ color: '#ffffff' }} />
+                            : <Plus className="w-4 h-4" style={{ color: '#002d74' }} />
+                          }
+                        </div>
+                      </button>
+
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                            style={{ overflow: 'hidden', background: '#f0f7ff' }}
+                          >
+                            <div className="px-5 pb-5 flex flex-col gap-3">
+                              <p className="text-sm leading-relaxed" style={{ color: '#5f6568', fontFamily: FONT }}>
+                                {item.answer}
+                              </p>
+                              <FeedbackRow key={item.id} />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Bas de colonne : CTA */}
+            <div
+              className="mt-6 flex flex-col items-start gap-4 rounded-2xl px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
+              style={{ background: '#f0f7ff' }}
+            >
+              <div>
+                <p className="text-sm font-semibold" style={{ color: '#000c5b', fontFamily: FONT }}>
+                  Vous avez d'autres questions ?
+                </p>
+                <p className="text-sm mt-1" style={{ color: '#5f6568', fontFamily: FONT }}>
+                  Nous répondons sous 24 h ouvrées, avant tout engagement.
+                </p>
+              </div>
+              <PrimaryButton href="#contact">Contactez-nous</PrimaryButton>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Building2, UserRound, BriefcaseBusiness, ArrowRight } from 'lucide-react';
+import { Buildings as Building2, User as UserRound, Briefcase as BriefcaseBusiness, ArrowRight } from '@phosphor-icons/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getFormationById } from '@/data/formations';
@@ -56,18 +56,19 @@ export const NATIONALITIES = [
   'Malgache', 'Marocaine', 'Portugaise', 'Roumaine', 'Sénégalaise', 'Suisse', 'Tunisienne', 'Autre',
 ];
 
-const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
+const headingFont = { fontFamily: "'Inter', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
+// 16 px sous sm : en dessous, iOS Safari zoome toute la page au focus du champ.
 const inputClass =
-  'w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors ' +
-  'focus:border-[#007f64] bg-white';
-const inputStyle = { borderColor: '#e5e5e5', color: '#004c3c', ...bodyFont };
+  'w-full rounded-xl border px-4 py-3 text-base sm:text-sm outline-none transition-colors ' +
+  'focus:border-[#000c5b] bg-white';
+const inputStyle = { borderColor: '#e5e5e5', color: '#000c5b', ...bodyFont };
 
 export function TextField({ label, value, onChange, required, type = 'text', placeholder }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
         {label} {required && <span style={{ color: '#c2410c' }}>*</span>}
       </span>
       <input
@@ -81,10 +82,10 @@ export function TextField({ label, value, onChange, required, type = 'text', pla
   );
 }
 
-export function SelectField({ label, value, onChange, options, required, placeholder = '—' }) {
+export function SelectField({ label, value, onChange, options, required, placeholder = 'Sélectionner' }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
         {label} {required && <span style={{ color: '#c2410c' }}>*</span>}
       </span>
       <select
@@ -104,7 +105,7 @@ export function SelectField({ label, value, onChange, options, required, placeho
 export function TextAreaField({ label, value, onChange, rows = 3, placeholder }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#007f64', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
         {label}
       </span>
       <textarea
@@ -120,7 +121,7 @@ export function TextAreaField({ label, value, onChange, rows = 3, placeholder })
 
 export function SectionTitle({ children }) {
   return (
-    <h3 className="font-bold text-base mt-8 mb-4" style={{ color: '#004c3c', ...headingFont }}>
+    <h3 className="font-bold text-base mt-8 mb-4" style={{ color: '#243037', ...headingFont }}>
       {children}
     </h3>
   );
@@ -139,16 +140,16 @@ export function Stepper({ current }) {
               <div
                 className="w-7 h-7 mx-auto rounded-full flex items-center justify-center text-xs font-bold mb-2"
                 style={{
-                  background: active ? '#007f64' : '#eafff6',
-                  color: active ? 'white' : '#5f6b66',
+                  background: active ? '#000c5b' : '#f0f7ff',
+                  color: active ? 'white' : '#5f6568',
                   ...headingFont,
                 }}>
                 {i + 1}
               </div>
-              <p className="text-xs sm:text-sm font-semibold" style={{ color: active ? '#004c3c' : '#5f6b66', ...headingFont }}>
+              <p className="text-xs sm:text-sm font-semibold" style={{ color: active ? '#000c5b' : '#5f6568', ...headingFont }}>
                 {label}
               </p>
-              <div className="h-1 rounded-full mt-3" style={{ background: active ? '#007f64' : '#e5e5e5' }} />
+              <div className="h-1 rounded-full mt-3" style={{ background: active ? '#000c5b' : '#e5e5e5' }} />
             </div>
           );
         })}
@@ -187,7 +188,7 @@ export default function Inscription() {
   const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
-    document.title = "Demande d'inscription — Hi-Tech Academy";
+    document.title = "Demande d'inscription : Hi-Tech Academy";
     return () => { document.title = 'Hi-Tech Academy'; };
   }, []);
 
@@ -210,8 +211,8 @@ export default function Inscription() {
       <div className="min-h-screen bg-white">
         <Header />
         <main className="pt-32 pb-20 text-center">
-          <p style={{ color: '#004c3c', ...headingFont }}>Formation introuvable.</p>
-          <Link to="/" className="underline text-sm" style={{ color: '#007f64', ...bodyFont }}>Retour à l'accueil</Link>
+          <p style={{ color: '#000c5b', ...headingFont }}>Formation introuvable.</p>
+          <Link to="/" className="underline text-sm" style={{ color: '#000c5b', ...bodyFont }}>Retour à l'accueil</Link>
         </main>
         <Footer />
       </div>
@@ -273,7 +274,7 @@ export default function Inscription() {
 
   // --- Formulaire (étape 1) -------------------------------------------
   return (
-    <div className="min-h-screen" style={{ background: '#f7fbf9' }}>
+    <div className="min-h-screen" style={{ background: '#f0f7ff' }}>
       <Header />
       <main className="pt-32 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
@@ -281,10 +282,10 @@ export default function Inscription() {
           <div className="text-center mb-8">
             <span
               className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-              style={{ color: '#007f64', ...headingFont }}>
+              style={{ color: '#000c5b', ...headingFont }}>
               {formation.title}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#004c3c', ...headingFont }}>
+            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#243037', ...headingFont }}>
               Émettre une demande d'inscription
             </h1>
           </div>
@@ -292,7 +293,7 @@ export default function Inscription() {
           <Stepper current={0} />
 
           <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-            <h2 className="font-bold text-lg mb-4" style={{ color: '#004c3c', ...headingFont }}>
+            <h2 className="font-bold text-lg mb-4" style={{ color: '#243037', ...headingFont }}>
               Mes informations
             </h2>
 
@@ -305,9 +306,9 @@ export default function Inscription() {
                   onClick={() => setMode(key)}
                   className="rounded-xl px-4 py-3.5 text-left text-sm font-semibold transition-all"
                   style={{
-                    border: mode === key ? '1.5px solid #007f64' : '1px solid #e5e5e5',
-                    background: mode === key ? '#eafff6' : 'white',
-                    color: mode === key ? '#007f64' : '#5f6b66',
+                    border: mode === key ? '1.5px solid #000c5b' : '1px solid #e5e5e5',
+                    background: mode === key ? '#f0f7ff' : 'white',
+                    color: mode === key ? '#000c5b' : '#5f6568',
                     ...headingFont,
                   }}>
                   <Icon className="w-4 h-4 mb-1.5" />
@@ -319,7 +320,7 @@ export default function Inscription() {
             {mode === 'INDEPENDENT' && (
               <p
                 className="text-xs rounded-xl px-4 py-3 mt-3"
-                style={{ background: '#eafff6', color: '#007f64', ...bodyFont }}>
+                style={{ background: '#f0f7ff', color: '#000c5b', ...bodyFont }}>
                 Vous serez automatiquement ajouté en tant qu'apprenant dans la suite de cette demande
                 d'inscription : la formation est destinée au président / gérant de l'entreprise.
               </p>
@@ -401,13 +402,13 @@ export default function Inscription() {
                     <TextField label="Poste occupé" value={form.currentPosition} onChange={set('currentPosition')} />
                   </div>
                   <TextAreaField label="Notes complémentaires" value={form.notes} onChange={set('notes')} />
-                  <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#004c3c', ...bodyFont }}>
+                  <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#000c5b', ...bodyFont }}>
                     <input
                       type="checkbox"
                       checked={form.needsAdaptation}
                       onChange={(e) => set('needsAdaptation')(e.target.checked)}
-                      className="mt-0.5 accent-[#007f64]" />
-                    A des besoins d'adaptation (handicap, contraintes...)
+                      className="mt-0.5 accent-[#000c5b]" />
+                    A des besoins d'adaptation (handicap, contraintes…)
                   </label>
                 </div>
               </>
@@ -430,11 +431,11 @@ export default function Inscription() {
                 onClick={submit}
                 disabled={missingFields.length > 0 || submitting}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: '#007f64', color: 'white', ...headingFont }}>
+                style={{ background: '#000c5b', color: 'white', ...headingFont }}>
                 {submitting ? 'Envoi en cours…' : 'Continuer vers le questionnaire'}
                 <ArrowRight className="w-4 h-4" />
               </button>
-              <p className="text-xs text-center mt-3" style={{ color: '#5f6b66', ...bodyFont }}>
+              <p className="text-xs text-center mt-3" style={{ color: '#5f6568', ...bodyFont }}>
                 Dernière étape après ce formulaire : un court questionnaire{' '}
                 {mode === 'COMPANY' ? 'sur vos attentes' : "d'analyse du besoin"} (obligatoire).
                 Votre demande ne sera transmise qu'une fois le questionnaire complété.
@@ -442,8 +443,8 @@ export default function Inscription() {
             </div>
           </div>
 
-          <p className="text-[11px] text-center mt-6" style={{ color: '#6b8a8b', ...bodyFont }}>
-            HI-TECH ACADEMY — Siret 92269564800027 — NAF 85.59A — Déclaration d'activité n° 11756755575
+          <p className="text-caption text-center mt-6" style={{ color: '#8c8c8c', ...bodyFont }}>
+            HI-TECH ACADEMY · Siret 92269564800027 · NAF 85.59A · Déclaration d'activité n° 11756755575
             (préfet de région d'Île-de-France). Les informations recueillies servent uniquement au
             traitement de votre demande d'inscription.
           </p>

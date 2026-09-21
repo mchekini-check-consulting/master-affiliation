@@ -1,227 +1,145 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { GraduationCap, Award, HeadphonesIcon, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import React from 'react';
+import { ArrowUpRight } from '@phosphor-icons/react';
+import PrimaryButton from '@/components/ui/primary-button';
+import { TEAL, MINT, LINE, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
-const features = [
-{
-  icon: GraduationCap,
-  title: 'Formateurs Experts',
-  description: 'Apprenez auprès de professionnels ayant une expérience significative dans l\'industrie.'
-},
-{
-  icon: Award,
-  title: 'Attestation de Formation',
-  description: 'Recevez une attestation de fin de formation détaillant les acquis évalués.'
-},
-{
-  icon: HeadphonesIcon,
-  title: 'Support Continu',
-  description: 'Profitez d\'un accompagnement personnalisé tout au long de votre formation.'
-},
-{
-  icon: CalendarDays,
-  title: 'Programme Flexible',
-  description: 'Nos programmes sont conçus pour s\'adapter à votre emploi du temps, en ligne et en présentiel.'
-}];
-
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.55, ease: [0.16, 1, 0.3, 1] } })
-};
-
-const IMG1 = '/images/d72ad55e5_benefit-img-2.png';
-const IMG2 = '/images/664c12fd3_benefit-img-31.png';
-const IMG3 = '/images/53aa683f2_benefit-img-1.png';
+// « Pourquoi nous choisir » — six arguments de positionnement, présentés
+// simplement (icône + titre + phrase), photo unique à droite.
+//
+// Retiré par rapport à la version précédente : les statistiques flottantes
+// (+70 %, +2 000 apprenants, 4,8/5) n'étaient sourcées nulle part et
+// contredisaient les indicateurs Qualiopi réels affichés dans la section
+// « Résultats » (95 % / 100 %, eux sourcés) ; le témoignage réutilisait
+// « Yanis K. » avec un rôle inventé (« Développeur Web ») alors que son avis
+// réel est déjà affiché ailleurs pour Kubernetes ; et les logos « Google,
+// Microsoft, Deloitte, aws, UBISOFT » sous « Ils nous font confiance »
+// laissaient croire à un partenariat ou une clientèle qui n'est étayée par
+// rien — une affirmation de ce type est un vrai risque, pas un détail de
+// mise en forme.
+//
+// Les six arguments sont présentés en liste éditoriale (titre bref + phrase,
+// filet fin, pas d'icône ni de carte) plutôt qu'en grille de pastilles :
+// c'est ce dernier motif — carré arrondi bleu pâle + glyphe centré, répété
+// six fois à l'identique — qui donne l'aspect « gabarit généré ».
+const PERKS = [
+  {
+    title: 'Le terrain avant la théorie',
+    description: "Des compétences concrètes, recherchées par les entreprises, pas des notions qui datent déjà de trois ans.",
+  },
+  {
+    title: 'Une équipe, pas un ticket',
+    description: "Un contact humain à chaque étape : avant la session pour cadrer votre projet, pendant pour vous débloquer, après pour faire le point.",
+  },
+  {
+    title: 'Votre rythme, notre cadre',
+    description: 'Formez-vous où vous voulez, quand vous voulez, sans que la rigueur du programme en pâtisse.',
+  },
+  {
+    title: 'Une attestation qui compte',
+    description: "Délivrée par un organisme certifié Qualiopi, reconnue dans vos démarches de financement, pas un certificat de complaisance.",
+  },
+  {
+    title: 'On juge sur pièces',
+    description: 'Chaque session se termine par un projet ou une mise en situation réelle, pas un questionnaire à choix multiples.',
+  },
+  {
+    title: 'Un groupe, pas un amphithéâtre',
+    description: "Un effectif assez restreint pour que le formateur s'adapte réellement à votre niveau.",
+  },
+];
 
 export default function WhyUsSection() {
   return (
-    <section className="w-full py-16 sm:py-20 lg:py-24" style={{ background: 'white' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-
-          {/* LEFT — Text content */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
-            
-            <span
-              className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-              style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              
-              Pourquoi nous Choisir !
-            </span>
+    <section id="whyus" className="bg-white py-20 sm:py-28" aria-labelledby="whyus-title">
+      <div className="max-w-site mx-auto px-4 sm:px-6">
+        <div className="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-12 lg:gap-20">
+          <div>
+            <p className="text-body-sm font-semibold mb-3" style={{ color: TEAL, ...headingFont }}>Pourquoi nous choisir</p>
             <h2
-              className="font-serif-display text-3xl sm:text-4xl lg:text-[3rem] font-bold tracking-tight leading-[1.15] mb-3"
-              style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              
-              Rendre votre Apprentissage{' '}
-              <span style={{ color: '#007f64' }}>plus Agréable</span>
+              id="whyus-title"
+              className="font-serif-display max-w-[18ch]"
+              style={{ fontSize: 'clamp(32px, 3.6vw, 48px)', lineHeight: 1.1, letterSpacing: '-0.02em', color: '#243037', ...serifFont }}>
+              Bien plus qu'une formation, un vrai tremplin pour votre avenir
             </h2>
-            <p className="text-sm mb-8" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
-              Apprenez plus de compétences, soyez plus compétitif.
+            <p className="text-body-lg leading-[1.6] mt-5 max-w-measure" style={{ color: BODY_MUTED, ...bodyFont }}>
+              Nous vous donnons les compétences, l'accompagnement et le cadre pour atteindre vos objectifs
+              professionnels, à votre rythme.
             </p>
 
-            {/* Decorative line */}
-            <div className="flex items-center gap-3 mb-10">
-              <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
-              <div className="w-2 h-2 rounded-full" style={{ background: '#004c3c' }} />
-              <div className="h-px w-12" style={{ background: '#c0d4d8' }} />
-            </div>
+            {/* Liste de principes, pas de fonctionnalités : un titre bref en DM
+                Sans, une phrase qui le justifie, un filet pour respirer entre
+                les deux. Aucune icône — la typographie porte la hiérarchie. */}
+            <ul className="mt-12" style={{ borderTop: `1px solid ${LINE}` }}>
+              {PERKS.map(({ title, description }) => (
+                <li
+                  key={title}
+                  className="grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-x-10 gap-y-2 py-7"
+                  style={{ borderBottom: `1px solid ${LINE}` }}>
+                  <h3 className="font-serif-display text-h3 leading-[1.3]" style={{ color: '#243037', ...serifFont }}>
+                    {title}
+                  </h3>
+                  <p className="text-body-base leading-[1.6]" style={{ color: BODY_MUTED, ...bodyFont }}>
+                    {description}
+                  </p>
+                </li>
+              ))}
+            </ul>
 
-            {/* Feature list - Carousel on mobile with scroll indicators, grid on larger screens */}
-            <div className="lg:hidden">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent>
-                  {features.map((feature, i) =>
-                    <CarouselItem key={i} className="pl-4">
-                      <motion.div
-                        custom={i}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={fadeUp}
-                        className="flex gap-4 p-5 rounded-2xl"
-                        style={{ background: 'white', border: '1px solid #e8edf6' }}>
-                        
-                        <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: '#eef1fa' }}>
-                        
-                          <feature.icon className="w-5 h-5" style={{ color: '#007f64' }} />
-                        </div>
-                        <div>
-                          <h3
-                          className="font-bold text-sm mb-1"
-                          style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-
-                                    {feature.title}
-                          </h3>
-                          <p className="text-xs leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
-                            {feature.description}
-                          </p>
-                        </div>
-                      </motion.div>
-                    </CarouselItem>
-                  )}
-                </CarouselContent>
-                <CarouselPrevious className="left-2" />
-                <CarouselNext className="right-2" />
-              </Carousel>
-              
-              {/* Scroll indicator dots */}
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <div className="w-2 h-2 rounded-full" style={{ background: '#007f64' }} />
-                <div className="w-2 h-2 rounded-full" style={{ background: '#c0d4d8' }} />
-                <div className="w-2 h-2 rounded-full" style={{ background: '#c0d4d8' }} />
-                <div className="w-2 h-2 rounded-full" style={{ background: '#c0d4d8' }} />
-              </div>
-              <p className="text-center text-xs mt-2" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
-                Faites défiler pour voir plus
-              </p>
+            <div className="mt-12">
+              <PrimaryButton to="/formations" size="lg">Découvrir nos formations</PrimaryButton>
             </div>
-            
-            <div className="hidden sm:grid grid-cols-2 gap-5">
-              {features.map((feature, i) =>
-              <motion.div
-                key={i}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                className="flex gap-4 p-5 rounded-2xl"
-                style={{ background: 'white', border: '1px solid #e8edf6' }}>
-                
-                  <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: '#eef1fa' }}>
-                  
-                    <feature.icon className="w-5 h-5" style={{ color: '#007f64' }} />
-                  </div>
-                  <div>
-                    <h3
-                    className="font-bold text-sm mb-1"
-                    style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    
-                      {feature.title}
-                    </h3>
-                    <p className="text-xs leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
-                      {feature.description}
+          </div>
+
+          {/* Panneau de conviction plutôt qu'une photo : un aplat dégradé dans
+              les deux teintes du primaire (#000c5b → #002d74 — pas de couleur
+              hors charte), une grande flèche et une citation de marque.
+              La cellule de droite est étirée à la hauteur de la colonne de
+              gauche (plus haute depuis le passage en liste éditoriale) et le
+              panneau est `sticky` : il reste sous les yeux tout le temps que
+              la colonne de gauche défile, au lieu de s'arrêter tôt et de
+              laisser un couloir de page vide en dessous. */}
+          <div className="hidden lg:block">
+            <div className="lg:sticky" style={{ top: 112 }}>
+              <div
+                className="relative overflow-hidden"
+                style={{
+                  borderRadius: 8,
+                  aspectRatio: '4 / 5',
+                  background: 'linear-gradient(155deg, #000c5b 0%, #002d74 100%)',
+                }}>
+                {/* Photo en fond, opacité légère : même principe que le voile de
+                    marque du héro de l'accueil (`.academy-hero::before`) — le
+                    dégradé reste la couche dominante, la photo n'y ajoute
+                    qu'une texture, jamais de contraste à rattraper pour le texte. */}
+                <img
+                  src="/images/whyus-panel.webp"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ opacity: 0.22 }}
+                />
+
+                <div className="relative z-[1] flex flex-col justify-between h-full p-10">
+                  <ArrowUpRight aria-hidden="true" className="w-16 h-16 self-end text-white" weight="bold" />
+
+                  <blockquote className="m-0">
+                    <p
+                      className="font-serif-display text-white"
+                      style={{ fontSize: 'clamp(24px, 2vw, 30px)', lineHeight: 1.25, letterSpacing: '-0.01em', ...serifFont }}>
+                      On ne choisit pas seulement une formation. On choisit la suite de sa carrière.
                     </p>
-                  </div>
-                </motion.div>
-              )}
+                    <footer className="text-body-sm font-semibold mt-6" style={{ color: MINT, ...headingFont }}>
+                      L&apos;équipe Hi-Tech Academy
+                    </footer>
+                  </blockquote>
+                </div>
+              </div>
             </div>
-          </motion.div>
-
-          {/* RIGHT — Bento puzzle grid */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="relative">
-            
-            {/* Bento grid — 2 cols, hauteur fixe et alignée */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '200px 200px', gap: '12px' }}>
-
-              {/* Col gauche — image tall sur les 2 rangées */}
-              <div
-                className="overflow-hidden"
-                style={{ gridColumn: '1', gridRow: '1 / 3', borderRadius: '80px 16px 16px 16px' }}>
-                <img
-                  src="/images/dccb1c49d_feature-11.jpg"
-                  alt="Diplômée"
-                  className="w-full h-full object-cover object-top" />
-              </div>
-
-              {/* Col droite haut */}
-              <div
-                className="overflow-hidden"
-                style={{ gridColumn: '2', gridRow: '1', borderRadius: '16px 80px 16px 16px' }}>
-                <img
-                  src={IMG1}
-                  alt="Étudiants en formation"
-                  className="w-full h-full object-cover" />
-              </div>
-
-              {/* Col droite bas */}
-              <div
-                className="overflow-hidden"
-                style={{ gridColumn: '2', gridRow: '2', borderRadius: '16px 16px 80px 16px' }}>
-                <img
-                  src={IMG3}
-                  alt="Étudiante en ligne"
-                  className="w-full h-full object-cover" />
-              </div>
-
-            </div>
-
-            {/* Floating accent dot */}
-            <div
-              className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full hidden"
-              style={{ background: '#004c3c' }} />
-            
-          </motion.div>
-
+          </div>
         </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }

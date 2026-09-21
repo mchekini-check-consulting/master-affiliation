@@ -11,15 +11,15 @@ export default function PrivacyPolicy() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <h1
             className="text-3xl sm:text-4xl font-bold mb-8"
-            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: '#243037', fontFamily: "'Inter', sans-serif" }}
           >
             Politique de Confidentialité
           </h1>
 
-          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
+          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6568', fontFamily: "'Inter', sans-serif" }}>
             
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 1. Collecte des données
               </h2>
               <p className="mb-2">
@@ -34,7 +34,7 @@ export default function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 2. Finalité du traitement
               </h2>
               <p className="mb-2">
@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 3. Durée de conservation
               </h2>
               <p>
@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 4. Destinataires des données
               </h2>
               <p>
@@ -67,7 +67,7 @@ export default function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 5. Vos droits
               </h2>
               <p className="mb-2">
@@ -86,7 +86,7 @@ export default function PrivacyPolicy() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 6. Sécurité
               </h2>
               <p>

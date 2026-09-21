@@ -1,128 +1,87 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, BadgeCheck, Check, Star } from 'lucide-react';
-import { NAVY, TEAL, ACCENT, HERO_GRADIENT, headingFont, serifFont, bodyFont } from '@/components/design';
+import { CurrencyEur as BadgeEuro, Laptop, Lifebuoy as LifeBuoy, Play } from '@phosphor-icons/react';
+import PrimaryButton from '@/components/ui/primary-button';
+import HeroCourseCarousel from '@/components/hero/HeroCourseCarousel';
 
-// Héro du thème « École » : dégradé doux du vert menthe au blanc (pointe de
-// bleu pâle), titre serif géant en phrases courtes, pilule bleue, rangée de
-// coches — et à droite un éventail de cartes photos cliquables.
-const CHECKS = [
-  'Organisme certifié Qualiopi',
-  'Finançable OPCO',
-  '100 % à distance, en direct',
+const benefits = [
+  { icon: Laptop, title: '100 % à distance', description: 'Apprenez à votre rythme' },
+  { icon: BadgeEuro, title: 'Finançable OPCO', description: "Jusqu'à 100 % de prise en charge" },
+  { icon: LifeBuoy, title: 'Accompagnement expert', description: 'Du début à la fin' },
 ];
 
-const CARDS = [
-  { image: '/images/ce6db5335_generated_76fdd024.png', label: 'Je finance ma formation', href: '/financements' },
-  { image: '/images/cbdcfde73_generated_f57bba76.png', label: 'Je choisis ma formation', href: '/formations', main: true },
-  { image: '/images/3611d0da4_generated_60e6197e.png', label: 'Je forme mes équipes', href: '/#contact' },
+// Bande de confiance. `src` attend un fichier déposé dans public/images/logos/.
+// Tant qu'il est vide, le nom s'affiche en toutes lettres : aucun logo n'est
+// fabriqué ni imité — on met le vrai fichier, ou rien.
+// N'y faire figurer QUE ce que le site peut justifier. L'ancienne bande
+// affichait « pôle emploi » et le bloc-marque « République Française », que
+// rien dans le catalogue n'étaye — et que la charte de l'État réserve de toute
+// façon à ses propres services. Les deux sont retirés.
+//   · Qualiopi : la mention du champ certifié est OBLIGATOIRE à côté du logo.
+//     Le nom de l'organisme certificateur doit y être ajouté dès qu'il est
+//     connu (`mention`).
+//   · OPCO n'est pas une marque unique mais une catégorie : onze opérateurs,
+//     onze logos. Reste donc en toutes lettres, sauf à nommer un OPCO précis.
+const trustLogos = [
+  { nom: 'Qualiopi', src: '', mention: 'Actions de formation' },
+  { nom: 'OPCO', src: '', mention: 'Financement mobilisable' },
 ];
 
-const HeroSection = () => {
+function TrustLogo({ nom, src, mention }) {
   return (
-    <section className="relative w-full overflow-hidden" style={{ background: HERO_GRADIENT }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-36 pb-20 lg:pt-44 lg:pb-28 grid lg:grid-cols-2 gap-14 items-center">
+    <div className="hero-trust-logo">
+      {src
+        ? <img src={src} alt={nom} loading="lazy" />
+        : <span className="hero-trust-logo__nom">{nom}</span>}
+      {mention && <small>{mention}</small>}
+    </div>
+  );
+}
 
-        {/* Colonne texte */}
-        <motion.div
-          initial={{ opacity: 0, y: 26 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
-
-          {/* Ligne de preuve */}
-          <p className="flex flex-wrap items-center gap-2 text-sm mb-6" style={{ color: '#1f2124', ...bodyFont }}>
-            <span className="flex items-center gap-1 font-bold" style={headingFont}>
-              <Star className="w-4 h-4" style={{ color: TEAL, fill: TEAL }} />
-              95 % de satisfaction
-            </span>
-            <span style={{ color: '#5a6478' }}>· organisme de formation certifié Qualiopi</span>
+export default function HeroSection() {
+  return (
+    <section className="academy-hero">
+      <div className="academy-hero__inner">
+        <div className="academy-hero__copy">
+          {/* Pas de <br /> en dur : des coupures figées ne valent que pour UNE
+              largeur de colonne, et c'est exactement ce qui rendait le héro
+              bancal après le passage du gabarit à 1400 px — le titre tenait sur
+              400 px au milieu d'une colonne de 700. `text-wrap: balance`
+              (index.css) équilibre les lignes à toutes les largeurs. */}
+          <h1>Formez-vous en direct, <span>repartez opérationnel.</span></h1>
+          {/* Chaque affirmation est vérifiable dans les données : « en direct,
+              jamais préenregistré » vient de la FAQ, « dès un participant » du
+              champ Effectif des cinq formations, l'OPCO de `financementsParDefaut`. */}
+          <p className="academy-hero__intro">
+            Des sessions en classe virtuelle <strong>animées en direct par un formateur</strong>, jamais préenregistrées.
+            Travaux pratiques sur un environnement réel, session confirmée <strong>dès un participant</strong>, et financement OPCO mobilisable.
           </p>
-
-          <h1
-            className="font-serif-display font-bold leading-[1.06] text-5xl sm:text-6xl lg:text-[4.5rem] mb-7"
-            style={{ color: '#101418', ...serifFont }}>
-            Apprendre.<br />Progresser.<br />Réussir.
-          </h1>
-
-          <p className="max-w-md text-base leading-relaxed mb-8" style={{ color: '#3d4451', ...bodyFont }}>
-            Cloud, intelligence artificielle, facturation électronique : des formations 100 % à distance,
-            animées en direct par des experts, conçues pour s'adapter à votre rythme et à vos objectifs.
-          </p>
-
-          <Link
-            to="/formations"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-[15px] text-white transition-all hover:opacity-90 hover:shadow-xl mb-9"
-            style={{ background: ACCENT, ...headingFont }}>
-            Choisir ma formation
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {CHECKS.map((c) => (
-              <span key={c} className="flex items-center gap-1.5 text-[13px]" style={{ color: '#1f2124', ...bodyFont }}>
-                <Check className="w-4 h-4" style={{ color: TEAL }} />
-                {c}
-              </span>
-            ))}
+          <div className="academy-hero__actions">
+            {/* `inverted` obligatoire : le héro est sur l'aplat #000c5b, qui est
+                aussi la couleur du bouton — sans inversion il disparaîtrait. */}
+            <PrimaryButton to="/formations" size="lg" inverted>
+              Découvrir nos formations
+            </PrimaryButton>
+            <button type="button" className="academy-hero__video"><span><Play size={14} weight="fill" /></span> Voir la vidéo (1 min)</button>
           </div>
-        </motion.div>
+          <div className="academy-hero__benefits">
+            {benefits.map(({ icon: Icon, title, description }) => <div className="academy-hero__benefit" key={title}><span><Icon size={22} weight="duotone" /></span><div><strong>{title}</strong><small>{description}</small></div></div>)}
+          </div>
+        </div>
 
-        {/* Éventail de cartes photos */}
-        <motion.div
-          initial={{ opacity: 0, y: 26 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-          className="hidden lg:flex items-center justify-center relative"
-          style={{ minHeight: 420 }}>
-          {CARDS.map(({ image, label, href, main }, i) => (
-            <Link
-              key={label}
-              to={href}
-              className="absolute overflow-hidden rounded-3xl group"
-              style={{
-                width: main ? 240 : 220,
-                height: main ? 400 : 320,
-                left: `${16 + i * 27}%`,
-                zIndex: main ? 10 : 5,
-                boxShadow: main ? '0 24px 50px rgba(0,56,44,0.30)' : '0 12px 30px rgba(0,56,44,0.18)',
-              }}>
-              <img
-                src={image}
-                alt={label}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              <div
-                className="absolute inset-0"
-                style={{ background: 'linear-gradient(180deg, transparent 40%, rgba(0,40,30,0.85) 100%)' }} />
-              <span
-                className="absolute bottom-5 left-0 right-0 px-4 text-center text-white font-serif-display font-semibold"
-                style={{ fontSize: main ? 19 : 15, ...serifFont }}>
-                {label} <ArrowRight className="inline w-4 h-4" />
-              </span>
-            </Link>
+        {/* Bande de confiance : en pied de héro, centrée sur toute la largeur
+            du cadre, sans sur-titre. Elle sort de `__copy` pour ne plus être
+            contrainte à la colonne de texte. */}
+        <div className="academy-hero__trust">
+          {trustLogos.map(({ nom, src, mention }) => (
+            <TrustLogo key={nom} nom={nom} src={src} mention={mention} />
           ))}
-        </motion.div>
+        </div>
       </div>
-
-      {/* Mobile : boutons d'orientation */}
-      <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 pb-12 flex flex-col gap-3">
-        {CARDS.map(({ label, href }) => (
-          <Link
-            key={label}
-            to={href}
-            className="flex items-center justify-between px-5 py-4 rounded-2xl bg-white font-semibold text-sm"
-            style={{ color: NAVY, border: '1px solid #e5e5e5', ...headingFont }}>
-            {label}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        ))}
+      {/* Colonne droite : le carrousel seul, posé sur l'aplat du héro. En
+          dessous de 1280 px, ce bloc repasse dans le flux sous le texte. */}
+      <div className="academy-hero__visual">
+        <HeroCourseCarousel />
       </div>
-
-      {/* Filet bas discret */}
-      <div className="h-px w-full" style={{ background: 'rgba(0,76,60,0.08)' }} />
-      <span className="sr-only"><BadgeCheck className="w-4 h-4" /></span>
     </section>
   );
-};
-
-export default HeroSection;
+}

@@ -11,15 +11,15 @@ export default function TermsAndConditions() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <h1
             className="text-3xl sm:text-4xl font-bold mb-8"
-            style={{ color: '#004c3c', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: '#243037', fontFamily: "'Inter', sans-serif" }}
           >
             Conditions Générales de Vente
           </h1>
 
-          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6b66', fontFamily: "'Inter', sans-serif" }}>
+          <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6568', fontFamily: "'Inter', sans-serif" }}>
             
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 1. Objet
               </h2>
               <p>
@@ -28,7 +28,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 2. Inscription
               </h2>
               <p>
@@ -37,7 +37,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 3. Tarifs et modalités de paiement
               </h2>
               <p className="mb-2">
@@ -51,7 +51,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 4. Rétractation et annulation
               </h2>
               <p className="mb-2">
@@ -64,7 +64,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 5. Déroulement de la formation
               </h2>
               <p>
@@ -73,7 +73,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 6. Certification
               </h2>
               <p>
@@ -82,7 +82,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 7. Responsabilité
               </h2>
               <p>
@@ -91,7 +91,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#007f64', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
                 8. Droit applicable
               </h2>
               <p>

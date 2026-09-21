@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Award } from 'lucide-react';
+import { ArrowRight, Certificate as Award } from '@phosphor-icons/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import {
@@ -11,7 +11,7 @@ import {
 } from '@/api/backend';
 import { SectionTitle } from '@/pages/Inscription';
 
-const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
+const headingFont = { fontFamily: "'Inter', sans-serif" };
 const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 // QCM d'évaluation finale : accessible via le lien envoyé par email par
@@ -32,7 +32,7 @@ export default function EvaluationFinale() {
   const [result, setResult] = useState(null); // { score, max_score }
 
   useEffect(() => {
-    document.title = 'Évaluation finale — Hi-Tech Academy';
+    document.title = 'Évaluation finale : Hi-Tech Academy';
     // Le catalogue du QCM dépend de la formation de la demande
     getRegistrationPublic(requestId)
       .then((reg) => {
@@ -67,7 +67,7 @@ export default function EvaluationFinale() {
   };
 
   const shell = (children) => (
-    <div className="min-h-screen" style={{ background: '#f7fbf9' }}>
+    <div className="min-h-screen" style={{ background: '#f0f7ff' }}>
       <Header />
       <main className="pt-32 pb-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">{children}</div>
@@ -79,15 +79,15 @@ export default function EvaluationFinale() {
   if (loadError) {
     return shell(
       <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <p className="mb-4" style={{ color: '#004c3c', ...headingFont }}>{loadError}</p>
-        <Link to="/" className="underline text-sm" style={{ color: '#007f64', ...bodyFont }}>Retour à l'accueil</Link>
+        <p className="mb-4" style={{ color: '#000c5b', ...headingFont }}>{loadError}</p>
+        <Link to="/" className="underline text-sm" style={{ color: '#000c5b', ...bodyFont }}>Retour à l'accueil</Link>
       </div>
     );
   }
 
   if (!registration || !content) {
     return shell(
-      <p className="text-center text-sm" style={{ color: '#5f6b66', ...bodyFont }}>Chargement…</p>
+      <p className="text-center text-sm" style={{ color: '#5f6568', ...bodyFont }}>Chargement…</p>
     );
   }
 
@@ -95,15 +95,15 @@ export default function EvaluationFinale() {
   if (!traineeId && registration.final_evaluation_submitted && !result) {
     return shell(
       <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#007f64' }} />
-        <h1 className="text-2xl font-bold mb-3" style={{ color: '#004c3c', ...headingFont }}>
+        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#000c5b' }} />
+        <h1 className="text-2xl font-bold mb-3" style={{ color: '#243037', ...headingFont }}>
           Cette évaluation a déjà été passée
         </h1>
-        <p className="text-sm mb-6" style={{ color: '#5f6b66', ...bodyFont }}>
+        <p className="text-sm mb-6" style={{ color: '#5f6568', ...bodyFont }}>
           Une seule tentative est autorisée. Le résultat sera reporté sur votre attestation de fin
           de formation.
         </p>
-        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#007f64', ...headingFont }}>
+        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#000c5b', ...headingFont }}>
           Retour à l'accueil
           <ArrowRight className="w-4 h-4" />
         </Link>
@@ -114,20 +114,20 @@ export default function EvaluationFinale() {
   if (result) {
     return shell(
       <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#004c3c' }} />
-        <h1 className="text-2xl font-bold mb-3" style={{ color: '#004c3c', ...headingFont }}>
+        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#000c5b' }} />
+        <h1 className="text-2xl font-bold mb-3" style={{ color: '#243037', ...headingFont }}>
           Merci, votre évaluation est enregistrée
         </h1>
         <div
           className="inline-block px-6 py-3 rounded-2xl text-lg font-bold mb-4"
-          style={{ background: '#eafff6', color: '#007f64', ...headingFont }}>
+          style={{ background: '#f0f7ff', color: '#000c5b', ...headingFont }}>
           Votre note au QCM : {result.score} / {result.max_score}
         </div>
-        <p className="text-sm mb-6" style={{ color: '#5f6b66', ...bodyFont }}>
+        <p className="text-sm mb-6" style={{ color: '#5f6568', ...bodyFont }}>
           Ce résultat, complété par la mise en pratique évaluée par le formateur, sera reporté sur
           votre attestation de fin de formation.
         </p>
-        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#007f64', ...headingFont }}>
+        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#000c5b', ...headingFont }}>
           Retour à l'accueil
           <ArrowRight className="w-4 h-4" />
         </Link>
@@ -140,13 +140,13 @@ export default function EvaluationFinale() {
       <div className="text-center mb-8">
         <span
           className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-          style={{ color: '#007f64', ...headingFont }}>
+          style={{ color: '#000c5b', ...headingFont }}>
           {registration.formation_title}
         </span>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#004c3c', ...headingFont }}>
-          Évaluation finale — QCM
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#243037', ...headingFont }}>
+          Évaluation finale : QCM
         </h1>
-        <p className="text-sm max-w-xl mx-auto" style={{ color: '#5f6b66', ...bodyFont }}>
+        <p className="text-sm max-w-xl mx-auto" style={{ color: '#5f6568', ...bodyFont }}>
           Ce QCM évalue les acquis de la formation ({content.questions.length} questions,
           <strong> une seule tentative</strong>). Le résultat est reporté sur votre attestation
           de fin de formation.
@@ -154,11 +154,11 @@ export default function EvaluationFinale() {
       </div>
 
       <div className="rounded-3xl p-6 sm:p-8" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <SectionTitle>Partie A — QCM ({content.questions.length} questions)</SectionTitle>
+        <SectionTitle>Partie A : QCM ({content.questions.length} questions)</SectionTitle>
         <div className="space-y-6">
           {content.questions.map((q) => (
             <div key={q.id}>
-              <p className="text-sm font-semibold mb-2" style={{ color: '#004c3c', ...headingFont }}>
+              <p className="text-sm font-semibold mb-2" style={{ color: '#000c5b', ...headingFont }}>
                 {q.id}. {q.text}
               </p>
               <div className="grid sm:grid-cols-2 gap-2">
@@ -169,9 +169,9 @@ export default function EvaluationFinale() {
                     onClick={() => setAnswers((a) => ({ ...a, [q.id]: index }))}
                     className="text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
                     style={{
-                      border: answers[q.id] === index ? '1.5px solid #007f64' : '1px solid #e5e5e5',
-                      background: answers[q.id] === index ? '#eafff6' : 'white',
-                      color: answers[q.id] === index ? '#007f64' : '#5f6b66',
+                      border: answers[q.id] === index ? '1.5px solid #000c5b' : '1px solid #e5e5e5',
+                      background: answers[q.id] === index ? '#f0f7ff' : 'white',
+                      color: answers[q.id] === index ? '#000c5b' : '#5f6568',
                       fontFamily: "'Inter', sans-serif",
                     }}>
                     {option}
@@ -198,7 +198,7 @@ export default function EvaluationFinale() {
             onClick={submit}
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: '#007f64', color: 'white', ...headingFont }}>
+            style={{ background: '#000c5b', color: 'white', ...headingFont }}>
             {submitting ? 'Envoi en cours…' : 'Valider définitivement mes réponses'}
             <ArrowRight className="w-4 h-4" />
           </button>

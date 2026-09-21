@@ -55,7 +55,9 @@ public final class RegistrationDtos {
             String diplomaLevel,
             String diplomaTitle,
             String currentPosition,
-            Boolean needsAdaptation) {
+            Boolean needsAdaptation,
+            // true : demande de devis depuis la page de vente (transmise sans questionnaire)
+            Boolean quoteRequest) {
     }
 
     public record CreatedResponse(UUID id, RegistrationStatus status) {
@@ -385,7 +387,8 @@ public final class RegistrationDtos {
             Integer positioningTestScore,
             Integer positioningTestMaxScore,
             Integer finalEvaluationScore,
-            Integer finalEvaluationMaxScore) {
+            Integer finalEvaluationMaxScore,
+            boolean quoteRequest) {
 
         static AdminListItem from(RegistrationRequest r) {
             NeedsAnalysis na = r.getNeedsAnalysis();
@@ -414,7 +417,8 @@ public final class RegistrationDtos {
                     pt != null ? pt.getScore() : null,
                     pt != null ? pt.getMaxScore() : null,
                     feSubmitted ? fe.getScore() : null,
-                    feSubmitted ? fe.getMaxScore() : null);
+                    feSubmitted ? fe.getMaxScore() : null,
+                    r.isQuoteRequest());
         }
     }
 
@@ -521,6 +525,7 @@ public final class RegistrationDtos {
             String diplomaTitle,
             String currentPosition,
             boolean needsAdaptation,
+            boolean quoteRequest,
             NeedsAnalysisView needsAnalysis,
             CertificateView certificate,
             SponsorSurveyView sponsorSurvey,
@@ -566,6 +571,7 @@ public final class RegistrationDtos {
                     r.getDiplomaTitle(),
                     r.getCurrentPosition(),
                     r.isNeedsAdaptation(),
+                    r.isQuoteRequest(),
                     r.getNeedsAnalysis() != null ? NeedsAnalysisView.from(r.getNeedsAnalysis()) : null,
                     r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null,
                     r.getSponsorSurvey() != null ? SponsorSurveyView.from(r.getSponsorSurvey()) : null,
