@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle as CheckCircle2, CaretDown as ChevronDown, Database, DownloadSimple as Download, ArrowSquareOut as ExternalLink, FileText, FolderOpen, MinusCircle } from '@phosphor-icons/react';
+import {
+  CheckCircle2, ChevronDown, Database, Download, ExternalLink, FileText, FolderOpen, MinusCircle,
+} from 'lucide-react';
 import PdfViewer from '@/pages/admin/PdfViewer';
 import { AUDIT_CRITERIA, OTHER_DOCUMENTS, auditDocUrl, isViewable } from '@/data/auditQualiopi';
 
-const headingFont = { fontFamily: "'Poppins', 'DM Sans', sans-serif" };
-const bodyFont = { fontFamily: "'DM Sans', sans-serif" };
+const headingFont = { fontFamily: "'Plus Jakarta Sans', sans-serif" };
+const bodyFont = { fontFamily: "'Inter', sans-serif" };
 
 // Contenu du dossier d'audit Qualiopi (critères → indicateurs → preuves),
 // affiché dans l'onglet « Audit Qualiopi » de l'espace admin.

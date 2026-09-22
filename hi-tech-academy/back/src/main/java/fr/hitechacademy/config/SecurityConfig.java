@@ -12,9 +12,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import fr.hitechacademy.seo.SeoAgentTokenFilter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -39,13 +41,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, SeoAgentTokenFilter seoAgentTokenFilter)
+            throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Réclamation publique
                         .requestMatchers(HttpMethod.POST, "/complaints").permitAll()
+                        // Lead « livre IA offert » (fin des articles de blog)
+                        .requestMatchers(HttpMethod.POST, "/leads/book").permitAll()
                         // Parcours public : dépôt d'une demande puis questionnaire d'analyse du besoin
                         .requestMatchers(HttpMethod.POST, "/registrations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/registrations/*/public").permitAll()
@@ -58,12 +63,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/registrations/final-evaluation").permitAll()
                         .requestMatchers(HttpMethod.POST, "/registrations/*/final-evaluation").permitAll()
                         .requestMatchers(HttpMethod.POST, "/registrations/*/trainees/*/final-evaluation").permitAll()
+                        // Blog public : articles SEO publiés, servis à la SPA
+                        .requestMatchers(HttpMethod.GET, "/blog/**").permitAll()
                         .requestMatchers("/actuator/health/**", "/actuator/health").permitAll()
                         // Dispatch d'erreur Spring (sinon les 400/404/409 publics ressortent en 401)
                         .requestMatchers("/error").permitAll()
+                        // API de l'orchestrateur SEO : token de service (ou admin)
+                        .requestMatchers("/seo/**").hasAnyRole("SEO_AGENT", "ADMIN")
                         // Espace admin (basic auth)
                         .anyRequest().authenticated()
                 )
+                // Bearer SEO_AGENT_TOKEN → rôle SEO_AGENT (routes /seo/**)
+                .addFilterBefore(seoAgentTokenFilter, BasicAuthenticationFilter.class)
                 // API : 401 JSON, jamais de redirection vers une page de login
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .formLogin(form -> form.disable())

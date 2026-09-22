@@ -72,16 +72,16 @@ export default function FormulaireDevis({ formation, couleur }) {
     setMessageErreur('');
     try {
       await createRegistration({
-        formationId: formation.id,
-        formationTitle: formation.title,
-        applicantType: form.applicantType,
-        companyName: isCompany ? form.companyName.trim() : null,
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
+        formation_id: formation.id,
+        formation_title: formation.title,
+        applicant_type: form.applicantType,
+        company_name: isCompany ? form.companyName.trim() : null,
+        first_name: form.firstName.trim(),
+        last_name: form.lastName.trim(),
         email: form.email.trim(),
         phone: form.phone.trim(),
         notes: form.message.trim() || null,
-        quoteRequest: true,
+        quote_request: true,
       });
       setEtat('sent');
     } catch (err) {
