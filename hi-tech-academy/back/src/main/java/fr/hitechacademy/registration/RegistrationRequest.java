@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -101,7 +102,10 @@ public class RegistrationRequest {
     private boolean needsAdaptation;
     // Demande de devis depuis la page de vente : pas de questionnaire préalable,
     // la demande est transmise à l'admin dès son dépôt (statut PENDING).
+    // Défaut SQL indispensable : ddl-auto=update ajoute la colonne NOT NULL
+    // sur une table qui contient déjà des demandes en production.
     @Column(nullable = false)
+    @ColumnDefault("false")
     private boolean quoteRequest;
 
     // --- Questionnaire d'analyse du besoin -----------------------------
