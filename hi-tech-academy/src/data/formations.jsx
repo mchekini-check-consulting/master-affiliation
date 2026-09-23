@@ -669,6 +669,138 @@ export const formations = [
       },
     ],
   },
+  {
+    id: 'management-processus-ia',
+    tag: 'Intelligence Artificielle',
+    title: "Gérer et transformer les processus de travail des équipes avec l'IA",
+    description:
+      "Intégrez l'IA dans le management quotidien de votre équipe : stratégie d'intégration responsable (AI Act, RGPD), reconfiguration des processus de travail, prompting avancé et assistants, production de contenus professionnels (textes, tableaux de bord, images, vidéos) et amélioration continue. 18 heures 100 % à distance, avec ateliers sur vos propres processus d'équipe.",
+    image: '/images/management-processus-ia.jpg',
+    version: 'Programme V1.0',
+    pdf: '/documents/Programme_Management_IA_V1.0.pdf',
+    keyFacts: [
+      { icon: Clock, label: 'Durée', value: '18 h, 3 journées de 6 h (9 h–12 h 30 / 13 h 30–16 h)' },
+      { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
+      { icon: Euro, label: 'Tarif', value: '2 400 € HT (2 880 € TTC) / stagiaire, forfait 18 h' },
+      { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
+      { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
+      { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
+    ],
+    qualiopiSections: [
+      {
+        id: 'public-prerequis',
+        title: 'Public visé et prérequis',
+        content: (
+          <>
+            <p className="mb-2">
+              <strong>Public concerné :</strong> managers de proximité, responsables d'équipe, dirigeants de
+              petites structures et entrepreneurs souhaitant intégrer l'IA dans les processus de travail de
+              leur équipe.
+            </p>
+            <p className="mb-1"><strong>Prérequis :</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Expérience d'au moins un an en management d'équipe ou en direction de structure.</li>
+              <li>Utilisation courante des outils informatiques (bureautique, navigation web, visioconférence).</li>
+              <li>Appétence pour les nouvelles technologies numériques.</li>
+            </ul>
+            <p className="mt-2">Les prérequis sont vérifiés à l'entrée via un test de positionnement.</p>
+          </>
+        ),
+      },
+      {
+        id: 'objectifs',
+        title: 'Objectifs opérationnels et évaluables',
+        content: (
+          <>
+            <p className="mb-2">À l'issue de la formation, le participant sera capable de :</p>
+            <ol className="list-decimal pl-5 space-y-1">
+              <li>Élaborer une stratégie d'intégration responsable de l'IA dans les processus de son équipe, en analysant les risques (éthiques, juridiques, sécurité, écologiques) et les opportunités de son contexte (AI Act, RGPD).</li>
+              <li>Reconfigurer l'organisation des activités et les processus de travail de l'équipe en combinant capacités de l'IA générative et ressources humaines, en veillant à l'accessibilité et à la réduction de l'impact écologique.</li>
+              <li>Élaborer des requêtes et configurations opérationnelles (prompt engineering, assistants personnalisés, RAG) pour maximiser la pertinence des résultats et l'efficacité des processus.</li>
+              <li>Créer et améliorer des contenus professionnels (textes, tableaux de bord, images, vidéos) avec l'IA en garantissant qualité, sécurité des données et accessibilité.</li>
+              <li>Inscrire les pratiques IA de l'équipe dans une démarche d'amélioration continue : mesure des résultats, veille réglementaire et technologique, ajustement des usages.</li>
+            </ol>
+          </>
+        ),
+      },
+      {
+        id: 'methodes',
+        title: 'Méthodes et moyens mobilisés',
+        content: (
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Alternance d'apports théoriques et d'ateliers pratiques menés sur les processus réels des participants (fil rouge sur les 3 journées).</li>
+            <li>Classe virtuelle synchrone Google Meet (caméra, partage d'écran, suivi de connexion).</li>
+            <li>Accès guidé aux outils d'IA générative du marché (ChatGPT, Claude, Gemini) et à des outils de transcription et de création de contenus ; gabarits fournis (charte d'usage IA, matrice de diagnostic des processus, bibliothèque de prompts).</li>
+            <li>Support de cours et modèles téléchargeables sur l'espace de la formation.</li>
+          </ul>
+        ),
+      },
+      {
+        id: 'evaluation',
+        title: "Modalités d'évaluation et de suivi",
+        content: (
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Avant :</strong> questionnaire d'analyse du besoin et des attentes ; test de positionnement (prérequis).</li>
+            <li><strong>Pendant :</strong> ateliers corrigés à chaque journée, émargement par demi-journée et rapport de connexion Google Meet.</li>
+            <li><strong>En fin de formation :</strong> évaluation finale des acquis (QCM /10 + atelier fil rouge /10, objectifs atteints à partir de 12/20), questionnaires de satisfaction à chaud puis à froid, attestation de fin de formation.</li>
+          </ul>
+        ),
+      },
+      {
+        id: 'acces',
+        title: "Modalités et délais d'accès",
+        content: (
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Inscription par e-mail (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>), téléphone (<a href="tel:+33751474135" className="underline">07 51 47 41 35</a>) ou via le formulaire de contact du site.</li>
+            <li>Délai d'accès : 1 jour minimum entre la demande et le début de la formation (hors prise en charge financeur).</li>
+            <li>Ouverture de la session à partir de 1 participant.</li>
+            <li>
+              Avant l'entrée en formation, chaque apprenant reçoit le{' '}
+              <a href="/documents/qualiopi/Livret_accueil_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                livret d'accueil (PDF)
+              </a>{' '}
+              et le{' '}
+              <a href="/documents/qualiopi/Reglement_interieur_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                règlement intérieur (PDF)
+              </a>.
+            </li>
+          </ul>
+        ),
+      },
+      {
+        id: 'handicap',
+        title: 'Accessibilité aux personnes en situation de handicap',
+        content: (
+          <>
+            <p className="mb-2">
+              Nos formations à distance peuvent être adaptées aux personnes en situation de handicap. Lors de
+              l'inscription, le référent handicap étudie avec le candidat les aménagements nécessaires et mobilise
+              si besoin son réseau de partenaires.
+            </p>
+            <p className="mb-2">
+              <strong>Référent handicap :</strong> Mahdi CHEKINI (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>, <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>)
+            </p>
+            <p>
+              <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                Consulter notre politique d'accessibilité (PDF)
+              </a>
+            </p>
+          </>
+        ),
+      },
+      {
+        id: 'indicateurs',
+        title: 'Indicateurs de résultats',
+        content: (
+          <p>
+            Hi-Tech Academy est nouvel entrant pour cette action de formation. Les indicateurs de résultats
+            (taux de satisfaction, atteinte des objectifs, assiduité) sont mis en place dès la première session
+            et publiés sur cette page.
+          </p>
+        ),
+      },
+    ],
+  },
 ];
 
 export function getFormationById(id) {
@@ -713,11 +845,18 @@ const iaTechNeedsLevels = [
   { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Agents & MCP', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
 ];
 
+const managementIaNeedsLevels = [
+  { key: 'levelLinux', field: 'level_linux', label: "Management d'équipe", options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelDocker', field: 'level_docker', label: 'Outils numériques du quotidien', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'IA générative', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+];
+
 const needsLevelsByFormation = {
   'facturation-electronique-pennylane': pennylaneNeedsLevels,
   'ia-pour-tous': iaNeedsLevels,
   'ia-for-business': iaBusinessNeedsLevels,
   'ia-for-tech': iaTechNeedsLevels,
+  'management-processus-ia': managementIaNeedsLevels,
 };
 
 export function getNeedsLevels(formationId) {
@@ -781,11 +920,23 @@ const iaTechQuizTexts = {
     + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
 };
 
+const managementIaQuizTexts = {
+  intro: "Ce test vérifie vos prérequis (pratique managériale, outils numériques), situe votre usage de l'IA et permet d'adapter l'animation à vos besoins.",
+  selfLevelQuestion: "Où en êtes-vous dans votre usage de l'IA avec votre équipe ?",
+  selfLevelMissing: 'Auto-évaluation IA',
+  selfLevelPdfLabel: "Usage déclaré de l'IA",
+  knowledgeSection: 'Connaissances IA (facultatif)',
+  purposeQuestion: "Selon vous, que pourrait apporter l'IA aux processus de travail de votre équipe ?",
+  finalPracticalNote: "Partie B (atelier fil rouge : transformer un processus de son équipe) évaluée par le formateur pendant la session ; le total "
+    + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
+};
+
 const quizTextsByFormation = {
   'facturation-electronique-pennylane': pennylaneQuizTexts,
   'ia-pour-tous': iaQuizTexts,
   'ia-for-business': iaBusinessQuizTexts,
   'ia-for-tech': iaTechQuizTexts,
+  'management-processus-ia': managementIaQuizTexts,
 };
 
 export function getQuizTexts(formationId) {

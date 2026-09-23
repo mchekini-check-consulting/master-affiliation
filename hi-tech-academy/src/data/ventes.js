@@ -462,6 +462,87 @@ export const ventes = {
       'Le paysage 2026 sans dogmatisme : SDKs, frameworks et arbitrages justifiés',
     ],
   },
+  'management-processus-ia': {
+    accroche: "Vos équipes utilisent déjà l'IA. La question est : avec ou sans vous ?",
+    promesse:
+      "Aujourd'hui, chacun bricole dans son coin : outils non validés, données sensibles exposées, contenus jamais vérifiés. Après 3 journées sur VOS processus, vous repartez avec une stratégie d'intégration conforme (AI Act, RGPD), un processus d'équipe réellement transformé, des assistants configurés et les indicateurs pour piloter la suite.",
+    clusters: [
+      {
+        titre: 'Cadrez avant que ça déborde',
+        items: [
+          "AI Act, RGPD : ce qu'un manager doit savoir, sans jargon juridique",
+          'La charte d’usage IA de votre équipe, rédigée pendant la formation',
+          'Données sensibles : ce qui ne doit JAMAIS partir dans un outil public',
+          "Hallucinations et biais : repérez les erreurs avant qu'elles coûtent cher",
+        ],
+      },
+      {
+        titre: 'Transformez vos processus, pas vos organigrammes',
+        items: [
+          'La matrice valeur/faisabilité : quelles tâches confier à l’IA en priorité',
+          'Répartition humain/IA : l’IA produit, votre équipe décide',
+          'Conduite du changement : embarquer l’équipe sans créer de fracture',
+          'Un plan de reconfiguration concret pour votre processus fil rouge',
+        ],
+      },
+      {
+        titre: 'Outillez votre quotidien de manager',
+        items: [
+          'Prompting avancé : la structure RCTF qui change la qualité des réponses',
+          'Assistants personnalisés : configurez une fois, toute l’équipe en profite',
+          'RAG : des réponses fiables appuyées sur VOS documents internes',
+          'Réunions augmentées : relevé de décisions en 5 minutes au lieu de 30',
+        ],
+      },
+      {
+        titre: 'Produisez des contenus fiables',
+        items: [
+          'Comptes rendus, annonces, e-mails délicats : premier jet immédiat, relecture maîtrisée',
+          'Tableaux de bord : l’IA analyse et commente, vos chiffres restent les vôtres',
+          'Images, audio, vidéo : la création utile, accessible et sécurisée',
+          'La check-list de vérification avant toute diffusion',
+        ],
+      },
+      {
+        titre: 'Installez la démarche qui dure',
+        items: [
+          'Indicateurs avant/après : prouvez le gain, ajustez ce qui déçoit',
+          'Veille réglementaire et technologique en 30 minutes par mois',
+          'Atelier fil rouge : un processus de votre équipe transformé de bout en bout',
+          'Votre plan d’action à 2 semaines et à 3 mois',
+        ],
+      },
+    ],
+    cible: {
+      pour: [
+        "Vous managez une équipe et l'IA s'invite dans vos processus, avec ou sans cadre.",
+        'Vous dirigez une petite structure et cherchez des gains concrets sans embaucher.',
+        'Vous voulez des livrables réutilisables dès le lendemain, pas un tour d’horizon théorique.',
+        'Vous devez répondre aux exigences de conformité (RGPD, AI Act) sans juriste dédié.',
+      ],
+      pasPour: [
+        { texte: "Vous découvrez l'IA à titre personnel, sans équipe à manager", redirige: 'ia-pour-tous' },
+        { texte: 'Vous voulez construire un business entier opéré par des agents IA', redirige: 'ia-for-business' },
+      ],
+    },
+    ctaUrgence: "Chaque semaine sans cadre, ce sont des données exposées et des heures perdues par toute l'équipe.",
+    ctaProjection: 'Dans un mois, votre équipe suit un processus transformé, mesuré et conforme.',
+    preuves: {
+      hero: { image: '/images/management-processus-ia.jpg', alt: 'Équipe en réunion de travail autour de deux ordinateurs portables', sousTitre: '', position: 'center' },
+      captures: [
+        { image: '', legende: '' },
+        { image: '', legende: '' },
+        { image: '', legende: '' },
+      ],
+      temoignages: [],
+      formateur: null,
+    },
+    argumentsMarketing: [
+      'Ateliers menés sur les processus réels de VOTRE équipe : charte, cartographie et assistants livrés',
+      'Format manager : 3 journées à distance, session ouverte à partir de 1 participant',
+      'Conformité intégrée à chaque étape : AI Act, RGPD, sécurité des données, sobriété numérique',
+    ],
+  },
 };
 
 // Gabarit vide des preuves : garantit la forme du bloc pour les composants,

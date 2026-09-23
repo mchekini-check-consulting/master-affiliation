@@ -85,6 +85,18 @@ const SECTIONS = [
     ],
   },
   {
+    title: "Formation Gérer et transformer les processus de travail des équipes avec l'IA",
+    documents: [
+      { title: 'Programme de formation', file: `${BASE}/Programme_Management_IA_V1.0.pdf`, icon: GraduationCap },
+      { title: 'Déroulé pédagogique', file: `${BASE}/Deroule_pedagogique_Management_IA_V1.0.pdf`, icon: LayoutList },
+      { title: 'Support de cours', file: `${BASE}/Support_de_cours_Management_IA_V1.0.pdf`, icon: FileText },
+      { title: 'Test de positionnement', file: `${BASE}/Test_positionnement_Management_IA.pdf`, icon: SearchCheck },
+      { title: 'Évaluation finale (QCM)', file: `${BASE}/Evaluation_finale_QCM_Management_IA.pdf`, icon: ClipboardCheck },
+      { title: 'Tableau croisé objectifs / contenus / évaluations', file: `${BASE}/Tableau_croise_Management_IA_V1.0.pdf`, icon: ClipboardList },
+      { title: 'Plaquette commerciale', file: `${BASE}/Plaquette_Management_IA_V1.0.pdf`, icon: Presentation },
+    ],
+  },
+  {
     title: 'Contractualisation (modèles)',
     documents: [
       { title: 'Convention de formation professionnelle', file: `${BASE}/Convention_de_formation_professionnelle.pdf`, icon: FileSignature },

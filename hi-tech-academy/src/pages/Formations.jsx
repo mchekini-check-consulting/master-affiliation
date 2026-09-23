@@ -92,7 +92,9 @@ export default function Formations() {
                   ? 'Linux et Docker (bases)'
                   : formation.id === 'ia-for-tech'
                     ? "Pratique d'un langage"
-                    : 'Ouverte à tous';
+                    : formation.id === 'management-processus-ia'
+                      ? 'Expérience managériale (1 an)'
+                      : 'Ouverte à tous';
                 return (
                   <motion.div
                     key={formation.id}

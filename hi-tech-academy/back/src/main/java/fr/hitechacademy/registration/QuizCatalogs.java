@@ -13,6 +13,7 @@ public final class QuizCatalogs {
     public static final String IA_ID = "ia-pour-tous";
     public static final String IA_BUSINESS_ID = "ia-for-business";
     public static final String IA_TECH_ID = "ia-for-tech";
+    public static final String MANAGEMENT_IA_ID = "management-processus-ia";
 
     private QuizCatalogs() {
     }
@@ -23,6 +24,7 @@ public final class QuizCatalogs {
             case IA_ID -> PositioningTestIaCatalog.QUESTIONS;
             case IA_BUSINESS_ID -> PositioningTestIaBusinessCatalog.QUESTIONS;
             case IA_TECH_ID -> PositioningTestIaTechCatalog.QUESTIONS;
+            case MANAGEMENT_IA_ID -> PositioningTestManagementIaCatalog.QUESTIONS;
             default -> PositioningTestCatalog.QUESTIONS;
         };
     }
@@ -33,6 +35,7 @@ public final class QuizCatalogs {
             case IA_ID -> PositioningTestIaCatalog.SELF_LEVELS;
             case IA_BUSINESS_ID -> PositioningTestIaBusinessCatalog.SELF_LEVELS;
             case IA_TECH_ID -> PositioningTestIaTechCatalog.SELF_LEVELS;
+            case MANAGEMENT_IA_ID -> PositioningTestManagementIaCatalog.SELF_LEVELS;
             default -> PositioningTestCatalog.SELF_LEVELS;
         };
     }
@@ -43,6 +46,7 @@ public final class QuizCatalogs {
             case IA_ID -> PositioningTestIaCatalog.KNOWN_TERMS;
             case IA_BUSINESS_ID -> PositioningTestIaBusinessCatalog.KNOWN_TERMS;
             case IA_TECH_ID -> PositioningTestIaTechCatalog.KNOWN_TERMS;
+            case MANAGEMENT_IA_ID -> PositioningTestManagementIaCatalog.KNOWN_TERMS;
             default -> PositioningTestCatalog.KNOWN_TERMS;
         };
     }
@@ -53,6 +57,7 @@ public final class QuizCatalogs {
             case IA_ID -> FinalEvaluationIaCatalog.QUESTIONS;
             case IA_BUSINESS_ID -> FinalEvaluationIaBusinessCatalog.QUESTIONS;
             case IA_TECH_ID -> FinalEvaluationIaTechCatalog.QUESTIONS;
+            case MANAGEMENT_IA_ID -> FinalEvaluationManagementIaCatalog.QUESTIONS;
             default -> FinalEvaluationCatalog.QUESTIONS;
         };
     }

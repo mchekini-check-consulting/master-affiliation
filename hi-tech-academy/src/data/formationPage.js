@@ -217,6 +217,27 @@ const pages = {
       'Usage courant de la ligne de commande',
     ],
   },
+
+  'management-processus-ia': {
+    objectifs: [
+      { icon: ShieldCheck, titre: 'Bâtir une stratégie IA responsable', texte: 'Risques analysés, AI Act et RGPD respectés.' },
+      { icon: Settings, titre: 'Reconfigurer vos processus', texte: 'Répartition humain/IA et conduite du changement.' },
+      { icon: PenLine, titre: 'Maîtriser prompts et assistants', texte: 'RCTF, assistants personnalisés, RAG sur vos documents.' },
+      { icon: Palette, titre: 'Produire des contenus fiables', texte: 'Comptes rendus, tableaux de bord, visuels vérifiés.' },
+      { icon: BarChart3, titre: "Mesurer l'apport réel de l'IA", texte: 'Indicateurs avant/après et suivi dans la durée.' },
+      { icon: Sparkles, titre: "Installer l'amélioration continue", texte: 'Veille, ajustement des usages, plan d’action.' },
+    ],
+    personas: [
+      { icon: Users, titre: 'Managers de proximité', texte: 'Qui veulent transformer les processus de leur équipe.' },
+      { icon: Briefcase, titre: 'Dirigeants de petites structures', texte: 'En quête de gains concrets et conformes.' },
+      { icon: UserCog, titre: "Responsables d'équipe et entrepreneurs", texte: 'Qui doivent cadrer des usages IA déjà présents.' },
+    ],
+    prerequis: [
+      "Un an d'expérience en management d'équipe ou en direction de structure",
+      'Utilisation courante des outils informatiques',
+      'Appétence pour les nouvelles technologies numériques',
+    ],
+  },
 };
 
 /**
