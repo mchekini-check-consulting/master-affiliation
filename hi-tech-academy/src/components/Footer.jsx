@@ -118,7 +118,7 @@ export default function Footer() {
 
         {/* ── Certification et enregistrement ── */}
         <div className="ftr__cert">
-          <a className="ftr__cert-badge" href="/documents/qualiopi/Certificat_Qualiopi_RNQ.pdf" download="PG2402 Certificat RNQ_HI-TECH ACADEMY.pdf">
+          <a className="ftr__cert-badge" href="/documents/qualiopi/Certificat_Qualiopi_RNQ.pdf" target="_blank" rel="noreferrer">
             <img
               src="/images/qualiopi-certification.webp"
               alt="Certification Qualiopi, processus certifié, République française : délivrée au titre des actions de formation"
