@@ -69,7 +69,7 @@ function getSlotConfig(totalCards, slot) {
 }
 
 const ARROW_CLASSES =
-  "relative flex items-center justify-center rounded-full border-[1.5px] border-[#000c5b]/15 bg-white/70 backdrop-blur-[16px] text-[#000c5b]/60 cursor-pointer shrink-0 z-30 outline-none shadow-[0_4px_20px_rgba(0,12,91,0.12)] hover:border-[#000c5b]/35 hover:text-[#000c5b] active:opacity-70 transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-[#0066b0]";
+  "relative flex items-center justify-center rounded-full border-[1.5px] border-[#002d74]/15 bg-white/70 backdrop-blur-[16px] text-[#002d74]/60 cursor-pointer shrink-0 z-30 outline-none shadow-[0_4px_20px_rgba(0,45,116,0.12)] hover:border-[#002d74]/35 hover:text-[#002d74] active:opacity-70 transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-[#0066b0]";
 
 function CardContent({ card, index, large }) {
   return (
@@ -364,7 +364,7 @@ export default function CardFanCarousel({ cards, spread = 1, fit = false, fitMar
             {cards.map((_, i) => (
               <span
                 key={i}
-                className={`h-2 w-2 rounded-full transition-all duration-300 ${i === centerIndex ? 'scale-[1.3] bg-[#000c5b]' : 'bg-[#000c5b]/20'}`} />
+                className={`h-2 w-2 rounded-full transition-all duration-300 ${i === centerIndex ? 'scale-[1.3] bg-[#002d74]' : 'bg-[#002d74]/20'}`} />
             ))}
           </div>
           <button type="button" className={`${ARROW_CLASSES} h-10 w-10 md:h-12 md:w-12`} onClick={() => cycle('right')} aria-label="Suivant">

@@ -52,13 +52,13 @@ export default function Blog() {
           <div className="text-center mb-14">
             <span
               className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-4"
-              style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+              style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
               Blog & Actualités
             </span>
             <h1
               className="font-serif-display text-hero"
               style={{ color: '#243037', fontFamily: "'Inter', sans-serif" }}>
-              Tous nos <span style={{ color: '#000c5b' }}>Articles</span>
+              Tous nos <span style={{ color: '#002d74' }}>Articles</span>
             </h1>
           </div>
 
@@ -72,7 +72,7 @@ export default function Blog() {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div
                     className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-semibold"
-                    style={{ backgroundColor: '#000c5b', color: 'white', fontFamily: "'Inter', sans-serif" }}>
+                    style={{ backgroundColor: '#002d74', color: 'white', fontFamily: "'Inter', sans-serif" }}>
                     {post.category}
                   </div>
                 </div>
@@ -88,7 +88,7 @@ export default function Blog() {
                     </span>
                   </div>
                   <h2
-                    className="text-lg font-bold leading-snug group-hover:text-[#000c5b] transition-colors"
+                    className="text-lg font-bold leading-snug group-hover:text-[#002d74] transition-colors"
                     style={{ color: '#243037', fontFamily: "'Inter', sans-serif" }}>
                     {post.title}
                   </h2>
@@ -99,7 +99,7 @@ export default function Blog() {
                   </p>
                   <span
                     className="inline-flex items-center gap-2 text-sm font-semibold transition-all group-hover:gap-3"
-                    style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+                    style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
                     Lire l'article
                     <ArrowRight className="w-4 h-4" />
                   </span>

@@ -19,7 +19,7 @@ export default function LegalNotices() {
           <div className="space-y-8 text-sm leading-relaxed" style={{ color: '#5f6568', fontFamily: "'Inter', sans-serif" }}>
             
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
                 1. Éditeur du site
               </h2>
               <p className="mb-2">
@@ -34,7 +34,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
                 2. Directeur de la publication
               </h2>
               <p>
@@ -43,7 +43,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
                 3. Hébergement
               </h2>
               <p>
@@ -52,7 +52,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
                 4. Propriété intellectuelle
               </h2>
               <p>
@@ -61,7 +61,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
                 5. Responsabilité
               </h2>
               <p>
@@ -70,7 +70,7 @@ export default function LegalNotices() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold mb-3" style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}>
+              <h2 className="text-lg font-semibold mb-3" style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}>
                 6. Liens hypertextes
               </h2>
               <p>

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, SealCheck as BadgeCheck, BookOpen, Clock, CurrencyEur as Euro, Bank as Landmark } from '@phosphor-icons/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { formations } from '@/data/formations';
 import { getVenteById } from '@/data/ventes';
+import { categories, getCategorieBySlug } from '@/data/categories';
 import {
   NAVY, TEAL, CYAN, ACCENT, MINT, MINT_LIGHT,
   headingFont, serifFont, bodyFont,
@@ -24,6 +25,13 @@ export default function Formations() {
     document.title = 'Formations : Hi-Tech Academy';
     return () => { document.title = 'Hi-Tech Academy'; };
   }, []);
+
+  // Filtre par catégorie, porté par l'URL (?categorie=…) : c'est ce que visent
+  // les cartes du méga-menu, et un lien filtré reste partageable.
+  const [params, setParams] = useSearchParams();
+  const categorie = getCategorieBySlug(params.get('categorie'));
+  const affichees = categorie ? categorie.formations : formations;
+  const choisir = (slug) => setParams(slug ? { categorie: slug } : {}, { replace: true });
 
   return (
     <div className="min-h-screen bg-white">
@@ -46,7 +54,7 @@ export default function Formations() {
                 expert, certifiées Qualiopi et finançables par votre OPCO.
               </p>
               <Link
-                to="/#contact"
+                to="/contact"
                 className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-cta text-white transition-all hover:opacity-90"
                 style={{ background: NAVY, ...headingFont }}>
                 Parler à un conseiller
@@ -58,7 +66,7 @@ export default function Formations() {
             <motion.div initial="hidden" animate="visible" variants={fadeUp} className="hidden lg:block relative" style={{ minHeight: 340 }}>
               <div className="absolute rounded-3xl" style={{ width: 90, height: 90, left: '2%', bottom: '8%', background: CYAN }} />
               <div className="absolute rounded-3xl" style={{ width: 120, height: 150, right: '0%', top: '10%', background: NAVY }} />
-              <div className="absolute overflow-hidden rounded-3xl" style={{ left: '10%', top: '0', width: '78%', height: 340, boxShadow: '0 20px 45px rgba(0,12,91,0.2)' }}>
+              <div className="absolute overflow-hidden rounded-3xl" style={{ left: '10%', top: '0', width: '78%', height: 340, boxShadow: '0 20px 45px rgba(0,45,116,0.2)' }}>
                 <img src="/images/ee46959d2_course-04.webp" alt="Formations Hi-Tech Academy" className="w-full h-full object-cover" />
               </div>
             </motion.div>
@@ -83,8 +91,27 @@ export default function Formations() {
               <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4" style={{ color: TEAL }} /> Attestation de fin de formation</span>
             </p>
 
+            <nav aria-label="Filtrer par catégorie" className="flex flex-wrap gap-2 mb-8">
+              {[{ slug: null, tag: 'Toutes les formations', count: formations.length }, ...categories.map((c) => ({ slug: c.slug, tag: c.tag, count: c.formations.length, icon: c.icon }))].map(({ slug, tag, count, icon: Icon }) => {
+                const actif = (categorie?.slug ?? null) === slug;
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => choisir(slug)}
+                    aria-pressed={actif}
+                    className="inline-flex items-center gap-2 h-11 px-5 rounded-full text-body-sm font-semibold transition-colors cursor-pointer"
+                    style={{ background: actif ? NAVY : '#ffffff', color: actif ? '#ffffff' : NAVY, border: `1px solid ${actif ? NAVY : '#dbebff'}`, ...headingFont }}>
+                    {Icon && <Icon size={18} weight={actif ? 'fill' : 'regular'} />}
+                    {tag}
+                    <span className="text-caption" style={{ opacity: 0.75 }}>{count}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {formations.map((formation, i) => {
+              {affichees.map((formation, i) => {
                 const vente = getVenteById(formation.id);
                 const duree = formation.keyFacts.find((f) => f.label === 'Durée')?.value.split(', ')[0] ?? '';
                 const tarif = formation.keyFacts.find((f) => f.label === 'Tarif')?.value.split(' / ')[0].split(', ')[0] ?? '';
@@ -104,7 +131,7 @@ export default function Formations() {
                     variants={fadeUp}
                     transition={{ delay: i * 0.05 }}
                     className="flex flex-col rounded-2xl overflow-hidden bg-white"
-                    style={{ border: '1px solid #e5e5e5', boxShadow: '0 2px 10px rgba(0,12,91,0.05)' }}>
+                    style={{ border: '1px solid #e5e5e5', boxShadow: '0 2px 10px rgba(0,45,116,0.05)' }}>
 
                     {/* Image sur fond menthe */}
                     <Link to={`/formations/${formation.id}`} className="relative block m-3 rounded-xl overflow-hidden" style={{ background: MINT, height: 150 }}>
@@ -163,7 +190,7 @@ export default function Formations() {
                 </p>
               </div>
               <Link
-                to="/#contact"
+                to="/contact"
                 className="shrink-0 inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm text-white"
                 style={{ background: ACCENT, ...headingFont }}>
                 Être conseillé <ArrowRight className="w-4 h-4" />

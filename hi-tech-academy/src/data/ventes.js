@@ -8,7 +8,6 @@ export const ventes = {
   'kubernetes-fondamentaux': {
     // Couleur propre à la formation : fond sombre du héro, accent clair (sur-titres,
     // chiffres du programme), trait (filets sur le fond). Texte courant : blanc.
-    couleur: { fond: '#000c5b', accent: '#9cbdff', trait: '#002d74' },
     accroche: 'Et si vous déployiez votre première application sur Kubernetes dès ce soir ?',
     promesse:
       "Aujourd'hui, Kubernetes vous semble réservé aux experts DevOps. Dans une journée, vous aurez déployé, exposé et configuré une application complète sur un vrai cluster Azure, et vous saurez expliquer chaque étape en entretien comme en réunion d'architecture.",
@@ -107,7 +106,6 @@ export const ventes = {
   },
 
   'facturation-electronique-pennylane': {
-    couleur: { fond: '#0b3d3a', accent: '#9fe3d2', trait: '#1c5a55' },
     accroche: 'Septembre 2026 : votre trésorerie tiendra-t-elle le choc de la facture électronique ?',
     promesse:
       "Aujourd'hui, la réforme de la facturation électronique est un brouillard d'acronymes et d'échéances. Dans deux jours, vous saurez exactement ce qu'elle impose à VOTRE entreprise, vous repartirez avec votre plan de mise en conformité, et Pennylane sera devenu votre allié du quotidien.",
@@ -185,7 +183,6 @@ export const ventes = {
   },
 
   'ia-pour-tous': {
-    couleur: { fond: '#2b1a5e', accent: '#c9b8ff', trait: '#4a3690' },
     accroche: "Ils gagnent 5 heures par semaine avec l'IA. Pourquoi pas vous ?",
     promesse:
       "Aujourd'hui, vous utilisez peut-être ChatGPT « de temps en temps », sans méthode. Après 80 heures 100 % pratiques, l'IA rédigera avec vous, analysera vos documents, créera vos visuels et automatisera vos tâches répétitives. Vous saurez exactement quand lui faire confiance, et quand vous méfier.",
@@ -272,7 +269,6 @@ export const ventes = {
   },
 
   'ia-for-business': {
-    couleur: { fond: '#4a1030', accent: '#ffb8d1', trait: '#7a2a52' },
     accroche: 'Et si des agents IA travaillaient pour votre business pendant que vous dormez ?',
     promesse:
       "Aujourd'hui, vous avez une idée (ou l'envie d'en trouver une) et pas d'équipe. En 100 heures, vous lancez un micro-business réel : idée validée par le marché, marque et site en ligne, premiers prospects contactés, et une équipe d'agents IA qui prospecte, publie, facture et répond à vos clients.",
@@ -368,7 +364,6 @@ export const ventes = {
   },
 
   'ia-for-tech': {
-    couleur: { fond: '#0f2233', accent: '#8fd3ff', trait: '#22415c' },
     accroche: "RAG, agents, MCP, evals : les compétences que les recruteurs s'arrachent.",
     promesse:
       "Vous savez coder, et les tutoriels IA vous laissent au stade du prototype. En 100 heures, vous concevez, sécurisez et déployez une application agentique complète (RAG, MCP, evals, guardrails) au niveau d'exigence de la production. Elle rejoint votre portfolio ; les compétences, votre CV.",
@@ -572,7 +567,9 @@ export function getVenteById(id) {
   const preuves = vente.preuves ?? {};
   return {
     ...vente,
-    couleur: { fond: '#000c5b', accent: '#9cbdff', trait: '#002d74', ...(vente.couleur ?? {}) },
+    // Une seule palette pour toutes les pages formation : l'aplat marine de
+    // la charte (celle de Kubernetes). Plus de couleur propre à chaque formation.
+    couleur: { fond: '#002d74', accent: '#9cbdff', trait: '#002d74' },
     preuves: {
       ...PREUVES_VIDES,
       ...preuves,

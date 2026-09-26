@@ -23,10 +23,10 @@ const columns = [
     title: "L'organisme",
     links: [
       { label: 'Accueil', href: '/' },
-      { label: 'À propos', href: '/#about' },
+      { label: 'À propos', href: '/a-propos' },
       { label: 'Financer sa formation', href: '/financements' },
       { label: 'Blog', href: '/blog' },
-      { label: 'Contact', href: '/#contact' },
+      { label: 'Contact', href: '/contact' },
     ],
   },
   {
@@ -91,8 +91,11 @@ export default function Footer() {
         {/* ── En-tête : nom, promesse, contact ── */}
         <div className="ftr__head">
           <div>
-            <LogoMark size={72} rotate={-7} className="ftr__logo" voidColor="#000c5b" />
-            <p className="ftr__name">Hi-Tech Academy</p>
+            {/* Emblème et nom sur une même ligne ; le slogan passe dessous. */}
+            <div className="ftr__brand">
+              <LogoMark size={56} className="ftr__logo" voidColor="#002d74" />
+              <p className="ftr__name">Hi-Tech Academy</p>
+            </div>
             <p className="ftr__claim">Apprendre aujourd&apos;hui. Construire demain.</p>
           </div>
           <address className="ftr__contact">

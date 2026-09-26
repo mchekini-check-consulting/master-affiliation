@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, ChartBar as BarChart3, Briefcase, CheckCircle as CheckCircle2, FileText, GraduationCap, Star } from '@phosphor-icons/react';
+import { ArrowRight, Briefcase, CheckCircle as CheckCircle2, FileText, GraduationCap, Heart, Star } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 
 // Trois profils d'audience, repris de la maquette. Les puces vivent dans la
@@ -36,7 +36,7 @@ const profiles = [
     icon: FileText,
     tone: 'mint',
     cta: 'Solutions entreprises',
-    href: '/#contact',
+    href: '/contact?sujet=devis',
     imageClass: 'business',
     image: '/images/profil-entreprises.webp',
     bullets: ['Formations personnalisées', 'Suivi et reporting', 'Compétences directement applicables'],
@@ -44,17 +44,21 @@ const profiles = [
   },
 ];
 
+// QUALIOPI : aucun chiffre non justifiable. Les deux taux sont ceux publiés
+// dans « Nos résultats » (ResultsSection.jsx), issus des questionnaires de
+// satisfaction : les modifier ici ET là-bas, jamais l'un sans l'autre.
+// Anciennement « +2K apprenants » et « +70 % en emploi sous 6 mois », que rien
+// n'étayait : retirés.
 const stats = [
-  { icon: GraduationCap, value: '+2K', label: 'Apprenants formés' },
   { icon: Star, value: '95%', label: 'Taux de satisfaction' },
-  { icon: BarChart3, value: '+70%', label: 'En emploi sous 6 mois' },
+  { icon: Heart, value: '100%', label: 'Taux de recommandation' },
 ];
 
 /** Emplacement de photo laissé vide : déposer l'image puis remplacer par <img>. */
 // Visuel de carte. Avec `src`, une vraie photo ; sans, l'aplat d'attente.
 // `has-photo` bascule l'accroche manuscrite en blanc et ajoute un voile
 // sombre en haut de l'image : mesure sur la photo fournie, ce coin est a
-// 54/255 de luminance, ou le #000c5b de l'accroche serait invisible.
+// 54/255 de luminance, ou le #002d74 de l'accroche serait invisible.
 function VisuelCarte({ className, scribble, src }) {
   return (
     <div

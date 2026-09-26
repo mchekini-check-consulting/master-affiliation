@@ -7,15 +7,15 @@ import React from 'react';
 // valeurs changent. L'admin n'utilise pas ce fichier et reste inchangé.
 
 // Palette de marque (4 couleurs identitaires) :
-//   #000c5b (primaire) · #9cbdff (surfaces) · #0062e1 (accent) · #f0f7ff (fonds)
+//   #002d74 (primaire) · #9cbdff (surfaces) · #0062e1 (accent) · #f0f7ff (fonds)
 // + 2 paliers techniques dérivés du primaire, indispensables aux états et aux
-//   filets (l'écart de luminance entre #000c5b et #9cbdff est trop grand pour
+//   filets (l'écart de luminance entre #002d74 et #9cbdff est trop grand pour
 //   qu'un survol ou une bordure s'y loge) : #002d74 · #0066b0
-export const INK = '#000c5b';        // bandes sombres : primaire
-export const NAVY = '#000c5b';       // titres et textes forts (primaire)
+export const INK = '#002d74';        // bandes sombres : primaire
+export const NAVY = '#002d74';       // titres et textes forts (primaire)
 export const TEAL = '#002d74';       // liens et icônes (6,9:1 sur blanc)
 export const CYAN = '#0066b0';       // formes et accents décoratifs uniquement
-export const ACCENT = '#000c5b';     // bleu marine : CTA principaux (pilules)
+export const ACCENT = '#002d74';     // bleu marine : CTA principaux (pilules)
 export const LILAC = '#0062e1';      // accent : APLATS SEULEMENT, texte #ffffff
 export const BODY = '#243037';       // texte courant sur fond clair
 export const BODY_MUTED = '#5f6568'; // texte secondaire (gris neutre)

@@ -29,12 +29,12 @@ const PrimaryButton = React.forwardRef(
     const classes = cn(
       'inline-flex items-center justify-center w-fit rounded-full font-semibold whitespace-nowrap',
       'transition-colors duration-200 cursor-pointer',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#000c5b]',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#002d74]',
       'disabled:pointer-events-none disabled:opacity-50',
       SIZES[size] ?? SIZES.md,
       inverted
-        ? 'bg-white text-[#000c5b] hover:bg-[#dbebff]'
-        : 'bg-[#000c5b] text-white hover:bg-[#002d74]',
+        ? 'bg-white text-[#002d74] hover:bg-[#dbebff]'
+        : 'bg-[#002d74] text-white hover:bg-[#011f55]',
       className
     );
 

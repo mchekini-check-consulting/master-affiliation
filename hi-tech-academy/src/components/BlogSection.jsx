@@ -54,7 +54,7 @@ function ArticleCard({ post, index }) {
           {/* Rubrique */}
           <span
             className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-[0.12em]"
-            style={{ background: '#000c5b', color: '#ffffff', fontFamily: FONT }}>
+            style={{ background: '#002d74', color: '#ffffff', fontFamily: FONT }}>
             {post.category}
           </span>
 
@@ -96,23 +96,9 @@ function ArticleCard({ post, index }) {
               className="inline-flex items-center gap-2.5 text-sm font-semibold"
               style={{ color: '#002d74', fontFamily: FONT }}>
 
-              {/* Pastille à double flèche : la première sort, la seconde entre. */}
-              <span
-                className="relative grid place-items-center w-9 h-9 rounded-full overflow-hidden shrink-0"
-                style={{
-                  background: '#f0f7ff',
-                  transition: 'background 0.3s ease',
-                }}>
-                <ArrowRight
-                  size={16}
-                  weight="bold"
-                  className="transition-all duration-500 ease-in group-hover:translate-x-7 group-hover:opacity-0"
-                  style={{ color: '#002d74' }} />
-                <ArrowRight
-                  size={16}
-                  weight="bold"
-                  className="absolute -translate-x-8 transition-transform duration-500 ease-out group-hover:translate-x-0"
-                  style={{ color: '#002d74' }} />
+              {/* Pastille plate : une flèche fixe, sans animation. */}
+              <span className="grid place-items-center w-9 h-9 rounded-full shrink-0" style={{ background: '#f0f7ff' }}>
+                <ArrowRight size={16} weight="bold" style={{ color: '#002d74' }} />
               </span>
               Lire l'article
             </span>

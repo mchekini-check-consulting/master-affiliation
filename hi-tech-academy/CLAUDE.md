@@ -2,13 +2,13 @@
 
 ## Palette de couleurs (obligatoire partout)
 
-Charte issue du design system `tokens.json` (migration bleu marine du 18/09/2026).
+Charte issue du design system `tokens.json` (migration bleu marine du 18/09/2026, primaire passé à `#002d74` le 24/09/2026).
 
 ### Les 4 couleurs identitaires
 
 | Rôle | Couleur |
 |------|---------|
-| **Primaire** (titres sombres, CTA, bandes sombres) | `#000c5b` |
+| **Primaire** (titres sombres, CTA, bandes sombres) | `#002d74` |
 | Surfaces, cartes, tags, accents sur fond sombre | `#9cbdff` |
 | **Accent bleu vif** — aplats décoratifs, texte BLANC dessus | `#0062e1` |
 | Fonds pâles de section | `#f0f7ff` |
@@ -17,7 +17,8 @@ Charte issue du design system `tokens.json` (migration bleu marine du 18/09/2026
 
 | Rôle | Couleur |
 |------|---------|
-| Liens, icônes, survol du primaire | `#002d74` |
+| Liens, icônes | `#002d74` |
+| Survol du primaire (boutons pleins) | `#011f55` |
 | Formes et accents **décoratifs** (jamais du texte fin) | `#0066b0` |
 | Filets et bordures | `#dbebff` |
 | Aplat pâle secondaire (fond de bloc accentué) | `#dfedff` |
@@ -27,7 +28,7 @@ Charte issue du design system `tokens.json` (migration bleu marine du 18/09/2026
 
 - `#0062e1` porte du texte **blanc** uniquement — jamais de texte foncé.
 - `#0066b0` est décoratif : interdit pour du texte courant. Pour un lien ou une icône porteuse de sens, utiliser `#002d74`.
-- `#9cbdff` ne porte que du texte `#000c5b` ou `#243037` — jamais de blanc.
+- `#9cbdff` ne porte que du texte `#002d74` ou `#243037` — jamais de blanc.
 
 ### Neutres
 
@@ -35,10 +36,10 @@ Charte issue du design system `tokens.json` (migration bleu marine du 18/09/2026
 - Neutres purs tolérés : blanc, `#f3f3f7`, `#f0f0f0`, `#e5e1e1`.
 - **Périmètre** : site public uniquement. `src/pages/admin/*`, `Admin.jsx` et `AuditQualiopiContent.jsx` gardent leur propre jeu de couleurs.
 - Hors charte par nature, à ne jamais convertir : couleurs d'alerte des formulaires (`#a12626`, `#fdecec`, `#c2410c`, `#8a5a00`, `#fdf3e2`…), couleurs de marque Google et le rouge République Française `#e2001a`.
-- Ombres en `rgba(0,12,91,…)` uniquement.
+- Ombres en `rgba(0,45,116,…)` uniquement.
 - **Fond du site** : blanc pur (`src/index.css`). Les sections publiques restent `background: 'transparent'` ; seules les cartes gardent un fond blanc.
 - Aucune autre teinte (pas de vert, doré, violet…), sauf les couleurs d'alerte.
-- Sur fond sombre (`#000c5b` / `#002d74`), les accents et mots-clés passent en `#9cbdff`.
+- Sur fond sombre (`#002d74` / `#002d74`), les accents et mots-clés passent en `#9cbdff`.
 - **Titres en `#243037`, jamais en bleu vif** : le bleu reste réservé aux boutons, icônes, fonds et accents.
 - Tokens centralisés dans `src/components/design.jsx` : les utiliser plutôt que des hex en dur.
 
@@ -160,17 +161,17 @@ Toujours teintées du primaire, jamais en gris neutre ni en bleu nuit :
 
 | Niveau | Valeur |
 |---|---|
-| Repos (carte) | `0 6px 18px -10px rgba(0,12,91,.16)` |
-| Survol / carte active | `0 18px 40px -20px rgba(0,12,91,.28)` |
-| Élément flottant (header collé, menu) | `0 8px 24px rgba(0,12,91,.10)` |
+| Repos (carte) | `0 6px 18px -10px rgba(0,45,116,.16)` |
+| Survol / carte active | `0 18px 40px -20px rgba(0,45,116,.28)` |
+| Élément flottant (header collé, menu) | `0 8px 24px rgba(0,45,116,.10)` |
 
 ## Bouton primaire (obligatoire pour tout CTA principal)
 
 Utiliser **toujours** `PrimaryButton` (`src/components/ui/primary-button.jsx`).
 
-Le bouton est **volontairement simple** : une pilule pleine en `#000c5b`, un
+Le bouton est **volontairement simple** : une pilule pleine en `#002d74`, un
 libellé blanc, rien d'autre. **Pas d'icône, pas de pastille, pas d'animation
-de survol** — seulement un changement de couleur vers `#002d74`. Ne pas
+de survol** — seulement un changement de couleur vers `#011f55`. Ne pas
 réintroduire de flèche ni d'effet de glissement : c'est une décision explicite.
 
 ```jsx
@@ -189,11 +190,11 @@ Props : `to` | `href` | (sinon `<button>`), `inverted`, `size` (`sm` 44 px ·
 
 ## Héro de la page d'accueil
 
-Le héro est sur **aplat `#000c5b`**, pas sur blanc. Conséquences à respecter :
+Le héro est sur **aplat `#002d74`**, pas sur blanc. Conséquences à respecter :
 
 - Titre en blanc, mot-clé accentué en `#9cbdff`, chapô en `#dbebff`.
 - Filets en `#002d74` (jamais du blanc en opacité).
-- Pastilles d'icône en `#9cbdff` avec un glyphe `#000c5b` — jamais de blanc sur
+- Pastilles d'icône en `#9cbdff` avec un glyphe `#002d74` — jamais de blanc sur
   `#9cbdff`.
 - Le header reçoit `embedded` et bascule tout seul en variante claire tant qu'on
   n'a pas défilé (`sombre` dans `Header.jsx`) : carré du logo inversé, libellés

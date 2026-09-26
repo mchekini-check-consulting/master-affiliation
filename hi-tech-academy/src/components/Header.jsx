@@ -3,9 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Buildings as Building2, CaretDown as ChevronDown, Headphones, Bank as Landmark, List as Menu, Phone, X } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
-import TopBar from '@/components/TopBar';
 import LogoMark from '@/components/LogoMark';
 import { formations } from '@/data/formations';
+import { categories } from '@/data/categories';
 import { NAVY, TEAL, LINE, MINT_LIGHT, BODY, BODY_MUTED, headingFont, bodyFont, serifFont } from '@/components/design';
 
 // Barre de navigation du site public : une CAPSULE BLANCHE flottante.
@@ -36,28 +36,16 @@ const BAR_H = 'h-16 lg:h-[72px]';
 // Retrait de la capsule par rapport au haut de la fenêtre, et son gabarit.
 // `CAPSULE_PT` + hauteur de barre = la hauteur totale occupée par le header,
 // reprise par `HEADER_OFFSET` dans les pages qui collent un élément dessous.
-// Le bandeau utilitaire est dans le FLUX NORMAL : il defile avec la page et
-// disparait en haut. Seule la capsule est fixe. Tant que le bandeau est encore
-// visible, la capsule est decalee vers le bas de ce qu'il en reste, puis elle
-// se colle au bord superieur. Sans ce decalage, elle recouvrirait le bandeau
-// des le chargement.
-const BARRE_H = 36;
 const CAPSULE_PT = 'pt-3 sm:pt-4';
 const CAPSULE_W = 'mx-auto w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)] max-w-site';
 const PHONE = { label: '07 51 47 41 35', href: 'tel:+33751474135' };
-
-// La signature de marque : trois mots, un par ligne, à droite du filet. Ils
-// tiennent lieu de baseline et donnent au lockup sa masse. Des NOMS et non des
-// verbes : un verbe promet, un nom affirme — c'est ce qui sépare un slogan
-// d'organisme de formation d'une devise d'école.
-const SIGNATURE = ['Exigence', 'Terrain', 'Résultat'];
 
 const navItems = [
   { label: 'Formations', panelId: 'formations' },
   { label: 'Financements', panelId: 'financements' },
   { label: 'Blog', href: '/blog' },
-  { label: 'À propos', href: '/#about' },
-  { label: 'Contact', href: '/#contact' },
+  { label: 'À propos', href: '/a-propos' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 const menuPanels = {
@@ -65,11 +53,12 @@ const menuPanels = {
     titre: 'Notre catalogue',
     sousTitre: 'Des formations courtes, en classe virtuelle, éligibles au financement OPCO.',
     footer: { label: 'Voir tout le catalogue', href: '/formations' },
-    items: formations.map((f) => ({
-      title: f.title,
-      description: f.tag,
-      imageSrc: f.image,
-      href: `/formations/${f.id}`,
+    items: categories.map((c) => ({
+      title: c.tag,
+      description: `${c.formations.length} formation${c.formations.length > 1 ? 's' : ''}`,
+      texte: c.description,
+      icon: c.icon,
+      href: `/formations?categorie=${c.slug}`,
     })),
   },
   financements: {
@@ -79,7 +68,7 @@ const menuPanels = {
     items: [
       { icon: Building2, title: 'Les OPCO, vos financeurs', description: 'Les Opérateurs de Compétences financent les actions de formation des entreprises, en priorité les TPE/PME.', href: '/financements' },
       { icon: Landmark, title: 'France compétences', description: 'Le régulateur qui finance et contrôle le système de formation professionnelle.', href: '/financements' },
-      { icon: Headphones, title: 'Être accompagné', description: 'Parlez à un conseiller de votre projet et de son financement.', href: '/#contact' },
+      { icon: Headphones, title: 'Être accompagné', description: 'Parlez à un conseiller de votre projet et de son financement.', href: '/contact?mode=rendez-vous' },
     ],
   },
 };
@@ -92,53 +81,89 @@ function NavLink({ href, children, ...props }) {
 
 function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-4 shrink-0" aria-label="Hi Tech Academy, accueil">
-      <LogoMark size={54} rotate={-7} className="shrink-0" style={{ color: NAVY }} />
-      {/* Filet de séparation : un trait plein à la hauteur de l'emblème, pas un
-          `border` de 1 px qui disparaîtrait. C'est lui qui fait tenir le lockup
-          ensemble, donc il est dans la couleur de la marque, pas en gris. */}
-      <span aria-hidden="true" className="shrink-0 w-px h-[52px]" style={{ background: NAVY }} />
-      {/* Les trois mots de la marque, empilés à la hauteur exacte de l'emblème :
-          trois lignes de 12 px en interligne 1,45 remplissent les 52 px du
-          filet. Le nom complet reste porté par l'`aria-label` du lien. */}
-      <span aria-hidden="true" className="flex flex-col justify-between h-[52px] py-px">
-        {SIGNATURE.map((mot) => (
-          <span
-            key={mot}
-            className="text-caption font-bold uppercase leading-none whitespace-nowrap"
-            style={{ color: NAVY, letterSpacing: '0.18em', ...serifFont }}>
-            {mot}
-          </span>
-        ))}
+    <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Hi Tech Academy, accueil">
+      <LogoMark size={40} className="shrink-0" style={{ color: NAVY }} />
+      {/* Nom de la marque en toutes lettres, à côté de l'emblème. Le nom
+          complet reste porté par l'`aria-label` du lien. */}
+      <span
+        aria-hidden="true"
+        className="whitespace-nowrap text-[20px] font-semibold leading-none"
+        style={{ color: '#243037', letterSpacing: '-0.015em', ...serifFont }}>
+        Hi Tech Academy
       </span>
     </Link>
   );
 }
 
-/** Carte illustrée du méga-menu (formations). */
-function ImageCard({ item, onNavigate }) {
+/**
+ * Carte de catégorie du méga-menu. Au survol : bordure marine, fond pâle,
+ * la pastille d'icône passe du marine au bleu vif et se soulève d'un cran,
+ * la flèche glisse. Tout reste dans la charte (aplats, pas de dégradé).
+ */
+function CategoryCard({ item, index, onNavigate }) {
+  const Icon = item.icon;
   return (
-    <NavLink
-      href={item.href}
-      onClick={onNavigate}
-      className="group relative flex h-[160px] flex-col justify-end overflow-hidden p-4"
-      style={{ borderRadius: RADIUS, border: `1px solid ${LINE}` }}>
-      <img
-        src={item.imageSrc}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-      <span
-        aria-hidden="true"
-        className="absolute inset-0"
-        style={{ background: 'linear-gradient(180deg, rgba(0,12,91,0.10) 35%, rgba(0,12,91,0.92) 100%)' }} />
-      <span className="relative text-caption font-semibold uppercase tracking-[0.12em]" style={{ color: '#9cbdff', ...bodyFont }}>
-        {item.description}
-      </span>
-      <span className="relative mt-1 flex items-center gap-2 text-body-base font-semibold text-white" style={headingFont}>
-        {item.title}
-        <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" />
-      </span>
-    </NavLink>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: 0.04 + index * 0.06, ease: [0.16, 1, 0.3, 1] }}>
+      <NavLink
+        href={item.href}
+        onClick={onNavigate}
+        className="mega-cat group flex h-full flex-col p-6 bg-white"
+        style={{ borderRadius: RADIUS }}>
+        <span className="flex items-start justify-between gap-3">
+          <span className="mega-cat__icon grid place-items-center w-12 h-12 shrink-0 text-white" style={{ borderRadius: RADIUS }}>
+            <Icon size={24} weight="duotone" />
+          </span>
+          <span className="mega-cat__count text-caption font-semibold px-2.5 py-1 rounded-full" style={{ color: NAVY, ...headingFont }}>
+            {item.description}
+          </span>
+        </span>
+        <span className="block text-h4 font-semibold leading-snug mt-6" style={{ color: BODY, ...serifFont }}>
+          {item.title}
+        </span>
+        <span className="block text-body-sm leading-[1.5] mt-2 flex-1" style={{ color: BODY_MUTED, ...bodyFont }}>
+          {item.texte}
+        </span>
+        <span className="inline-flex items-center gap-2 mt-5 text-body-sm font-semibold" style={{ color: NAVY, ...headingFont }}>
+          Voir les formations
+          <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </span>
+      </NavLink>
+    </motion.div>
+  );
+}
+
+/** Dernière carte : tout le catalogue, sur l'aplat marine. */
+function CatalogueCard({ index, onNavigate }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: 0.04 + index * 0.06, ease: [0.16, 1, 0.3, 1] }}>
+      <NavLink
+        href="/formations"
+        onClick={onNavigate}
+        className="group flex h-full flex-col justify-between p-6 transition-colors duration-300 bg-[#002d74] hover:bg-[#011f55]"
+        style={{ borderRadius: RADIUS }}>
+        <span>
+          <span className="block text-caption font-semibold" style={{ color: '#9cbdff', ...headingFont }}>Catalogue complet</span>
+          <span className="block text-h3 font-semibold leading-tight mt-3 text-white" style={serifFont}>
+            {formations.length} formations certifiées Qualiopi
+          </span>
+          <span className="block text-body-sm leading-[1.5] mt-2" style={{ color: '#dbebff', ...bodyFont }}>
+            En direct, 100 % à distance, finançables par votre OPCO.
+          </span>
+        </span>
+        <span className="flex items-center justify-between mt-6">
+          <span className="text-body-sm font-semibold text-white" style={headingFont}>Tout le catalogue</span>
+          <span className="grid place-items-center w-11 h-11 rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1">
+            <ArrowRight className="w-4 h-4" style={{ color: NAVY }} />
+          </span>
+        </span>
+      </NavLink>
+    </motion.div>
   );
 }
 
@@ -173,38 +198,12 @@ function DropdownPanel({ panelId, onNavigate }) {
   const panel = menuPanels[panelId];
 
   const grid = panelId === 'formations'
-    ? (() => {
-        const [first, second, ...rest] = panel.items;
-        return (
-          <div className="grid grid-cols-[1fr_1fr_1fr] gap-4">
-            <ImageCard item={first} onNavigate={onNavigate} />
-            <ImageCard item={second} onNavigate={onNavigate} />
-            {/* Les formations suivantes en lignes compactes : trois lignes de
-                48 px + deux gouttières de 8 px retombent exactement sur la
-                hauteur des deux cartes illustrées (160 px). */}
-            <div className="grid gap-2 content-start">
-              {rest.slice(0, 3).map((item) => (
-                <NavLink
-                  key={item.href}
-                  href={item.href}
-                  onClick={onNavigate}
-                  className="group flex items-center justify-between gap-3 h-12 px-4 transition-colors hover:bg-[#dbebff]"
-                  style={{ borderRadius: RADIUS, border: `1px solid ${LINE}`, background: MINT_LIGHT }}>
-                  <span className="min-w-0">
-                    <span className="block truncate text-body-sm font-semibold leading-tight" style={{ color: BODY, ...headingFont }}>
-                      {item.title}
-                    </span>
-                    <span className="block truncate text-caption leading-tight mt-0.5" style={{ color: BODY_MUTED, ...bodyFont }}>
-                      {item.description}
-                    </span>
-                  </span>
-                  <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" style={{ color: TEAL }} />
-                </NavLink>
-              ))}
-            </div>
-          </div>
-        );
-      })()
+    ? (
+      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${panel.items.length}, minmax(0, 1fr)) minmax(0, 1.1fr)` }}>
+        {panel.items.map((item, i) => <CategoryCard key={item.href} item={item} index={i} onNavigate={onNavigate} />)}
+        <CatalogueCard index={panel.items.length} onNavigate={onNavigate} />
+      </div>
+    )
     : (
       <div className="grid grid-cols-3 gap-4">
         {panel.items.map((item) => <TextCard key={item.title} item={item} onNavigate={onNavigate} />)}
@@ -218,14 +217,14 @@ function DropdownPanel({ panelId, onNavigate }) {
           <h2 className="text-h4 font-bold" style={{ color: BODY, ...headingFont }}>{panel.titre}</h2>
           <p className="text-body-sm mt-1" style={{ color: BODY_MUTED, ...bodyFont }}>{panel.sousTitre}</p>
         </div>
-        <NavLink
+        {panelId !== 'formations' && <NavLink
           href={panel.footer.href}
           onClick={onNavigate}
           className="group inline-flex items-center gap-2 h-11 px-5 rounded-full text-body-sm font-semibold transition-colors hover:bg-[#dbebff]"
           style={{ background: MINT_LIGHT, color: NAVY, border: `1px solid ${LINE}`, ...headingFont }}>
           {panel.footer.label}
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-        </NavLink>
+        </NavLink>}
       </div>
       {grid}
     </div>
@@ -248,12 +247,9 @@ export default function Header({ embedded: _embedded = false }) {
     setMobileActiveMenu(null);
   };
 
-  const [decalage, setDecalage] = useState(BARRE_H);
-
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 10);
-      setDecalage(Math.max(0, BARRE_H - window.scrollY));
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -282,13 +278,9 @@ export default function Header({ embedded: _embedded = false }) {
 
   return (
     <>
-      {/* Flux normal : il defile et ne revient pas. */}
-      <TopBar />
-
       <header
         ref={headerRef}
-        className="fixed inset-x-0 z-50 pointer-events-none"
-        style={{ top: decalage }}>
+        className="fixed inset-x-0 top-0 z-50 pointer-events-none">
         <div className={CAPSULE_PT}>
 
       {/* ── capsule blanche ──
@@ -305,7 +297,7 @@ export default function Header({ embedded: _embedded = false }) {
           // Spread négatif proche du flou : l'ombre reste inset sur les côtés et
           // en haut (quasi invisible), le décalage vertical la fait déborder
           // seulement en dessous — jamais un halo qui déborde de la capsule.
-          boxShadow: scrolled ? '0 10px 16px -10px rgba(0,12,91,0.26)' : '0 8px 12px -10px rgba(0,12,91,0.20)',
+          boxShadow: scrolled ? '0 10px 16px -10px rgba(0,45,116,0.26)' : '0 8px 12px -10px rgba(0,45,116,0.20)',
         }}>
         <div className={`${BAR_H} flex items-center justify-between gap-6 xl:gap-10 px-4 sm:px-6`}>
           <Logo />
@@ -380,7 +372,7 @@ export default function Header({ embedded: _embedded = false }) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={`hidden lg:block ${CAPSULE_W} mt-3 overflow-hidden pointer-events-auto`}
-            style={{ background: '#ffffff', borderRadius: 24, border: `1px solid ${LINE}`, boxShadow: '0 18px 40px -20px rgba(0,12,91,.28)' }}>
+            style={{ background: '#ffffff', borderRadius: 24, border: `1px solid ${LINE}`, boxShadow: '0 18px 40px -20px rgba(0,45,116,.28)' }}>
             <DropdownPanel panelId={activeMenu} onNavigate={closeAll} />
           </motion.div>
         )}
@@ -395,7 +387,7 @@ export default function Header({ embedded: _embedded = false }) {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={`lg:hidden ${CAPSULE_W} mt-3 overflow-hidden pointer-events-auto`}
-            style={{ background: '#ffffff', borderRadius: 24, border: `1px solid ${LINE}`, boxShadow: '0 18px 40px -20px rgba(0,12,91,.28)' }}>
+            style={{ background: '#ffffff', borderRadius: 24, border: `1px solid ${LINE}`, boxShadow: '0 18px 40px -20px rgba(0,45,116,.28)' }}>
             <div className="max-h-[calc(100dvh-120px)] overflow-y-auto px-5 py-4" style={headingFont}>
               {navItems.map((item) => {
                 if (!item.panelId) {

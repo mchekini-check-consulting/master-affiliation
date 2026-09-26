@@ -15,7 +15,7 @@ const COMPLAINANT_TYPES = [
 
 // 16 px sous sm : en dessous, iOS Safari zoome toute la page au focus du champ.
 const inputClass = 'w-full rounded-xl border px-4 py-3 text-base sm:text-sm outline-none transition-colors focus:border-[#002d74] bg-white';
-const inputStyle = { borderColor: '#e5e5e5', color: '#000c5b', ...bodyFont };
+const inputStyle = { borderColor: '#e5e5e5', color: '#002d74', ...bodyFont };
 
 const emptyForm = {
   formationId: formations[0]?.id ?? '',

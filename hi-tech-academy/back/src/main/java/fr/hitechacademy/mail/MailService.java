@@ -338,6 +338,59 @@ public class MailService {
                 body.formatted(firstName, lastName, formationTitle));
     }
 
+    /** Message ou demande de rendez-vous déposé sur la page Contact : notifie l'organisme. */
+    @Async
+    public void notifyAdminContact(boolean appointment, String fullName, String email, String phone, String details) {
+        String body = """
+                %s vient d'arriver depuis la page Contact du site.
+
+                De : %s
+                Email : %s
+                Téléphone : %s
+
+                %s
+
+                Le contact est dans le CRM (colonne « À contacter ») :
+                %s/admin
+
+                — Notification automatique Hi-Tech Academy""";
+        send(adminRecipient,
+                (appointment ? "Demande de rendez-vous — " : "Nouveau message — ") + fullName,
+                body.formatted(appointment ? "Une demande de rendez-vous" : "Un message",
+                        fullName, email, phone != null ? phone : "non renseigné", details, baseUrl));
+    }
+
+    /**
+     * Accusé de réception envoyé depuis la page Contact. Pour un rendez-vous,
+     * rappelle que le créneau est une demande, confirmée ensuite par l'équipe.
+     */
+    @Async
+    public void acknowledgeContact(String to, String firstName, String appointmentFormat, String when) {
+        String corps = appointmentFormat != null
+                ? """
+                Nous avons bien reçu votre demande de rendez-vous en %s, le %s.
+
+                Nous vous confirmons ce créneau par email sous 24 h ouvrées, ou vous
+                en proposons un autre s'il n'est plus disponible.""".formatted(appointmentFormat, when)
+                : """
+                Nous avons bien reçu votre message. Nous vous répondons sous 24 h
+                ouvrées.""";
+        String body = """
+                Bonjour %s,
+
+                %s
+
+                Pour toute urgence : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Cordialement,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        send(to,
+                appointmentFormat != null ? "Votre demande de rendez-vous — Hi-Tech Academy"
+                        : "Nous avons bien reçu votre message — Hi-Tech Academy",
+                body.formatted(firstName, corps));
+    }
+
     private void send(String to, String subject, String body) {
         if (!enabled) {
             log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);

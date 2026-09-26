@@ -17,7 +17,7 @@ const PROFILS = [
     titre: 'Prise en charge par votre OPCO ou votre plan de compétences',
     texte: "Pour un salarié, la formation relève du plan de développement des compétences : votre OPCO peut la financer en tout ou partie selon votre branche. Nous fournissons le devis, le programme et la convention au format attendu, et nous vous accompagnons dans le dépôt du dossier.",
     etapes: ['Vous demandez un devis', 'Nous préparons devis, programme et convention', 'Vous déposez la demande auprès de votre OPCO', 'La session est planifiée'],
-    cta: 'Recevoir le devis pour mon OPCO',
+    cta: 'Demander une inscription',
   },
   {
     key: 'independant',
@@ -25,7 +25,7 @@ const PROFILS = [
     titre: "Financement par votre fonds d'assurance formation",
     texte: "Travailleur indépendant, vous cotisez à un fonds d'assurance formation (AGEFICE, FIF PL, FAFCEA…) qui peut prendre en charge tout ou partie du coût. Nous vous remettons les pièces demandées par votre fonds et une convention à votre nom.",
     etapes: ['Vous demandez un devis', 'Nous fournissons devis, programme et convention', 'Vous sollicitez votre fonds de formation', 'La session est planifiée'],
-    cta: 'Recevoir mon devis',
+    cta: 'Demander une inscription',
   },
   {
     key: 'particulier',
@@ -33,11 +33,11 @@ const PROFILS = [
     titre: 'Financement personnel, sans surprise',
     texte: "Vous vous formez à titre personnel : le tarif TTC est le prix final, sans frais annexes. Un devis et une convention de formation vous sont remis avant tout engagement, avec un délai de rétractation.",
     etapes: ['Vous demandez un devis', 'Nous validons ensemble la date et votre niveau', 'Vous signez la convention', 'La session est planifiée'],
-    cta: 'Recevoir mon devis',
+    cta: 'Demander une inscription',
   },
 ];
 
-export default function Tarif({ prixHT, mentionTTC, inclus, infosPratiques, couleur }) {
+export default function Tarif({ prixHT, mentionTTC, inclus, infosPratiques, couleur, inscriptionTo }) {
   const [profil, setProfil] = useState(PROFILS[0]);
   const accent = couleur.fond;
 
@@ -80,7 +80,7 @@ export default function Tarif({ prixHT, mentionTTC, inclus, infosPratiques, coul
                 </li>
               ))}
             </ol>
-            <PrimaryButton href="#devis" className="mt-7" style={{ background: accent }}>{profil.cta}</PrimaryButton>
+            <PrimaryButton to={inscriptionTo} className="mt-7" style={{ background: accent }}>{profil.cta}</PrimaryButton>
           </div>
         </div>
 

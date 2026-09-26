@@ -62,13 +62,13 @@ const bodyFont = { fontFamily: "'Inter', sans-serif" };
 // 16 px sous sm : en dessous, iOS Safari zoome toute la page au focus du champ.
 const inputClass =
   'w-full rounded-xl border px-4 py-3 text-base sm:text-sm outline-none transition-colors ' +
-  'focus:border-[#000c5b] bg-white';
-const inputStyle = { borderColor: '#e5e5e5', color: '#000c5b', ...bodyFont };
+  'focus:border-[#002d74] bg-white';
+const inputStyle = { borderColor: '#e5e5e5', color: '#002d74', ...bodyFont };
 
 export function TextField({ label, value, onChange, required, type = 'text', placeholder }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
         {label} {required && <span style={{ color: '#c2410c' }}>*</span>}
       </span>
       <input
@@ -85,7 +85,7 @@ export function TextField({ label, value, onChange, required, type = 'text', pla
 export function SelectField({ label, value, onChange, options, required, placeholder = 'Sélectionner' }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
         {label} {required && <span style={{ color: '#c2410c' }}>*</span>}
       </span>
       <select
@@ -105,7 +105,7 @@ export function SelectField({ label, value, onChange, options, required, placeho
 export function TextAreaField({ label, value, onChange, rows = 3, placeholder }) {
   return (
     <label className="block">
-      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
+      <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
         {label}
       </span>
       <textarea
@@ -140,16 +140,16 @@ export function Stepper({ current }) {
               <div
                 className="w-7 h-7 mx-auto rounded-full flex items-center justify-center text-xs font-bold mb-2"
                 style={{
-                  background: active ? '#000c5b' : '#f0f7ff',
+                  background: active ? '#002d74' : '#f0f7ff',
                   color: active ? 'white' : '#5f6568',
                   ...headingFont,
                 }}>
                 {i + 1}
               </div>
-              <p className="text-xs sm:text-sm font-semibold" style={{ color: active ? '#000c5b' : '#5f6568', ...headingFont }}>
+              <p className="text-xs sm:text-sm font-semibold" style={{ color: active ? '#002d74' : '#5f6568', ...headingFont }}>
                 {label}
               </p>
-              <div className="h-1 rounded-full mt-3" style={{ background: active ? '#000c5b' : '#e5e5e5' }} />
+              <div className="h-1 rounded-full mt-3" style={{ background: active ? '#002d74' : '#e5e5e5' }} />
             </div>
           );
         })}
@@ -211,8 +211,8 @@ export default function Inscription() {
       <div className="min-h-screen bg-white">
         <Header />
         <main className="pt-32 pb-20 text-center">
-          <p style={{ color: '#000c5b', ...headingFont }}>Formation introuvable.</p>
-          <Link to="/" className="underline text-sm" style={{ color: '#000c5b', ...bodyFont }}>Retour à l'accueil</Link>
+          <p style={{ color: '#002d74', ...headingFont }}>Formation introuvable.</p>
+          <Link to="/" className="underline text-sm" style={{ color: '#002d74', ...bodyFont }}>Retour à l'accueil</Link>
         </main>
         <Footer />
       </div>
@@ -282,7 +282,7 @@ export default function Inscription() {
           <div className="text-center mb-8">
             <span
               className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-              style={{ color: '#000c5b', ...headingFont }}>
+              style={{ color: '#002d74', ...headingFont }}>
               {formation.title}
             </span>
             <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#243037', ...headingFont }}>
@@ -306,9 +306,9 @@ export default function Inscription() {
                   onClick={() => setMode(key)}
                   className="rounded-xl px-4 py-3.5 text-left text-sm font-semibold transition-all"
                   style={{
-                    border: mode === key ? '1.5px solid #000c5b' : '1px solid #e5e5e5',
+                    border: mode === key ? '1.5px solid #002d74' : '1px solid #e5e5e5',
                     background: mode === key ? '#f0f7ff' : 'white',
-                    color: mode === key ? '#000c5b' : '#5f6568',
+                    color: mode === key ? '#002d74' : '#5f6568',
                     ...headingFont,
                   }}>
                   <Icon className="w-4 h-4 mb-1.5" />
@@ -320,7 +320,7 @@ export default function Inscription() {
             {mode === 'INDEPENDENT' && (
               <p
                 className="text-xs rounded-xl px-4 py-3 mt-3"
-                style={{ background: '#f0f7ff', color: '#000c5b', ...bodyFont }}>
+                style={{ background: '#f0f7ff', color: '#002d74', ...bodyFont }}>
                 Vous serez automatiquement ajouté en tant qu'apprenant dans la suite de cette demande
                 d'inscription : la formation est destinée au président / gérant de l'entreprise.
               </p>
@@ -402,12 +402,12 @@ export default function Inscription() {
                     <TextField label="Poste occupé" value={form.currentPosition} onChange={set('currentPosition')} />
                   </div>
                   <TextAreaField label="Notes complémentaires" value={form.notes} onChange={set('notes')} />
-                  <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#000c5b', ...bodyFont }}>
+                  <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: '#002d74', ...bodyFont }}>
                     <input
                       type="checkbox"
                       checked={form.needsAdaptation}
                       onChange={(e) => set('needsAdaptation')(e.target.checked)}
-                      className="mt-0.5 accent-[#000c5b]" />
+                      className="mt-0.5 accent-[#002d74]" />
                     A des besoins d'adaptation (handicap, contraintes…)
                   </label>
                 </div>
@@ -431,7 +431,7 @@ export default function Inscription() {
                 onClick={submit}
                 disabled={missingFields.length > 0 || submitting}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: '#000c5b', color: 'white', ...headingFont }}>
+                style={{ background: '#002d74', color: 'white', ...headingFont }}>
                 {submitting ? 'Envoi en cours…' : 'Continuer vers le questionnaire'}
                 <ArrowRight className="w-4 h-4" />
               </button>

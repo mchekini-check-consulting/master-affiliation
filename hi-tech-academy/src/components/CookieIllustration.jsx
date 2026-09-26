@@ -34,12 +34,12 @@ export default function CookieIllustration({ size = 56, className = '' }) {
       <path
         d="M28 4c3.1 0 6 .6 8.8 1.8-.6 3.4 1.9 6.4 5.3 6.2.9 2.3 3.2 3.8 5.7 3.5A24 24 0 1 1 28 4Z"
         fill="#dfedff"
-        stroke="#000c5b"
+        stroke="#002d74"
         strokeWidth="2.2"
         strokeLinejoin="round"
       />
       {CHIPS.map((chip) => (
-        <circle key={`${chip.cx}-${chip.cy}`} {...chip} fill="#000c5b" />
+        <circle key={`${chip.cx}-${chip.cy}`} {...chip} fill="#002d74" />
       ))}
       {CRUMBS.map((crumb) => (
         <circle key={`${crumb.cx}-${crumb.cy}`} {...crumb} fill="#0062e1" />

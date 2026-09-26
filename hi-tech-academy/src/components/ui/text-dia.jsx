@@ -43,7 +43,7 @@ export function DiaText({ words, duration = 2000, className, ...props }) {
             style={{
               WebkitTextFillColor: 'transparent',
               backgroundImage:
-                'linear-gradient(90deg, currentColor 50%, #000c5b 50%, #002d74, #0066b0, #9cbdff)',
+                'linear-gradient(90deg, currentColor 50%, #002d74 50%, #002d74, #0066b0, #9cbdff)',
               backgroundSize: '250% 100%',
             }}
             initial={{ backgroundPosition: '100% 0%' }}

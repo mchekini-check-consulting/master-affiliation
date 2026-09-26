@@ -55,7 +55,7 @@ function Journee({ parcours, accent }) {
   );
 }
 
-export default function Methode({ inclus, approche, parcours, misePratique, photo, couleur }) {
+export default function Methode({ inclus, approche, parcours, misePratique, photo, couleur, inscriptionTo }) {
   const accent = couleur.fond;
 
   return (
@@ -134,7 +134,7 @@ export default function Methode({ inclus, approche, parcours, misePratique, phot
         <p className="text-h4 max-w-[40ch]" style={{ color: '#243037', ...headingFont }}>
           Une session s'ouvre dès un participant. La prochaine peut être la vôtre.
         </p>
-        <PrimaryButton href="#devis" style={{ background: accent }}>Recevoir un devis</PrimaryButton>
+        <PrimaryButton to={inscriptionTo} style={{ background: accent }}>Demander une inscription</PrimaryButton>
       </div>
     </Bande>
   );

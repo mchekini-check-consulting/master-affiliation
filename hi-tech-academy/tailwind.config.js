@@ -98,6 +98,11 @@ module.exports = {
   		},
   		// Mensurations d'interface : hauteurs de contrôles, rayons, gouttières.
   		// Tout est multiple de 4 px, les valeurs principales de 8 px.
+  		// `h-screen` & co. divisent par le zoom grands écrans (voir
+  		// `--page-zoom` dans index.css), sinon ils dépassent la fenêtre.
+  		height: { screen: 'var(--screen-h)' },
+  		minHeight: { screen: 'var(--screen-h)' },
+  		maxHeight: { screen: 'var(--screen-h)' },
   		spacing: {
   			'control-sm': '36px',
   			control: '44px',

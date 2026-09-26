@@ -40,7 +40,7 @@ export default function Arguments({ arguments: args, urgence, projection, couleu
         <div className="flex flex-wrap items-center justify-between gap-6 mt-14 sm:mt-20 p-8 sm:p-10" style={{ borderRadius: 8, background: couleur.trait }}>
           <p className="font-serif-display text-h2 max-w-[28ch]" style={serifFont}>{urgence}</p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <PrimaryButton href="#devis" size="lg" inverted style={{ color: couleur.fond }}>Recevoir mon devis</PrimaryButton>
+            <PrimaryButton to={inscriptionTo} size="lg" inverted style={{ color: couleur.fond }}>Demander une inscription</PrimaryButton>
             <Link to={inscriptionTo} className="inline-flex items-center gap-2 text-body-sm font-semibold text-white hover:underline" style={headingFont}>
               Je m'inscris directement <ArrowRight className="w-4 h-4" />
             </Link>

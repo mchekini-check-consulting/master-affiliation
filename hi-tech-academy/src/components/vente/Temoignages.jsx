@@ -50,7 +50,7 @@ export default function Temoignages({ temoignages, couleur }) {
 
   const notes = temoignages.map((t) => t.note).filter((n) => typeof n === 'number');
   const moyenne = notes.length ? notes.reduce((a, b) => a + b, 0) / notes.length : null;
-  const accent = couleur?.fond ?? '#000c5b';
+  const accent = couleur?.fond ?? '#002d74';
 
   return (
     <Bande id="avis" tone="pale">

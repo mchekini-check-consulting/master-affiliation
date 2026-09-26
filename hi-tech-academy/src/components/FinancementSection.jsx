@@ -113,7 +113,7 @@ export default function FinancementSection() {
               </ol>
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-8 pt-6" style={{ borderTop: `1px solid ${LINE}` }}>
-                <PrimaryButton to="/formations">Choisir ma formation et recevoir un devis</PrimaryButton>
+                <PrimaryButton to="/formations">Choisir ma formation et demander une inscription</PrimaryButton>
                 <Link to="/financements" className="inline-flex items-center gap-2 text-body-sm font-semibold hover:underline" style={{ color: TEAL, ...headingFont }}>
                   Tout comprendre sur le financement <ArrowRight className="w-4 h-4" />
                 </Link>
