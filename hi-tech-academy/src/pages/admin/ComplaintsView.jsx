@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { adminGetComplaint, adminListComplaints, adminUpdateComplaint } from '@/api/backend';
-import { Badge, Card, EmptyState, Field, ViewHeader, bodyFont, formatDate, headingFont } from './common';
+import { Card, EmptyState, Field, ViewHeader, bodyFont, formatDate, headingFont } from './common';
 
 const COMPLAINANT_LABELS = {
   COMPANY: 'Entreprise',

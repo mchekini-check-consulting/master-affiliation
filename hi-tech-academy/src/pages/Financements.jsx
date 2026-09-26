@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import {
   INK, NAVY, TEAL, ACCENT, BODY, BODY_DARK, KEYWORD_GRADIENT,
-  SectionHeading, Starfield, Pill, headingFont, serifFont, bodyFont,
+  SectionHeading, Pill, headingFont, serifFont, bodyFont,
 } from '@/components/design';
 
 const fadeUp = {
