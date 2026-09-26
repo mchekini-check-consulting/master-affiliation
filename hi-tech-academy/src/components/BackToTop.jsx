@@ -52,7 +52,7 @@ export default function BackToTop() {
         // les sections claires.
         background: hovered ? MINT_LIGHT : "#ffffff",
         color: INK,
-        boxShadow: "0 6px 20px rgba(0,12,91,0.28)",
+        boxShadow: "0 6px 20px rgba(0,45,116,0.28)",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(12px)",
         pointerEvents: visible ? "auto" : "none",

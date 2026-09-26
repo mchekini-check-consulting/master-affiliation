@@ -91,7 +91,7 @@ export default function WhyUsSection() {
           </div>
 
           {/* Panneau de conviction plutôt qu'une photo : un aplat dégradé dans
-              les deux teintes du primaire (#000c5b → #002d74 — pas de couleur
+              les deux teintes du primaire (#002d74 → #002d74 — pas de couleur
               hors charte), une grande flèche et une citation de marque.
               La cellule de droite est étirée à la hauteur de la colonne de
               gauche (plus haute depuis le passage en liste éditoriale) et le
@@ -99,13 +99,19 @@ export default function WhyUsSection() {
               la colonne de gauche défile, au lieu de s'arrêter tôt et de
               laisser un couloir de page vide en dessous. */}
           <div className="hidden lg:block">
+            {/* Le panneau fait la hauteur de la fenêtre, moins le header
+                flottant au-dessus (112 px) et une marge de 24 px en bas : collé
+                en `sticky`, il remplit l'écran pendant que seul le texte de
+                gauche défile, sans laisser de vide sous lui. `--screen-h` et
+                non `100vh`, pour rester juste sous le zoom des grands écrans. */}
             <div className="lg:sticky" style={{ top: 112 }}>
               <div
                 className="relative overflow-hidden"
                 style={{
                   borderRadius: 8,
-                  aspectRatio: '4 / 5',
-                  background: 'linear-gradient(155deg, #000c5b 0%, #002d74 100%)',
+                  height: 'calc(var(--screen-h) - 136px)',
+                  minHeight: 480,
+                  background: 'linear-gradient(155deg, #002d74 0%, #002d74 100%)',
                 }}>
                 {/* Photo en fond, opacité légère : même principe que le voile de
                     marque du héro de l'accueil (`.academy-hero::before`) — le

@@ -53,7 +53,7 @@ function Tile({ item, index, height }) {
             'rounded-full px-6 py-2 text-xl font-semibold text-white',
             TILT[index % TILT.length]
           )}
-          style={{ background: '#000c5b', fontFamily: "var(--font-heading)" }}>
+          style={{ background: '#002d74', fontFamily: "var(--font-heading)" }}>
           {title}
         </h3>
       </div>

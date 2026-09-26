@@ -97,7 +97,7 @@ function FeedbackRow() {
         style={{
           fontFamily: FONT,
           border: '1px solid #dbebff',
-          background: vote === 'up' ? '#000c5b' : '#ffffff',
+          background: vote === 'up' ? '#002d74' : '#ffffff',
           color: vote === 'up' ? '#ffffff' : '#002d74',
         }}
       >
@@ -112,7 +112,7 @@ function FeedbackRow() {
         style={{
           fontFamily: FONT,
           border: '1px solid #dbebff',
-          background: vote === 'down' ? '#000c5b' : '#ffffff',
+          background: vote === 'down' ? '#002d74' : '#ffffff',
           color: vote === 'down' ? '#ffffff' : '#002d74',
         }}
       >
@@ -140,8 +140,11 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="w-full py-16 sm:py-20 px-4 sm:px-6 md:px-8" style={{ background: 'transparent' }}>
-      <div className="max-w-5xl mx-auto">
+    <section className="w-full py-16 sm:py-20" style={{ background: 'transparent' }}>
+      {/* Même gabarit que toutes les sections : `max-w-site` + `px-4 sm:px-6`
+          SUR LE CONTENEUR, soit 1400 px utiles. Le padding posé sur la section
+          laissait le contenu s'étaler sur les 1448 px du conteneur. */}
+      <div className="max-w-site mx-auto px-4 sm:px-6">
 
         {/* Header */}
         <div className="text-center mb-12">
@@ -164,7 +167,7 @@ export default function FAQSection() {
 
           <div className="flex items-center justify-center gap-3 mt-5">
             <div className="h-px w-12" style={{ background: '#dbebff' }} />
-            <div className="w-2 h-2 rounded-full" style={{ background: '#000c5b' }} />
+            <div className="w-2 h-2 rounded-full" style={{ background: '#002d74' }} />
             <div className="h-px w-12" style={{ background: '#dbebff' }} />
           </div>
         </div>
@@ -175,7 +178,7 @@ export default function FAQSection() {
           <div
             role="tablist"
             aria-label="Thèmes de la FAQ"
-            className="flex flex-row gap-2 overflow-x-auto md:w-60 md:shrink-0 md:flex-col md:overflow-visible"
+            className="flex flex-row gap-2 overflow-x-auto md:w-72 md:shrink-0 md:flex-col md:overflow-visible"
           >
             {CATEGORIES.map((c) => {
               const Icon = c.icon;
@@ -191,7 +194,7 @@ export default function FAQSection() {
                   style={{
                     fontFamily: FONT,
                     background: isActive ? '#f0f7ff' : '#ffffff',
-                    color: isActive ? '#000c5b' : '#5f6568',
+                    color: isActive ? '#002d74' : '#5f6568',
                     border: isActive ? '1.5px solid #002d74' : '1.5px solid #f0f7ff',
                     transition: 'background 0.25s ease, color 0.25s ease, border-color 0.25s ease',
                   }}
@@ -238,7 +241,7 @@ export default function FAQSection() {
                       >
                         <span
                           className="font-semibold text-sm md:text-base leading-snug"
-                          style={{ color: '#000c5b', fontFamily: FONT }}
+                          style={{ color: '#002d74', fontFamily: FONT }}
                         >
                           {item.question}
                         </span>
@@ -263,7 +266,7 @@ export default function FAQSection() {
                             style={{ overflow: 'hidden', background: '#f0f7ff' }}
                           >
                             <div className="px-5 pb-5 flex flex-col gap-3">
-                              <p className="text-sm leading-relaxed" style={{ color: '#5f6568', fontFamily: FONT }}>
+                              <p className="text-sm leading-relaxed max-w-measure" style={{ color: '#5f6568', fontFamily: FONT }}>
                                 {item.answer}
                               </p>
                               <FeedbackRow key={item.id} />
@@ -283,14 +286,14 @@ export default function FAQSection() {
               style={{ background: '#f0f7ff' }}
             >
               <div>
-                <p className="text-sm font-semibold" style={{ color: '#000c5b', fontFamily: FONT }}>
+                <p className="text-sm font-semibold" style={{ color: '#002d74', fontFamily: FONT }}>
                   Vous avez d'autres questions ?
                 </p>
                 <p className="text-sm mt-1" style={{ color: '#5f6568', fontFamily: FONT }}>
                   Nous répondons sous 24 h ouvrées, avant tout engagement.
                 </p>
               </div>
-              <PrimaryButton href="#contact">Contactez-nous</PrimaryButton>
+              <PrimaryButton to="/contact">Contactez-nous</PrimaryButton>
             </div>
           </div>
 

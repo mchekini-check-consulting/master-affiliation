@@ -79,8 +79,8 @@ export default function EvaluationFinale() {
   if (loadError) {
     return shell(
       <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <p className="mb-4" style={{ color: '#000c5b', ...headingFont }}>{loadError}</p>
-        <Link to="/" className="underline text-sm" style={{ color: '#000c5b', ...bodyFont }}>Retour à l'accueil</Link>
+        <p className="mb-4" style={{ color: '#002d74', ...headingFont }}>{loadError}</p>
+        <Link to="/" className="underline text-sm" style={{ color: '#002d74', ...bodyFont }}>Retour à l'accueil</Link>
       </div>
     );
   }
@@ -95,7 +95,7 @@ export default function EvaluationFinale() {
   if (!traineeId && registration.final_evaluation_submitted && !result) {
     return shell(
       <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#000c5b' }} />
+        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#002d74' }} />
         <h1 className="text-2xl font-bold mb-3" style={{ color: '#243037', ...headingFont }}>
           Cette évaluation a déjà été passée
         </h1>
@@ -103,7 +103,7 @@ export default function EvaluationFinale() {
           Une seule tentative est autorisée. Le résultat sera reporté sur votre attestation de fin
           de formation.
         </p>
-        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#000c5b', ...headingFont }}>
+        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#002d74', ...headingFont }}>
           Retour à l'accueil
           <ArrowRight className="w-4 h-4" />
         </Link>
@@ -114,20 +114,20 @@ export default function EvaluationFinale() {
   if (result) {
     return shell(
       <div className="rounded-3xl p-8 text-center" style={{ background: 'white', border: '1px solid #e5e5e5' }}>
-        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#000c5b' }} />
+        <Award className="w-12 h-12 mx-auto mb-4" style={{ color: '#002d74' }} />
         <h1 className="text-2xl font-bold mb-3" style={{ color: '#243037', ...headingFont }}>
           Merci, votre évaluation est enregistrée
         </h1>
         <div
           className="inline-block px-6 py-3 rounded-2xl text-lg font-bold mb-4"
-          style={{ background: '#f0f7ff', color: '#000c5b', ...headingFont }}>
+          style={{ background: '#f0f7ff', color: '#002d74', ...headingFont }}>
           Votre note au QCM : {result.score} / {result.max_score}
         </div>
         <p className="text-sm mb-6" style={{ color: '#5f6568', ...bodyFont }}>
           Ce résultat, complété par la mise en pratique évaluée par le formateur, sera reporté sur
           votre attestation de fin de formation.
         </p>
-        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#000c5b', ...headingFont }}>
+        <Link to="/" className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: '#002d74', ...headingFont }}>
           Retour à l'accueil
           <ArrowRight className="w-4 h-4" />
         </Link>
@@ -140,7 +140,7 @@ export default function EvaluationFinale() {
       <div className="text-center mb-8">
         <span
           className="inline-block text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-          style={{ color: '#000c5b', ...headingFont }}>
+          style={{ color: '#002d74', ...headingFont }}>
           {registration.formation_title}
         </span>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{ color: '#243037', ...headingFont }}>
@@ -158,7 +158,7 @@ export default function EvaluationFinale() {
         <div className="space-y-6">
           {content.questions.map((q) => (
             <div key={q.id}>
-              <p className="text-sm font-semibold mb-2" style={{ color: '#000c5b', ...headingFont }}>
+              <p className="text-sm font-semibold mb-2" style={{ color: '#002d74', ...headingFont }}>
                 {q.id}. {q.text}
               </p>
               <div className="grid sm:grid-cols-2 gap-2">
@@ -169,9 +169,9 @@ export default function EvaluationFinale() {
                     onClick={() => setAnswers((a) => ({ ...a, [q.id]: index }))}
                     className="text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
                     style={{
-                      border: answers[q.id] === index ? '1.5px solid #000c5b' : '1px solid #e5e5e5',
+                      border: answers[q.id] === index ? '1.5px solid #002d74' : '1px solid #e5e5e5',
                       background: answers[q.id] === index ? '#f0f7ff' : 'white',
-                      color: answers[q.id] === index ? '#000c5b' : '#5f6568',
+                      color: answers[q.id] === index ? '#002d74' : '#5f6568',
                       fontFamily: "'Inter', sans-serif",
                     }}>
                     {option}
@@ -198,7 +198,7 @@ export default function EvaluationFinale() {
             onClick={submit}
             disabled={missing.length > 0 || submitting}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: '#000c5b', color: 'white', ...headingFont }}>
+            style={{ background: '#002d74', color: 'white', ...headingFont }}>
             {submitting ? 'Envoi en cours…' : 'Valider définitivement mes réponses'}
             <ArrowRight className="w-4 h-4" />
           </button>

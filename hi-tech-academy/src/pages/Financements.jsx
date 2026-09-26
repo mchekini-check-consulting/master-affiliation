@@ -120,7 +120,7 @@ export default function Financements() {
                 et on vous accompagne.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
-                <Pill as="a" href="/#contact">Étudier mon financement</Pill>
+                <Pill as={Link} to="/contact?sujet=financement">Étudier mon financement</Pill>
                 <Pill as={Link} to="/formations" variant="secondary">Voir les formations</Pill>
               </div>
             </motion.div>
@@ -162,7 +162,7 @@ export default function Financements() {
                   variants={fadeUp}
                   className="rounded-3xl p-7"
                   style={{ background: '#f0f7ff', border: '1px solid #e5e5e5' }}>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(0,12,91,0.08)' }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(0,45,116,0.08)' }}>
                     <Icon className="w-6 h-6" style={{ color: TEAL }} />
                   </div>
                   <h3 className="font-extrabold text-lg mb-3" style={{ color: NAVY, ...serifFont }}>{titre}</h3>
@@ -289,7 +289,7 @@ export default function Financements() {
                 <Pill as="a" href="https://quel-est-mon-opco.francecompetences.fr/" target="_blank" rel="noopener noreferrer">
                   Trouver mon OPCO <ExternalLink className="w-4 h-4" />
                 </Pill>
-                <Pill as="a" href="/#contact" variant="secondary">Nous envoyer mon SIRET</Pill>
+                <Pill as={Link} to="/contact?sujet=financement" variant="secondary">Nous envoyer mon SIRET</Pill>
               </div>
             </div>
 
@@ -340,7 +340,7 @@ export default function Financements() {
         </section>
 
         {/* ---------- CTA final ---------- */}
-        <section style={{ background: 'linear-gradient(135deg, #000c5b 0%, #000c5b 60%, #0066b0 100%)' }}>
+        <section style={{ background: 'linear-gradient(135deg, #002d74 0%, #002d74 60%, #0066b0 100%)' }}>
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
             <h2 className="font-serif-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white mb-4" style={headingFont}>
               Et si votre prochaine formation ne vous coûtait rien ?
@@ -349,7 +349,7 @@ export default function Financements() {
               Un échange de 15 minutes suffit pour estimer votre prise en charge. Sans engagement.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Pill as="a" href="/#contact">Étudier mon financement <ArrowRight className="w-4 h-4" /></Pill>
+              <Pill as={Link} to="/contact?sujet=financement">Étudier mon financement <ArrowRight className="w-4 h-4" /></Pill>
               <Pill as={Link} to="/formations" variant="secondary" dark>Choisir ma formation</Pill>
             </div>
             <p className="text-xs mt-6" style={{ color: '#9cbdff', ...bodyFont }}>

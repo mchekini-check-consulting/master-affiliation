@@ -1,6 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
 import { headingFont, serifFont, bodyFont } from '@/components/design';
 
@@ -54,10 +52,7 @@ export default function HeroVente({ heroRef, formation, accroche, sousTitre, ima
             </p>
 
             <div className="flex flex-wrap items-center gap-x-7 gap-y-4 mt-9">
-              <PrimaryButton href="#devis" size="lg" inverted style={{ color: couleur.fond }}>Recevoir le programme et un devis</PrimaryButton>
-              <Link to={inscriptionTo} className="inline-flex items-center gap-2 text-body-base font-semibold text-white hover:underline" style={headingFont}>
-                Je m'inscris directement <ArrowRight className="w-4 h-4" />
-              </Link>
+              <PrimaryButton to={inscriptionTo} size="lg" inverted style={{ color: couleur.fond }}>Demander une inscription</PrimaryButton>
             </div>
 
             <ul className="flex flex-wrap gap-x-8 gap-y-2 mt-10 pt-6" style={{ borderTop: `1px solid ${couleur.trait}` }}>

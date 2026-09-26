@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import PrimaryButton from '@/components/ui/primary-button';
 import { TEAL, MINT_LIGHT, LINE, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 import { CheckLine, RADIUS } from './atomes';
@@ -14,7 +13,7 @@ export default function CarteHero({ prixHT, mentionTTC, facts, inscriptionTo, co
   return (
     <div
       className="bg-white overflow-hidden w-full"
-      style={{ borderRadius: RADIUS, boxShadow: '0 18px 40px -20px rgba(0,12,91,.28)' }}>
+      style={{ borderRadius: RADIUS, boxShadow: '0 18px 40px -20px rgba(0,45,116,.28)' }}>
       <div className="px-6 pt-5 pb-4" style={{ background: MINT_LIGHT, borderBottom: `1px solid ${LINE}` }}>
         <p className="text-body-sm font-semibold" style={{ color: BODY_MUTED, ...headingFont }}>Tarif par stagiaire</p>
         <p className="flex items-baseline gap-2 mt-1">
@@ -49,13 +48,7 @@ export default function CarteHero({ prixHT, mentionTTC, facts, inscriptionTo, co
       </dl>
 
       <div className="px-6 pt-5 pb-5" style={{ borderTop: `1px solid ${LINE}` }}>
-        <PrimaryButton href="#devis" className="w-full" style={{ background: couleur.fond }}>Recevoir un devis</PrimaryButton>
-        <Link
-          to={inscriptionTo}
-          className="mt-3 w-full inline-flex items-center justify-center h-11 rounded-full text-body-sm font-semibold transition-colors hover:bg-[#f0f7ff]"
-          style={{ color: '#243037', border: `1px solid ${LINE}`, ...headingFont }}>
-          Demander une inscription
-        </Link>
+        <PrimaryButton to={inscriptionTo} className="w-full" style={{ background: couleur.fond }}>Demander une inscription</PrimaryButton>
         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5">
           {reassurances.map((r) => <li key={r}><CheckLine className="text-body-sm">{r}</CheckLine></li>)}
         </ul>

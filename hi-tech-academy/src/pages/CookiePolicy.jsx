@@ -101,7 +101,7 @@ export default function CookiePolicy() {
               <section key={section.title}>
                 <h2
                   className="text-lg font-semibold mb-3"
-                  style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}
+                  style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}
                 >
                   {section.title}
                 </h2>
@@ -116,7 +116,7 @@ export default function CookiePolicy() {
             <section>
               <h2
                 className="text-lg font-semibold mb-3"
-                style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}
+                style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}
               >
                 Détail des cookies
               </h2>
@@ -131,7 +131,7 @@ export default function CookiePolicy() {
                           className="text-left"
                           style={{
                             padding: '12px 16px',
-                            color: '#000c5b',
+                            color: '#002d74',
                             fontSize: 13,
                             fontWeight: 600,
                             borderBottom: '1px solid #dbebff',
@@ -162,7 +162,7 @@ export default function CookiePolicy() {
               <section key={section.title}>
                 <h2
                   className="text-lg font-semibold mb-3"
-                  style={{ color: '#000c5b', fontFamily: "'Inter', sans-serif" }}
+                  style={{ color: '#002d74', fontFamily: "'Inter', sans-serif" }}
                 >
                   {section.title}
                 </h2>
@@ -187,7 +187,7 @@ export default function CookiePolicy() {
               }}
             >
               <div style={{ flex: '1 1 260px' }}>
-                <p style={{ margin: 0, color: '#000c5b', fontSize: 15, fontWeight: 600 }}>
+                <p style={{ margin: 0, color: '#002d74', fontSize: 15, fontWeight: 600 }}>
                   Revoir vos préférences
                 </p>
                 <p style={{ margin: '4px 0 0', fontSize: 13 }}>
@@ -201,8 +201,8 @@ export default function CookiePolicy() {
                   height: 44,
                   padding: '0 22px',
                   borderRadius: 9999,
-                  border: '1px solid #000c5b',
-                  background: '#000c5b',
+                  border: '1px solid #002d74',
+                  background: '#002d74',
                   color: '#ffffff',
                   fontSize: 14,
                   fontWeight: 600,

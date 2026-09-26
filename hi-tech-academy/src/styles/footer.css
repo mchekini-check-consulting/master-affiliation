@@ -1,15 +1,16 @@
 /* ══════════════════════════════════════════════════════════════════════════
    Pied de page (src/components/Footer.jsx) — registre institutionnel.
-   Aplat marine #000c5b, texte blanc / #dbebff, accents #9cbdff, filets
+   Aplat marine #002d74, texte blanc / #dbebff, accents #9cbdff, filets
    #002d74. Trois étages : en-tête (nom + contact), colonnes de liens,
    certification + enregistrement ; puis la barre légale.
    ══════════════════════════════════════════════════════════════════════════ */
-.ftr { position: relative; color: #ffffff; background: #000c5b; }
+.ftr { position: relative; color: #ffffff; background: #002d74; }
 .ftr__inner { width: var(--canvas); margin: 0 auto; padding: 72px 0 48px; }
 
 /* ── En-tête ────────────────────────────────────────────────────────────── */
 .ftr__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px 48px; padding-bottom: 40px; border-bottom: 1px solid #002d74; }
-.ftr__logo { display: block; color: #ffffff; margin: 0 0 20px; }
+.ftr__brand { display: flex; align-items: center; gap: 16px; }
+.ftr__logo { display: block; flex: none; color: #ffffff; margin: 0; }
 .ftr__name { margin: 0; color: #ffffff; font: 700 clamp(32px, 3.4vw, 48px)/1.05 var(--font-heading); letter-spacing: -.02em; }
 .ftr__claim { margin: 12px 0 0; color: #9cbdff; font: 500 var(--text-body-lg)/1.4 var(--font-body); }
 .ftr__contact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; font: 500 var(--text-body-base)/1.4 var(--font-body); font-style: normal; color: #dbebff; }

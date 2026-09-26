@@ -182,6 +182,11 @@ export function createComplaint(payload) {
   return request('/complaints', { method: 'POST', body: payload });
 }
 
+// Page Contact : message libre ou demande de rendez-vous (→ CRM + emails).
+export function sendContactRequest(payload) {
+  return request('/leads/contact', { method: 'POST', body: payload });
+}
+
 // --- Espace admin (basic auth) ---------------------------------------
 const AUTH_STORAGE_KEY = 'hta-admin-auth';
 

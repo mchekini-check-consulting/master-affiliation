@@ -118,7 +118,7 @@ export default function BlogPost() {
             <div className="flex items-center gap-3 mb-5">
               <span
                 className="inline-block px-3 py-1.5 rounded-full text-xs font-semibold"
-                style={{ backgroundColor: '#000c5b', color: 'white', ...interFont }}>
+                style={{ backgroundColor: '#002d74', color: 'white', ...interFont }}>
                 {post.category}
               </span>
             </div>
@@ -183,7 +183,7 @@ export default function BlogPost() {
                       {p.category} · {p.readTime}
                     </p>
                     <h3
-                      className="text-base font-bold leading-snug group-hover:text-[#000c5b] transition-colors"
+                      className="text-base font-bold leading-snug group-hover:text-[#002d74] transition-colors"
                       style={{ color: '#243037', ...interFont }}>
                       {p.title}
                     </h3>
@@ -246,7 +246,7 @@ export default function BlogPost() {
           margin: 2rem 0 0.6rem;
         }
         .article-content strong {
-          color: #000c5b;
+          color: #002d74;
           font-weight: 700;
         }
         .article-content a {
@@ -299,15 +299,15 @@ export default function BlogPost() {
           background: #f0f7ff;
           border-radius: 0 8px 8px 0;
           font-style: italic;
-          color: #000c5b;
+          color: #002d74;
         }
         .article-content blockquote p {
           margin: 0;
-          color: #000c5b;
+          color: #002d74;
         }
         .article-content code {
           background: #f0f7ff;
-          color: #000c5b;
+          color: #002d74;
           padding: 0.15rem 0.4rem;
           border-radius: 0.35rem;
           font-size: 0.9em;
@@ -344,7 +344,7 @@ export default function BlogPost() {
         }
         .article-content th {
           background: #dfedff;
-          color: #000c5b;
+          color: #002d74;
           font-family: 'DM Sans', sans-serif;
         }
       `}</style>

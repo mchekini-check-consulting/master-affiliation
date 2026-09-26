@@ -75,7 +75,7 @@ function BookModal({ articleSlug, onClose }) {
   return (
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,12,91,0.55)' }}
+      style={{ background: 'rgba(0,45,116,0.55)' }}
       onClick={onClose}>
       <div
         className="w-full max-w-md rounded-3xl p-7 sm:p-8 relative"
@@ -98,27 +98,27 @@ function BookModal({ articleSlug, onClose }) {
         {sent ? (
           <div className="text-center mt-4">
             <CheckCircle2 className="w-10 h-10 mx-auto mb-3" style={{ color: '#002d74' }} />
-            <h3 className="text-xl font-bold mb-2" style={{ color: '#000c5b', ...headingFont }}>
+            <h3 className="text-xl font-bold mb-2" style={{ color: '#002d74', ...headingFont }}>
               Le livre est en route !
             </h3>
             <p className="text-sm leading-relaxed mb-6" style={{ color: '#5f6568', ...bodyFont }}>
               Vérifiez votre boîte mail : votre exemplaire d'« {BOOK.title} » vous attend
               (pensez aux courriers indésirables).
             </p>
-            <p className="text-sm font-semibold mb-3" style={{ color: '#000c5b', ...headingFont }}>
+            <p className="text-sm font-semibold mb-3" style={{ color: '#002d74', ...headingFont }}>
               Et pour transformer la lecture en compétences :
             </p>
             <Link
               to="/formations"
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold text-white"
-              style={{ background: '#000c5b', ...headingFont }}>
+              style={{ background: '#002d74', ...headingFont }}>
               <GraduationCap className="w-4 h-4" />
               Découvrir nos formations IA
             </Link>
           </div>
         ) : (
           <form onSubmit={submit} className="mt-4">
-            <h3 className="text-xl font-bold text-center mb-1" style={{ color: '#000c5b', ...headingFont }}>
+            <h3 className="text-xl font-bold text-center mb-1" style={{ color: '#002d74', ...headingFont }}>
               Recevez « {BOOK.title} »
             </h3>
             <p className="text-sm text-center mb-5" style={{ color: '#5f6568', ...bodyFont }}>
@@ -127,7 +127,7 @@ function BookModal({ articleSlug, onClose }) {
 
             <div className="grid grid-cols-2 gap-3 mb-3">
               <label className="block">
-                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
+                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                   Prénom *
                 </span>
                 <input
@@ -138,10 +138,10 @@ function BookModal({ articleSlug, onClose }) {
                   placeholder="Marie"
                   autoComplete="given-name"
                   className="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-[#002d74]"
-                  style={{ borderColor: '#dbebff', color: '#000c5b', ...bodyFont }} />
+                  style={{ borderColor: '#dbebff', color: '#002d74', ...bodyFont }} />
               </label>
               <label className="block">
-                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
+                <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                   Nom *
                 </span>
                 <input
@@ -152,12 +152,12 @@ function BookModal({ articleSlug, onClose }) {
                   placeholder="Durand"
                   autoComplete="family-name"
                   className="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-[#002d74]"
-                  style={{ borderColor: '#dbebff', color: '#000c5b', ...bodyFont }} />
+                  style={{ borderColor: '#dbebff', color: '#002d74', ...bodyFont }} />
               </label>
             </div>
 
             <label className="block mb-3">
-              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                 Email *
               </span>
               <input
@@ -167,10 +167,10 @@ function BookModal({ articleSlug, onClose }) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="vous@exemple.fr"
                 className="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-[#002d74]"
-                style={{ borderColor: '#dbebff', color: '#000c5b', ...bodyFont }} />
+                style={{ borderColor: '#dbebff', color: '#002d74', ...bodyFont }} />
             </label>
             <label className="block mb-4">
-              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#000c5b', ...headingFont }}>
+              <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                 Téléphone <span className="font-normal" style={{ color: '#8c8c8c' }}>(optionnel)</span>
               </span>
               <input
@@ -179,7 +179,7 @@ function BookModal({ articleSlug, onClose }) {
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="06 12 34 56 78"
                 className="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-[#002d74]"
-                style={{ borderColor: '#dbebff', color: '#000c5b', ...bodyFont }} />
+                style={{ borderColor: '#dbebff', color: '#002d74', ...bodyFont }} />
             </label>
 
             {error && (
@@ -192,7 +192,7 @@ function BookModal({ articleSlug, onClose }) {
               type="submit"
               disabled={sending}
               className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-full text-sm font-bold text-white disabled:opacity-50 transition-all hover:opacity-90"
-              style={{ background: '#000c5b', ...headingFont }}>
+              style={{ background: '#002d74', ...headingFont }}>
               <Mail className="w-4 h-4" />
               {sending ? 'Envoi…' : 'Recevoir le livre par mail'}
             </button>
@@ -249,7 +249,7 @@ export default function BookOffer({ articleSlug }) {
             </p>
             <ul className="flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1.5 mb-7">
               {BOOK.arguments.map((argument) => (
-                <li key={argument} className="flex items-center gap-1.5 text-sm" style={{ color: '#000c5b', ...bodyFont }}>
+                <li key={argument} className="flex items-center gap-1.5 text-sm" style={{ color: '#002d74', ...bodyFont }}>
                   <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: '#0062e1' }} />
                   {argument}
                 </li>
@@ -259,7 +259,7 @@ export default function BookOffer({ articleSlug }) {
               type="button"
               onClick={() => setModalOpen(true)}
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold text-white transition-all hover:opacity-90 hover:shadow-lg"
-              style={{ background: '#000c5b', ...headingFont }}>
+              style={{ background: '#002d74', ...headingFont }}>
               <Download className="w-4 h-4" />
               Télécharger le livre
             </button>
@@ -270,7 +270,7 @@ export default function BookOffer({ articleSlug }) {
       {/* Enchaînement : du livre aux formations — bande sombre signature */}
       <div
         className="relative overflow-hidden rounded-3xl mt-14 px-6 sm:px-10 py-10 sm:py-12"
-        style={{ background: '#000c5b' }}>
+        style={{ background: '#002d74' }}>
         <div className="relative">
           <p
             className="text-center text-xs font-bold uppercase tracking-[0.22em] mb-3"
@@ -300,7 +300,7 @@ export default function BookOffer({ articleSlug }) {
                   style={{ background: '#002d74' }}>
                   <span
                     className="self-start text-[11px] font-bold px-2.5 py-1 rounded-full mb-3"
-                    style={{ background: '#9cbdff', color: '#000c5b', ...headingFont }}>
+                    style={{ background: '#9cbdff', color: '#002d74', ...headingFont }}>
                     {formation.tag}
                   </span>
                   <p className="text-base font-bold mb-1.5" style={{ color: 'white', ...headingFont }}>

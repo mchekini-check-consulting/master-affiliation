@@ -19,6 +19,8 @@ import BlogPost from './pages/BlogPost';
 import Formations from './pages/Formations';
 import FormationVente from './pages/FormationVente';
 import Financements from './pages/Financements';
+import Contact from './pages/Contact';
+import About from './pages/About';
 import Reclamations from './pages/Reclamations';
 import Inscription from './pages/Inscription';
 import AnalyseBesoin from './pages/AnalyseBesoin';
@@ -61,6 +63,8 @@ const AuthenticatedApp = () => {
       <Route path="/formations" element={<Formations />} />
       <Route path="/formations/:formationId" element={<FormationVente />} />
       <Route path="/financements" element={<Financements />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/a-propos" element={<About />} />
       <Route path="/reclamations" element={<Reclamations />} />
       <Route path="/inscription/:formationId" element={<Inscription />} />
       <Route path="/inscription/demande/:requestId/questionnaire" element={<AnalyseBesoin />} />

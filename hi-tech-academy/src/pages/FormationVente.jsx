@@ -9,22 +9,20 @@ import { getFormationPage } from '@/data/formationPage';
 import PageNotFound from '@/lib/PageNotFound';
 import HeroVente from '@/components/vente/HeroVente';
 import CarteHero from '@/components/vente/CarteHero';
-import Temoignages from '@/components/vente/Temoignages';
+import ResultsSection from '@/components/ResultsSection';
 import Arguments from '@/components/vente/Arguments';
 import Objectifs from '@/components/vente/Objectifs';
 import Programme from '@/components/vente/Programme';
 import Formateur from '@/components/vente/Formateur';
 import PourQui from '@/components/vente/PourQui';
 import Parcours from '@/components/vente/Parcours';
-import Methode from '@/components/vente/Methode';
 import Tarif from '@/components/vente/Tarif';
 import Faq from '@/components/vente/Faq';
-import FormulaireDevis from '@/components/vente/FormulaireDevis';
 import BarreCta from '@/components/vente/BarreCta';
 
 // Page formation = tunnel de vente, style éditorial sombre. Elle reçoit du
-// trafic publicitaire : une seule action attendue (la demande de devis,
-// ancre #devis), l'inscription directe en secondaire.
+// trafic publicitaire : une seule action attendue, la demande d'inscription
+// (/inscription/:id). Le formulaire de devis en pied de page a été retiré.
 //
 // Rythme : bandes pleine largeur en alternance navy / blanc / pâle, photos
 // bord à bord, une barre CTA fixe dès que le héro est passé. Ordre des
@@ -153,14 +151,6 @@ export default function FormationVente() {
         />
 
         <Objectifs objectifs={page.objectifs} couleur={vente.couleur} photo={preuves.ambiance.objectifs} sanction={fact('Sanction').toLowerCase()} />
-        <Methode
-          inclus={page.inclus}
-          approche={page.approche}
-          parcours={page.parcours}
-          misePratique={page.misePratique}
-          photo={preuves.ambiance.methode}
-          couleur={vente.couleur}
-        />
         <Programme
           modules={modules}
           captures={preuves.captures}
@@ -177,18 +167,20 @@ export default function FormationVente() {
           inscriptionTo={inscriptionTo}
         />
         <Formateur formateur={preuves.formateur} />
-        <PourQui pour={pour} pasPour={pasPour} personas={page.personas} prerequis={page.prerequis} couleur={vente.couleur} />
+        <PourQui pour={pour} pasPour={pasPour} personas={page.personas} prerequis={page.prerequis} couleur={vente.couleur} contactTo={`/contact?mode=rendez-vous&formation=${formation.id}`} />
         <Parcours couleur={vente.couleur} />
-        <Temoignages temoignages={preuves.temoignages} couleur={vente.couleur} />
+        {/* Bloc « Nos résultats » de l'accueil, réutilisé tel quel (à la place
+            des témoignages) : un seul endroit à mettre à jour pour les chiffres. */}
+        <ResultsSection />
         <Tarif
           prixHT={prixHT}
           mentionTTC={mentionTTC}
           inclus={page.inclus}
           infosPratiques={infosPratiques}
           couleur={vente.couleur}
+          inscriptionTo={inscriptionTo}
         />
         <Faq faq={page.faq} />
-        <FormulaireDevis formation={formation} couleur={vente.couleur} />
       </main>
 
       <BarreCta visible={barreVisible} prixHT={prixHT} resume={`${dureeCourte} · ${modaliteCourte}`} inscriptionTo={inscriptionTo} />

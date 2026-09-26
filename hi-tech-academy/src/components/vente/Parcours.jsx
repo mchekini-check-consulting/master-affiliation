@@ -79,7 +79,7 @@ export default function Parcours({ couleur }) {
 
       <p className="text-body-sm mt-12 pt-6 max-w-measure" style={{ color: BODY, borderTop: `1px solid ${LINE}`, borderRadius: RADIUS, ...bodyFont }}>
         En situation de handicap ? Notre référent étudie avec vous les adaptations nécessaires dès la
-        demande de devis : rythme, supports, outils.
+        demande d'inscription : rythme, supports, outils.
       </p>
     </Bande>
   );

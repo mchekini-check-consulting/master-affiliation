@@ -68,7 +68,7 @@ const faqParDefaut = [
     r: "Oui, la formation est accessible partout, sous réserve de pouvoir suivre les horaires de la session (heure de Paris).",
   },
   {
-    q: 'Que se passe-t-il après ma demande de devis ?',
+    q: "Que se passe-t-il après ma demande d'inscription ?",
     r: "Nous vous rappelons sous 24 h ouvrées pour valider votre projet, votre niveau de départ et votre financement, puis nous vous adressons devis et convention. Sans engagement.",
   },
 ];

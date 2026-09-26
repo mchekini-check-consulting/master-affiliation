@@ -1,6 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   GRANDS ÉCRANS (≥ 2048 px CSS) — mise à l'échelle proportionnelle
+   Le site est dessiné pour ~1920 px : gabarit de 1400 px et tailles en px. Sur
+   un écran de 2560 px (iMac, Studio Display, écran externe en « plus
+   d'espace »), il restait minuscule au milieu d'immenses marges, avec un héro
+   à moitié vide. On zoome donc toute la page d'un facteur ≈ largeur / 1920 :
+   à 2560 px on retrouve exactement la composition d'un écran 1920 × 1080.
+
+   ⚠ `zoom` multiplie AUSSI les unités vw/vh : `100vh` vaudrait 133 % de la
+   fenêtre. Toute hauteur/largeur « plein écran » doit donc passer par
+   `--screen-h`, `--screen-svh` ou `--screen-w` (ou les utilitaires Tailwind
+   `h-screen`/`min-h-screen`/`max-h-screen`, redéfinis dans
+   tailwind.config.js), qui divisent par le zoom. Les media queries, elles,
+   voient la vraie largeur de la fenêtre : les paliers existants ne bougent pas. */
+:root {
+  --page-zoom: 1;
+  --screen-h: calc(100vh / var(--page-zoom));
+  --screen-svh: calc(100svh / var(--page-zoom));
+  --screen-w: calc(100vw / var(--page-zoom));
+}
+@media (min-width: 2048px) { :root { --page-zoom: 1.1; } }
+@media (min-width: 2240px) { :root { --page-zoom: 1.2; } }
+@media (min-width: 2400px) { :root { --page-zoom: 1.25; } }
+@media (min-width: 2560px) { :root { --page-zoom: 1.3333; } }
+@media (min-width: 2880px) { :root { --page-zoom: 1.5; } }
+@media (min-width: 3200px) { :root { --page-zoom: 1.6667; } }
+@media (min-width: 3840px) { :root { --page-zoom: 2; } }
+html { zoom: var(--page-zoom); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
    SYSTÈME TYPOGRAPHIQUE — site public
    Titres : DM Sans. Corps et interface : Inter. Caveat reste
    réservée aux accroches manuscrites décoratives.
@@ -159,41 +188,41 @@ p { text-wrap: pretty; }
 }
 
 /* Section des profils — visuels laissés vides pour import ultérieur */
-.audience-section { position: relative; overflow: hidden; padding: 96px 0; color: #000c5b; background: #ffffff; }/* Deux vraies colonnes de grille. La version initiale posait la colonne des
+.audience-section { position: relative; overflow: hidden; padding: 96px 0; color: #002d74; background: #ffffff; }/* Deux vraies colonnes de grille. La version initiale posait la colonne des
    cartes en `position: absolute` : la hauteur de la section ne venait plus que
    de la colonne texte, plus courte, donc les cartes débordaient et l'`overflow:
    hidden` de la section les coupait. La grille rend la hauteur au contenu. */
 .audience-section__inner { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 27fr) minmax(0, 71fr); gap: 48px; align-items: start; width: var(--canvas); margin: 0 auto; }.audience-section__intro { position: relative; padding-top: 32px; }/* Maquette : « Des parcours adaptés » en noir, « à chaque profil » en vert —
    conforme à la règle « titres en noir, le vert reste un accent ». */
-.audience-section__intro h2 { margin: 0 0 24px; color: #243037; font: 700 clamp(36px, 3.4vw, 48px)/1.15 var(--font-heading); letter-spacing: -.015em; }.audience-section__intro h2 span { color: #000c5b; }.audience-lead { max-width: 100%; margin: 0; color: #5f6568; font: 400 var(--text-base)/1.5 var(--font-body); }/* Les trois chiffres tiennent TOUJOURS sur une seule ligne : `nowrap`, gouttière
+.audience-section__intro h2 { margin: 0 0 24px; color: #243037; font: 700 clamp(36px, 3.4vw, 48px)/1.15 var(--font-heading); letter-spacing: -.015em; }.audience-section__intro h2 span { color: #002d74; }.audience-lead { max-width: 100%; margin: 0; color: #5f6568; font: 400 var(--text-base)/1.5 var(--font-body); }/* Les trois chiffres tiennent TOUJOURS sur une seule ligne : `nowrap`, gouttière
    et tailles fluides. Chaque bloc partage la largeur à parts égales (`flex: 1 1 0`
    + `min-width: 0`) et rétrécit au lieu de passer à la ligne. */
-.audience-stats { display: flex; flex-wrap: nowrap; gap: clamp(8px, 1.4vw, 24px); margin-top: 32px; }.audience-stats > div { flex: 1 1 0; min-width: 0; }.audience-stats span { display: grid; place-items: center; width: clamp(32px, 3vw, 44px); height: clamp(32px, 3vw, 44px); margin-bottom: 8px; border-radius: 12px; color: #000c5b; background: #dbebff; }.audience-stats span svg { width: clamp(16px, 1.5vw, 22px); height: clamp(16px, 1.5vw, 22px); }.audience-stats b { display: block; color: #000c5b; font: 700 clamp(16px, 1.6vw, 22px)/1.3 var(--font-heading); }.audience-stats small { display: block; margin-top: 4px; color: #5f6568; font: 400 clamp(9px, .85vw, 12px)/1.33 var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.audience-section__profiles { min-width: 0; }.audience-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }/* Colonne flex : les CTA des trois cartes s'alignent quel que soit le nombre
+.audience-stats { display: flex; flex-wrap: nowrap; gap: clamp(8px, 1.4vw, 24px); margin-top: 32px; }.audience-stats > div { flex: 1 1 0; min-width: 0; }.audience-stats span { display: grid; place-items: center; width: clamp(32px, 3vw, 44px); height: clamp(32px, 3vw, 44px); margin-bottom: 8px; border-radius: 12px; color: #002d74; background: #dbebff; }.audience-stats span svg { width: clamp(16px, 1.5vw, 22px); height: clamp(16px, 1.5vw, 22px); }.audience-stats b { display: block; color: #002d74; font: 700 clamp(16px, 1.6vw, 22px)/1.3 var(--font-heading); }.audience-stats small { display: block; margin-top: 4px; color: #5f6568; font: 400 12px/1.33 var(--font-body); text-wrap: balance; }.audience-section__profiles { min-width: 0; }.audience-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }/* Colonne flex : les CTA des trois cartes s'alignent quel que soit le nombre
    de lignes de la description (maquette). */
-.audience-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(207,238,228,.95); border-radius: 24px; background: rgba(255,255,255,.9); box-shadow: 0 6px 18px -10px rgba(0,12,91,.16); }/* Emplacement photo : l'accroche manuscrite est posée en haut à droite comme
+.audience-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(207,238,228,.95); border-radius: 24px; background: rgba(255,255,255,.9); box-shadow: 0 6px 18px -10px rgba(0,45,116,.16); }/* Emplacement photo : l'accroche manuscrite est posée en haut à droite comme
    sur la maquette. Remplacer le bloc par un <img> une fois les visuels reçus. */
 .audience-card__image { position: relative; height: 208px; background: linear-gradient(145deg, #dbebff, #f0f7ff); }.audience-card__image.professional { background: linear-gradient(145deg, #dfedff, #f0f7ff); }.audience-card__image.business { background: linear-gradient(145deg, #dbebff, #f0f7ff); }
 /* Photo de carte : elle remplit l'emplacement. Le voile ne couvre que le
    haut, juste ce qu'il faut pour que l'accroche manuscrite blanche reste
    lisible quel que soit le cadrage — un voile plein noierait la photo. */
 .audience-card__image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.audience-card__image.has-photo::after { content: ''; position: absolute; inset: 0 0 auto; height: 56%; background: linear-gradient(180deg, rgba(0,12,91,.66) 0%, rgba(0,12,91,.28) 55%, rgba(0,12,91,0) 100%); }
+.audience-card__image.has-photo::after { content: ''; position: absolute; inset: 0 0 auto; height: 56%; background: linear-gradient(180deg, rgba(0,45,116,.66) 0%, rgba(0,45,116,.28) 55%, rgba(0,45,116,0) 100%); }
 .audience-card__image.has-photo .audience-card__scribble { color: #ffffff; }
-.audience-card__scribble { position: absolute; z-index: 2; top: 24px; right: 20px; display: grid; gap: 2px; color: #000c5b; text-align: right; font: 700 17px/1.15 var(--font-hand); transform: rotate(-6deg); }
+.audience-card__scribble { position: absolute; z-index: 2; top: 24px; right: 20px; display: grid; gap: 2px; color: #002d74; text-align: right; font: 700 17px/1.15 var(--font-hand); transform: rotate(-6deg); }
 /* Le panneau blanc remonte sur la photo, coins arrondis — détail de la maquette. */
 .audience-card__body { position: relative; display: flex; flex: 1; flex-direction: column; margin-top: -24px; padding: 28px 20px 16px; border-radius: 24px 24px 0 0; background: #ffffff; }
-.audience-card__cta { margin-top: auto; }.audience-card__icon { position: absolute; top: -36px; left: 20px; display: grid; place-items: center; width: 56px; height: 56px; border: 6px solid white; border-radius: 16px; color: #000c5b; background: #f0f7ff; }.audience-card__icon.is-lavender { color: #000c5b; background: #dfedff; }.audience-card__icon svg { width: 29px; height: 29px; }.audience-card h3 { margin: 0 0 8px; color: #243037; font: 600 var(--text-h3)/1.3 var(--font-heading); }.audience-card p { min-height: 48px; margin: 0; color: #5f6568; font: 400 var(--text-sm)/1.4 var(--font-body); }.audience-card ul { display: grid; gap: 10px; margin: 20px 0 22px; padding: 0; list-style: none; color: #5f6568; font: 400 var(--text-xs)/1.33 var(--font-body); }.audience-card li { display: flex; align-items: center; gap: 10px; }/* 16 px : l'icône ne doit pas dépasser la ligne de texte (12 px × 1.33 = 16),
+.audience-card__cta { margin-top: auto; }.audience-card__icon { position: absolute; top: -36px; left: 20px; display: grid; place-items: center; width: 56px; height: 56px; border: 6px solid white; border-radius: 16px; color: #002d74; background: #f0f7ff; }.audience-card__icon.is-lavender { color: #002d74; background: #dfedff; }.audience-card__icon svg { width: 29px; height: 29px; }.audience-card h3 { margin: 0 0 8px; color: #243037; font: 600 var(--text-h3)/1.3 var(--font-heading); }.audience-card p { min-height: 48px; margin: 0; color: #5f6568; font: 400 var(--text-sm)/1.4 var(--font-body); }.audience-card ul { display: grid; gap: 10px; margin: 20px 0 22px; padding: 0; list-style: none; color: #5f6568; font: 400 var(--text-xs)/1.33 var(--font-body); }.audience-card li { display: flex; align-items: center; gap: 10px; }/* 16 px : l'icône ne doit pas dépasser la ligne de texte (12 px × 1.33 = 16),
    sinon c'est elle qui impose la hauteur des rangées. */
-.audience-card li svg { width: 16px; height: 16px; flex: none; color: #000c5b; }.audience-card__cta { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 8px 0 20px; border-radius: 999px; color: #000c5b; background: #f0f7ff; font: 600 var(--text-sm)/1 var(--font-body); }.audience-card__cta.is-lavender { color: #000c5b; background: #dfedff; }.audience-card__cta span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: white; background: #000c5b; }.audience-card__cta.is-lavender span { color: #ffffff; background: #0062e1; }.audience-card__cta svg { width: 17px; }
+.audience-card li svg { width: 16px; height: 16px; flex: none; color: #002d74; }.audience-card__cta { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 8px 0 20px; border-radius: 999px; color: #002d74; background: #f0f7ff; font: 600 var(--text-sm)/1 var(--font-body); }.audience-card__cta.is-lavender { color: #002d74; background: #dfedff; }.audience-card__cta span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: white; background: #002d74; }.audience-card__cta.is-lavender span { color: #ffffff; background: #0062e1; }.audience-card__cta svg { width: 17px; }
 /* Le libellé est encadré de deux filets, comme sur la maquette. */
 /* Accroche + flèche empilées (`column-reverse` : le texte est au-dessus alors
    que le SVG vient en premier dans le DOM, où il doit rester pour la lecture).
    Poussée vers la droite et descendue pour que la pointe de la flèche arrive
    au ras du bord des cartes. */
-.audience-bottom-note { position: absolute; right: max(8px, calc(var(--canvas-left) - 150px)); top: 20px; display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 4px; margin: 0; color: #000c5b; font: 700 19px/1.3 var(--font-hand); text-align: left; transform: rotate(-5deg); }.audience-bottom-note svg { flex: none; width: 52px; height: 68px; margin-left: 18px; }
+.audience-bottom-note { position: absolute; right: max(8px, calc(var(--canvas-left) - 150px)); top: 20px; display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 4px; margin: 0; color: #002d74; font: 700 19px/1.3 var(--font-hand); text-align: left; transform: rotate(-5deg); }.audience-bottom-note svg { flex: none; width: 52px; height: 68px; margin-left: 18px; }
 @media (max-width: 1200px) { .audience-section__inner { grid-template-columns: minmax(0, 28fr) minmax(0, 70fr); gap: 32px; }.audience-card__image { height: 190px; }.audience-card__body { padding-inline: 20px; }.audience-card h3 { font-size: 20px; }.audience-card__cta { padding-left: 16px; }}
 @media (max-width: 900px) { .audience-section { padding: 64px 0; }.audience-section__inner { grid-template-columns: minmax(0, 1fr); gap: 0; width: min(100% - 32px, 680px); }.audience-section__intro { padding-top: 0; }.audience-lead { max-width: 600px; }.audience-section__profiles { margin-top: 48px; }.audience-cards { gap: 14px; }.audience-card__image { height: 190px; }.audience-bottom-note { display: none; }}
-@media (max-width: 640px) { .audience-section__intro h2 { margin-top: 25px; font-size: 38px; }.audience-stats small { font-size: 9px; }.audience-cards { grid-template-columns: 1fr; }.audience-card__image { height: 220px; }}
+@media (max-width: 640px) { .audience-section__intro h2 { margin-top: 25px; font-size: 38px; }.audience-cards { grid-template-columns: 1fr; }.audience-card__image { height: 220px; }}
 .fan-card:focus-visible { outline: 3px solid #0066b0; outline-offset: 3px; }
 
 /* Accueil — héro de référence (public/images/hero-academy.png). */
@@ -209,7 +238,7 @@ p { text-wrap: pretty; }
    les clamp() en vh (nécessaires pour tenir en 100svh) ont leurs bornes min et
    max calées dessus. Rythme vertical croissant selon la hiérarchie :
    titre 32 → intro 24 → CTA 32 → bénéfices 56 → confiance 40. */
-.academy-hero { position: relative; min-height: calc(100svh - var(--hero-lift, 0px)); overflow: hidden; color: #ffffff; background: #000c5b;
+.academy-hero { position: relative; min-height: calc(var(--screen-svh) - var(--hero-lift, 0px)); overflow: hidden; color: #ffffff; background: #002d74;
   /* Gouttière texte↔photo, et largeur de la colonne de texte qui en découle.
      La photo démarre exactement à `copy + gouttière` : les deux valeurs
      viennent du même calcul, il ne peut donc ni y avoir de chevauchement ni
@@ -268,7 +297,7 @@ p { text-wrap: pretty; }
   background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,.42) 100%);
 }
 
-/* Fond de marque : tracés fins et mots-clés, posés sur l'aplat #000c5b. Couche
+/* Fond de marque : tracés fins et mots-clés, posés sur l'aplat #002d74. Couche
    purement décorative (`aria-hidden` par nature, c'est un pseudo-élément), en
    retrait derrière le contenu — `__inner` est en z-index 1, le carrousel en 4. */
 .academy-hero::before {
@@ -283,10 +312,10 @@ p { text-wrap: pretty; }
      large, donc suréchantillonnée et rognée de ses décors latéraux — d'où
      l'impression d'étirement. En `contain` elle garde ses proportions et
      s'affiche à sa taille naturelle ou en dessous, donc nette.
-     Les bandes laissées libres montrent le fond du héro (#000c5b), que l'image
+     Les bandes laissées libres montrent le fond du héro (#002d74), que l'image
      porte elle-même en #01105f : l'écart est invisible, il n'y a pas de
      raccord perceptible. */
-  /* Image de fond retirée : le héro garde son seul aplat #000c5b.
+  /* Image de fond retirée : le héro garde son seul aplat #002d74.
      Pour la remettre, rétablir ici :
      background: url('/images/hero-backdrop.png') center / contain no-repeat; */
   background: none;
@@ -304,13 +333,16 @@ p { text-wrap: pretty; }
    dont le bloc conteneur fait toute la largeur de la page (`.academy-hero`,
    `.audience-section`…). À l'intérieur du héro, on n'utilise que des LONGUEURS
    et des `100%` locaux, dont la référence est explicite dans chaque règle. */
-/* Le héro n'a plus de photo : il repose sur le seul aplat #000c5b. La colonne
+/* Le héro n'a plus de photo : il repose sur le seul aplat #002d74. La colonne
    de droite ne porte donc que le carrousel. */
 .academy-hero__visual { position: absolute; inset: 0; pointer-events: none; }
 /* Le héro partage le gabarit commun (`--canvas` = 1400 px + 2 × 24 px), comme
    le header et toutes les sections : le logo, le H1 du héro et les titres des
    sections suivantes tombent sur la même verticale. */
-.academy-hero__inner { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: calc(100svh - var(--hero-lift, 0px) - var(--hero-slant)); width: var(--canvas); margin: 0 auto; padding-top: clamp(112px, 16vh, 152px); padding-bottom: clamp(24px, 4vh, 48px); }
+.academy-hero__inner { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: calc(var(--screen-svh) - var(--hero-lift, 0px) - var(--hero-slant)); width: var(--canvas); margin: 0 auto; padding-top: clamp(112px, 16vh, 152px); padding-bottom: clamp(56px, 8vh, 80px); }
+/* ↑ padding-bottom : les tuiles blanches de la bande de confiance doivent
+   sortir du dégradé d'ombre posé sur les 96 px du bas (`::after`), sinon leur
+   base se grise. 80 px + `--hero-slant` (22 px) les place au-dessus. */
 /* Colonne de texte = le cadre moins la colonne visuelle et la gouttière. Ici
    `100%` vaut la largeur de `.academy-hero__inner`, c'est-à-dire le cadre :
    la référence est locale et sans ambiguïté. La longueur de ligne est traitée
@@ -344,16 +376,16 @@ p { text-wrap: pretty; }
 .academy-hero__benefit { display: flex; align-items: center; gap: 16px; min-width: 0; }
 /* Icône simple, sans pastille colorée : un trait fin suffit, le rendu reste
    sobre et éditorial plutôt que « carte d'app ». */
-.academy-hero__benefit > span { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border: 1px solid #9cbdff; border-radius: 50%; background: #9cbdff; color: #000c5b; }
+.academy-hero__benefit > span { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border: 1px solid #9cbdff; border-radius: 50%; background: #9cbdff; color: #002d74; }
 .academy-hero__benefit strong, .academy-hero__benefit small { display: block; font-family: var(--font-body); }
 .academy-hero__benefit strong { font-size: 15px; font-weight: 600; }.academy-hero__benefit small { margin-top: 4px; color: #9cbdff; font-size: 12px; }
 .academy-hero__trust { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px clamp(40px, 5vw, 80px); margin-top: auto; padding-top: clamp(24px, 3.2vh, 32px); border-top: 1px solid #002d74; color: #dbebff; }
-.hero-trust-logo { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
-/* Hauteur de rendu commune : c'est elle qui aligne optiquement des logos de
-   proportions différentes. `object-fit: contain` évite toute déformation. */
-.hero-trust-logo img { display: block; height: 40px; width: auto; max-width: 160px; object-fit: contain; }
-.hero-trust-logo__nom { display: block; color: #ffffff; font: 600 17px/1.2 var(--font-body); letter-spacing: .01em; }
-.hero-trust-logo small { display: block; color: #9cbdff; font: 400 11px/1.3 var(--font-body); }
+/* Logos de confiance : monochromes (fichiers `-mono.png`, blancs sur fond
+   transparent), sans carte ni texte, à opacité réduite pour rester en
+   retrait. Même hauteur optique pour les deux marques ; OPCO, plus massif,
+   est un cran plus bas. */
+.hero-trust-logo { display: block; height: 52px; width: auto; opacity: .6; }
+.hero-trust-logo[src*="opco"] { height: 42px; }
 /* Colonne visuelle : son bord gauche est posé à `bord droit du cadre moins sa
    propre largeur`, et elle saigne jusqu'au bord droit de la fenêtre pour que la
    photo reste plein bord. `50%` et `--canvas` sont ici résolus contre
@@ -490,7 +522,7 @@ p { text-wrap: pretty; }
    carrée : en `cover`, le navigateur l'agrandissait pour couvrir la hauteur et
    rognait les deux tiers de la largeur — toutes les mentions latérales
    disparaissaient. On fixe donc la LARGEUR (100% auto) : l'image est entière,
-   sans déformation, et le reste de la hauteur est comblé par #000c5b, qui est
+   sans déformation, et le reste de la hauteur est comblé par #002d74, qui est
    la couleur même de ses bords (#2d024c en bas, #2f024d en haut) — le raccord
    ne se voit pas. */
 /* ===== Catalogue de la page d'accueil =====
@@ -498,7 +530,7 @@ p { text-wrap: pretty; }
    version precedente empilait des valeurs arbitraires (33, 13, 15, 17, 25,
    38, 41, 43, 51, 58 px) et des tailles hors echelle (10, 13, 15, 20 px) :
    c'est cette absence de systeme qui se lisait comme un rendu automatique. */
-/* Bleu de rappel (#002d74) et non le #000c5b du héro : deux aplats sombres
+/* Bleu de rappel (#002d74) et non le #002d74 du héro : deux aplats sombres
    identiques à quelques écrans d'intervalle fatiguent l'œil et effacent la
    séparation entre les sections. Même famille, une marche plus claire — les
    textes #ffffff / #dbebff / #9cbdff y gardent tous un contraste AA. */
@@ -541,7 +573,7 @@ p { text-wrap: pretty; }
    passait juste en dessous. */
 .catalogue-filters button { display: inline-flex; align-items: center; height: 44px; padding: 0 24px; border: 1px solid #9cbdff; border-radius: 999px; color: #ffffff; background: transparent; font: 500 var(--text-sm)/1 var(--font-body); cursor: pointer; transition: color .2s, background-color .2s, border-color .2s; }
 .catalogue-filters button:hover { border-color: #ffffff; background: #002d74; }
-.catalogue-filters button.is-active { color: #000c5b; border-color: #ffffff; background: #ffffff; }
+.catalogue-filters button.is-active { color: #002d74; border-color: #ffffff; background: #ffffff; }
 
 /* ---- cartes ---- */
 .catalogue-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
@@ -558,7 +590,7 @@ p { text-wrap: pretty; }
 .catalogue-card__body > p { display: -webkit-box; margin: 8px 0 16px; overflow: hidden; color: #5f6568; font: 400 var(--text-sm)/1.5 var(--font-body); -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .catalogue-card__meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: auto; padding-bottom: 16px; border-bottom: 1px solid #dbebff; }
 .catalogue-card__meta span { display: inline-flex; align-items: center; gap: 8px; color: #002d74; white-space: nowrap; font: 500 var(--text-xs)/1.33 var(--font-body); }
-.catalogue-card__link { display: flex; justify-content: space-between; align-items: center; min-height: 44px; margin-top: 8px; color: #000c5b; font: 600 var(--text-sm) var(--font-body); }
+.catalogue-card__link { display: flex; justify-content: space-between; align-items: center; min-height: 44px; margin-top: 8px; color: #002d74; font: 600 var(--text-sm) var(--font-body); }
 .catalogue-card__link svg { transition: transform .2s; }
 .catalogue-card__link:hover svg { transform: translateX(4px); }
 
@@ -572,7 +604,7 @@ p { text-wrap: pretty; }
 .catalogue-promises svg { flex: none; color: #9cbdff; }
 .catalogue-promises b { color: #ffffff; font: 600 var(--text-sm)/1.4 var(--font-body); }
 .catalogue-promises small { display: block; margin-top: 4px; color: #9cbdff; font: 400 var(--text-xs)/1.33 var(--font-body); }
-.catalogue-footer__cta { display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0 28px; border-radius: 999px; color: #000c5b; background: #ffffff; white-space: nowrap; font: 600 var(--text-base)/1 var(--font-body); transition: background-color .2s; }
+.catalogue-footer__cta { display: inline-flex; align-items: center; gap: 12px; height: 48px; padding: 0 28px; border-radius: 999px; color: #002d74; background: #ffffff; white-space: nowrap; font: 600 var(--text-base)/1 var(--font-body); transition: background-color .2s; }
 .catalogue-footer__cta:hover { background: #dbebff; }
 
 @media (max-width: 1250px) { .catalogue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.catalogue-card__image { height: 200px; }.catalogue-footer { align-items: flex-start; flex-direction: column; }.catalogue-handwriting { transform: scale(.8) rotate(-8deg); transform-origin: top right; } }
@@ -589,7 +621,7 @@ p { text-wrap: pretty; }
     @apply text-foreground font-body;
     /* Fond du site : blanc pur, uniforme sur toutes les pages. */
     background: #ffffff;
-    min-height: 100vh;
+    min-height: var(--screen-h);
   }
 }
 
@@ -624,8 +656,8 @@ p { text-wrap: pretty; }
 .hcc-card { position: absolute; top: 0; left: 50%; margin-left: -172px; width: 344px; height: 100%; overflow: hidden; padding: 0; border-radius: 8px; background: #ffffff; border: 1px solid #dbebff; }
 /* Ombre douce et très diffuse : elle détache la carte du fond clair sans
    ramener le relief marqué qu'on a retiré du reste de la home. */
-.hcc-card { box-shadow: 0 6px 18px -10px rgba(0,12,91,.16); }
-.hcc-card.is-active { box-shadow: 0 18px 40px -20px rgba(0,12,91,.28); }
+.hcc-card { box-shadow: 0 6px 18px -10px rgba(0,45,116,.16); }
+.hcc-card.is-active { box-shadow: 0 18px 40px -20px rgba(0,45,116,.28); }
 
 .hcc-card__media { position: relative; height: 200px; overflow: hidden; background: #f0f7ff; }
 .hcc-card__media img { width: 100%; height: 100%; object-fit: cover; }
@@ -651,13 +683,15 @@ p { text-wrap: pretty; }
 .hcc-card__body a:hover svg { transform: translateX(3px); }
 
 .hcc__controls { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 24px; }
-.hcc__controls > button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #dbebff; border-radius: 50%; color: #000c5b; background: #ffffff; cursor: pointer; transition: background-color .2s, color .2s; }
-.hcc__controls > button:hover { color: #ffffff; background: #000c5b; border-color: #000c5b; }
+.hcc__controls > button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #dbebff; border-radius: 50%; color: #002d74; background: #ffffff; cursor: pointer; transition: background-color .2s, color .2s; }
+.hcc__controls > button:hover { color: #ffffff; background: #002d74; border-color: #002d74; }
 .hcc__controls > button svg { width: 16px; height: 16px; }
 .hcc__controls > div { display: flex; align-items: center; gap: 8px; }
-/* Puce active : pastille allongée, comme sur la maquette. */
-.hcc__controls > div button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: #dbebff; cursor: pointer; transition: width .3s, background-color .3s; }
-.hcc__controls > div button.is-active { width: 24px; background: #000c5b; }
+/* Puce active : pastille allongée, comme sur la maquette. Les puces reposent
+   sur l'aplat marine du héro : l'active est donc blanche (jamais #002d74, qui
+   s'y confond) et les autres passent en #9cbdff pour s'en distinguer. */
+.hcc__controls > div button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: #9cbdff; cursor: pointer; transition: width .3s, background-color .3s; }
+.hcc__controls > div button.is-active { width: 24px; background: #ffffff; }
 
 @media (max-width: 1279px) {
   .academy-hero__visual { min-height: 0; }
@@ -675,4 +709,20 @@ p { text-wrap: pretty; }
 
 /* Héro de la page formation : mêmes réglages de base que l'accueil. La
    couleur de fond vient de la formation (`--vente-fond`, voir ventes.js). */
-.vente-hero { position: relative; overflow: hidden; --hero-slant: 22px; background: var(--vente-fond, #000c5b); }
+.vente-hero { position: relative; overflow: hidden; --hero-slant: 22px; background: var(--vente-fond, #002d74); }
+/* Pages intérieures (PageHero.jsx) : le mot-clé du titre passe en #9cbdff. */
+.page-hero h1 span { color: #9cbdff; }
+
+/* ── Méga-menu « Formations » : cartes de catégorie (Header.jsx) ──────────
+   Repos : bordure #dbebff, pastille d'icône marine. Survol : bordure marine,
+   fond pâle, la pastille passe au bleu vif et se soulève de 2 px. Aplats et
+   filets seulement, conformément à la charte. */
+.mega-cat { border: 1px solid #dbebff; transition: border-color .3s, background-color .3s, box-shadow .3s; }
+.mega-cat:hover, .mega-cat:focus-visible { border-color: #002d74; background: #f0f7ff !important; box-shadow: 0 18px 40px -20px rgba(0,45,116,.28); }
+.mega-cat__icon { background: #002d74; transition: background-color .3s, transform .3s cubic-bezier(.16,1,.3,1); }
+.mega-cat:hover .mega-cat__icon, .mega-cat:focus-visible .mega-cat__icon { background: #0062e1; transform: translateY(-2px) rotate(-4deg); }
+.mega-cat__count { background: #f0f7ff; transition: background-color .3s; }
+.mega-cat:hover .mega-cat__count, .mega-cat:focus-visible .mega-cat__count { background: #ffffff; }
+@media (prefers-reduced-motion: reduce) {
+  .mega-cat:hover .mega-cat__icon { transform: none; }
+}

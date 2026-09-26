@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 // Adapté de « footer-section-4 » (21st.dev) : JSX, react-router au lieu de
 // next/link, framer-motion, couleurs Hi-Tech Academy.
 
-const PRIMARY = '#000c5b';
+const PRIMARY = '#002d74';
 
 const SOCIAL_ICONS = { facebook: Facebook, instagram: Instagram, linkedin: Linkedin, youtube: Youtube, twitter: Twitter };
 
@@ -76,7 +76,7 @@ export default function Footer4({
             className="relative flex min-h-[300px] w-full flex-col justify-between overflow-hidden py-10 md:min-h-[520px] md:w-1/3"
             style={{
               background: PRIMARY,
-              paddingLeft: 'max(1.5rem, calc((100vw - 1500px) / 2))',
+              paddingLeft: 'max(1.5rem, calc((var(--screen-w) - 1500px) / 2))',
               paddingRight: '2rem',
             }}>
 
@@ -162,7 +162,7 @@ export default function Footer4({
             className="flex min-h-[460px] w-full flex-col justify-between bg-white py-10 md:min-h-[520px] md:w-2/3 md:py-12"
             style={{
               paddingLeft: '2rem',
-              paddingRight: 'max(1.5rem, calc((100vw - 1500px) / 2))',
+              paddingRight: 'max(1.5rem, calc((var(--screen-w) - 1500px) / 2))',
             }}>
 
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-10">
@@ -172,7 +172,7 @@ export default function Footer4({
                   <ul className="flex flex-col space-y-3 text-sm font-medium" style={{ color: '#5f6568' }}>
                     {section.links.map((link) => (
                       <li key={link.label}>
-                        <FooterLink href={link.href} className="transition-colors hover:text-[#000c5b]">
+                        <FooterLink href={link.href} className="transition-colors hover:text-[#002d74]">
                           {link.label}
                         </FooterLink>
                       </li>
@@ -196,7 +196,7 @@ export default function Footer4({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Votre adresse e-mail"
-                  className="flex-1 rounded-full border bg-transparent px-5 py-3 text-sm outline-none transition-colors focus:border-[#000c5b]"
+                  className="flex-1 rounded-full border bg-transparent px-5 py-3 text-sm outline-none transition-colors focus:border-[#002d74]"
                   style={{ borderColor: '#dbebff', color: '#243037' }} />
                 <button
                   type="submit"

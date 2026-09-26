@@ -9,33 +9,18 @@ const benefits = [
   { icon: LifeBuoy, title: 'Accompagnement expert', description: 'Du début à la fin' },
 ];
 
-// Bande de confiance. `src` attend un fichier déposé dans public/images/logos/.
-// Tant qu'il est vide, le nom s'affiche en toutes lettres : aucun logo n'est
-// fabriqué ni imité — on met le vrai fichier, ou rien.
-// N'y faire figurer QUE ce que le site peut justifier. L'ancienne bande
-// affichait « pôle emploi » et le bloc-marque « République Française », que
-// rien dans le catalogue n'étaye — et que la charte de l'État réserve de toute
-// façon à ses propres services. Les deux sont retirés.
-//   · Qualiopi : la mention du champ certifié est OBLIGATOIRE à côté du logo.
-//     Le nom de l'organisme certificateur doit y être ajouté dès qu'il est
-//     connu (`mention`).
-//   · OPCO n'est pas une marque unique mais une catégorie : onze opérateurs,
-//     onze logos. Reste donc en toutes lettres, sauf à nommer un OPCO précis.
+// Bande de confiance : les logos seuls, en monochrome clair sur l'aplat
+// marine, opacité réduite. Les fichiers `-mono.png` sont dérivés des logos
+// officiels (fond blanc rendu transparent, tracé passé en blanc) : à
+// remplacer par la version monochrome officielle du kit Qualiopi si elle est
+// fournie.
+//   ⚠ Qualiopi : les règles d'usage de la marque demandent la mention de la
+//     catégorie certifiée (« actions de formation ») à côté du logo. Retirée
+//     ici à la demande ; elle reste affichée dans le footer.
 const trustLogos = [
-  { nom: 'Qualiopi', src: '', mention: 'Actions de formation' },
-  { nom: 'OPCO', src: '', mention: 'Financement mobilisable' },
+  { nom: 'Qualiopi, processus certifié, République française', src: '/images/logos/qualiopi-mono.png', width: 251, height: 105 },
+  { nom: 'OPCO, opérateurs de compétences', src: '/images/logos/opco-mono.png', width: 308, height: 124 },
 ];
-
-function TrustLogo({ nom, src, mention }) {
-  return (
-    <div className="hero-trust-logo">
-      {src
-        ? <img src={src} alt={nom} loading="lazy" />
-        : <span className="hero-trust-logo__nom">{nom}</span>}
-      {mention && <small>{mention}</small>}
-    </div>
-  );
-}
 
 export default function HeroSection() {
   return (
@@ -56,12 +41,14 @@ export default function HeroSection() {
             Travaux pratiques sur un environnement réel, session confirmée <strong>dès un participant</strong>, et financement OPCO mobilisable.
           </p>
           <div className="academy-hero__actions">
-            {/* `inverted` obligatoire : le héro est sur l'aplat #000c5b, qui est
+            {/* `inverted` obligatoire : le héro est sur l'aplat #002d74, qui est
                 aussi la couleur du bouton — sans inversion il disparaîtrait. */}
             <PrimaryButton to="/formations" size="lg" inverted>
               Découvrir nos formations
             </PrimaryButton>
-            <button type="button" className="academy-hero__video"><span><Play size={14} weight="fill" /></span> Voir la vidéo (1 min)</button>
+            {/* CTA secondaire : mène à « Notre méthode » (#methode), les six
+                temps du parcours. Il annonçait une vidéo qui n'existe pas. */}
+            <a href="#methode" className="academy-hero__video"><span><Play size={14} weight="fill" /></span> Comment ça marche ?</a>
           </div>
           <div className="academy-hero__benefits">
             {benefits.map(({ icon: Icon, title, description }) => <div className="academy-hero__benefit" key={title}><span><Icon size={22} weight="duotone" /></span><div><strong>{title}</strong><small>{description}</small></div></div>)}
@@ -72,8 +59,8 @@ export default function HeroSection() {
             du cadre, sans sur-titre. Elle sort de `__copy` pour ne plus être
             contrainte à la colonne de texte. */}
         <div className="academy-hero__trust">
-          {trustLogos.map(({ nom, src, mention }) => (
-            <TrustLogo key={nom} nom={nom} src={src} mention={mention} />
+          {trustLogos.map(({ nom, src, width, height }) => (
+            <img key={src} className="hero-trust-logo" src={src} alt={nom} width={width} height={height} loading="lazy" decoding="async" />
           ))}
         </div>
       </div>

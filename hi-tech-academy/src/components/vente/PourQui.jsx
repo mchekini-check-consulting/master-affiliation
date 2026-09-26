@@ -11,7 +11,7 @@ import { Bande, RADIUS } from './atomes';
 // lieu d'être perdu : chaque « pas encore » peut porter un lien `redirige`.
 // Registre éditorial : typographie, filets, un seul aplat coloré, pas d'icône.
 
-export default function PourQui({ pour, pasPour, personas, prerequis, couleur }) {
+export default function PourQui({ pour, pasPour, personas, prerequis, couleur, contactTo }) {
   const accent = couleur.fond;
 
   return (
@@ -63,7 +63,7 @@ export default function PourQui({ pour, pasPour, personas, prerequis, couleur })
             ))}
           </ul>
           <p className="text-body-sm mt-4 pt-5" style={{ color: BODY_MUTED, borderTop: `1px solid ${LINE}`, ...bodyFont }}>
-            Un doute ? Décrivez-nous votre situation dans la demande de devis : nous vous répondons franchement.
+            Un doute ? Décrivez-nous votre situation dans votre demande d'inscription : nous vous répondons franchement.
           </p>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function PourQui({ pour, pasPour, personas, prerequis, couleur })
         </div>
         <div className="lg:text-right">
           <p className="text-h4 mb-4" style={{ color: '#243037', ...headingFont }}>Pas sûr d'être au niveau ?</p>
-          <PrimaryButton href="#devis" style={{ background: accent }}>Parlons-en, sans engagement</PrimaryButton>
+          <PrimaryButton to={contactTo} style={{ background: accent }}>Parlons-en, sans engagement</PrimaryButton>
         </div>
       </div>
     </Bande>

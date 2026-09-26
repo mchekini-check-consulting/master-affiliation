@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 //  · TypeScript → JSX, et `@gsap/react` n'est PAS installé : son hook `useGSAP`
 //    n'est qu'un `useLayoutEffect` + `gsap.context()`, écrit ici directement.
 //    Une dépendance de moins.
-//  · `min-h-screen` → `min-h-[100svh]` : sur mobile, `vh` inclut la barre
+//  · `min-h-screen` → `min-h-[var(--screen-svh)]` : sur mobile, `vh` inclut la barre
 //    d'URL, ce qui décale les points d'épinglage au premier défilement.
 //  · `prefers-reduced-motion` ne désactive pas seulement l'animation : aucun
 //    `ScrollTrigger` n'est créé, les panneaux s'enchaînent normalement.
@@ -23,11 +23,11 @@ export function StoryPanel({ className, style = {}, children, 'aria-label': aria
     <section
       data-story-panel
       aria-label={ariaLabel}
-      className={cn('relative min-h-[100svh] w-full overflow-hidden', className)}>
+      className={cn('relative min-h-[var(--screen-svh)] w-full overflow-hidden', className)}>
       <div
-        className="story-panel__inner relative flex min-h-[100svh] w-full flex-col justify-between gap-6 will-change-transform"
+        className="story-panel__inner relative flex min-h-[var(--screen-svh)] w-full flex-col justify-between gap-6 will-change-transform"
         style={{ transformOrigin: 'bottom left', ...style }}>
-        <div className="max-w-site mx-auto flex min-h-[100svh] w-full flex-col justify-between gap-8 px-4 py-16 sm:px-6 sm:py-20">
+        <div className="max-w-site mx-auto flex min-h-[var(--screen-svh)] w-full flex-col justify-between gap-8 px-4 py-16 sm:px-6 sm:py-20">
           {children}
         </div>
       </div>

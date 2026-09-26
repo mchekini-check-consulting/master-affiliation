@@ -15,7 +15,7 @@ import {
 // « Tout accepter », comme l'exige la CNIL : même taille, même graisse, même
 // poids de contour, seule la couleur de fond les distingue.
 
-const INK = '#000c5b';
+const INK = '#002d74';
 const LINE = '#dbebff';
 const BODY = '#243037';
 const MUTED = '#5f6568';
@@ -142,20 +142,20 @@ export default function CookieConsent() {
         alignItems: showPanel ? 'center' : 'flex-end',
         justifyContent: 'center',
         padding: 16,
-        background: showPanel ? 'rgba(0,12,91,0.45)' : 'transparent',
+        background: showPanel ? 'rgba(0,45,116,0.45)' : 'transparent',
       }}
     >
       <div
         style={{
           width: '100%',
           maxWidth: showPanel ? 640 : 1120,
-          maxHeight: showPanel ? 'calc(100vh - 32px)' : 'none',
+          maxHeight: showPanel ? 'calc(var(--screen-h) - 32px)' : 'none',
           overflowY: showPanel ? 'auto' : 'visible',
           padding: showPanel ? 28 : 24,
           borderRadius: 20,
           border: `1px solid ${LINE}`,
           background: '#ffffff',
-          boxShadow: '0 18px 48px rgba(0,12,91,0.22)',
+          boxShadow: '0 18px 48px rgba(0,45,116,0.22)',
           fontFamily: "'Inter', sans-serif",
         }}
       >
