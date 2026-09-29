@@ -32,6 +32,140 @@
       ]
     },
     {
+      "id": "terraform-debutant",
+      "titre": "Terraform — niveau débutant",
+      "questions": [
+        {
+          "q": "Qu'est-ce que Terraform et à quoi ça sert ?",
+          "r": "Terraform est un outil d'Infrastructure as Code qui permet de décrire et gérer une infrastructure avec du code, principalement en HCL. Il fonctionne avec des providers comme AWS, Azure ou GCP, permet de versionner l'infrastructure, la reproduire et gérer les changements de manière déclarative."
+        },
+        {
+          "q": "À quoi sert le fichier state ?",
+          "r": "Le state fait le lien entre les ressources déclarées dans le code Terraform et les ressources réelles. Il permet à Terraform de savoir ce qu'il gère et de calculer les changements. Il peut contenir des données sensibles, donc on évite de le stocker dans Git et on privilégie un backend distant sécurisé."
+        },
+        {
+          "q": "Différence entre terraform plan et terraform apply ?",
+          "r": "terraform plan prévisualise les changements : création, modification, suppression. terraform apply applique réellement ces changements."
+        },
+        {
+          "q": "À quoi sert terraform init ?",
+          "r": "terraform init initialise le projet Terraform : téléchargement des providers, initialisation du backend et téléchargement des modules."
+        },
+        {
+          "q": "Différence entre variable, local et output ?",
+          "r": "Une variable est une entrée du module. Un local est une valeur calculée ou intermédiaire réutilisable dans tout le module. Un output expose une valeur produite par le module."
+        },
+        {
+          "q": "Différence entre resource et data source ?",
+          "r": "Une resource représente une ressource gérée par Terraform. Une data source permet de lire des informations existantes sans que Terraform ne crée la ressource."
+        },
+        {
+          "q": "Différence entre count et for_each ?",
+          "r": "count crée plusieurs instances avec des index numériques. for_each fonctionne avec des clés issues d'une map ou d'un set, ce qui rend souvent les ressources plus stables dans le state."
+        },
+        {
+          "q": "À quoi sert le bloc provider et comment gérer sa version ?",
+          "r": "Le bloc provider configure l'accès à un fournisseur comme AWS. La version se configure dans terraform.required_providers. Le fichier .terraform.lock.hcl verrouille ensuite la version sélectionnée."
+        },
+        {
+          "q": "À quoi sert un module Terraform ?",
+          "r": "Un module regroupe des ressources réutilisables. Il permet de standardiser l'infrastructure, éviter la duplication et simplifier la maintenance grâce à des inputs et outputs."
+        },
+        {
+          "q": "Différence entre terraform validate et terraform plan ?",
+          "r": "validate vérifie la syntaxe et la cohérence de la configuration. plan calcule les changements nécessaires sur l'infrastructure réelle."
+        }
+      ]
+    },
+    {
+      "id": "terraform-confirme",
+      "titre": "Terraform — niveau confirmé",
+      "questions": [
+        {
+          "q": "Qu'est-ce qu'un backend Terraform et pourquoi utiliser un backend distant ?",
+          "r": "Le backend stocke le state. Un backend distant permet de partager le state, centraliser sa gestion, sécuriser les accès et, selon le backend, utiliser du state locking pour éviter les modifications concurrentes."
+        },
+        {
+          "q": "Dépendances implicites vs depends_on ?",
+          "r": "Terraform détecte automatiquement les dépendances à travers les références entre ressources. depends_on permet de forcer une dépendance explicite quand elle n'est pas visible naturellement dans les références."
+        },
+        {
+          "q": "À quoi sert lifecycle ?",
+          "r": "create_before_destroy crée d'abord la nouvelle ressource avant de supprimer l'ancienne. prevent_destroy empêche la destruction. ignore_changes demande à Terraform d'ignorer certains changements d'attributs."
+        },
+        {
+          "q": "Comment gérer plusieurs environnements dev/staging/prod ?",
+          "r": "Une bonne approche consiste à utiliser des modules communs et des configurations séparées par environnement, avec leurs propres variables et states. Les workspaces peuvent aussi être utilisés pour des environnements très similaires, mais offrent moins d'isolation."
+        },
+        {
+          "q": "Différence entre terraform import et une data source ?",
+          "r": "terraform import rattache une ressource existante au state pour qu'elle soit désormais gérée par Terraform. Une data source ne fait que lire une ressource existante."
+        },
+        {
+          "q": "Comment gérer les secrets avec Terraform ?",
+          "r": "Éviter les secrets en dur dans le code. Utiliser un gestionnaire de secrets ou la CI/CD. sensitive = true masque certaines sorties, mais ne chiffre pas le secret. Le state doit être fortement sécurisé. Les valeurs ephemeral et attributs write-only peuvent éviter certains secrets dans le state lorsque le provider les supporte."
+        },
+        {
+          "q": "Pourquoi for_each est souvent plus sûr que count dans le state ?",
+          "r": "Avec count, les ressources sont identifiées par index. Une suppression au milieu peut décaler les index. Avec for_each, chaque ressource a une clé stable."
+        },
+        {
+          "q": "Qu'est-ce qu'un drift ?",
+          "r": "Un drift est un écart entre la configuration souhaitée et l'infrastructure réelle, souvent causé par une modification manuelle. terraform plan peut le détecter. Ensuite, soit on réapplique le code pour corriger le drift, soit on modifie le code pour conserver le changement."
+        },
+        {
+          "q": "Différence entre terraform state rm, terraform destroy et supprimer une resource du code ?",
+          "r": "state rm retire la ressource du state sans la supprimer du cloud. destroy détruit les ressources réellement. Supprimer un bloc resource du code fait normalement proposer sa destruction au prochain plan."
+        },
+        {
+          "q": "À quoi servait terraform taint ?",
+          "r": "taint marquait une ressource comme devant être recréée au prochain apply, même sans drift. Aujourd'hui, on utilise plutôt terraform apply -replace=\"adresse\" ou terraform plan -replace=\"adresse\"."
+        }
+      ]
+    },
+    {
+      "id": "terraform-expert",
+      "titre": "Terraform — niveau expert",
+      "questions": [
+        {
+          "q": "Comment gérer un state très gros ou lent ?",
+          "r": "Découper l'infrastructure en plusieurs states selon des domaines ou cycles de vie : réseau, base de données, application, etc. Cela réduit les temps de plan, le blast radius et la contention, mais augmente la complexité des dépendances et pipelines."
+        },
+        {
+          "q": "Comment gérer les dépendances entre plusieurs states ?",
+          "r": "Utiliser des outputs et, par exemple, terraform_remote_state ou un mécanisme externe comme SSM Parameter Store. Éviter les dépendances circulaires et le couplage excessif."
+        },
+        {
+          "q": "Comment déplacer une ressource d'un module à un autre sans la recréer ?",
+          "r": "Utiliser terraform state mv ou un bloc moved pour changer l'adresse Terraform sans changer la ressource réelle."
+        },
+        {
+          "q": "Différence entre moved et terraform state mv ?",
+          "r": "terraform state mv modifie directement le state, de façon ponctuelle. Un bloc moved est déclaré dans le code, versionné dans Git et reproductible sur plusieurs environnements."
+        },
+        {
+          "q": "Comment gérer une migration de provider ou de région ?",
+          "r": "Pour une montée de version de provider : vérifier les breaking changes, mettre à jour la version, faire terraform init -upgrade, puis un plan très attentif. Pour une migration de région, il faut souvent recréer en parallèle, migrer les données, basculer le trafic, puis supprimer l'ancienne infrastructure."
+        },
+        {
+          "q": "Comment faire évoluer un module utilisé par beaucoup de projets sans recréer les ressources ?",
+          "r": "Versionner le module, conserver autant que possible la compatibilité des inputs/outputs, utiliser des blocs moved pour les refactorings internes et faire migrer les consommateurs progressivement."
+        },
+        {
+          "q": "Comment sécuriser un pipeline Terraform CI/CD ?",
+          "r": "Faire fmt, validate, tests et contrôles de sécurité, générer un plan sauvegardé, faire relire ce plan, demander une approbation avant la prod, puis appliquer exactement le plan validé. Utiliser des credentials temporaires et au moindre privilège."
+        },
+        {
+          "q": "Que se passe-t-il si terraform apply échoue au milieu ?",
+          "r": "Terraform ne fait pas de rollback global. Ce qui a réussi reste en place et le state est mis à jour. On corrige l'erreur, on relance terraform plan, puis apply pour finir."
+        },
+        {
+          "q": "Différence entre terraform refresh, terraform plan -refresh-only et un terraform plan classique ?",
+          "r": "terraform refresh met historiquement à jour le state pour refléter l'infrastructure réelle, sans modifier l'infrastructure. terraform plan -refresh-only montre les changements de state liés au drift et permet de les examiner avant de les accepter. Un terraform plan classique rafraîchit l'état puis calcule aussi les changements nécessaires pour rendre l'infrastructure conforme au code."
+        }
+      ]
+    },
+    {
       "id": "cicd",
       "titre": "Pipelines CI/CD",
       "questions": [
