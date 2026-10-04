@@ -93,6 +93,8 @@ for (const largeur of [320, 375]) {
       // Lien interne (react-router) : le document n'est pas rechargé, seul le
       // démontage de la barre peut remettre la variable à zéro.
       await page.evaluate(() => { window.__sansRechargement = true; });
+      // Sous 640 px, les colonnes du pied de page sont des accordéons repliés.
+      await page.getByRole('button', { name: 'Informations légales' }).click();
       await page.locator('footer a[href="/mentions-legales"]').first().click();
       await expect(page).toHaveURL(/\/mentions-legales$/);
       expect(await page.evaluate(() => window.__sansRechargement)).toBe(true);
