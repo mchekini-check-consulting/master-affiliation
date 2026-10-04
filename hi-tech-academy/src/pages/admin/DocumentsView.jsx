@@ -61,6 +61,18 @@ const SECTIONS = [
     ],
   },
   {
+    title: "Formation L'essentiel de l'IA : fondamentaux, outils et cas d'usage métiers",
+    documents: [
+      { title: 'Programme de formation', file: `${BASE}/Programme_Essentiel_IA_V1.0.pdf`, icon: GraduationCap },
+      { title: 'Déroulé pédagogique', file: `${BASE}/Deroule_pedagogique_Essentiel_IA_V1.0.pdf`, icon: LayoutList },
+      { title: 'Support de cours', file: `${BASE}/Support_de_cours_Essentiel_IA_V1.0.pdf`, icon: FileText },
+      { title: 'Test de positionnement', file: `${BASE}/Test_positionnement_Essentiel_IA.pdf`, icon: SearchCheck },
+      { title: 'Évaluation finale (QCM)', file: `${BASE}/Evaluation_finale_QCM_Essentiel_IA.pdf`, icon: ClipboardCheck },
+      { title: 'Tableau croisé objectifs / contenus / évaluations', file: `${BASE}/Tableau_croise_Essentiel_IA_V1.0.pdf`, icon: ClipboardList },
+      { title: 'Plaquette commerciale', file: `${BASE}/Plaquette_Essentiel_IA_V1.0.pdf`, icon: Presentation },
+    ],
+  },
+  {
     title: 'Formation IA for Business',
     documents: [
       { title: 'Programme de formation', file: `${BASE}/Programme_IA_For_Business_V1.0.pdf`, icon: GraduationCap },

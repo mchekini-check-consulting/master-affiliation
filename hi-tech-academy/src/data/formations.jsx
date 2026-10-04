@@ -407,6 +407,140 @@ export const formations = [
     ],
   },
   {
+    id: 'essentiel-ia',
+    tag: 'Intelligence Artificielle',
+    title: "L'essentiel de l'IA : fondamentaux, outils et cas d'usage métiers",
+    description:
+      "Les fondamentaux de l'IA en 21 heures : comprendre les modèles (ChatGPT, Claude, Gemini…), maîtriser le prompting, appliquer l'IA à vos e-mails, documents et recherches, créer images, présentations et pages web sans code, découvrir les agents et l'automatisation — avec un module entier consacré aux cas d'usage de votre métier. Format condensé 100 % pratique, accessible sans bagage technique.",
+    image: '/images/essentiel-ia.jpg',
+    version: 'Programme V1.0',
+    pdf: '/documents/Programme_Essentiel_IA_V1.0.pdf',
+    keyFacts: [
+      { icon: Clock, label: 'Durée', value: '21 h, séances à distance (planning défini à l’inscription)' },
+      { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
+      { icon: Euro, label: 'Tarif', value: '2 400 € HT (2 880 € TTC) / stagiaire, forfait 21 h' },
+      { icon: CalendarClock, label: "Délai d'accès", value: '1 jour minimum entre la demande et le début' },
+      { icon: Users, label: 'Effectif', value: 'À partir de 1 participant' },
+      { icon: Award, label: 'Sanction', value: 'Attestation de fin de formation' },
+    ],
+    qualiopiSections: [
+      {
+        id: 'public-prerequis',
+        title: 'Public visé et prérequis',
+        content: (
+          <>
+            <p className="mb-2">
+              <strong>Public concerné :</strong> grand public (entrepreneurs, indépendants, salariés,
+              particuliers) souhaitant acquérir l'essentiel de l'IA et l'appliquer concrètement dans
+              son quotidien de travail.
+            </p>
+            <p className="mb-1"><strong>Prérequis :</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Formation non technique : aucune compétence informatique avancée requise.</li>
+              <li>Pratique numérique régulière : ordinateur, navigateur web, messagerie et bureautique.</li>
+            </ul>
+            <p className="mt-2">
+              Un test de positionnement est réalisé à l'entrée : il sert d'état des lieux pour adapter
+              la session au niveau des participants (il n'est pas éliminatoire).
+            </p>
+          </>
+        ),
+      },
+      {
+        id: 'objectifs',
+        title: 'Objectifs opérationnels et évaluables',
+        content: (
+          <>
+            <p className="mb-2">À l'issue de la formation, le participant sera capable de :</p>
+            <ol className="list-decimal pl-5 space-y-1">
+              <li>Expliquer simplement le fonctionnement et les limites des IA génératives (LLM, tokens, contexte, hallucinations, vie privée) et choisir l'outil adapté à chaque usage.</li>
+              <li>Rédiger des prompts efficaces et se constituer un environnement personnalisé : méthode en 4 étapes, projets et instructions, bibliothèque de prompts réutilisables.</li>
+              <li>Appliquer l'IA à ses tâches professionnelles quotidiennes : rédaction, analyse de documents, RAG, Deep Research, mode vocal.</li>
+              <li>Créer des contenus professionnels avec l'IA : images, présentations, pages web sans code.</li>
+              <li>Identifier et mettre en œuvre des cas d'usage IA propres à son métier, automatiser ses premières tâches avec agents et connecteurs, et adopter des usages sûrs et critiques.</li>
+            </ol>
+          </>
+        ),
+      },
+      {
+        id: 'methodes',
+        title: 'Méthodes et moyens mobilisés',
+        content: (
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Approche 100 % pratique ancrée dans les usages professionnels : démonstrations en direct, ateliers guidés, réalisations individuelles.</li>
+            <li>Classe virtuelle synchrone Google Meet (caméra, partage d'écran, suivi de connexion).</li>
+            <li>Chaque participant manipule les outils d'IA sur son propre poste, avec accompagnement individualisé ; le module « cas d'usage métiers » est animé par profil (commercial/marketing, RH/administratif, gestion/finance, support client).</li>
+            <li>Support de cours, bibliothèque de prompts, fiches cas d'usage métiers et plan d'action personnel téléchargeables sur l'espace de la formation.</li>
+          </ul>
+        ),
+      },
+      {
+        id: 'evaluation',
+        title: "Modalités d'évaluation et de suivi",
+        content: (
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Avant :</strong> questionnaire d'analyse du besoin et des attentes ; test de positionnement (état des lieux, non éliminatoire).</li>
+            <li><strong>Pendant :</strong> ateliers corrigés à chaque module, émargement par demi-journée et rapport de connexion Google Meet.</li>
+            <li><strong>En fin de formation :</strong> évaluation finale des acquis (QCM + atelier « boîte à outils IA métier ») lors de la dernière séance, questionnaires de satisfaction à chaud puis à froid, attestation de fin de formation.</li>
+          </ul>
+        ),
+      },
+      {
+        id: 'acces',
+        title: "Modalités et délais d'accès",
+        content: (
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Inscription par e-mail (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>), téléphone (<a href="tel:+33751474135" className="underline">07 51 47 41 35</a>) ou via le formulaire de contact du site.</li>
+            <li>Délai d'accès : 1 jour minimum entre la demande et le début de la formation (hors prise en charge financeur).</li>
+            <li>Ouverture de la session à partir de 1 participant ; le planning des séances (21 h) est défini avec les participants à l'inscription.</li>
+            <li>
+              Avant l'entrée en formation, chaque apprenant reçoit le{' '}
+              <a href="/documents/qualiopi/Livret_accueil_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                livret d'accueil (PDF)
+              </a>{' '}
+              et le{' '}
+              <a href="/documents/qualiopi/Reglement_interieur_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                règlement intérieur (PDF)
+              </a>.
+            </li>
+          </ul>
+        ),
+      },
+      {
+        id: 'handicap',
+        title: 'Accessibilité aux personnes en situation de handicap',
+        content: (
+          <>
+            <p className="mb-2">
+              Nos formations à distance peuvent être adaptées aux personnes en situation de handicap. Lors de
+              l'inscription, le référent handicap étudie avec le candidat les aménagements nécessaires et mobilise
+              si besoin son réseau de partenaires.
+            </p>
+            <p className="mb-2">
+              <strong>Référent handicap :</strong> Mahdi CHEKINI (<a href="mailto:contact@hi-techacademy.fr" className="underline">contact@hi-techacademy.fr</a>, <a href="tel:+33751474135" className="underline">07 51 47 41 35</a>)
+            </p>
+            <p>
+              <a href="/documents/qualiopi/Accessibilite_handicap_V1.0.pdf" target="_blank" rel="noopener noreferrer" className="underline">
+                Consulter notre politique d'accessibilité (PDF)
+              </a>
+            </p>
+          </>
+        ),
+      },
+      {
+        id: 'indicateurs',
+        title: 'Indicateurs de résultats',
+        content: (
+          <p>
+            Hi-Tech Academy est nouvel entrant pour cette action de formation. Les indicateurs de résultats
+            (taux de satisfaction, atteinte des objectifs, assiduité) sont mis en place dès la première session
+            et publiés sur cette page.
+          </p>
+        ),
+      },
+    ],
+  },
+  {
     id: 'ia-for-business',
     tag: 'Intelligence Artificielle',
     title: 'IA for Business',
@@ -851,9 +985,16 @@ const managementIaNeedsLevels = [
   { key: 'levelKubernetes', field: 'level_kubernetes', label: 'IA générative', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
 ];
 
+const essentielIaNeedsLevels = [
+  { key: 'levelLinux', field: 'level_linux', label: 'Outils numériques du quotidien (e-mail, navigateur, bureautique)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelDocker', field: 'level_docker', label: 'Usage des IA (ChatGPT, Claude, Gemini…)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'IA appliquée à votre métier', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+];
+
 const needsLevelsByFormation = {
   'facturation-electronique-pennylane': pennylaneNeedsLevels,
   'ia-pour-tous': iaNeedsLevels,
+  'essentiel-ia': essentielIaNeedsLevels,
   'ia-for-business': iaBusinessNeedsLevels,
   'ia-for-tech': iaTechNeedsLevels,
   'management-processus-ia': managementIaNeedsLevels,
@@ -931,9 +1072,21 @@ const managementIaQuizTexts = {
     + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
 };
 
+const essentielIaQuizTexts = {
+  intro: "Ce test fait un état des lieux de votre pratique numérique et de vos premières notions d'IA, pour adapter l'animation à vos besoins et à votre métier.",
+  selfLevelQuestion: "Où en êtes-vous dans votre usage de l'IA ?",
+  selfLevelMissing: 'Auto-évaluation IA',
+  selfLevelPdfLabel: "Usage déclaré de l'IA",
+  knowledgeSection: 'Connaissances IA (facultatif)',
+  purposeQuestion: "Selon vous, que pourrait vous apporter l'IA dans votre métier ?",
+  finalPracticalNote: "Partie B (atelier « boîte à outils IA métier ») évaluée par le formateur pendant la session ; le total "
+    + "/20 est reporté sur l'attestation de fin de formation (seuil indicatif : 60 %).",
+};
+
 const quizTextsByFormation = {
   'facturation-electronique-pennylane': pennylaneQuizTexts,
   'ia-pour-tous': iaQuizTexts,
+  'essentiel-ia': essentielIaQuizTexts,
   'ia-for-business': iaBusinessQuizTexts,
   'ia-for-tech': iaTechQuizTexts,
   'management-processus-ia': managementIaQuizTexts,

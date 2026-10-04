@@ -11,6 +11,7 @@ public final class QuizCatalogs {
 
     public static final String PENNYLANE_ID = "facturation-electronique-pennylane";
     public static final String IA_ID = "ia-pour-tous";
+    public static final String ESSENTIEL_IA_ID = "essentiel-ia";
     public static final String IA_BUSINESS_ID = "ia-for-business";
     public static final String IA_TECH_ID = "ia-for-tech";
     public static final String MANAGEMENT_IA_ID = "management-processus-ia";
@@ -22,6 +23,7 @@ public final class QuizCatalogs {
         return switch (safe(formationId)) {
             case PENNYLANE_ID -> PositioningTestPennylaneCatalog.QUESTIONS;
             case IA_ID -> PositioningTestIaCatalog.QUESTIONS;
+            case ESSENTIEL_IA_ID -> PositioningTestEssentielIaCatalog.QUESTIONS;
             case IA_BUSINESS_ID -> PositioningTestIaBusinessCatalog.QUESTIONS;
             case IA_TECH_ID -> PositioningTestIaTechCatalog.QUESTIONS;
             case MANAGEMENT_IA_ID -> PositioningTestManagementIaCatalog.QUESTIONS;
@@ -33,6 +35,7 @@ public final class QuizCatalogs {
         return switch (safe(formationId)) {
             case PENNYLANE_ID -> PositioningTestPennylaneCatalog.SELF_LEVELS;
             case IA_ID -> PositioningTestIaCatalog.SELF_LEVELS;
+            case ESSENTIEL_IA_ID -> PositioningTestEssentielIaCatalog.SELF_LEVELS;
             case IA_BUSINESS_ID -> PositioningTestIaBusinessCatalog.SELF_LEVELS;
             case IA_TECH_ID -> PositioningTestIaTechCatalog.SELF_LEVELS;
             case MANAGEMENT_IA_ID -> PositioningTestManagementIaCatalog.SELF_LEVELS;
@@ -44,6 +47,7 @@ public final class QuizCatalogs {
         return switch (safe(formationId)) {
             case PENNYLANE_ID -> PositioningTestPennylaneCatalog.KNOWN_TERMS;
             case IA_ID -> PositioningTestIaCatalog.KNOWN_TERMS;
+            case ESSENTIEL_IA_ID -> PositioningTestEssentielIaCatalog.KNOWN_TERMS;
             case IA_BUSINESS_ID -> PositioningTestIaBusinessCatalog.KNOWN_TERMS;
             case IA_TECH_ID -> PositioningTestIaTechCatalog.KNOWN_TERMS;
             case MANAGEMENT_IA_ID -> PositioningTestManagementIaCatalog.KNOWN_TERMS;
@@ -55,6 +59,7 @@ public final class QuizCatalogs {
         return switch (safe(formationId)) {
             case PENNYLANE_ID -> FinalEvaluationPennylaneCatalog.QUESTIONS;
             case IA_ID -> FinalEvaluationIaCatalog.QUESTIONS;
+            case ESSENTIEL_IA_ID -> FinalEvaluationEssentielIaCatalog.QUESTIONS;
             case IA_BUSINESS_ID -> FinalEvaluationIaBusinessCatalog.QUESTIONS;
             case IA_TECH_ID -> FinalEvaluationIaTechCatalog.QUESTIONS;
             case MANAGEMENT_IA_ID -> FinalEvaluationManagementIaCatalog.QUESTIONS;

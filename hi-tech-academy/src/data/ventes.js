@@ -268,6 +268,98 @@ export const ventes = {
     ],
   },
 
+  'essentiel-ia': {
+    accroche: "21 heures pour maîtriser l'IA et l'appliquer à votre métier. Pas une de plus.",
+    promesse:
+      "Aujourd'hui, l'IA vous intrigue mais votre agenda déborde. En 21 heures, vous repartez avec une méthode éprouvée, votre environnement configuré, et 2 à 3 workflows construits pour VOTRE poste, applicables dès le lendemain matin.",
+    clusters: [
+      {
+        titre: "Comprenez l'IA en une matinée, sans une ligne de technique",
+        items: [
+          'ChatGPT, Claude, Gemini, Mistral : lequel est fait pour VOTRE usage ?',
+          "Hallucinations : repérez les réponses inventées avant qu'elles vous coûtent cher",
+          "Vie privée : les données à ne JAMAIS confier à une IA",
+        ],
+      },
+      {
+        titre: 'Des réponses dix fois meilleures, dès le premier essai',
+        items: [
+          'La méthode en 4 étapes qui transforme vos résultats immédiatement',
+          'Configurez une fois, gagnez du temps pour toujours : projets et instructions',
+          "Votre bibliothèque de prompts : l'actif qui prend de la valeur chaque semaine",
+          "L'IA relecteur : plus un e-mail sensible ne part sans filet",
+        ],
+      },
+      {
+        titre: 'Gagnez des heures sur votre semaine de travail',
+        items: [
+          'E-mails, courriers, comptes rendus : rédigez en 5 minutes ce qui prenait une heure',
+          'Contrats et rapports : faites-les analyser avant de les lire en détail',
+          "RAG : branchez l'IA sur VOS documents et obtenez des réponses fiables et sourcées",
+          "Deep Research : un rapport documenté en 10 minutes au lieu d'une journée",
+        ],
+      },
+      {
+        titre: 'Créez comme un pro, sans compétence technique',
+        items: [
+          'Images et présentations : des visuels professionnels en quelques minutes',
+          'Votre page web publiée pendant la formation, sans coder',
+        ],
+      },
+      {
+        titre: "Votre métier, passé au crible de l'IA",
+        items: [
+          'Commercial & marketing : prospection et rendez-vous préparés en 5 minutes',
+          "RH & administratif : offres, tri de CV et comptes rendus en un clin d'œil",
+          'Gestion & finance : devis, factures et relances analysés avant vous',
+          'Support client : des réponses types dans votre ton, prêtes à partir',
+          'Atelier par profil : repartez avec 2 à 3 workflows construits pour VOTRE poste',
+        ],
+      },
+      {
+        titre: "L'IA qui agit, en toute sécurité",
+        items: [
+          "Vos premiers agents IA : quand l'IA arrête de répondre et commence à agir",
+          'Connecteurs et MCP : reliez votre IA à Gmail et votre agenda',
+          "Deepfakes et arnaques : reconnaissez les contenus falsifiés avant d'en être victime",
+          "Atelier final : VOTRE boîte à outils IA métier, prête à l'emploi",
+        ],
+      },
+    ],
+    cible: {
+      pour: [
+        "Vous voulez les bénéfices de l'IA sans pouvoir bloquer 80 heures dans votre agenda.",
+        'Vous utilisez ChatGPT « un peu », sans méthode ni résultats constants.',
+        "Vous attendez des cas d'usage concrets pour VOTRE métier, pas des démos génériques.",
+        'Vous êtes salarié, indépendant ou dirigeant et chaque heure compte.',
+      ],
+      pasPour: [
+        { texte: "Vous voulez explorer l'IA en profondeur, création et vie personnelle comprises", redirige: 'ia-pour-tous' },
+        { texte: 'Vous voulez lancer un business entier opéré par des agents IA', redirige: 'ia-for-business' },
+        { texte: 'Vous êtes développeur et voulez construire des applications IA', redirige: 'ia-for-tech' },
+      ],
+    },
+    ctaUrgence: 'Sessions dès 1 participant, accès sous 24 h : 21 heures suffisent pour rattraper le train.',
+    ctaProjection: 'À la dernière séance, vos workflows IA tourneront déjà sur vos vrais dossiers.',
+    // Preuves de la page de vente — À FOURNIR avant mise en ligne. Une chaîne
+    // vide masque l'élément ; ne rien inventer (voir PREUVES_VIDES).
+    preuves: {
+      hero: { image: '/images/essentiel-ia.jpg', alt: 'Lettres AI en relief sur fond bleu, symbole de l’intelligence artificielle', sousTitre: '', position: 'center' },
+      captures: [
+        { image: '', legende: '' },
+        { image: '', legende: '' },
+        { image: '', legende: '' },
+      ],
+      temoignages: [],
+      formateur: null,
+    },
+    argumentsMarketing: [
+      "21 heures : l'essentiel de l'IA, sans sacrifier la pratique",
+      'Un module entier dédié à VOTRE métier : commercial, RH, gestion, support client',
+      'Planning des séances défini avec vous : compatible avec une activité professionnelle',
+    ],
+  },
+
   'ia-for-business': {
     accroche: 'Et si des agents IA travaillaient pour votre business pendant que vous dormez ?',
     promesse:

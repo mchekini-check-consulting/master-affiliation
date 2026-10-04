@@ -176,6 +176,27 @@ const pages = {
     ],
   },
 
+  'essentiel-ia': {
+    objectifs: [
+      { icon: Brain, titre: "Comprendre ce que l'IA sait faire", texte: 'Capacités réelles, limites et données sensibles.' },
+      { icon: PenLine, titre: 'Maîtriser le prompting', texte: 'Une méthode en 4 étapes, reproductible.' },
+      { icon: Timer, titre: 'Gagner des heures chaque semaine', texte: 'E-mails, documents, recherches sourcées.' },
+      { icon: Palette, titre: 'Créer vos contenus professionnels', texte: 'Images, présentations, page web sans code.' },
+      { icon: Briefcase, titre: "Appliquer l'IA à votre métier", texte: '2 à 3 workflows construits pour votre poste.' },
+      { icon: Bot, titre: 'Automatiser en confiance', texte: 'Agents, connecteurs et esprit critique.' },
+    ],
+    personas: [
+      { icon: Users, titre: 'Tous profils, tous métiers', texte: 'Une pratique numérique régulière suffit.' },
+      { icon: Briefcase, titre: 'Salariés et indépendants pressés', texte: "L'essentiel en 21 heures seulement." },
+      { icon: GraduationCap, titre: 'Équipes à acculturer', texte: 'Un socle commun IA pour toute l’équipe.' },
+    ],
+    prerequis: [
+      'Aucune compétence informatique avancée',
+      'Une pratique numérique régulière (navigateur, messagerie, bureautique)',
+      "L'envie de tester sur vos propres cas",
+    ],
+  },
+
   'ia-for-business': {
     objectifs: [
       { icon: Sparkles, titre: 'Identifier les cas d’usage rentables', texte: 'Là où l’IA crée réellement de la valeur.' },
