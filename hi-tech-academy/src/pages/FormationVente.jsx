@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { CalendarBlank as CalendarDays, Clock, Monitor, Users } from '@phosphor-icons/react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getFormationById } from '@/data/formations';
@@ -72,7 +71,6 @@ export default function FormationVente() {
   const dureeBrute = fact('Durée');
   const dureeCourte = dureeBrute.split(', ')[0];
   const dureeDetail = dureeBrute.split(', ')[1] ?? '';
-  const dureeJours = dureeDetail.split(' (')[0];
   const horaires = (dureeDetail.match(/\(([^)]+)\)/)?.[1] ?? '').trim();
 
   const modalite = fact('Modalité');
@@ -83,15 +81,17 @@ export default function FormationVente() {
   const inscriptionTo = `/inscription/${formation.id}`;
 
   const heroFacts = ['Organisme certifié Qualiopi', 'Formateur en direct, jamais de vidéo', 'Attestation de fin de formation'];
-  const reassurances = ['Réponse sous 24 h ouvrées', 'Sans engagement', fact('Sanction')];
+  // L'attestation figure déjà dans les garanties du héro : pas de doublon ici.
+  const reassurances = ['Réponse sous 24 h ouvrées', 'sans engagement'];
 
   // Faits clés de la carte du héro : ce qu'il faut savoir avant de s'engager.
+  // `detail` n'est affiché qu'à partir de 640 px (voir CarteHero).
   const modaliteDetail = (modalite.match(/\(([^)]+)\)/)?.[1] ?? '').trim();
   const carteFacts = [
-    { icon: Clock, label: 'Durée', valeur: dureeCourte, detail: dureeJours },
-    { icon: Monitor, label: 'Format', valeur: modaliteCourte, detail: modaliteDetail },
-    { icon: CalendarDays, label: 'Prochaine session', valeur: 'Sur demande', detail: fact("Délai d'accès") },
-    { icon: Users, label: 'Participants', valeur: effectif.replace('À partir de ', 'Dès ') },
+    { label: 'Durée', valeur: dureeCourte, detail: dureeDetail.split(' (')[0] },
+    { label: 'Format', valeur: modaliteCourte, detail: modaliteDetail },
+    { label: 'Prochaine session', valeur: 'Sur demande', detail: fact("Délai d'accès") },
+    { label: 'Participants', valeur: effectif.replace('À partir de ', 'Dès ') },
   ];
 
   // Fiche pratique (mentions Qualiopi), en grille serrée sous le prix.
@@ -130,6 +130,7 @@ export default function FormationVente() {
         <HeroVente
           heroRef={heroRef}
           formation={formation}
+          titre={vente.titreCourt || formation.title}
           accroche={vente.accroche}
           sousTitre={preuves.hero.sousTitre || formation.description}
           image={preuves.hero.image || preuves.ambiance.hero}
@@ -167,8 +168,8 @@ export default function FormationVente() {
           inscriptionTo={inscriptionTo}
         />
         <Formateur formateur={preuves.formateur} />
-        <PourQui pour={pour} pasPour={pasPour} personas={page.personas} prerequis={page.prerequis} couleur={vente.couleur} contactTo={`/contact?mode=rendez-vous&formation=${formation.id}`} />
-        <Parcours couleur={vente.couleur} />
+        <PourQui pour={pour} pasPour={pasPour} personas={page.personas} prerequis={page.prerequis} couleur={vente.couleur} contactTo={`/contact?mode=rendez-vous&formation=${formation.id}`} inscriptionTo={inscriptionTo} />
+        <Parcours couleur={vente.couleur} inscriptionTo={inscriptionTo} />
         {/* Bloc « Nos résultats » de l'accueil, réutilisé tel quel (à la place
             des témoignages) : un seul endroit à mettre à jour pour les chiffres. */}
         <ResultsSection />

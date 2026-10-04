@@ -12,22 +12,27 @@ import { cn } from '@/lib/utils';
 //
 // `inverted` : variante blanche pour les fonds sombres.
 // `size`     : 'sm' (44 px, header) · 'md' (48 px, défaut) · 'lg' (56 px, héro).
+// `block`    : pleine largeur sous 640 px (CTA de section sur mobile).
 //
-// Les hauteurs sont des cibles tactiles : 44 px minimum partout.
+// Les hauteurs sont des cibles tactiles : 44 px minimum partout. Sous 640 px
+// ce sont des hauteurs MINIMALES : un libellé long passe sur deux lignes et le
+// bouton grandit, au lieu de déborder de son conteneur.
 const SIZES = {
-  sm: 'h-11 px-6 text-body-sm',
-  md: 'h-12 px-7 text-body-base',
-  lg: 'h-14 px-8 text-body-base',
+  sm: 'min-h-[44px] py-2 px-6 text-body-sm sm:h-11 sm:py-0',
+  md: 'min-h-[48px] py-2.5 px-7 text-body-base sm:h-12 sm:py-0',
+  lg: 'min-h-[56px] py-3 px-8 text-body-base sm:h-14 sm:py-0',
 };
 
 const PrimaryButton = React.forwardRef(
-  ({ to, href, children, className, inverted = false, size = 'md', disabled, ...props }, ref) => {
+  ({ to, href, children, className, inverted = false, size = 'md', block = false, disabled, ...props }, ref) => {
     // `icon` est encore passé par d'anciens appels : on l'absorbe pour qu'il ne
     // se retrouve pas posé sur le DOM, sans rien en faire.
     const { icon: _ignoredIcon, ...rest } = props;
 
     const classes = cn(
-      'inline-flex items-center justify-center w-fit rounded-full font-semibold whitespace-nowrap',
+      'inline-flex items-center justify-center max-w-full rounded-full font-semibold text-center',
+      'whitespace-normal sm:whitespace-nowrap',
+      block ? 'w-full sm:w-fit' : 'w-fit',
       'transition-colors duration-200 cursor-pointer',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#002d74]',
       'disabled:pointer-events-none disabled:opacity-50',

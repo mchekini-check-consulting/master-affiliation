@@ -16,6 +16,8 @@
 .ftr__contact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; font: 500 var(--text-body-base)/1.4 var(--font-body); font-style: normal; color: #dbebff; }
 .ftr__contact a { color: #ffffff; text-decoration: none; }
 .ftr__contact a:hover { text-decoration: underline; }
+/* Icônes des coordonnées : réservées au mobile. */
+.ftr__contact svg { display: none; }
 
 /* ── Colonnes de liens ──────────────────────────────────────────────────── */
 .ftr__nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px clamp(24px, 3vw, 64px); padding: 48px 0; border-bottom: 1px solid #002d74; }
@@ -60,4 +62,56 @@
   .ftr__contact { flex-direction: column; align-items: flex-start; }
   .ftr__nav { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 40px 0; }
   .ftr__legal-inner { flex-direction: column; align-items: flex-start; }
+}
+
+/* ── Mobile, version dédiée ─────────────────────────────────────────────────
+   Seuil à 639 px : c'est celui de `useMediaQuery` dans Footer.jsx, qui
+   transforme les titres de colonne en boutons d'accordéon.
+   Sur l'aplat marine, les filets de la charte (#002d74) sont invisibles : les
+   séparateurs de cette version sont en #0066b0, teinte décorative. */
+@media (max-width: 639px) {
+  .ftr__inner { padding: 40px 0 32px; }
+
+  /* En-tête : emblème et nom sur une seule ligne. */
+  .ftr__head { align-items: stretch; gap: 24px; padding-bottom: 0; border-bottom: 0; }
+  .ftr__brand { gap: 12px; }
+  .ftr__logo { width: 44px; height: 44px; }
+  .ftr__name { font-size: 28px; white-space: nowrap; }
+  .ftr__claim { margin-top: 12px; font-size: var(--text-base); }
+
+  /* Coordonnées : trois lignes à toucher, de 52 px chacune. */
+  .ftr__contact { align-items: stretch; gap: 0; border-top: 1px solid #0066b0; }
+  .ftr__contact a, .ftr__contact span { display: flex; align-items: center; gap: 12px; min-height: 52px; border-bottom: 1px solid #0066b0; color: #ffffff; overflow-wrap: anywhere; }
+  .ftr__contact svg { display: block; flex: none; width: 20px; height: 20px; color: #9cbdff; }
+
+  /* Colonnes en accordéon. */
+  .ftr__nav { gap: 0; padding: 32px 0 0; border-bottom: 0; }
+  .ftr__column { border-bottom: 1px solid #0066b0; }
+  .ftr__column h2 { margin: 0; }
+  .ftr__toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 56px; padding: 0; border: 0; background: none; color: #ffffff; font: 600 var(--text-base)/1.3 var(--font-body); text-align: left; cursor: pointer; }
+  .ftr__toggle:hover { color: #ffffff; text-decoration: none; }
+  .ftr__toggle svg { flex: none; width: 20px; height: 20px; color: #9cbdff; transition: transform .3s; }
+  .ftr__column.is-open .ftr__toggle svg { transform: rotate(180deg); }
+  /* Repli par `grid-template-rows` : la hauteur s'anime sans la connaître.
+     `visibility` retire les liens repliés du parcours clavier. */
+  .ftr__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+  .ftr__panel > ul { min-height: 0; overflow: hidden; visibility: hidden; transition: visibility 0s .3s; }
+  .ftr__column.is-open .ftr__panel { grid-template-rows: 1fr; }
+  .ftr__column.is-open .ftr__panel > ul { visibility: visible; transition-delay: 0s; }
+  .ftr__column li + li { margin-top: 0; }
+  .ftr__column li:last-child { padding-bottom: 12px; }
+  .ftr__column a, .ftr__column li button { display: flex; min-height: 44px; }
+
+  /* Certification. */
+  .ftr__cert { padding-top: 32px; gap: 16px; }
+  .ftr__cert-badge { max-width: none; padding: 12px 14px; }
+
+  /* Barre légale : réseaux d'abord, mention centrée dessous. */
+  .ftr__legal { border-top: 1px solid #0066b0; }
+  .ftr__legal-inner { flex-direction: column-reverse; align-items: center; gap: 16px; padding: 24px 0; text-align: center; }
+  .ftr__socials { gap: 12px; }
+  .ftr__socials a { border-color: #0066b0; }
+}
+@media (max-width: 639px) and (prefers-reduced-motion: reduce) {
+  .ftr__panel, .ftr__panel > ul, .ftr__toggle svg { transition: none; }
 }

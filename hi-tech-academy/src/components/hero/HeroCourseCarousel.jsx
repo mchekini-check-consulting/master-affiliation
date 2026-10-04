@@ -38,7 +38,7 @@ const shortDuration = (formation) => {
   return hours ? `${hours}h` : '';
 };
 
-const slides = formations
+export const slides = formations
   .filter((formation) => presentation[formation.id])
   .map((formation) => ({
     id: formation.id,
@@ -77,17 +77,12 @@ const layout = {
   1: { x: 245, z: -330, rotateY: -10, opacity: 1 },
 };
 
-function Card({ slide, offset, spring }) {
+// Contenu d'une carte, commun à la scène 3D (ci-dessous) et au rail mobile
+// (HeroCourseRail.jsx).
+export function CardContent({ slide, focusable = true }) {
   const Icon = slide.icon;
-  const active = offset === 0;
   return (
-    <motion.article
-      className={`hcc-card ${active ? 'is-active' : ''}`}
-      initial={false}
-      animate={layout[offset]}
-      transition={spring}
-      aria-hidden={!active}
-    >
+    <>
       <div className="hcc-card__media">
         <img src={slide.image} alt="" />
         <span className="hcc-card__tag">
@@ -102,10 +97,25 @@ function Card({ slide, offset, spring }) {
       <div className="hcc-card__body">
         <h3>{slide.title}</h3>
         <p>{slide.pitch}</p>
-        <Link to={`/formations/${slide.id}`} tabIndex={active ? 0 : -1}>
+        <Link to={`/formations/${slide.id}`} tabIndex={focusable ? 0 : -1}>
           Voir la formation <ArrowRight />
         </Link>
       </div>
+    </>
+  );
+}
+
+function Card({ slide, offset, spring }) {
+  const active = offset === 0;
+  return (
+    <motion.article
+      className={`hcc-card ${active ? 'is-active' : ''}`}
+      initial={false}
+      animate={layout[offset]}
+      transition={spring}
+      aria-hidden={!active}
+    >
+      <CardContent slide={slide} focusable={active} />
     </motion.article>
   );
 }

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Quotes, Star } from '@phosphor-icons/react';
 import { getTousLesTemoignages } from '@/data/ventes';
 import { getFormationById } from '@/data/formations';
+import Rail from '@/components/ui/rail';
 import { NAVY, TEAL, MINT, MINT_LIGHT, LINE, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
 // Avis des participants — accueil, juste avant le blog. Même registre que la
@@ -53,9 +54,9 @@ export default function TestimonialsSection() {
   const formationsNotees = new Set(avis.map((a) => a.formationId).filter(Boolean)).size;
 
   return (
-    <section id="avis" className="py-20 sm:py-28" style={{ background: MINT_LIGHT }}>
+    <section id="avis" className="py-16 sm:py-28" style={{ background: MINT_LIGHT }}>
       <div className="max-w-site mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] gap-12 lg:gap-20 items-start">
+        <div className="grid lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] gap-8 sm:gap-12 lg:gap-20 items-start">
           {/* Colonne collante : titre + note moyenne */}
           <div className="lg:sticky lg:top-28">
             <p className="text-body-sm font-semibold mb-3" style={{ color: TEAL, ...headingFont }}>Avis des participants</p>
@@ -66,28 +67,31 @@ export default function TestimonialsSection() {
             </h2>
 
             {moyenne !== null && (
-              <div className="mt-8 pt-8" style={{ borderTop: `1px solid ${LINE}` }}>
-                <p className="flex items-baseline gap-2">
+              // Sous 640 px, la note et son détail passent côte à côte.
+              <div className="mt-6 pt-6 sm:mt-8 sm:pt-8 flex items-center gap-5 sm:block" style={{ borderTop: `1px solid ${LINE}` }}>
+                <p className="flex items-baseline gap-2 shrink-0">
                   <span className="font-serif-display tabular-nums" style={{ fontSize: 'clamp(56px, 5.5vw, 80px)', lineHeight: 1, letterSpacing: '-0.02em', color: '#243037', ...serifFont }}>
                     {moyenne.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                   </span>
                   <span className="text-h4" style={{ color: BODY_MUTED, ...headingFont }}>/ 5</span>
                 </p>
-                <div className="mt-3"><Etoiles note={Math.round(moyenne)} taille={24} /></div>
-                <p className="text-body-sm leading-[1.5] mt-3 max-w-[30ch]" style={{ color: BODY_MUTED, ...bodyFont }}>
-                  {avis.length} avis sur {formationsNotees} formation{formationsNotees > 1 ? 's' : ''}, recueillis
-                  lors des évaluations de satisfaction en fin de session.
-                </p>
+                <div className="min-w-0">
+                  <div className="sm:mt-3"><Etoiles note={Math.round(moyenne)} taille={24} /></div>
+                  <p className="text-body-sm leading-[1.5] mt-2 sm:mt-3 max-w-[30ch]" style={{ color: BODY_MUTED, ...bodyFont }}>
+                    {avis.length} avis sur {formationsNotees} formation{formationsNotees > 1 ? 's' : ''}, recueillis
+                    lors des évaluations de satisfaction en fin de session.
+                  </p>
+                </div>
               </div>
             )}
 
-            <Link to="/formations" className="inline-flex items-center gap-2 mt-8 text-body-base font-semibold hover:underline" style={{ color: TEAL, ...headingFont }}>
+            <Link to="/formations" className="inline-flex items-center gap-2 min-h-[44px] mt-4 sm:mt-8 sm:min-h-0 text-body-base font-semibold hover:underline" style={{ color: TEAL, ...headingFont }}>
               Voir les formations <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          {/* Les avis */}
-          <ul className="grid md:grid-cols-2 gap-4">
+          {/* Les avis : rail au balayage sous 768 px, grille au-delà. */}
+          <Rail as="ul" label="Avis des participants" className="grid md:grid-cols-2 gap-4">
             {avis.map((a) => {
               const formation = a.formationId ? getFormationById(a.formationId) : null;
               return (
@@ -119,7 +123,7 @@ export default function TestimonialsSection() {
                       </span>
                       <span className="min-w-0">
                         <span className="block text-body-base font-semibold leading-tight" style={{ color: BODY, ...headingFont }}>{a.nom}</span>
-                        <span className="block text-body-sm mt-0.5 truncate" style={{ color: BODY_MUTED, ...bodyFont }}>{a.role}</span>
+                        <span className="block text-body-sm mt-0.5 sm:truncate" style={{ color: BODY_MUTED, ...bodyFont }}>{a.role}</span>
                       </span>
                     </div>
                     {formation && (
@@ -134,7 +138,7 @@ export default function TestimonialsSection() {
                 </li>
               );
             })}
-          </ul>
+          </Rail>
         </div>
       </div>
     </section>

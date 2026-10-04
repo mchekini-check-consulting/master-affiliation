@@ -19,6 +19,24 @@
   --screen-h: calc(100vh / var(--page-zoom));
   --screen-svh: calc(100svh / var(--page-zoom));
   --screen-w: calc(100vw / var(--page-zoom));
+
+  /* Bas d'écran. `--safe-bottom` est la zone réservée par l'iPhone (barre
+     d'accueil) ; `--bottom-bar-h` est publiée par la barre fixe de la page
+     (hook useBottomBar) et vaut 0 quand il n'y en a pas. */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bottom-bar-h: 0px;
+
+  /* Pile des éléments fixes, du plus bas au plus haut. Le bandeau cookies
+     reste au-dessus de tout : tant qu'il est là, il faut pouvoir y répondre. */
+  --z-back-to-top: 30;
+  --z-bottom-bar: 40;
+  --z-cookies: 2147483600;
+}
+/* `100vh` compte la barre d'adresse mobile même quand elle est affichée : le
+   bas d'un bloc « plein écran » passait dessous. `dvh` suit la hauteur
+   réellement visible. Les navigateurs qui ne le gèrent pas gardent `100vh`. */
+@supports (height: 100dvh) {
+  :root { --screen-h: calc(100dvh / var(--page-zoom)); }
 }
 @media (min-width: 2048px) { :root { --page-zoom: 1.1; } }
 @media (min-width: 2240px) { :root { --page-zoom: 1.2; } }
@@ -222,7 +240,33 @@ p { text-wrap: pretty; }
 .audience-bottom-note { position: absolute; right: max(8px, calc(var(--canvas-left) - 150px)); top: 20px; display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 4px; margin: 0; color: #002d74; font: 700 19px/1.3 var(--font-hand); text-align: left; transform: rotate(-5deg); }.audience-bottom-note svg { flex: none; width: 52px; height: 68px; margin-left: 18px; }
 @media (max-width: 1200px) { .audience-section__inner { grid-template-columns: minmax(0, 28fr) minmax(0, 70fr); gap: 32px; }.audience-card__image { height: 190px; }.audience-card__body { padding-inline: 20px; }.audience-card h3 { font-size: 20px; }.audience-card__cta { padding-left: 16px; }}
 @media (max-width: 900px) { .audience-section { padding: 64px 0; }.audience-section__inner { grid-template-columns: minmax(0, 1fr); gap: 0; width: min(100% - 32px, 680px); }.audience-section__intro { padding-top: 0; }.audience-lead { max-width: 600px; }.audience-section__profiles { margin-top: 48px; }.audience-cards { gap: 14px; }.audience-card__image { height: 190px; }.audience-bottom-note { display: none; }}
-@media (max-width: 640px) { .audience-section__intro h2 { margin-top: 25px; font-size: 38px; }.audience-cards { grid-template-columns: 1fr; }.audience-card__image { height: 220px; }}
+/* Le titre suit l'échelle mobile (H2 = 22 px). Il était forcé à 38 px, plus
+   grand que sur desktop. */
+@media (max-width: 640px) { .audience-section__intro h2 { margin-top: 24px; font-size: var(--text-h2); line-height: var(--lh-heading); letter-spacing: var(--ls-h2); }.audience-cards { grid-template-columns: 1fr; }.audience-card__image { height: 220px; }}
+/* Parcours par profil, mobile (AboutSection.jsx). Trois onglets soulignés,
+   une seule carte affichée. Seuil à 639 px : celui de `useMediaQuery`.
+   Les onglets n'ont pas de padding latéral : à 320 px, les trois libellés
+   tiennent tout juste sur la ligne ; `overflow-x` sert de filet. */
+@media (max-width: 639px) {
+  .audience-section__intro h2 { margin-top: 0; }
+  .audience-stats { flex-direction: column; gap: 12px; margin-top: 24px; }
+  .audience-stats > div { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; align-items: center; }
+  .audience-stats span { grid-row: span 2; width: 40px; height: 40px; margin-bottom: 0; border-radius: 8px; }
+  .audience-stats span svg { width: 20px; height: 20px; }
+  .audience-stats b { font-size: 20px; line-height: 1.2; }
+  .audience-stats small { margin-top: 0; font-size: var(--text-sm); }
+  .audience-section__profiles { margin-top: 32px; }
+  .audience-tabs { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 20px; overflow-x: auto; border-bottom: 1px solid #dbebff; scrollbar-width: none; }
+  .audience-tabs::-webkit-scrollbar { display: none; }
+  .audience-tabs button { flex: none; min-height: 48px; padding: 0; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; color: #5f6568; background: none; font: 600 var(--text-sm)/1 var(--font-body); white-space: nowrap; cursor: pointer; transition: color .2s, border-color .2s; }
+  .audience-tabs button.is-active { color: #002d74; border-bottom-color: #002d74; }
+  .audience-card__image { height: 184px; }
+  .audience-card p { min-height: 0; font-size: var(--text-base); }
+  .audience-card ul { margin: 16px 0 20px; font-size: var(--text-sm); }
+  .audience-card li svg { width: 18px; height: 18px; }
+  /* Le libellé du bouton reste à 14 px : à 16 px, « Découvrir nos
+     formations » passe sur deux lignes à 320 px. */
+}
 .fan-card:focus-visible { outline: 3px solid #0066b0; outline-offset: 3px; }
 
 /* Accueil — héro de référence (public/images/hero-academy.png). */
@@ -370,8 +414,8 @@ p { text-wrap: pretty; }
    utilisé sur le site) pour ne pas concurrencer le bouton primaire. */
 .academy-hero__video { display: inline-flex; align-items: center; gap: 12px; padding: 0; color: #ffffff; background: transparent; border: 0; font: 600 15px var(--font-body); cursor: pointer; transition: color .25s; }
 .academy-hero__video:hover { color: #9cbdff; }
-.academy-hero__video > span { display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid #0062e1; border-radius: 50%; padding-left: 2px; color: #ffffff; background: #0062e1; transition: background-color .25s, color .25s, border-color .25s; }
-.academy-hero__video:hover > span { color: #ffffff; background: #004a94; border-color: #004a94; }
+.academy-hero__video-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid #0062e1; border-radius: 50%; padding-left: 2px; color: #ffffff; background: #0062e1; transition: background-color .25s, color .25s, border-color .25s; }
+.academy-hero__video:hover .academy-hero__video-icon { color: #ffffff; background: #004a94; border-color: #004a94; }
 .academy-hero__benefits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.2vh, 24px) 24px; margin-top: clamp(28px, 5vh, 56px); }
 .academy-hero__benefit { display: flex; align-items: center; gap: 16px; min-width: 0; }
 /* Icône simple, sans pastille colorée : un trait fin suffit, le rendu reste
@@ -379,6 +423,9 @@ p { text-wrap: pretty; }
 .academy-hero__benefit > span { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border: 1px solid #9cbdff; border-radius: 50%; background: #9cbdff; color: #002d74; }
 .academy-hero__benefit strong, .academy-hero__benefit small { display: block; font-family: var(--font-body); }
 .academy-hero__benefit strong { font-size: 15px; font-weight: 600; }.academy-hero__benefit small { margin-top: 4px; color: #9cbdff; font-size: 12px; }
+/* Copie des avantages : ne sert qu'à la boucle mobile (HeroBenefits.jsx). */
+.academy-hero__benefit.is-clone { display: none; }
+@keyframes hero-benefits-loop { to { transform: translateX(-50%); } }
 .academy-hero__trust { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px clamp(40px, 5vw, 80px); margin-top: auto; padding-top: clamp(24px, 3.2vh, 32px); border-top: 1px solid #002d74; color: #dbebff; }
 /* Logos de confiance : monochromes (fichiers `-mono.png`, blancs sur fond
    transparent), sans carte ni texte, à opacité réduite pour rester en
@@ -420,10 +467,47 @@ p { text-wrap: pretty; }
   .academy-hero__visual { width: calc(100% - 32px); }
   .academy-hero__inner { padding-top: 96px; }
   .academy-hero__intro { font-size: 17px; }
-  .academy-hero__actions { flex-direction: column; align-items: flex-start; gap: 18px; }
   .academy-hero__benefits { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .academy-hero__benefit > span { width: 40px; height: 40px; }
+  .academy-hero__benefit strong { font-size: 16px; }
+  .academy-hero__benefit small { font-size: 14px; }
   .academy-hero__trust { gap: 20px 32px; }
+}
+/* Actions du héro sur une seule ligne : deux pilules de 56 px, la principale
+   pleine et la secondaire au filet. Seuil à 639 px, complément exact du `sm:`
+   de Tailwind qui bascule les libellés courts (HeroSection.jsx). Le glyphe de
+   lecture perd sa pastille, et disparaît sous 360 px où la place manque. */
+@media (max-width: 639px) {
+  /* Le carrousel 3D n'est plus monté (HeroSection.jsx) : la bande de confiance
+     ferme le héro, et c'est le cadre qui porte la marge basse. */
+  .academy-hero__inner { padding-bottom: 48px; }
+  .academy-hero h1 { margin-top: 8px; }
+  .academy-hero__trust { margin-top: 32px; padding-top: 0; border-top: 0; gap: 16px 40px; }
+  .hero-trust-logo { height: 36px; }
+  .hero-trust-logo[src*="opco"] { height: 30px; }
+  .academy-hero__actions { align-items: stretch; gap: 12px; }
+  .academy-hero__actions .academy-hero__cta { flex: 1 1 auto; width: auto; min-width: 0; padding-inline: 16px; white-space: nowrap; }
+  .academy-hero__video { flex: none; justify-content: center; gap: 8px; min-height: 56px; padding: 0 16px; border: 1px solid #9cbdff; border-radius: 999px; font-size: 16px; white-space: nowrap; }
+  .academy-hero__video:hover { color: #ffffff; border-color: #ffffff; }
+  .academy-hero__video-icon,
+  .academy-hero__video:hover .academy-hero__video-icon { width: auto; height: auto; padding: 0; border: 0; color: #9cbdff; background: transparent; }
+}
+@media (max-width: 359px) {
+  .academy-hero__video-icon { display: none; }
+}
+/* Avantages du héro en boucle continue, sur une seule ligne. Le bandeau
+   saigne jusqu'aux bords de l'écran (gouttière de 16 px annulée). L'écart
+   entre deux avantages est un `padding-right` et non un `gap` : chaque moitié
+   de la piste a ainsi exactement la même largeur, et le retour à zéro tombe
+   juste. Sans animation demandée, on garde la colonne empilée ci-dessus. */
+@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
+  /* Deux filets décoratifs cadrent le bandeau ; le masque fond les avantages
+     dans l'aplat aux deux bords au lieu de les trancher net. */
+  .academy-hero__benefits-viewport { overflow: hidden; margin: 28px -16px 0; padding: 16px 0; border-block: 1px solid #0066b0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
+  .academy-hero__benefits { display: flex; gap: 0; width: max-content; margin-top: 0; animation: hero-benefits-loop 24s linear infinite; }
+  .academy-hero__benefit,
+  .academy-hero__benefit.is-clone { display: flex; flex: none; padding-right: 40px; }
+  .academy-hero__benefit strong, .academy-hero__benefit small { white-space: nowrap; }
 }
 @media (min-width: 640px) { .fan-layout { height: 26rem; } .fan-card { width: 12rem; } }
 @media (min-width: 1024px) { .fan-layout { height: 30rem; } .fan-card { width: 15rem; } }
@@ -702,9 +786,82 @@ p { text-wrap: pretty; }
 }
 
 @media (max-width: 640px) {
+  .hcc__hint, .hcc__controls { display: none; }
   .hcc__stage { height: 396px; }
   .hcc-card { width: min(100%, 320px); }
 }
+
+/* ── Rail au balayage (ui/rail.jsx) ─────────────────────────────────────────
+   Sous 768 px, la grille de cartes devient un rail horizontal qui saigne
+   jusqu'aux bords de l'écran. La gouttière suit celle des sections :
+   16 px, puis 24 px à partir de 640 px. Au-delà de 767 px, rien ne s'applique. */
+.rail__progress { display: none; }
+/* Placé dans une grille, le rail ne doit pas l'élargir à la largeur de ses
+   cartes mises bout à bout. */
+.rail { min-width: 0; }
+@media (max-width: 767px) {
+  .rail { --rail-gutter: 16px; margin-inline: calc(var(--rail-gutter) * -1); }
+  .rail .rail__track { display: flex; gap: 12px; margin-inline: 0; padding: 0 var(--rail-gutter) 4px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--rail-gutter); overscroll-behavior-x: contain; scrollbar-width: none; }
+  .rail .rail__track::-webkit-scrollbar { display: none; }
+  .rail .rail__track > * { flex: 0 0 84%; min-width: 0; scroll-snap-align: start; }
+  .rail .rail__track > :only-child { flex-basis: 100%; }
+  .rail__progress[hidden] { display: none; }
+  .rail__progress { position: relative; display: block; height: 2px; margin: 24px var(--rail-gutter) 0; border-radius: 999px; background: #dbebff; }
+  .rail__progress i { position: absolute; top: 0; bottom: 0; border-radius: 999px; background: #002d74; }
+}
+@media (min-width: 640px) and (max-width: 767px) {
+  .rail { --rail-gutter: 24px; }
+  .rail .rail__track > * { flex-basis: 56%; }
+}
+
+/* ── Catalogue de l'accueil, mobile (FormationsSection.jsx) ────────────────
+   Filtres sur une seule ligne à faire défiler, cartes en rail, textes à
+   l'échelle mobile. Sur l'aplat marine, la barre de position du rail passe en
+   blanc sur #0066b0. */
+@media (max-width: 767px) {
+  .catalogue-header > p:not(.catalogue-eyebrow):not(.catalogue-handwriting) { font-size: var(--text-base); }
+  .catalogue-filters { flex-wrap: nowrap; justify-content: flex-start; gap: 8px; margin: 24px -16px; padding: 0 16px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .catalogue-filters::-webkit-scrollbar { display: none; }
+  .catalogue-filters button { flex: none; padding: 0 16px; white-space: nowrap; }
+  .catalogue-card__image { height: auto; aspect-ratio: 16 / 9; }
+  .catalogue-card__body > p { font-size: var(--text-base); }
+  .catalogue-card__meta { gap: 8px 12px; }
+  .catalogue-card__meta span { gap: 6px; font-size: var(--text-sm); }
+  .catalogue-card__link { font-size: var(--text-base); }
+  .catalogue-section .rail__progress { background: #0066b0; }
+  .catalogue-section .rail__progress i { background: #ffffff; }
+  .catalogue-footer { margin-top: 32px; padding-top: 0; border-top: 0; }
+  .catalogue-promises small { font-size: var(--text-sm); }
+  .catalogue-promises b { font-size: var(--text-base); }
+}
+/* Entre 640 et 720 px, le cadre du catalogue garde une gouttière de 16 px. */
+@media (min-width: 640px) and (max-width: 720px) {
+  .catalogue-section .rail { --rail-gutter: 16px; }
+}
+
+/* ── Rail de formations du héro, mobile (HeroCourseRail.jsx) ───────────────
+   Monté sous 640 px à la place de la scène 3D. Défilement natif, aimanté carte
+   par carte. Le rail saigne jusqu'aux bords de l'écran ; `scroll-padding`
+   recale la carte active sur la gouttière de 16 px du contenu. */
+.hcr { margin: 32px -16px 0; }
+.hcr__rail { display: flex; gap: 12px; padding: 0 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 16px; overscroll-behavior-x: contain; scrollbar-width: none; }
+.hcr__rail::-webkit-scrollbar { display: none; }
+.hcr .hcr__card { position: relative; top: auto; left: auto; display: flex; flex-direction: column; flex: 0 0 80%; width: auto; height: auto; margin: 0; scroll-snap-align: start; box-shadow: none; }
+.hcr .hcc-card__media { height: auto; aspect-ratio: 16 / 9; }
+.hcr .hcc-card__body { display: flex; flex: 1; flex-direction: column; padding: 16px 20px 8px; }
+.hcr .hcc-card__body p { font-size: 16px; }
+/* Toute la carte est cliquable : le lien étend sa zone à la carte entière. */
+.hcr .hcc-card__body a { min-height: 44px; margin-top: auto; padding-top: 8px; font-size: 16px; }
+.hcr .hcc-card__body a::after { content: ''; position: absolute; inset: 0; }
+/* Progression : un segment par formation. Le segment actif se remplit en 5 s
+   et sa fin d'animation fait avancer le rail ; une fois la main prise par le
+   visiteur, il indique seulement la position. */
+.hcr__progress { display: flex; gap: 6px; margin: 20px 16px 0; }
+.hcr__progress span { flex: 1; height: 2px; overflow: hidden; border-radius: 999px; background: #0066b0; }
+.hcr__progress span.is-done,
+.hcr__progress span.is-active:empty { background: #ffffff; }
+.hcr__progress i { display: block; height: 100%; background: #ffffff; transform-origin: left; animation: hcr-fill 5s linear forwards; }
+@keyframes hcr-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 
 /* Héro de la page formation : mêmes réglages de base que l'accueil. La

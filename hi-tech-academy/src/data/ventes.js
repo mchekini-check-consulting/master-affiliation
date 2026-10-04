@@ -458,6 +458,9 @@ export const ventes = {
     ],
   },
   'management-processus-ia': {
+    // Titre du héro. L'intitulé officiel (formations.jsx) est trop long pour un
+    // <h1> : il reste celui du programme, des documents et de l'onglet.
+    titreCourt: "Manager avec l'IA",
     accroche: "Vos équipes utilisent déjà l'IA. La question est : avec ou sans vous ?",
     promesse:
       "Aujourd'hui, chacun bricole dans son coin : outils non validés, données sensibles exposées, contenus jamais vérifiés. Après 3 journées sur VOS processus, vous repartez avec une stratégie d'intégration conforme (AI Act, RGPD), un processus d'équipe réellement transformé, des assistants configurés et les indicateurs pour piloter la suite.",

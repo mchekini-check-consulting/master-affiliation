@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { LINE, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
-import { Bande, RADIUS } from './atomes';
+import { Bande, Fold, RADIUS } from './atomes';
 
 // « Faite pour vous ? » — la section qui qualifie. Deux panneaux face à face
 // (au bon endroit / pas encore), puis les profils et le niveau de départ.
@@ -11,8 +12,113 @@ import { Bande, RADIUS } from './atomes';
 // lieu d'être perdu : chaque « pas encore » peut porter un lien `redirige`.
 // Registre éditorial : typographie, filets, un seul aplat coloré, pas d'icône.
 
-export default function PourQui({ pour, pasPour, personas, prerequis, couleur, contactTo }) {
+// Version mobile (sous 768 px), tournée vers l'action. Le visiteur qui se
+// reconnaît dans le panneau marine trouve le bouton d'inscription juste en
+// dessous, sans avoir à traverser le reste. Tout ce qui qualifie sans vendre
+// (niveau de départ, contre-indications, profils) est replié dans une seule
+// carte, et le doute se règle par un lien de contact en fin de section.
+function PourQuiMobile({ pour, pasPour, personas, prerequis, couleur, contactTo, inscriptionTo }) {
   const accent = couleur.fond;
+  const [ouvert, setOuvert] = useState('niveau');
+  const basculer = (cle) => setOuvert((actuel) => (actuel === cle ? null : cle));
+
+  return (
+    <Bande id="public" tone="pale">
+      <p className="text-body-sm font-semibold mb-3" style={{ color: accent, ...headingFont }}>À qui s'adresse cette formation</p>
+      <h2 className="font-serif-display text-h1" style={{ color: '#243037', ...serifFont }}>
+        Faite pour vous si vous vous reconnaissez ici
+      </h2>
+
+      <div className="mt-6 p-5 text-white" style={{ borderRadius: RADIUS, background: accent }}>
+        <h3 className="font-serif-display text-h3 text-white" style={serifFont}>Vous êtes au bon endroit si…</h3>
+        <ul className="mt-5 space-y-4">
+          {pour.map((p) => (
+            <li key={p} className="flex items-start gap-3">
+              <span className="inline-flex items-center justify-center shrink-0 w-6 h-6 rounded-full" style={{ background: couleur.accent }}>
+                <Check weight="bold" className="w-3.5 h-3.5" style={{ color: accent }} />
+              </span>
+              <span className="text-body-base leading-[1.5]" style={bodyFont}>{p}</span>
+            </li>
+          ))}
+        </ul>
+        {inscriptionTo && (
+          <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${couleur.accent}` }}>
+            <PrimaryButton to={inscriptionTo} inverted block>Demander une inscription</PrimaryButton>
+            <p className="text-body-sm text-center mt-3" style={{ color: '#dbebff', ...bodyFont }}>
+              Réponse sous 24 h ouvrées, sans engagement
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Le filet de la dernière ligne doublerait la bordure de la carte. */}
+      <div className="mt-4 px-5 bg-white [&>div:last-child]:!border-b-0" style={{ borderRadius: RADIUS, border: `1px solid ${LINE}` }}>
+        <Fold title="Votre niveau de départ" open={ouvert === 'niveau'} onToggle={() => basculer('niveau')}>
+          <ul className="space-y-3">
+            {prerequis.map((p) => (
+              <li key={p} className="flex items-start gap-3 text-body-base leading-[1.5]" style={{ color: BODY, ...bodyFont }}>
+                <span className="w-1.5 h-1.5 rounded-full mt-2.5 shrink-0" style={{ background: accent }} />{p}
+              </li>
+            ))}
+          </ul>
+          <p className="text-body-sm mt-4" style={{ color: BODY_MUTED, ...bodyFont }}>
+            Vérifié en amont par un court test de positionnement, non éliminatoire, il sert à adapter la session à votre groupe.
+          </p>
+        </Fold>
+
+        {pasPour.length > 0 && (
+          <Fold title="Pas encore, si…" open={ouvert === 'pasPour'} onToggle={() => basculer('pasPour')}>
+            <ul>
+              {pasPour.map(({ texte, redirige }, i) => (
+                <li key={texte} className={i === 0 ? 'pb-4' : 'py-4'} style={{ borderTop: i === 0 ? 'none' : `1px solid ${LINE}` }}>
+                  <p className="text-body-base leading-[1.5]" style={{ color: BODY, ...bodyFont }}>{texte}</p>
+                  {redirige && (
+                    <Link
+                      to={`/formations/${redirige.id}`}
+                      className="inline-flex items-center gap-2 min-h-[44px] text-body-sm font-semibold"
+                      style={{ color: accent, ...headingFont }}>
+                      Découvrir « {redirige.title} » <ArrowRight className="w-4 h-4 shrink-0" />
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </Fold>
+        )}
+
+        {personas.length > 0 && (
+          <Fold title="Les profils que nous formons" open={ouvert === 'profils'} onToggle={() => basculer('profils')}>
+            <ul className="space-y-4">
+              {personas.map(({ titre, texte }) => (
+                <li key={titre}>
+                  <h4 className="text-body-base font-semibold" style={{ color: '#243037', ...headingFont }}>{titre}</h4>
+                  <p className="text-body-base leading-[1.5] mt-1" style={{ color: BODY_MUTED, ...bodyFont }}>{texte}</p>
+                </li>
+              ))}
+            </ul>
+          </Fold>
+        )}
+      </div>
+
+      <p className="text-body-base mt-6" style={{ color: BODY, ...bodyFont }}>
+        Pas sûr d'être au niveau ?{' '}
+        <Link
+          to={contactTo}
+          className="inline-flex items-center gap-2 min-h-[44px] font-semibold underline underline-offset-4"
+          style={{ color: accent, ...headingFont }}>
+          Parlons-en, sans engagement <ArrowRight className="w-4 h-4 shrink-0" />
+        </Link>
+      </p>
+    </Bande>
+  );
+}
+
+export default function PourQui(props) {
+  const { pour, pasPour, personas, prerequis, couleur, contactTo } = props;
+  const accent = couleur.fond;
+  const mobile = useMediaQuery('(max-width: 767px)');
+
+  if (mobile) return <PourQuiMobile {...props} />;
 
   return (
     <Bande id="public" tone="pale">

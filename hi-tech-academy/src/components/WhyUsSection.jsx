@@ -1,7 +1,8 @@
 import React from 'react';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
-import { TEAL, MINT, LINE, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
+import Rail from '@/components/ui/rail';
+import { TEAL, MINT, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
 // « Pourquoi nous choisir » — six arguments de positionnement, présentés
 // simplement (icône + titre + phrase), photo unique à droite.
@@ -50,10 +51,10 @@ const PERKS = [
 
 export default function WhyUsSection() {
   return (
-    <section id="whyus" className="bg-white py-20 sm:py-28" aria-labelledby="whyus-title">
+    <section id="whyus" className="bg-white py-16 sm:py-28" aria-labelledby="whyus-title">
       <div className="max-w-site mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-12 lg:gap-20">
-          <div>
+        <div className="grid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] gap-8 sm:gap-12 lg:gap-20">
+          <div className="min-w-0">
             <p className="text-body-sm font-semibold mb-3" style={{ color: TEAL, ...headingFont }}>Pourquoi nous choisir</p>
             <h2
               id="whyus-title"
@@ -68,13 +69,15 @@ export default function WhyUsSection() {
 
             {/* Liste de principes, pas de fonctionnalités : un titre bref en DM
                 Sans, une phrase qui le justifie, un filet pour respirer entre
-                les deux. Aucune icône — la typographie porte la hiérarchie. */}
-            <ul className="mt-12" style={{ borderTop: `1px solid ${LINE}` }}>
+                les deux. Aucune icône — la typographie porte la hiérarchie.
+                Sous 768 px, la liste devient un rail au balayage : chaque
+                principe est une carte au filet, les six tiennent sur la
+                hauteur d'une seule. */}
+            <Rail as="ul" label="Pourquoi nous choisir" className="mt-8 md:mt-12 md:border-t md:border-[#dbebff]">
               {PERKS.map(({ title, description }) => (
                 <li
                   key={title}
-                  className="grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-x-10 gap-y-2 py-7"
-                  style={{ borderBottom: `1px solid ${LINE}` }}>
+                  className="grid content-start md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-x-10 gap-y-2 max-md:p-5 max-md:rounded-lg max-md:border max-md:border-[#dbebff] md:py-7 md:border-b md:border-[#dbebff]">
                   <h3 className="font-serif-display text-h3 leading-[1.3]" style={{ color: '#243037', ...serifFont }}>
                     {title}
                   </h3>
@@ -83,9 +86,10 @@ export default function WhyUsSection() {
                   </p>
                 </li>
               ))}
-            </ul>
+            </Rail>
 
-            <div className="mt-12">
+            {/* Sous 1024 px, le bouton est porté par le panneau ci-dessous. */}
+            <div className="mt-12 hidden lg:block">
               <PrimaryButton to="/formations" size="lg">Découvrir nos formations</PrimaryButton>
             </div>
           </div>
@@ -98,7 +102,7 @@ export default function WhyUsSection() {
               panneau est `sticky` : il reste sous les yeux tout le temps que
               la colonne de gauche défile, au lieu de s'arrêter tôt et de
               laisser un couloir de page vide en dessous. */}
-          <div className="hidden lg:block">
+          <div>
             {/* Le panneau fait la hauteur de la fenêtre, moins le header
                 flottant au-dessus (112 px) et une marge de 24 px en bas : collé
                 en `sticky`, il remplit l'écran pendant que seul le texte de
@@ -106,11 +110,9 @@ export default function WhyUsSection() {
                 non `100vh`, pour rester juste sous le zoom des grands écrans. */}
             <div className="lg:sticky" style={{ top: 112 }}>
               <div
-                className="relative overflow-hidden"
+                className="relative overflow-hidden lg:h-[calc(var(--screen-h)-136px)] lg:min-h-[480px]"
                 style={{
                   borderRadius: 8,
-                  height: 'calc(var(--screen-h) - 136px)',
-                  minHeight: 480,
                   background: 'linear-gradient(155deg, #002d74 0%, #002d74 100%)',
                 }}>
                 {/* Photo en fond, opacité légère : même principe que le voile de
@@ -127,8 +129,8 @@ export default function WhyUsSection() {
                   style={{ opacity: 0.22 }}
                 />
 
-                <div className="relative z-[1] flex flex-col justify-between h-full p-10">
-                  <ArrowUpRight aria-hidden="true" className="w-16 h-16 self-end text-white" weight="bold" />
+                <div className="relative z-[1] flex flex-col justify-between gap-8 h-full p-6 sm:p-10">
+                  <ArrowUpRight aria-hidden="true" className="w-10 h-10 lg:w-16 lg:h-16 self-end text-white" weight="bold" />
 
                   <blockquote className="m-0">
                     <p
@@ -136,10 +138,15 @@ export default function WhyUsSection() {
                       style={{ fontSize: 'clamp(24px, 2vw, 30px)', lineHeight: 1.25, letterSpacing: '-0.01em', ...serifFont }}>
                       On ne choisit pas seulement une formation. On choisit la suite de sa carrière.
                     </p>
-                    <footer className="text-body-sm font-semibold mt-6" style={{ color: MINT, ...headingFont }}>
+                    <footer className="text-body-sm font-semibold mt-4 lg:mt-6" style={{ color: MINT, ...headingFont }}>
                       L&apos;équipe Hi-Tech Academy
                     </footer>
                   </blockquote>
+
+                  {/* `inverted` : le panneau est sur l'aplat #002d74. */}
+                  <PrimaryButton to="/formations" size="lg" inverted block className="lg:hidden max-sm:px-4">
+                    Découvrir nos formations
+                  </PrimaryButton>
                 </div>
               </div>
             </div>

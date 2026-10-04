@@ -1,13 +1,10 @@
 import React from 'react';
-import { CurrencyEur as BadgeEuro, Laptop, Lifebuoy as LifeBuoy, Play } from '@phosphor-icons/react';
+import { Play } from '@phosphor-icons/react';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import PrimaryButton from '@/components/ui/primary-button';
+import HeroBenefits from '@/components/hero/HeroBenefits';
 import HeroCourseCarousel from '@/components/hero/HeroCourseCarousel';
-
-const benefits = [
-  { icon: Laptop, title: '100 % à distance', description: 'Apprenez à votre rythme' },
-  { icon: BadgeEuro, title: 'Finançable OPCO', description: "Jusqu'à 100 % de prise en charge" },
-  { icon: LifeBuoy, title: 'Accompagnement expert', description: 'Du début à la fin' },
-];
+import HeroCourseRail from '@/components/hero/HeroCourseRail';
 
 // Bande de confiance : les logos seuls, en monochrome clair sur l'aplat
 // marine, opacité réduite. Les fichiers `-mono.png` sont dérivés des logos
@@ -22,7 +19,12 @@ const trustLogos = [
   { nom: 'OPCO, opérateurs de compétences', src: '/images/logos/opco-mono.png', width: 308, height: 124 },
 ];
 
+// Même seuil que le `sm:` de Tailwind et que le bloc `max-width: 639px` de
+// index.css : sous 640 px, le carrousel 3D cède la place au rail tactile.
+const REQUETE_MOBILE = '(max-width: 639px)';
+
 export default function HeroSection() {
+  const mobile = useMediaQuery(REQUETE_MOBILE);
   return (
     <section className="academy-hero">
       <div className="academy-hero__inner">
@@ -36,24 +38,41 @@ export default function HeroSection() {
           {/* Chaque affirmation est vérifiable dans les données : « en direct,
               jamais préenregistré » vient de la FAQ, « dès un participant » du
               champ Effectif des cinq formations, l'OPCO de `financementsParDefaut`. */}
+          {/* Sous 640 px, chapô resserré : trois lignes au lieu de six, pour
+              que les boutons restent visibles sans défiler. */}
           <p className="academy-hero__intro">
-            Des sessions en classe virtuelle <strong>animées en direct par un formateur</strong>, jamais préenregistrées.
-            Travaux pratiques sur un environnement réel, session confirmée <strong>dès un participant</strong>, et financement OPCO mobilisable.
+            <span className="sm:hidden">
+              Des classes virtuelles <strong>animées en direct par un formateur</strong>. Session confirmée <strong>dès un participant</strong>, financement OPCO mobilisable.
+            </span>
+            <span className="hidden sm:inline">
+              Des sessions en classe virtuelle <strong>animées en direct par un formateur</strong>, jamais préenregistrées.
+              Travaux pratiques sur un environnement réel, session confirmée <strong>dès un participant</strong>, et financement OPCO mobilisable.
+            </span>
           </p>
           <div className="academy-hero__actions">
             {/* `inverted` obligatoire : le héro est sur l'aplat #002d74, qui est
                 aussi la couleur du bouton — sans inversion il disparaîtrait. */}
-            <PrimaryButton to="/formations" size="lg" inverted>
-              Découvrir nos formations
+            {/* Sous 640 px, libellés courts : les deux actions tiennent sur
+                une seule ligne, en deux pilules de même hauteur. */}
+            <PrimaryButton to="/formations" size="lg" inverted className="academy-hero__cta">
+              <span className="sm:hidden">Nos formations</span>
+              <span className="hidden sm:inline">Découvrir nos formations</span>
             </PrimaryButton>
             {/* CTA secondaire : mène à « Notre méthode » (#methode), les six
                 temps du parcours. Il annonçait une vidéo qui n'existe pas. */}
-            <a href="#methode" className="academy-hero__video"><span><Play size={14} weight="fill" /></span> Comment ça marche ?</a>
+            <a href="#methode" className="academy-hero__video">
+              <span className="academy-hero__video-icon"><Play size={14} weight="fill" /></span>
+              <span className="sm:hidden">La méthode</span>
+              <span className="hidden sm:inline">Comment ça marche ?</span>
+            </a>
           </div>
-          <div className="academy-hero__benefits">
-            {benefits.map(({ icon: Icon, title, description }) => <div className="academy-hero__benefit" key={title}><span><Icon size={22} weight="duotone" /></span><div><strong>{title}</strong><small>{description}</small></div></div>)}
-          </div>
+          {/* Grille à trois colonnes, bandeau en boucle sous 640 px. */}
+          <HeroBenefits />
         </div>
+
+        {/* Sous 640 px, les formations passent ici, dans le flux, sous forme
+            de rail au balayage. Une seule version est montée à la fois. */}
+        {mobile && <HeroCourseRail />}
 
         {/* Bande de confiance : en pied de héro, centrée sur toute la largeur
             du cadre, sans sur-titre. Elle sort de `__copy` pour ne plus être
@@ -66,9 +85,11 @@ export default function HeroSection() {
       </div>
       {/* Colonne droite : le carrousel seul, posé sur l'aplat du héro. En
           dessous de 1280 px, ce bloc repasse dans le flux sous le texte. */}
-      <div className="academy-hero__visual">
-        <HeroCourseCarousel />
-      </div>
+      {!mobile && (
+        <div className="academy-hero__visual">
+          <HeroCourseCarousel />
+        </div>
+      )}
     </section>
   );
 }

@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Certificate, Clock, Monitor, UsersThree, VideoCamera } from '@phosphor-icons/react';
 import { formations } from '@/data/formations';
+import Rail from '@/components/ui/rail';
 
 // Catalogue de la page d'accueil.
 //
@@ -103,9 +104,11 @@ export default function FormationsSection() {
           ))}
         </nav>
 
-        <div className="catalogue-grid">
+        {/* Rail au balayage sous 768 px. La clé remonte le rail à chaque
+            changement de filtre : il repart de la première carte. */}
+        <Rail key={categorieActive} label="Formations du catalogue" className="catalogue-grid">
           {cartes.map((formation) => <CarteFormation key={formation.id} formation={formation} />)}
-        </div>
+        </Rail>
 
         <footer className="catalogue-footer">
           <div className="catalogue-promises">

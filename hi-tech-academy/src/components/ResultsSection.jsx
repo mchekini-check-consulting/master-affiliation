@@ -54,8 +54,8 @@ export default function ResultsSection() {
         {/* Panneau marine inscrit dans la grille du site, jamais pleine
             largeur : c'est ce qui distingue « aplat de marque » d'« encart
             publicitaire ». */}
-        <div className="px-6 py-10 sm:px-12 sm:py-14" style={{ borderRadius: 8, background: NAVY }}>
-          <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-20 items-start">
+        <div className="px-5 py-8 sm:px-12 sm:py-14" style={{ borderRadius: 8, background: NAVY }}>
+          <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 sm:gap-10 lg:gap-20 items-start">
             <div>
               <p className="text-body-sm font-semibold mb-3" style={{ color: MINT, ...headingFont }}>Nos résultats</p>
               <h2 className="font-serif-display text-h1 max-w-[16ch] text-white" style={serifFont}>
@@ -69,16 +69,22 @@ export default function ResultsSection() {
 
             {/* Une liste de définitions : le chiffre est la valeur, le libellé
                 son terme. `tabular` fige la largeur des chiffres pour que la
-                mise en page ne sautille pas pendant le décompte. */}
+                mise en page ne sautille pas pendant le décompte.
+                Sous 640 px, chaque indicateur tient sur une ligne : le chiffre
+                (40 px) à gauche, son libellé à droite. Le second filet, en
+                #002d74 donc invisible sur le panneau, y passe en #0066b0 pour
+                séparer les deux lignes. */}
             <dl className="grid sm:grid-cols-2 gap-x-12">
               {indicators.map(({ value, suffix, label, detail }, i) => (
-                <div key={label} className="pt-6 pb-2" style={{ borderTop: `2px solid ${i === 0 ? MINT : '#002d74'}` }}>
+                <div
+                  key={label}
+                  className={`grid grid-cols-[96px_minmax(0,1fr)] gap-x-4 items-start py-5 border-t-2 sm:block sm:pt-6 sm:pb-2 ${i === 0 ? 'border-[#9cbdff]' : 'border-[#0066b0] sm:border-[#002d74]'}`}>
                   <dd
-                    className="font-serif-display tabular leading-none text-white"
-                    style={{ fontSize: 'clamp(48px, 5vw, 72px)', letterSpacing: '-0.02em', ...serifFont }}>
+                    className="row-span-2 font-serif-display tabular leading-none text-white text-[40px] sm:text-[clamp(48px,5vw,72px)]"
+                    style={{ letterSpacing: '-0.02em', ...serifFont }}>
                     <CountUp to={value} suffix={suffix} start={inView} />
                   </dd>
-                  <dt className="text-h4 mt-4 text-white" style={headingFont}>{label}</dt>
+                  <dt className="text-h5 sm:text-h4 sm:mt-4 text-white [overflow-wrap:anywhere]" style={headingFont}>{label}</dt>
                   <p className="text-body-sm leading-[1.5] mt-1 max-w-[30ch]" style={{ color: '#dbebff', ...bodyFont }}>{detail}</p>
                 </div>
               ))}
@@ -86,7 +92,7 @@ export default function ResultsSection() {
           </div>
 
           {/* Mention réglementaire : elle reste, c'est une obligation de transparence. */}
-          <p className="text-caption mt-12 pt-5 max-w-measure" style={{ color: '#dbebff', borderTop: '1px solid #002d74', ...bodyFont }}>
+          <p className="text-caption mt-6 sm:mt-12 pt-5 max-w-measure" style={{ color: '#dbebff', borderTop: '1px solid #002d74', ...bodyFont }}>
             Indicateurs issus des questionnaires de satisfaction à chaud des bénéficiaires, mis à jour au
             21/07/2026. Hi-Tech Academy, organisme de formation certifié Qualiopi.
           </p>

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from '@phosphor-icons/react';
+import { ArrowRight, CaretDown } from '@phosphor-icons/react';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { NAVY, TEAL, MINT, MINT_LIGHT, LINE, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
 // « Notre méthode » en six temps. Registre éditorial : une colonne collante
@@ -43,11 +44,70 @@ const TEMPS = [
   },
 ];
 
-export default function TimelineSection() {
+function Reperes({ reperes }) {
   return (
-    <section id="methode" className="bg-white py-20 sm:py-28" aria-label="Notre méthode, en six temps">
+    <ul className="flex flex-wrap gap-2 mt-5">
+      {reperes.map((r) => (
+        <li key={r} className="inline-flex items-center h-8 px-3.5 rounded-full text-body-sm font-medium" style={{ background: MINT_LIGHT, color: NAVY, ...headingFont }}>
+          {r}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Un temps de la méthode sous 640 px : une ligne à toucher (numéro, titre,
+// chevron) qui déplie son texte. Six paragraphes empilés faisaient défiler
+// plus de quatre écrans ; repliés, les six titres tiennent sur un seul et la
+// chronologie se lit d'un coup d'œil.
+function TempsMobile({ temps, index, open, onToggle }) {
+  const { titre, texte, reperes } = temps;
+  const panelId = `methode-temps-${index}`;
+  return (
+    <li style={{ borderBottom: `1px solid ${LINE}` }}>
+      <h3 className="font-serif-display m-0" style={{ fontSize: 20, lineHeight: 1.2, letterSpacing: 0, color: '#243037', ...serifFont }}>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={onToggle}
+          className="grid grid-cols-[44px_minmax(0,1fr)_20px] items-center gap-x-3 w-full min-h-[72px] py-3 text-left">
+          <span className="tabular-nums leading-none" style={{ fontSize: 28, letterSpacing: '-0.02em', color: TEAL }}>
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <span>{titre}</span>
+          <CaretDown
+            className={`w-5 h-5 transition-transform duration-300 motion-reduce:transition-none ${open ? 'rotate-180' : ''}`}
+            style={{ color: TEAL }}
+          />
+        </button>
+      </h3>
+      {/* Repli par `grid-template-rows` : la hauteur s'anime sans la
+          connaître. `invisible` retire le texte replié du parcours clavier
+          et des lecteurs d'écran. */}
+      <div
+        id={panelId}
+        className={`grid transition-[grid-template-rows] duration-300 motion-reduce:transition-none ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+        <div className={`min-h-0 overflow-hidden ${open ? 'visible' : 'invisible [transition:visibility_0s_.3s]'}`}>
+          <div className="pl-[56px] pb-6">
+            <p className="text-body-base leading-[1.6] m-0" style={{ color: BODY, ...bodyFont }}>{texte}</p>
+            <Reperes reperes={reperes} />
+          </div>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+export default function TimelineSection() {
+  const mobile = useMediaQuery('(max-width: 639px)');
+  // Le premier temps est ouvert à l'arrivée : il montre que les lignes se
+  // déplient. Un seul temps ouvert à la fois.
+  const [ouvert, setOuvert] = useState(0);
+  return (
+    <section id="methode" className="bg-white py-16 sm:py-28" aria-label="Notre méthode, en six temps">
       <div className="max-w-site mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:gap-20 items-start">
+        <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 sm:gap-12 lg:gap-20 items-start">
           {/* Colonne collante : promesse + photo */}
           <div className="lg:sticky lg:top-28">
             <p className="text-body-sm font-semibold mb-4" style={{ color: TEAL, ...headingFont }}>Notre méthode</p>
@@ -84,7 +144,16 @@ export default function TimelineSection() {
 
           {/* Les six temps */}
           <ol style={{ borderTop: `1px solid ${LINE}` }}>
-            {TEMPS.map(({ titre, texte, reperes }, i) => (
+            {mobile && TEMPS.map((temps, i) => (
+              <TempsMobile
+                key={temps.titre}
+                temps={temps}
+                index={i}
+                open={ouvert === i}
+                onToggle={() => setOuvert((courant) => (courant === i ? null : i))}
+              />
+            ))}
+            {!mobile && TEMPS.map(({ titre, texte, reperes }, i) => (
               <li
                 key={titre}
                 className="grid grid-cols-[56px_minmax(0,1fr)] sm:grid-cols-[88px_minmax(0,1fr)] gap-x-4 py-8 sm:py-10"
@@ -101,24 +170,18 @@ export default function TimelineSection() {
                     {titre}
                   </h3>
                   <p className="text-body-lg leading-[1.6] mt-4 max-w-measure" style={{ color: BODY, ...bodyFont }}>{texte}</p>
-                  <ul className="flex flex-wrap gap-2 mt-5">
-                    {reperes.map((r) => (
-                      <li key={r} className="inline-flex items-center h-8 px-3.5 rounded-full text-body-sm font-medium" style={{ background: MINT_LIGHT, color: NAVY, ...headingFont }}>
-                        {r}
-                      </li>
-                    ))}
-                  </ul>
+                  <Reperes reperes={reperes} />
                 </div>
               </li>
             ))}
           </ol>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-6 mt-12 sm:mt-16">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 sm:gap-6 mt-8 sm:mt-16">
           <p className="text-h4 max-w-[40ch]" style={{ color: '#243037', ...headingFont }}>
             La méthode est la même partout. Reste à choisir la formation.
           </p>
-          <Link to="/formations" className="inline-flex items-center gap-2 text-body-base font-semibold hover:underline" style={{ color: TEAL, ...headingFont }}>
+          <Link to="/formations" className="inline-flex items-center gap-2 min-h-[44px] sm:min-h-0 text-body-base font-semibold hover:underline" style={{ color: TEAL, ...headingFont }}>
             Voir les formations <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

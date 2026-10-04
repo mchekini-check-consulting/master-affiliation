@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LogoMark from '@/components/LogoMark';
-import { ArrowRight, FacebookLogo as Facebook, InstagramLogo as Instagram, LinkedinLogo as Linkedin, YoutubeLogo as Youtube } from '@phosphor-icons/react';
+import { ArrowRight, CaretDown, EnvelopeSimple, FacebookLogo as Facebook, InstagramLogo as Instagram, LinkedinLogo as Linkedin, MapPin, Phone, YoutubeLogo as Youtube } from '@phosphor-icons/react';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { formations as catalogue } from '@/data/formations';
 import { openCookieSettings } from '@/lib/cookieConsent';
 import '@/styles/footer.css';
@@ -84,7 +85,36 @@ function FooterLink({ link }) {
   );
 }
 
+// Colonne de liens. Sous 640 px, elle devient un accordéon : le titre est un
+// bouton, la liste se replie. Au-dessus, le titre reste un simple intertitre
+// et la liste est toujours dépliée (footer.css).
+function FooterColumn({ column, index, mobile, open, onToggle }) {
+  const panelId = `ftr-panel-${index}`;
+  return (
+    <div className={`ftr__column ${open ? 'is-open' : ''}`}>
+      <h2>
+        {mobile ? (
+          <button type="button" className="ftr__toggle" aria-expanded={open} aria-controls={panelId} onClick={onToggle}>
+            {column.title}
+            <CaretDown />
+          </button>
+        ) : column.title}
+      </h2>
+      <div className="ftr__panel" id={panelId}>
+        <ul>
+          {column.links.map((link) => (
+            <li key={link.label}><FooterLink link={link} /></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export default function Footer() {
+  const mobile = useMediaQuery('(max-width: 639px)');
+  // Un seul volet ouvert à la fois : le pied de page reste court.
+  const [openIndex, setOpenIndex] = useState(null);
   return (
     <footer className="ftr">
       <div className="ftr__inner">
@@ -99,23 +129,25 @@ export default function Footer() {
             <p className="ftr__claim">Apprendre aujourd&apos;hui. Construire demain.</p>
           </div>
           <address className="ftr__contact">
-            <a href="tel:+33751474135">07 51 47 41 35</a>
-            <a href="mailto:contact@hi-techacademy.fr">contact@hi-techacademy.fr</a>
-            <span>73 rue de Reuilly, 75012 Paris</span>
+            {/* Les icônes ne s'affichent que sous 640 px, où chaque
+                coordonnée devient une ligne à toucher (footer.css). */}
+            <a href="tel:+33751474135"><Phone aria-hidden="true" />07 51 47 41 35</a>
+            <a href="mailto:contact@hi-techacademy.fr"><EnvelopeSimple aria-hidden="true" />contact@hi-techacademy.fr</a>
+            <span><MapPin aria-hidden="true" />73 rue de Reuilly, 75012 Paris</span>
           </address>
         </div>
 
         {/* ── Colonnes de liens ── */}
         <nav className="ftr__nav" aria-label="Pied de page">
-          {columns.map((column) => (
-            <div className="ftr__column" key={column.title}>
-              <h2>{column.title}</h2>
-              <ul>
-                {column.links.map((link) => (
-                  <li key={link.label}><FooterLink link={link} /></li>
-                ))}
-              </ul>
-            </div>
+          {columns.map((column, index) => (
+            <FooterColumn
+              key={column.title}
+              column={column}
+              index={index}
+              mobile={mobile}
+              open={mobile && openIndex === index}
+              onToggle={() => setOpenIndex((current) => (current === index ? null : index))}
+            />
           ))}
         </nav>
 

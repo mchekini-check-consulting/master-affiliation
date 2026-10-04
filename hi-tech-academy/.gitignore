@@ -38,3 +38,9 @@ documents_finaux/
 
 # Originaux d'images (sources non servies par le site)
 _sources-images/
+
+# Vérification mobile (Playwright) : captures et rapports, jamais versionnés
+captures/
+test-results/
+playwright-report/
+tests/mobile/*-snapshots/

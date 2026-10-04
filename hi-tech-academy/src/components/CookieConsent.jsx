@@ -137,7 +137,7 @@ export default function CookieConsent() {
       style={{
         position: 'fixed',
         inset: showPanel ? 0 : 'auto 0 0 0',
-        zIndex: 2147483600,
+        zIndex: 'var(--z-cookies)',
         display: 'flex',
         alignItems: showPanel ? 'center' : 'flex-end',
         justifyContent: 'center',

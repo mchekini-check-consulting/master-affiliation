@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Clock } from '@phosphor-icons/react';
 import { blogPosts } from '@/data/blogPosts';
+import Rail from '@/components/ui/rail';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 const FONT = "'Inter', sans-serif";
 const HEADING_FONT = "'DM Sans', sans-serif";
@@ -20,14 +22,16 @@ const fadeUp = {
 // Carte d'article. Mise en page éditoriale : image en 4/3, étiquette de
 // rubrique posée dans l'angle, numéro d'ordre en filigrane, puis titre,
 // chapô et pied de carte (lien « Lire l'article » + date sur un filet).
-function ArticleCard({ post, index }) {
+function ArticleCard({ post, index, rail }) {
   const number = String(index + 1).padStart(2, '0');
 
   return (
     <motion.article
       className="group h-full"
       custom={index}
-      initial="hidden"
+      // Dans le rail, une carte hors écran n'est « vue » qu'au balayage :
+      // l'apparition en fondu la ferait surgir en retard sous le doigt.
+      initial={rail ? false : 'hidden'}
       whileInView="visible"
       viewport={{ once: true }}
       variants={fadeUp}>
@@ -44,7 +48,7 @@ function ArticleCard({ post, index }) {
         onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#f0f7ff'; }}>
 
         {/* Image */}
-        <div className="relative overflow-hidden aspect-[4/3]">
+        <div className="relative overflow-hidden aspect-[16/9] md:aspect-[4/3]">
           <img
             src={post.image}
             alt={post.title}
@@ -53,14 +57,14 @@ function ArticleCard({ post, index }) {
 
           {/* Rubrique */}
           <span
-            className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-[0.12em]"
+            className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-caption md:text-[11px] font-semibold uppercase tracking-[0.12em]"
             style={{ background: '#002d74', color: '#ffffff', fontFamily: FONT }}>
             {post.category}
           </span>
 
           {/* Durée de lecture */}
           <span
-            className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold"
+            className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-caption md:text-[11px] font-semibold"
             style={{ background: '#ffffff', color: '#002d74', fontFamily: FONT }}>
             <Clock size={13} weight="bold" />
             {post.readTime}
@@ -83,28 +87,31 @@ function ArticleCard({ post, index }) {
           </div>
 
           <p
-            className="text-sm leading-relaxed line-clamp-3"
+            className="text-base md:text-sm leading-relaxed line-clamp-2 md:line-clamp-3"
             style={{ color: '#5f6568', fontFamily: FONT }}>
             {post.excerpt}
           </p>
 
           {/* Pied de carte */}
-          <div className="mt-auto pt-4 flex items-center justify-between gap-3"
+          <div className="mt-auto pt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1"
             style={{ borderTop: '1px solid #f0f7ff' }}>
 
             <span
-              className="inline-flex items-center gap-2.5 text-sm font-semibold"
+              className="inline-flex items-center gap-2.5 text-sm font-semibold whitespace-nowrap"
               style={{ color: '#002d74', fontFamily: FONT }}>
 
-              {/* Pastille plate : une flèche fixe, sans animation. */}
-              <span className="grid place-items-center w-9 h-9 rounded-full shrink-0" style={{ background: '#f0f7ff' }}>
+              {/* Pastille plate : une flèche fixe, sans animation. Dans le rail
+                  mobile, la carte est trop étroite pour la pastille et la
+                  date : la flèche passe après le libellé, sans pastille. */}
+              <span className="hidden md:grid place-items-center w-9 h-9 rounded-full shrink-0" style={{ background: '#f0f7ff' }}>
                 <ArrowRight size={16} weight="bold" style={{ color: '#002d74' }} />
               </span>
               Lire l'article
+              <ArrowRight className="md:hidden" size={16} weight="bold" />
             </span>
 
             <span className="flex items-center gap-2 shrink-0">
-              <span className="h-px w-6" style={{ background: '#dbebff' }} />
+              <span className="hidden md:block h-px w-6" style={{ background: '#dbebff' }} />
               <time
                 dateTime={post.dateISO}
                 className="text-xs"
@@ -120,13 +127,14 @@ function ArticleCard({ post, index }) {
 }
 
 export default function BlogSection() {
+  const rail = useMediaQuery('(max-width: 767px)');
   return (
     <section className="w-full py-16 sm:py-20 md:py-24" style={{ background: 'transparent' }}>
       <div className="max-w-site mx-auto px-4 sm:px-6">
 
         {/* Header */}
         <motion.div
-          className="mb-12 flex flex-col gap-6 sm:mb-16 md:flex-row md:items-end md:justify-between"
+          className="mb-8 flex flex-col gap-6 sm:mb-16 md:flex-row md:items-end md:justify-between"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -144,29 +152,29 @@ export default function BlogSection() {
               Nos Derniers{' '}
               <span style={{ color: '#002d74' }}>Articles</span>
             </h2>
-            <p className="mt-4 text-sm max-w-md" style={{ color: '#5f6568', fontFamily: FONT }}>
+            <p className="mt-4 text-base md:text-sm max-w-md" style={{ color: '#5f6568', fontFamily: FONT }}>
               Veille, retours de terrain et repères pratiques pour choisir votre prochaine compétence.
             </p>
           </div>
 
         </motion.div>
 
-        {/* Grille */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 items-stretch">
+        {/* Grille, rail au balayage sous 768 px */}
+        <Rail label="Derniers articles" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
           {blogPosts.map((post, i) => (
-            <ArticleCard key={post.slug} post={post} index={i} />
+            <ArticleCard key={post.slug} post={post} index={i} rail={rail} />
           ))}
-        </div>
+        </Rail>
 
         {/* CTA */}
         <motion.div
-          className="text-center"
+          className="mt-8 md:mt-12 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
 
-          <PrimaryButton to="/blog" className="mx-auto">Voir tous les articles</PrimaryButton>
+          <PrimaryButton to="/blog" block className="mx-auto">Voir tous les articles</PrimaryButton>
         </motion.div>
 
       </div>

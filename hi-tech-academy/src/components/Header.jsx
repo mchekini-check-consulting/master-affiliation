@@ -81,13 +81,13 @@ function NavLink({ href, children, ...props }) {
 
 function Logo() {
   return (
-    <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Hi Tech Academy, accueil">
+    <Link to="/" className="flex items-center gap-2 min-[360px]:gap-3 shrink-0" aria-label="Hi Tech Academy, accueil">
       <LogoMark size={40} className="shrink-0" style={{ color: NAVY }} />
       {/* Nom de la marque en toutes lettres, à côté de l'emblème. Le nom
           complet reste porté par l'`aria-label` du lien. */}
       <span
         aria-hidden="true"
-        className="whitespace-nowrap text-[20px] font-semibold leading-none"
+        className="whitespace-nowrap text-[18px] min-[360px]:text-[20px] font-semibold leading-none"
         style={{ color: '#243037', letterSpacing: '-0.015em', ...serifFont }}>
         Hi Tech Academy
       </span>
@@ -299,7 +299,7 @@ export default function Header({ embedded: _embedded = false }) {
           // seulement en dessous — jamais un halo qui déborde de la capsule.
           boxShadow: scrolled ? '0 10px 16px -10px rgba(0,45,116,0.26)' : '0 8px 12px -10px rgba(0,45,116,0.20)',
         }}>
-        <div className={`${BAR_H} flex items-center justify-between gap-6 xl:gap-10 px-4 sm:px-6`}>
+        <div className={`${BAR_H} flex items-center justify-between gap-3 sm:gap-6 xl:gap-10 px-4 sm:px-6`}>
           <Logo />
 
           {/* navigation desktop */}

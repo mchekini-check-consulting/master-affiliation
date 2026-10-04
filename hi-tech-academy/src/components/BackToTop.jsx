@@ -37,9 +37,11 @@ export default function BackToTop() {
       style={{
         position: "fixed",
         right: "1.5rem",
-        bottom: "1.5rem",
-        // Au-dessus de tout, y compris la barre d'annotation de dev (Agentation).
-        zIndex: 2147483000,
+        // Il se pose au-dessus de la barre fixe de la page quand il y en a une
+        // (`--bottom-bar-h`), et hors de la zone réservée par l'iPhone. Il
+        // recouvrait le bouton d'inscription de la page de vente.
+        bottom: "calc(var(--bottom-bar-h, 0px) + 1.5rem + var(--safe-bottom, 0px))",
+        zIndex: "var(--z-back-to-top)",
         width: 48,
         height: 48,
         display: "flex",
@@ -56,7 +58,7 @@ export default function BackToTop() {
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(12px)",
         pointerEvents: visible ? "auto" : "none",
-        transition: "opacity .25s ease, transform .25s ease, background .2s ease",
+        transition: "opacity .25s ease, transform .25s ease, background .2s ease, bottom .3s ease",
       }}
     >
       <ArrowUp size={22} strokeWidth={2.2} aria-hidden="true" />

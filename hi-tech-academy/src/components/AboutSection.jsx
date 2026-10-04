@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowRight, Briefcase, CheckCircle as CheckCircle2, FileText, GraduationCap, Heart, Star } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 // Trois profils d'audience, repris de la maquette. Les puces vivent dans la
 // donnée plutôt que dans une cascade de ternaires au moment du rendu.
@@ -93,6 +94,11 @@ function ProfileCard({ profile }) {
 }
 
 export default function AboutSection() {
+  // Sous 640 px, trois onglets remplacent les trois cartes empilées : le
+  // visiteur choisit son profil et ne lit que la carte qui le concerne.
+  const mobile = useMediaQuery('(max-width: 639px)');
+  const [actif, setActif] = useState(0);
+  const cartes = mobile ? [profiles[actif]] : profiles;
   return (
     <section id="about" className="audience-section">
       <div className="audience-section__inner">
@@ -114,8 +120,27 @@ export default function AboutSection() {
         </div>
 
         <div className="audience-section__profiles">
-          <div className="audience-cards">
-            {profiles.map((profile) => <ProfileCard profile={profile} key={profile.title} />)}
+          {mobile && (
+            <div className="audience-tabs" role="tablist" aria-label="Choisir votre profil">
+              {profiles.map((profile, index) => (
+                <button
+                  key={profile.title}
+                  type="button"
+                  role="tab"
+                  id={`audience-tab-${index}`}
+                  aria-selected={index === actif}
+                  aria-controls="audience-panel"
+                  className={index === actif ? 'is-active' : ''}
+                  onClick={() => setActif(index)}>
+                  {profile.title}
+                </button>
+              ))}
+            </div>
+          )}
+          <div
+            className="audience-cards"
+            {...(mobile ? { role: 'tabpanel', id: 'audience-panel', 'aria-labelledby': `audience-tab-${actif}` } : {})}>
+            {cartes.map((profile) => <ProfileCard profile={profile} key={profile.title} />)}
           </div>
         </div>
 

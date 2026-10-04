@@ -182,11 +182,16 @@ import PrimaryButton from '@/components/ui/primary-button';
 <PrimaryButton type="submit" onClick={fn}>Envoyer</PrimaryButton>      // <button>
 <PrimaryButton to="/x" inverted>…</PrimaryButton>                      // variante blanche sur fond sombre
 <PrimaryButton to="/x" size="lg">…</PrimaryButton>                     // 56 px ; "sm" = 44 px (header)
+<PrimaryButton to="/x" block>…</PrimaryButton>                         // pleine largeur sous 640 px
 ```
 
 Props : `to` | `href` | (sinon `<button>`), `inverted`, `size` (`sm` 44 px ·
-`md` 48 px · `lg` 56 px), `className`, et tout attribut natif. Une prop `icon`
-éventuellement transmise par un ancien appel est absorbée sans effet.
+`md` 48 px · `lg` 56 px), `block` (pleine largeur sous 640 px), `className`, et
+tout attribut natif. Une prop `icon` éventuellement transmise par un ancien
+appel est absorbée sans effet.
+
+Sous 640 px, le libellé peut passer à la ligne : les hauteurs deviennent des
+hauteurs minimales. Ne pas reposer `whitespace-nowrap` sur un bouton.
 
 ## Héro de la page d'accueil
 
