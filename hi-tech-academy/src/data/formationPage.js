@@ -12,7 +12,8 @@ import {
   Boxes, Rocket, Share2, Settings, Server, BarChart3, Brain, PenLine, Timer,
   Palette, Bot, ShieldCheck, FileCheck2, Wallet, Building2, UserCog, Code2,
   Users, Briefcase, GraduationCap, Sparkles, ClipboardList, MonitorPlay,
-  Wrench, MessagesSquare, Landmark, HeartHandshake,
+  Wrench, MessagesSquare, Landmark, HeartHandshake, BookOpen, PhoneCall,
+  Scale, Terminal, CalendarCheck, FileText, Banknote,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------- communs --
@@ -39,6 +40,112 @@ export const inclusParDefaut = [
   { icon: Server, titre: 'Environnement de travail', texte: 'Pour les travaux pratiques' },
   { icon: GraduationCap, titre: 'Attestation', texte: 'De fin de formation' },
 ];
+
+// ------------------------------------------------- « vous repartez avec » --
+// Livrables de la section Bonus (compris dans le tarif, rien d'inventé).
+// Les formations IA partagent la même liste ; les autres ont la leur ;
+// une formation inconnue retombe sur la liste générique.
+
+/** Commune aux formations de la catégorie Intelligence Artificielle. */
+const bonusIa = [
+  {
+    icon: PenLine,
+    titre: 'Une bibliothèque de prompts prêts à l\'emploi',
+    texte: 'Classés par métier et par cas d\'usage : vous copiez, vous adaptez, vous vous en servez dès le lendemain de la session.',
+  },
+  {
+    icon: BookOpen,
+    titre: 'Les supports de formation complets, avec mises à jour',
+    texte: 'Conservés après la session et mis à jour : vous suivez les évolutions des outils sans refaire la formation.',
+  },
+  {
+    icon: Bot,
+    titre: 'Des templates d\'agents et d\'automatisations',
+    texte: 'Des modèles prêts à brancher pour vos premiers agents et automatisations, à personnaliser sur vos propres cas d\'usage.',
+  },
+  {
+    icon: Scale,
+    titre: 'Le guide comparatif des outils IA',
+    texte: 'Quel outil choisir pour quel usage : un comparatif mis à jour régulièrement, pour décider sans y passer des heures.',
+  },
+];
+
+const bonusParFormation = {
+  'kubernetes-fondamentaux': [
+    {
+      icon: Terminal,
+      titre: 'Le pack de fiches de commandes kubectl',
+      texte: 'Les commandes et manifestes vus en session, prêts à copier dans votre terminal. Vous les gardez à vie.',
+    },
+    {
+      icon: BookOpen,
+      titre: 'Les supports de formation complets',
+      texte: 'Support de cours en PDF, énoncés et corrigés des travaux pratiques, conservés après la session.',
+    },
+    {
+      icon: Boxes,
+      titre: 'Les manifestes du TP fil rouge',
+      texte: 'Le déploiement complet réalisé en session (Pods, Deployments, Services, ConfigMaps) à rejouer sur vos propres projets.',
+    },
+    {
+      icon: PhoneCall,
+      titre: 'Un suivi individuel de 30 minutes',
+      texte: 'Quelques semaines après la session, un point en tête à tête avec votre formateur : ce que vous avez mis en place, ce qui bloque, et comment avancer.',
+    },
+  ],
+  'facturation-electronique-pennylane': [
+    {
+      icon: ClipboardList,
+      titre: 'Votre checklist de mise en conformité',
+      texte: 'La feuille de route complète de la réforme, appliquée à votre entreprise pendant la formation. Vous repartez avec la vôtre.',
+    },
+    {
+      icon: CalendarCheck,
+      titre: 'Le plan d\'action 30 jours',
+      texte: 'Priorisé selon votre profil (artisan, commerçant, prestataire, e-commerçant), prêt à dérouler dès le lendemain.',
+    },
+    {
+      icon: BookOpen,
+      titre: 'Les supports de formation complets',
+      texte: 'Support de cours et pas-à-pas Pennylane en PDF, conservés après la session.',
+    },
+    {
+      icon: PhoneCall,
+      titre: 'Un suivi individuel de 30 minutes',
+      texte: 'Quelques semaines après la session, un point en tête à tête avec votre formateur : ce que vous avez mis en place, ce qui bloque, et comment avancer.',
+    },
+  ],
+};
+
+/** Liste générique : formation hors IA sans liste dédiée. */
+const bonusParDefaut = [
+  {
+    icon: FileText,
+    titre: 'Le pack fiches réflexes',
+    texte: 'Des fiches PDF prêtes à l\'emploi, à réutiliser au quotidien. Vous les gardez à vie et vous en servez dès le lendemain.',
+  },
+  {
+    icon: PhoneCall,
+    titre: 'Un suivi individuel de 30 minutes',
+    texte: 'Quelques semaines après la session, un point en tête à tête avec votre formateur : ce que vous avez mis en place, ce qui bloque, et comment avancer.',
+  },
+  {
+    icon: Banknote,
+    titre: 'Le montage du dossier de financement',
+    texte: 'Devis, programme et convention au format attendu par votre OPCO ou votre fonds : nous préparons chaque pièce avec vous.',
+  },
+  {
+    icon: MonitorPlay,
+    titre: 'Le support de cours et l\'environnement de travaux pratiques',
+    texte: 'Le support complet en PDF, conservé après la session, et un environnement de travaux pratiques prêt à l\'emploi.',
+  },
+];
+
+/** Les livrables « vous repartez avec » d'une formation (objet du catalogue). */
+export function getBonusFormation(formation) {
+  return bonusParFormation[formation.id]
+    ?? (formation.tag === 'Intelligence Artificielle' ? bonusIa : bonusParDefaut);
+}
 
 const faqParDefaut = [
   // Les trois premières lèvent les objections qui bloquent le plus souvent :

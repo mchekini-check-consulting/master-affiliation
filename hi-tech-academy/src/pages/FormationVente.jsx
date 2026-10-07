@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getFormationById } from '@/data/formations';
 import { getVenteById } from '@/data/ventes';
-import { getFormationPage } from '@/data/formationPage';
+import { getFormationPage, getBonusFormation } from '@/data/formationPage';
 import PageNotFound from '@/lib/PageNotFound';
 import { rdvProps } from '@/lib/rendezVous';
 import HeroVente from '@/components/vente/HeroVente';
@@ -174,8 +174,9 @@ export default function FormationVente() {
           couleur={vente.couleur}
         />
         {/* Bonus inclus juste après le programme : la valeur s'empile avant
-            l'annonce du prix. C'est la bande marine de la page. */}
-        <Bonus couleur={vente.couleur} rdvAction={rdvAction} inscriptionTo={inscriptionTo} />
+            l'annonce du prix. C'est la bande marine de la page. Livrables
+            propres à la formation (IA ou non) : formationPage.js. */}
+        <Bonus items={getBonusFormation(formation)} couleur={vente.couleur} rdvAction={rdvAction} inscriptionTo={inscriptionTo} />
         <Formateur formateur={preuves.formateur} />
         <PourQui pour={pour} pasPour={pasPour} personas={page.personas} prerequis={page.prerequis} couleur={vente.couleur} rdvAction={rdvAction} />
         <ParcoursAppel couleur={vente.couleur} rdvAction={rdvAction} />
