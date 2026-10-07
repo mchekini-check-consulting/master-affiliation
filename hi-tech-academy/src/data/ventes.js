@@ -158,13 +158,10 @@ export const ventes = {
     // vide masque l'élément ; ne rien inventer (voir PREUVES_VIDES).
     preuves: {
       hero: {
-        image: '/images/pennylane-hero-dashboard.webp',
-        alt: "Capture d'écran du tableau de bord Pennylane : chiffres clés, factures et transactions",
+        image: '/images/pennylane-hero.png',
+        alt: 'Logo Pennylane sur fond vert sombre',
         sousTitre: '',
-        // Garde l'en-tête et les chiffres clés (haut de la capture) visibles
-        // plutôt que le pied du tableau, sur un héro bien plus large que la
-        // capture d'écran.
-        position: 'center 12%',
+        position: 'center',
       },
       ambiance: { objectifs: '/images/pennylane-objectifs.jpg' },
       captures: [
