@@ -5,20 +5,9 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 
 // Trois profils d'audience, repris de la maquette. Les puces vivent dans la
 // donnée plutôt que dans une cascade de ternaires au moment du rendu.
+// Ordre voulu : les professionnels et les entreprises d'abord (cœur de cible,
+// financement OPCO), les étudiants en dernier.
 const profiles = [
-  {
-    title: 'Étudiants',
-    description: 'Acquérez des compétences concrètes pour booster votre avenir.',
-    icon: GraduationCap,
-    tone: 'mint',
-    cta: 'Découvrir nos formations',
-    href: '/formations',
-    imageClass: 'student',
-    image: '/images/profil-etudiants.jpg',
-    bullets: ['Formations certifiantes', 'Projets pratiques', 'Accompagnement personnalisé'],
-    // Accroche manuscrite posée sur la photo, comme sur la maquette.
-    scribble: 'Apprendre\naujourd’hui,\nconstruire\ndemain.',
-  },
   {
     title: 'Professionnels',
     description: 'Développez vos compétences et faites évoluer votre carrière.',
@@ -42,6 +31,19 @@ const profiles = [
     image: '/images/profil-entreprises.webp',
     bullets: ['Formations personnalisées', 'Suivi et reporting', 'Compétences directement applicables'],
     scribble: 'Des talents\npour aller\nplus loin.',
+  },
+  {
+    title: 'Étudiants',
+    description: 'Acquérez des compétences concrètes pour booster votre avenir.',
+    icon: GraduationCap,
+    tone: 'mint',
+    cta: 'Découvrir nos formations',
+    href: '/formations',
+    imageClass: 'student',
+    image: '/images/profil-etudiants.jpg',
+    bullets: ['Formations certifiantes', 'Projets pratiques', 'Accompagnement personnalisé'],
+    // Accroche manuscrite posée sur la photo, comme sur la maquette.
+    scribble: 'Apprendre\naujourd’hui,\nconstruire\ndemain.',
   },
 ];
 
@@ -104,8 +106,8 @@ export default function AboutSection() {
       <div className="audience-section__inner">
         <div className="audience-section__intro">
           {/* Maquette : première ligne en noir, seconde en vert. */}
-          <h2>Des parcours adaptés<br /><span>à chaque profil</span></h2>
-          <p className="audience-lead">Que vous soyez étudiant, professionnel en reconversion ou entreprise, nous avons la formation qu&apos;il vous faut pour atteindre vos objectifs et développer des compétences durables et recherchées.</p>
+          <h2>Votre objectif d&apos;abord,<br /><span>le parcours ensuite</span></h2>
+          <p className="audience-lead">Étudiant, professionnel en reconversion ou entreprise : partez de votre situation réelle et repartez avec des compétences durables, recherchées et directement applicables dans votre quotidien.</p>
 
           <div className="audience-stats">
             {stats.map(({ icon: Icon, value, label }) => (

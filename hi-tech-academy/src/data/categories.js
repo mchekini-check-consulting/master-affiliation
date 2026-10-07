@@ -11,14 +11,28 @@ const META = {
   'Infrastructure & Cloud': {
     icon: Cloud,
     description: 'Conteneurs, Kubernetes et déploiement de vos applications sur le cloud.',
+    // Accroche du héro de /formations?categorie=… : propre à la catégorie,
+    // jamais le titre générique du catalogue.
+    hero: {
+      titre: 'Le cloud tourne sur Kubernetes. Votre prochain poste aussi',
+      texte: "Déployez une application complète sur un vrai cluster Azure en une journée, guidé en direct par le formateur.",
+    },
   },
   'Gestion & Comptabilité': {
     icon: Receipt,
     description: 'Facturation électronique et pilotage de la gestion avec Pennylane.',
+    hero: {
+      titre: 'Facturation électronique : la réforme arrive, prenez une longueur d\'avance',
+      texte: 'Deux jours pour décoder la réforme, maîtriser Pennylane et repartir avec votre plan de conformité.',
+    },
   },
   'Intelligence Artificielle': {
     icon: Brain,
     description: "De la prise en main de l'IA aux agents et processus en production.",
+    hero: {
+      titre: "Maîtriser l'IA devient la compétence de base de tous les métiers",
+      texte: 'Du premier prompt aux agents en production : quatre parcours selon votre profil, 100 % en direct.',
+    },
   },
 };
 
@@ -36,6 +50,7 @@ export const categories = Array.from(new Set(formations.map((f) => f.tag))).map(
     slug: slugCategorie(tag),
     icon: META[tag]?.icon ?? GraduationCap,
     description: META[tag]?.description ?? `${liste.length} formation${liste.length > 1 ? 's' : ''} au catalogue.`,
+    hero: META[tag]?.hero ?? null,
     formations: liste,
   };
 });

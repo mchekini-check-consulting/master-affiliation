@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PrimaryButton from '@/components/ui/primary-button';
 import { TEAL, MINT_LIGHT, LINE, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 import { RADIUS } from './atomes';
@@ -19,7 +20,7 @@ import { RADIUS } from './atomes';
  * et seulement ensuite les faits, sans leurs précisions (elles sont dans la
  * fiche pratique de la section Tarif).
  */
-export default function CarteHero({ prixHT, mentionTTC, facts, inscriptionTo, couleur, reassurances }) {
+export default function CarteHero({ prixHT, mentionTTC, facts, inscriptionTo, rdvAction, couleur, reassurances }) {
   return (
     <div
       className="bg-white overflow-hidden w-full h-full flex flex-col"
@@ -48,7 +49,7 @@ export default function CarteHero({ prixHT, mentionTTC, facts, inscriptionTo, co
         href="#tarif"
         className="order-2 flex items-center justify-between gap-4 px-4 sm:px-7 min-h-[44px] sm:min-h-[48px] py-2 transition-colors hover:bg-[#dfedff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#002d74]"
         style={{ background: MINT_LIGHT, borderTop: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` }}>
-        <span className="text-body-sm font-semibold" style={{ color: BODY, ...headingFont }}>Prise en charge OPCO possible</span>
+        <span className="text-body-sm font-semibold" style={{ color: BODY, ...headingFont }}>Finançable jusqu'à 100 % (OPCO, FAF)</span>
         {/* Libellé court sous 640 px : le libellé complet renvoyait la mention à la ligne. */}
         <span className="text-body-sm font-medium underline underline-offset-4 shrink-0" style={{ color: TEAL, ...bodyFont }}>
           <span className="sm:hidden">Détails</span>
@@ -72,8 +73,14 @@ export default function CarteHero({ prixHT, mentionTTC, facts, inscriptionTo, co
       </dl>
 
       <div className="order-3 sm:order-4 px-4 sm:px-7 pt-4 sm:pt-6 pb-4 sm:pb-6 border-b sm:border-b-0 sm:border-t" style={{ borderColor: LINE }}>
-        <PrimaryButton to={inscriptionTo} size="lg" className="w-full px-4 sm:px-8" style={{ background: couleur.fond }}>Demander une inscription</PrimaryButton>
+        <PrimaryButton {...rdvAction} size="lg" className="w-full px-4 sm:px-8" style={{ background: couleur.fond }}>Réserver mon appel gratuit</PrimaryButton>
         <p className="text-body-sm text-center mt-3 [text-wrap:balance]" style={{ color: BODY_MUTED, ...bodyFont }}>{reassurances.join(', ')}</p>
+        <Link
+          to={inscriptionTo}
+          className="flex items-center justify-center w-full min-h-[44px] mt-1 text-body-sm font-medium underline underline-offset-4"
+          style={{ color: TEAL, ...headingFont }}>
+          Demander une inscription directement
+        </Link>
       </div>
     </div>
   );

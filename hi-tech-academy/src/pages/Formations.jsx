@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { formations } from '@/data/formations';
 import { getVenteById } from '@/data/ventes';
 import { categories, getCategorieBySlug } from '@/data/categories';
+import { rdvProps } from '@/lib/rendezVous';
 import {
   NAVY, TEAL, CYAN, ACCENT, MINT, MINT_LIGHT,
   headingFont, serifFont, bodyFont,
@@ -17,21 +18,31 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
 
+// Accroche par défaut du catalogue (toutes catégories). Le message : l'IA
+// s'impose dans les métiers, et tout ce qu'il faut pour s'y mettre est réuni
+// ici au lieu d'être éparpillé. Les catégories portent leur propre accroche
+// (categories.js, `hero`) : jamais un titre générique sur une page filtrée.
+const HERO_DEFAUT = {
+  titre: "Les métiers de la tech passent à l'IA, avec ou sans vous",
+  texte: "Ceux qui s'y mettent maintenant prennent l'avantage. Au lieu de chercher des heures dans des tutoriels dispersés, tout est réuni ici : des formations en direct, par des formateurs experts.",
+};
+
 // Onglet « Formations », thème École : héro en dégradé vert avec visuel à
 // formes organiques, puis grille de cartes (image sur fond menthe, titre
 // serif vert, lignes durée / prérequis / financement, pilule contour).
 export default function Formations() {
-  useEffect(() => {
-    document.title = 'Formations : Hi-Tech Academy';
-    return () => { document.title = 'Hi-Tech Academy'; };
-  }, []);
-
   // Filtre par catégorie, porté par l'URL (?categorie=…) : c'est ce que visent
   // les cartes du méga-menu, et un lien filtré reste partageable.
   const [params, setParams] = useSearchParams();
   const categorie = getCategorieBySlug(params.get('categorie'));
   const affichees = categorie ? categorie.formations : formations;
   const choisir = (slug) => setParams(slug ? { categorie: slug } : {}, { replace: true });
+  const hero = categorie?.hero ?? HERO_DEFAUT;
+
+  useEffect(() => {
+    document.title = categorie ? `${categorie.tag} : Hi-Tech Academy` : 'Formations : Hi-Tech Academy';
+    return () => { document.title = 'Hi-Tech Academy'; };
+  }, [categorie]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -47,19 +58,23 @@ export default function Formations() {
               <h1
                 className="font-serif-display font-bold leading-[1.12] text-4xl sm:text-5xl mb-5"
                 style={{ color: '#243037', ...serifFont }}>
-                Découvrez nos formations Tech, IA et Gestion
+                {hero.titre}
               </h1>
               <p className="max-w-lg text-base leading-relaxed mb-8" style={{ color: '#243037', ...bodyFont }}>
-                Des actions de formation intensives, 100 % à distance et animées en direct par un formateur
-                expert, certifiées Qualiopi et finançables par votre OPCO.
+                {hero.texte}
               </p>
-              <Link
-                to="/contact"
+              <a
+                {...rdvProps()}
                 className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-cta text-white transition-all hover:opacity-90"
                 style={{ background: NAVY, ...headingFont }}>
-                Parler à un conseiller
+                Réserver mon appel gratuit
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </a>
+              {/* Le financement, l'argument décisif, illustré plutôt que raconté. */}
+              <p className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-6 text-body-sm font-semibold" style={{ color: NAVY, ...headingFont }}>
+                <span className="inline-flex items-center gap-1.5"><Landmark className="w-4 h-4" /> Finançable jusqu'à 100 % (OPCO, FAF)</span>
+                <span className="inline-flex items-center gap-1.5"><BadgeCheck className="w-4 h-4" /> Dossier monté avec vous</span>
+              </p>
             </motion.div>
 
             {/* Visuel à formes organiques */}
@@ -83,7 +98,7 @@ export default function Formations() {
             <h2
               className="font-serif-display font-bold text-3xl sm:text-4xl mb-3"
               style={{ color: '#243037', ...serifFont }}>
-              Nos formations certifiées Qualiopi
+              {categorie ? `Nos formations ${categorie.tag}` : 'Nos formations certifiées Qualiopi'}
             </h2>
             <p className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm mb-10" style={{ color: '#5f6568', ...bodyFont }}>
               <span className="flex items-center gap-1.5"><BadgeCheck className="w-4 h-4" style={{ color: TEAL }} /> Certifié Qualiopi</span>
@@ -121,7 +136,9 @@ export default function Formations() {
                     ? "Pratique d'un langage"
                     : formation.id === 'management-processus-ia'
                       ? 'Expérience managériale (1 an)'
-                      : 'Ouverte à tous';
+                      : formation.id === 'essentiel-ia'
+                        ? 'Pratique numérique régulière'
+                        : 'Ouverte à tous';
                 return (
                   <motion.div
                     key={formation.id}
@@ -161,7 +178,7 @@ export default function Formations() {
                         </li>
                         <li className="flex items-center gap-2 text-body-sm" style={{ color: '#243037', ...bodyFont }}>
                           <Euro className="w-4 h-4 shrink-0" style={{ color: TEAL }} />
-                          {tarif} · finançable OPCO
+                          {tarif} · jusqu'à 100 % financé
                         </li>
                       </ul>
 
@@ -186,15 +203,15 @@ export default function Formations() {
                   Vous hésitez entre deux formations ?
                 </h3>
                 <p className="text-sm" style={{ color: '#5f6568', ...bodyFont }}>
-                  Un conseiller étudie votre profil, votre financement et vous oriente, sans engagement.
+                  30 minutes en visio : on vous oriente et on vérifie votre prise en charge, jusqu'à 100 %.
                 </p>
               </div>
-              <Link
-                to="/contact"
+              <a
+                {...rdvProps()}
                 className="shrink-0 inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm text-white"
                 style={{ background: ACCENT, ...headingFont }}>
-                Être conseillé <ArrowRight className="w-4 h-4" />
-              </Link>
+                Réserver mon appel gratuit <ArrowRight className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </section>

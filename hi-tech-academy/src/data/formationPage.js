@@ -41,11 +41,15 @@ export const inclusParDefaut = [
 ];
 
 const faqParDefaut = [
-  // Les deux premières lèvent les objections qui bloquent le plus souvent :
-  // « qui paie ? » et « suis-je au niveau ? ».
+  // Les trois premières lèvent les objections qui bloquent le plus souvent :
+  // « qui paie ? », « que se passe-t-il pendant l'appel ? » et « suis-je au niveau ? ».
   {
     q: 'Puis-je faire financer cette formation ?',
-    r: "Oui. Salarié : via le plan de développement des compétences de votre entreprise ou votre OPCO. Indépendant : via votre fonds d'assurance formation (AGEFICE, FIF PL…). Nous fournissons devis, programme et convention, et nous vous accompagnons dans le montage du dossier.",
+    r: "Oui, jusqu'à 100 % selon votre situation. Salarié : via le plan de développement des compétences de votre entreprise et votre OPCO. Indépendant : via votre fonds d'assurance formation (AGEFICE, FIF PL…). Nous montons le dossier avec vous : devis, programme et convention au format attendu par le financeur, et nous restons disponibles jusqu'à l'accord. L'appel gratuit de 30 minutes sert d'abord à vérifier votre prise en charge.",
+  },
+  {
+    q: "Comment se passe l'appel gratuit de 30 minutes ?",
+    r: "C'est un point stratégique en visio, gratuit et sans engagement. Nous clarifions votre besoin, votre niveau de départ et votre financement. Vous repartez avec une réponse claire sur votre prise en charge et, si la formation vous convient, une proposition de dates.",
   },
   {
     q: 'Quels sont les prérequis techniques ?',

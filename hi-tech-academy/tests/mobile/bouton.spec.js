@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { preparerContexte, ouvrir, contextePour } from './helpers.js';
 
-const LIBELLE = 'Choisir ma formation et demander une inscription';
+const LIBELLE = 'Vérifier ma prise en charge en 30 min';
 const bouton = (page) => page.getByRole('link', { name: LIBELLE });
 
 for (const largeur of [320, 375]) {

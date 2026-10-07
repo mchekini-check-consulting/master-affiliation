@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Check, Minus, Plus } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
 import { LINE, MINT_LIGHT, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
@@ -14,30 +15,30 @@ const PROFILS = [
   {
     key: 'entreprise',
     label: 'Entreprise',
-    titre: 'Prise en charge par votre OPCO ou votre plan de compétences',
-    texte: "Pour un salarié, la formation relève du plan de développement des compétences : votre OPCO peut la financer en tout ou partie selon votre branche. Nous fournissons le devis, le programme et la convention au format attendu, et nous vous accompagnons dans le dépôt du dossier.",
-    etapes: ['Vous demandez un devis', 'Nous préparons devis, programme et convention', 'Vous déposez la demande auprès de votre OPCO', 'La session est planifiée'],
-    cta: 'Demander une inscription',
+    titre: "Jusqu'à 100 % pris en charge par votre OPCO",
+    texte: "Pour un salarié, la formation relève du plan de développement des compétences : selon votre branche, votre OPCO peut la financer jusqu'à 100 %. Nous montons le dossier avec vous : devis, programme et convention au format attendu, et nous restons disponibles jusqu'à l'accord. L'appel de 30 minutes sert d'abord à vérifier votre prise en charge, avant tout engagement.",
+    etapes: ['Vous réservez un appel gratuit de 30 minutes', 'Nous vérifions ensemble votre prise en charge', 'Nous préparons devis, programme et convention pour votre OPCO', 'La session est planifiée'],
+    cta: 'Vérifier ma prise en charge',
   },
   {
     key: 'independant',
     label: 'Indépendant',
-    titre: "Financement par votre fonds d'assurance formation",
-    texte: "Travailleur indépendant, vous cotisez à un fonds d'assurance formation (AGEFICE, FIF PL, FAFCEA…) qui peut prendre en charge tout ou partie du coût. Nous vous remettons les pièces demandées par votre fonds et une convention à votre nom.",
-    etapes: ['Vous demandez un devis', 'Nous fournissons devis, programme et convention', 'Vous sollicitez votre fonds de formation', 'La session est planifiée'],
-    cta: 'Demander une inscription',
+    titre: "Jusqu'à 100 % via votre fonds d'assurance formation",
+    texte: "Travailleur indépendant, vous cotisez déjà à un fonds d'assurance formation (AGEFICE, FIF PL, FAFCEA…) qui peut prendre en charge jusqu'à 100 % du coût. Pendant l'appel, nous identifions votre fonds et vos droits, puis nous montons le dossier avec vous : chaque pièce est fournie à votre nom.",
+    etapes: ['Vous réservez un appel gratuit de 30 minutes', 'Nous identifions votre fonds et vérifions vos droits', 'Nous fournissons devis, programme et convention', 'La session est planifiée'],
+    cta: 'Vérifier ma prise en charge',
   },
   {
     key: 'particulier',
     label: 'Particulier',
     titre: 'Financement personnel, sans surprise',
-    texte: "Vous vous formez à titre personnel : le tarif TTC est le prix final, sans frais annexes. Un devis et une convention de formation vous sont remis avant tout engagement, avec un délai de rétractation.",
-    etapes: ['Vous demandez un devis', 'Nous validons ensemble la date et votre niveau', 'Vous signez la convention', 'La session est planifiée'],
-    cta: 'Demander une inscription',
+    texte: "Vous vous formez à titre personnel : le tarif TTC est le prix final, sans frais annexes. Un devis et une convention de formation vous sont remis avant tout engagement, avec un délai de rétractation. L'appel de 30 minutes sert à valider votre niveau de départ et la date qui vous convient.",
+    etapes: ['Vous réservez un appel gratuit de 30 minutes', 'Nous validons ensemble la date et votre niveau', 'Vous signez la convention', 'La session est planifiée'],
+    cta: 'Réserver mon appel gratuit',
   },
 ];
 
-export default function Tarif({ prixHT, mentionTTC, inclus, infosPratiques, couleur, inscriptionTo }) {
+export default function Tarif({ prixHT, mentionTTC, inclus, infosPratiques, couleur, inscriptionTo, rdvAction }) {
   const [profil, setProfil] = useState(PROFILS[0]);
   const [ficheOuverte, setFicheOuverte] = useState(false);
   const accent = couleur.fond;
@@ -51,7 +52,7 @@ export default function Tarif({ prixHT, mentionTTC, inclus, infosPratiques, coul
         <div className="lg:col-start-1 lg:row-start-1">
           <p className="text-body-sm font-semibold mb-3" style={{ color: accent, ...headingFont }}>Tarif et financement</p>
           <h2 className="font-serif-display max-w-[18ch]" style={{ fontSize: 'clamp(28px, 3.4vw, 48px)', lineHeight: 1.1, letterSpacing: '-0.02em', color: '#243037', ...serifFont }}>
-            Un prix clair. Trois façons de le financer.
+            Un prix clair, finançable jusqu'à 100 %
           </h2>
         </div>
 
@@ -131,9 +132,12 @@ export default function Tarif({ prixHT, mentionTTC, inclus, infosPratiques, coul
                 </li>
               ))}
             </ol>
-            <PrimaryButton to={inscriptionTo} block className="mt-7" style={{ background: accent }}>{profil.cta}</PrimaryButton>
-            <p className="sm:hidden text-body-sm text-center mt-3" style={{ color: BODY_MUTED, ...bodyFont }}>
-              Réponse sous 24 h ouvrées, sans engagement
+            <PrimaryButton {...rdvAction} block className="mt-7" style={{ background: accent }}>{profil.cta}</PrimaryButton>
+            <p className="text-body-sm text-center sm:text-left mt-3" style={{ color: BODY_MUTED, ...bodyFont }}>
+              30 minutes en visio, gratuit et sans engagement.{' '}
+              <Link to={inscriptionTo} className="font-medium underline underline-offset-4" style={{ color: accent }}>
+                Ou demander une inscription directement
+              </Link>
             </p>
           </div>
         </div>

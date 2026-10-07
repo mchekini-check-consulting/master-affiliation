@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Check } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
 import { headingFont, serifFont, bodyFont } from '@/components/design';
@@ -15,7 +16,7 @@ import { headingFont, serifFont, bodyFont } from '@/components/design';
  * `carte`   : le nœud <CarteHero /> rendu dans la colonne droite.
  * `heroRef` : la page s'en sert pour afficher la barre CTA quand le héro sort.
  */
-export default function HeroVente({ heroRef, formation, titre, accroche, sousTitre, image, imagePosition = 'center', alt, facts, inscriptionTo, couleur, carte }) {
+export default function HeroVente({ heroRef, formation, titre, accroche, sousTitre, image, imagePosition = 'center', alt, facts, inscriptionTo, rdvAction, couleur, carte }) {
   // Les garanties sont rendues à deux endroits, un seul visible à la fois :
   // sous le texte à partir de 640 px, sous la carte en dessous. Sur mobile
   // elles repoussaient le prix et le bouton d'un demi-écran.
@@ -82,7 +83,10 @@ export default function HeroVente({ heroRef, formation, titre, accroche, sousTit
             {/* Masqué sous 640 px : la carte, empilée juste dessous, porte déjà
                 le même bouton à côté du prix. */}
             <div className="hidden sm:flex flex-wrap items-center gap-x-7 gap-y-4 mt-9">
-              <PrimaryButton to={inscriptionTo} size="lg" inverted style={{ color: couleur.fond }}>Demander une inscription</PrimaryButton>
+              <PrimaryButton {...rdvAction} size="lg" inverted style={{ color: couleur.fond }}>Réserver mon appel gratuit</PrimaryButton>
+              <Link to={inscriptionTo} className="inline-flex items-center min-h-[44px] text-body-sm font-semibold text-white underline underline-offset-4" style={headingFont}>
+                Demander une inscription
+              </Link>
             </div>
 
             {garanties('hidden sm:flex flex-row flex-wrap mt-10')}

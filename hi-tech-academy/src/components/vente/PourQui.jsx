@@ -17,7 +17,15 @@ import { Bande, Fold, RADIUS } from './atomes';
 // dessous, sans avoir à traverser le reste. Tout ce qui qualifie sans vendre
 // (niveau de départ, contre-indications, profils) est replié dans une seule
 // carte, et le doute se règle par un lien de contact en fin de section.
-function PourQuiMobile({ pour, pasPour, personas, prerequis, couleur, contactTo, inscriptionTo }) {
+// Lien texte vers l'action rendez-vous : <a> si Calendly est branché (href),
+// <Link> sinon (formulaire interne, `to`). Même contrat que PrimaryButton.
+function LienRdv({ action, className, style, children }) {
+  return action.href
+    ? <a href={action.href} target={action.target} rel={action.rel} className={className} style={style}>{children}</a>
+    : <Link to={action.to} className={className} style={style}>{children}</Link>;
+}
+
+function PourQuiMobile({ pour, pasPour, personas, prerequis, couleur, rdvAction }) {
   const accent = couleur.fond;
   const [ouvert, setOuvert] = useState('niveau');
   const basculer = (cle) => setOuvert((actuel) => (actuel === cle ? null : cle));
@@ -41,11 +49,11 @@ function PourQuiMobile({ pour, pasPour, personas, prerequis, couleur, contactTo,
             </li>
           ))}
         </ul>
-        {inscriptionTo && (
+        {rdvAction && (
           <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${couleur.accent}` }}>
-            <PrimaryButton to={inscriptionTo} inverted block>Demander une inscription</PrimaryButton>
+            <PrimaryButton {...rdvAction} inverted block>Réserver mon appel gratuit</PrimaryButton>
             <p className="text-body-sm text-center mt-3" style={{ color: '#dbebff', ...bodyFont }}>
-              Réponse sous 24 h ouvrées, sans engagement
+              30 minutes en visio, gratuit et sans engagement
             </p>
           </div>
         )}
@@ -102,19 +110,19 @@ function PourQuiMobile({ pour, pasPour, personas, prerequis, couleur, contactTo,
 
       <p className="text-body-base mt-6" style={{ color: BODY, ...bodyFont }}>
         Pas sûr d'être au niveau ?{' '}
-        <Link
-          to={contactTo}
+        <LienRdv
+          action={rdvAction}
           className="inline-flex items-center gap-2 min-h-[44px] font-semibold underline underline-offset-4"
           style={{ color: accent, ...headingFont }}>
           Parlons-en, sans engagement <ArrowRight className="w-4 h-4 shrink-0" />
-        </Link>
+        </LienRdv>
       </p>
     </Bande>
   );
 }
 
 export default function PourQui(props) {
-  const { pour, pasPour, personas, prerequis, couleur, contactTo } = props;
+  const { pour, pasPour, personas, prerequis, couleur, rdvAction } = props;
   const accent = couleur.fond;
   const mobile = useMediaQuery('(max-width: 767px)');
 
@@ -169,7 +177,7 @@ export default function PourQui(props) {
             ))}
           </ul>
           <p className="text-body-sm mt-4 pt-5" style={{ color: BODY_MUTED, borderTop: `1px solid ${LINE}`, ...bodyFont }}>
-            Un doute ? Décrivez-nous votre situation dans votre demande d'inscription : nous vous répondons franchement.
+            Un doute ? Posez-le pendant l'appel gratuit de 30 minutes, nous vous répondons franchement.
           </p>
         </div>
       </div>
@@ -204,7 +212,7 @@ export default function PourQui(props) {
         </div>
         <div className="lg:text-right">
           <p className="text-h4 mb-4" style={{ color: '#243037', ...headingFont }}>Pas sûr d'être au niveau ?</p>
-          <PrimaryButton to={contactTo} style={{ background: accent }}>Parlons-en, sans engagement</PrimaryButton>
+          <PrimaryButton {...rdvAction} style={{ background: accent }}>Réserver mon appel gratuit</PrimaryButton>
         </div>
       </div>
     </Bande>

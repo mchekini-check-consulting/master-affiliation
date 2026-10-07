@@ -12,8 +12,10 @@ for (const route of ROUTES) {
     await ouvrir(page, route.chemin);
     await expect(page).toHaveScreenshot(`${route.nom}.png`, {
       fullPage: true,
-      // Le carrousel du héro défile seul toutes les 5 s.
-      mask: [page.locator('.hcc')],
+      // Le carrousel du héro défile seul toutes les 5 s ; le sélecteur de jours
+      // du formulaire de rendez-vous propose des dates relatives à aujourd'hui ;
+      // l'iframe Calendly charge un contenu externe variable.
+      mask: [page.locator('.hcc'), page.locator('[data-jours]'), page.locator('iframe[src*="calendly"]')],
     });
   });
 }

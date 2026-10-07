@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Buildings as Building2, CaretDown as ChevronDown, Headphones, Bank as Landmark, List as Menu, Phone, X } from '@phosphor-icons/react';
+import { ArrowRight, Buildings as Building2, CaretDown as ChevronDown, GraduationCap, Headphones, Bank as Landmark, List as Menu, Phone, X } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
+import { rdvProps } from '@/lib/rendezVous';
 import LogoMark from '@/components/LogoMark';
 import { formations } from '@/data/formations';
 import { categories } from '@/data/categories';
@@ -52,7 +53,7 @@ const menuPanels = {
   formations: {
     titre: 'Notre catalogue',
     sousTitre: 'Des formations courtes, en classe virtuelle, éligibles au financement OPCO.',
-    footer: { label: 'Voir tout le catalogue', href: '/formations' },
+    footer: { label: 'Voir le catalogue complet', href: '/formations' },
     items: categories.map((c) => ({
       title: c.tag,
       description: `${c.formations.length} formation${c.formations.length > 1 ? 's' : ''}`,
@@ -71,6 +72,18 @@ const menuPanels = {
       { icon: Headphones, title: 'Être accompagné', description: 'Parlez à un conseiller de votre projet et de son financement.', href: '/contact?mode=rendez-vous' },
     ],
   },
+};
+
+// Dernière carte du méga-menu Formations : même gabarit que les cartes de
+// catégorie (CategoryCard), seul le libellé d'action change pour annoncer
+// clairement le catalogue complet.
+const catalogueItem = {
+  title: 'Toutes les formations',
+  description: `${formations.length} formations`,
+  texte: 'En direct, 100 % à distance, finançables jusqu\'à 100 % (OPCO, FAF).',
+  icon: GraduationCap,
+  href: '/formations',
+  cta: 'Voir le catalogue complet',
 };
 
 /** Lien interne (react-router) ou ancre (/#section) selon la cible. */
@@ -127,40 +140,8 @@ function CategoryCard({ item, index, onNavigate }) {
           {item.texte}
         </span>
         <span className="inline-flex items-center gap-2 mt-5 text-body-sm font-semibold" style={{ color: NAVY, ...headingFont }}>
-          Voir les formations
+          {item.cta ?? 'Voir les formations'}
           <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </span>
-      </NavLink>
-    </motion.div>
-  );
-}
-
-/** Dernière carte : tout le catalogue, sur l'aplat marine. */
-function CatalogueCard({ index, onNavigate }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.04 + index * 0.06, ease: [0.16, 1, 0.3, 1] }}>
-      <NavLink
-        href="/formations"
-        onClick={onNavigate}
-        className="group flex h-full flex-col justify-between p-6 transition-colors duration-300 bg-[#002d74] hover:bg-[#011f55]"
-        style={{ borderRadius: RADIUS }}>
-        <span>
-          <span className="block text-caption font-semibold" style={{ color: '#9cbdff', ...headingFont }}>Catalogue complet</span>
-          <span className="block text-h3 font-semibold leading-tight mt-3 text-white" style={serifFont}>
-            {formations.length} formations certifiées Qualiopi
-          </span>
-          <span className="block text-body-sm leading-[1.5] mt-2" style={{ color: '#dbebff', ...bodyFont }}>
-            En direct, 100 % à distance, finançables par votre OPCO.
-          </span>
-        </span>
-        <span className="flex items-center justify-between mt-6">
-          <span className="text-body-sm font-semibold text-white" style={headingFont}>Tout le catalogue</span>
-          <span className="grid place-items-center w-11 h-11 rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1">
-            <ArrowRight className="w-4 h-4" style={{ color: NAVY }} />
-          </span>
         </span>
       </NavLink>
     </motion.div>
@@ -199,9 +180,8 @@ function DropdownPanel({ panelId, onNavigate }) {
 
   const grid = panelId === 'formations'
     ? (
-      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${panel.items.length}, minmax(0, 1fr)) minmax(0, 1.1fr)` }}>
-        {panel.items.map((item, i) => <CategoryCard key={item.href} item={item} index={i} onNavigate={onNavigate} />)}
-        <CatalogueCard index={panel.items.length} onNavigate={onNavigate} />
+      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${panel.items.length + 1}, minmax(0, 1fr))` }}>
+        {[...panel.items, catalogueItem].map((item, i) => <CategoryCard key={item.href} item={item} index={i} onNavigate={onNavigate} />)}
       </div>
     )
     : (
@@ -343,7 +323,7 @@ export default function Header({ embedded: _embedded = false }) {
               <Phone className="w-4 h-4 shrink-0" style={{ color: TEAL }} />
               <span className="hidden whitespace-nowrap min-[1280px]:inline">{PHONE.label}</span>
             </a>
-            <PrimaryButton to="/formations" size="sm">S&apos;inscrire</PrimaryButton>
+            <PrimaryButton {...rdvProps()} size="sm">Réserver un appel</PrimaryButton>
           </div>
 
           {/* bascule mobile — cible de 44 px */}
@@ -450,8 +430,8 @@ export default function Header({ embedded: _embedded = false }) {
               })}
 
               <div className="grid gap-3 pt-6">
-                <PrimaryButton to="/formations" onClick={closeAll} className="w-full justify-start">
-                  S&apos;inscrire
+                <PrimaryButton {...rdvProps()} onClick={closeAll} className="w-full justify-start">
+                  Réserver un appel gratuit
                 </PrimaryButton>
                 <a
                   href={PHONE.href}

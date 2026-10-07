@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
-import { BODY_MUTED, bodyFont } from '@/components/design';
-import { Bande, SectionTitle, Fold } from './atomes';
+import { TEAL, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
+import { Bande, Fold } from './atomes';
 
-/** Les objections, une par ligne dépliable (une seule ouverte à la fois). */
+/**
+ * Les objections, une par ligne dépliable (une seule ouverte à la fois).
+ * Titre centré en haut, questions dessous dans une colonne de lecture
+ * `max-w-3xl` (la largeur FAQ du design système) : pas de colonne vide.
+ */
 export default function Faq({ faq }) {
   const [ouverte, setOuverte] = useState(0);
   if (!faq || faq.length === 0) return null;
 
   return (
     <Bande id="faq">
-      <div className="grid lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] gap-x-16">
-        <SectionTitle kicker="Questions fréquentes">Vous hésitez encore ?</SectionTitle>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-8 sm:mb-10">
+          <p className="text-body-sm font-semibold mb-3" style={{ color: TEAL, ...headingFont }}>Questions fréquentes</p>
+          <h2 className="font-serif-display text-h1" style={{ color: '#243037', ...serifFont }}>
+            Vous hésitez encore ?
+          </h2>
+        </div>
         <div style={{ borderTop: '1px solid #dbebff' }}>
           {faq.map((item, i) => (
             <Fold key={item.q} title={item.q} open={ouverte === i} onToggle={() => setOuverte(ouverte === i ? null : i)}>

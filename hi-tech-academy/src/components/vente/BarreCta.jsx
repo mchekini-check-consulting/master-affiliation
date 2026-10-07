@@ -1,14 +1,15 @@
 import React, { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import PrimaryButton from '@/components/ui/primary-button';
 import { LINE, BODY_MUTED, headingFont, bodyFont } from '@/components/design';
 import { useBottomBar } from '@/hooks/use-bottom-bar';
 
 /**
- * Barre d'action fixe en bas d'écran, à toutes les largeurs : prix + devis
- * (+ inscription sur desktop). Elle glisse hors champ tant que le héro — qui
- * porte déjà le CTA — est visible.
+ * Barre d'action fixe en bas d'écran, à toutes les largeurs : prix + appel
+ * découverte (+ lien inscription sur desktop). Elle glisse hors champ tant que
+ * le héro — qui porte déjà le CTA — est visible.
  */
-export default function BarreCta({ visible, prixHT, resume, inscriptionTo }) {
+export default function BarreCta({ visible, prixHT, resume, inscriptionTo, rdvAction }) {
   const ref = useRef(null);
   useBottomBar(ref, visible);
 
@@ -26,14 +27,27 @@ export default function BarreCta({ visible, prixHT, resume, inscriptionTo }) {
           <span className="block text-body-base font-bold leading-tight tabular-nums" style={{ color: '#243037', ...headingFont }}>
             {prixHT} <span className="text-caption font-semibold" style={{ color: BODY_MUTED }}>HT</span>
           </span>
-          <span className="block text-caption leading-snug truncate" style={{ color: BODY_MUTED, ...bodyFont }}>{resume}</span>
+          <span className="block text-caption leading-snug truncate" style={{ color: BODY_MUTED, ...bodyFont }}>
+            {resume}
+            {/* La mention financement ne tient pas sous 640 px : le résumé doit
+                rester entier (voir elements-fixes.spec.js). */}
+            <span className="hidden sm:inline"> · Finançable jusqu'à 100 %</span>
+          </span>
         </span>
         {/* Libellé court sous 640 px : le libellé complet passait sur deux
             lignes et tronquait le résumé. Seul le résumé cède de la place. */}
         <span className="flex items-center gap-5 shrink-0">
-          <PrimaryButton to={inscriptionTo} size="sm">
-            <span className="sm:hidden">S'inscrire</span>
-            <span className="hidden sm:inline">Demander une inscription</span>
+          <Link
+            to={inscriptionTo}
+            className="hidden sm:inline-flex items-center min-h-[44px] text-body-sm font-semibold underline underline-offset-4"
+            style={{ color: '#243037', ...headingFont }}>
+            Demander une inscription
+          </Link>
+          {/* Libellé court sous 640 px : « Réserver un appel » tronquait le
+              résumé à 320 px (voir elements-fixes.spec.js). */}
+          <PrimaryButton {...rdvAction} size="sm">
+            <span className="sm:hidden">Appel gratuit</span>
+            <span className="hidden sm:inline">Réserver mon appel gratuit</span>
           </PrimaryButton>
         </span>
       </div>

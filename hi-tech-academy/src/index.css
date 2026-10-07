@@ -410,12 +410,11 @@ p { text-wrap: pretty; }
    met en avant, pas une graisse lourde qui alourdirait le paragraphe. */
 .academy-hero__intro strong { color: #ffffff; font-weight: 600; }
 .academy-hero__actions { display: flex; align-items: center; gap: 32px; margin-top: clamp(16px, 3.2vh, 32px); }
-/* CTA secondaire : libellé neutre, pastille de lecture en violet (accent déjà
-   utilisé sur le site) pour ne pas concurrencer le bouton primaire. */
-.academy-hero__video { display: inline-flex; align-items: center; gap: 12px; padding: 0; color: #ffffff; background: transparent; border: 0; font: 600 15px var(--font-body); cursor: pointer; transition: color .25s; }
-.academy-hero__video:hover { color: #9cbdff; }
-.academy-hero__video-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid #0062e1; border-radius: 50%; padding-left: 2px; color: #ffffff; background: #0062e1; transition: background-color .25s, color .25s, border-color .25s; }
-.academy-hero__video:hover .academy-hero__video-icon { color: #ffffff; background: #004a94; border-color: #004a94; }
+/* CTA secondaire : pilule fantôme (contour clair, fond transparent), même
+   gabarit que la pilule primaire mais en retrait visuel. Le plein blanc reste
+   réservé à l'action principale. */
+.academy-hero__secondary { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 28px; color: #ffffff; background: transparent; border: 1px solid #9cbdff; border-radius: 999px; font: 600 16px var(--font-body); white-space: nowrap; cursor: pointer; transition: border-color .25s; }
+.academy-hero__secondary:hover { border-color: #ffffff; }
 .academy-hero__benefits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2.2vh, 24px) 24px; margin-top: clamp(28px, 5vh, 56px); }
 .academy-hero__benefit { display: flex; align-items: center; gap: 16px; min-width: 0; }
 /* Icône simple, sans pastille colorée : un trait fin suffit, le rendu reste
@@ -487,13 +486,7 @@ p { text-wrap: pretty; }
   .hero-trust-logo[src*="opco"] { height: 30px; }
   .academy-hero__actions { align-items: stretch; gap: 12px; }
   .academy-hero__actions .academy-hero__cta { flex: 1 1 auto; width: auto; min-width: 0; padding-inline: 16px; white-space: nowrap; }
-  .academy-hero__video { flex: none; justify-content: center; gap: 8px; min-height: 56px; padding: 0 16px; border: 1px solid #9cbdff; border-radius: 999px; font-size: 16px; white-space: nowrap; }
-  .academy-hero__video:hover { color: #ffffff; border-color: #ffffff; }
-  .academy-hero__video-icon,
-  .academy-hero__video:hover .academy-hero__video-icon { width: auto; height: auto; padding: 0; border: 0; color: #9cbdff; background: transparent; }
-}
-@media (max-width: 359px) {
-  .academy-hero__video-icon { display: none; }
+  .academy-hero__secondary { flex: none; padding: 0 16px; }
 }
 /* Avantages du héro en boucle continue, sur une seule ligne. Le bandeau
    saigne jusqu'aux bords de l'écran (gouttière de 16 px annulée). L'écart

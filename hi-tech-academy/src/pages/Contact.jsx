@@ -10,13 +10,15 @@ import PrimaryButton from '@/components/ui/primary-button';
 import { Bande, RADIUS } from '@/components/vente/atomes';
 import { formations } from '@/data/formations';
 import { sendContactRequest } from '@/api/backend';
+import { CALENDLY_URL } from '@/lib/rendezVous';
 import { NAVY, LINE, MINT_LIGHT, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
-// Page Contact : deux entrées, un seul formulaire. « Envoyer un message » pour
-// une question, « Prendre rendez-vous » pour un échange de 30 minutes. Le
-// rendez-vous est une DEMANDE (jour + créneau souhaités) confirmée ensuite par
-// email : rien n'est réservé automatiquement, la page ne promet donc pas un
-// créneau garanti. Tout arrive dans le CRM de l'admin (ContactLeadController).
+// Page Contact : deux entrées. « Envoyer un message » pour une question
+// (formulaire interne, CRM de l'admin via ContactLeadController). « Prendre
+// rendez-vous » affiche Calendly en iframe : le créneau se réserve directement
+// dans le calendrier, sans validation manuelle. Si CALENDLY_URL est vide
+// (lib/rendezVous.js), l'onglet retombe sur l'ancien formulaire de DEMANDE de
+// rendez-vous (jour + créneau souhaités, confirmés ensuite par email).
 //
 // Liens profonds : /contact?mode=rendez-vous, ?sujet=financement|devis|formation,
 // ?formation=<id du catalogue>.
@@ -228,6 +230,12 @@ export default function Contact() {
 
   const err = (champ) => (erreurs[champ] ? { 'aria-invalid': true, 'aria-describedby': `${champ}-err`, 'data-erreur': true } : {});
 
+  // Calendly en ligne (iframe officielle). `embed_domain` est requis par
+  // Calendly pour le rendu embarqué ; le lien de secours ouvre la même page.
+  const calendlyEmbed = CALENDLY_URL
+    ? `${CALENDLY_URL}?embed_type=Inline&embed_domain=${window.location.host}&hide_gdpr_banner=1`
+    : null;
+
   return (
     <div className="min-h-screen bg-white">
       <Header embedded />
@@ -310,7 +318,7 @@ export default function Contact() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={envoyer} noValidate className="p-6 sm:p-8 bg-white" style={{ borderRadius: RADIUS, border: `1px solid ${LINE}` }}>
+              <div className="p-6 sm:p-8 bg-white" style={{ borderRadius: RADIUS, border: `1px solid ${LINE}` }}>
 
                 {/* Bascule message / rendez-vous : deux grandes cibles, l'icône
                     et le libellé disent ce qui se passe avant le clic. */}
@@ -334,11 +342,34 @@ export default function Contact() {
                     );
                   })}
                 </div>
+                {/* Pas d'intro quand Calendly est affiché : l'iframe se suffit. */}
+                {!(mode === 'rdv' && calendlyEmbed) && (
                 <p className="text-body-sm mt-4" style={{ color: BODY_MUTED, ...bodyFont }}>
                   {mode === 'rdv'
                     ? 'Un échange de 30 minutes avec un conseiller, gratuit et sans engagement. Choisissez un moment, nous vous le confirmons par email.'
                     : 'Posez votre question, nous vous répondons sous 24 h ouvrées.'}
                 </p>
+                )}
+
+                {mode === 'rdv' && calendlyEmbed ? (
+                  <div className="mt-6">
+                    <iframe
+                      src={calendlyEmbed}
+                      title="Choisir un créneau de rendez-vous (Calendly)"
+                      loading="lazy"
+                      className="w-full h-[980px] sm:h-[720px]"
+                      style={{ border: 0, borderRadius: RADIUS }}
+                    />
+                    <p className="text-body-sm mt-3" style={{ color: BODY_MUTED, ...bodyFont }}>
+                      Le calendrier ne s'affiche pas ?{' '}
+                      <a href={CALENDLY_URL} target="_blank" rel="noreferrer" className="font-semibold underline" style={{ color: NAVY }}>
+                        Ouvrir la page de réservation
+                      </a>
+                      {' '}ou appelez-nous au {PHONE.label}.
+                    </p>
+                  </div>
+                ) : (
+                <form onSubmit={envoyer} noValidate>
 
                 {mode === 'rdv' && (
                   <div className="mt-8 space-y-7 pb-8" style={{ borderBottom: `1px solid ${LINE}` }}>
@@ -357,8 +388,10 @@ export default function Contact() {
                     </Groupe>
 
                     <Groupe label="Jour" erreur={erreurs.date}>
-                      {/* Défilement horizontal sur mobile, grille sur ordinateur. */}
-                      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:grid sm:grid-cols-5 sm:overflow-visible" data-erreur={!!erreurs.date}>
+                      {/* Défilement horizontal sur mobile, grille sur ordinateur.
+                          `data-jours` : masqué par la capture de non-régression
+                          (desktop.spec.js), les dates changent chaque jour. */}
+                      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:grid sm:grid-cols-5 sm:overflow-visible" data-erreur={!!erreurs.date} data-jours>
                         {jours.map((d) => {
                           const iso = isoLocal(d);
                           return (
@@ -473,7 +506,9 @@ export default function Contact() {
                     <span className="text-body-sm" style={{ color: BODY_MUTED, ...bodyFont }}>Réponse sous 24 h ouvrées</span>
                   </div>
                 </div>
-              </form>
+                </form>
+                )}
+              </div>
             )}
           </div>
         </Bande>

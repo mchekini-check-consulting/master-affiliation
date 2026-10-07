@@ -65,10 +65,11 @@ export default function FormationsSection() {
 
         <header className="catalogue-header">
           <p className="catalogue-eyebrow"><i />Nos formations</p>
-          <h2>Explorer nos <span>formations</span></h2>
+          <h2>Quelle formation est <span>faite pour vous ?</span></h2>
           <p>
-            Des actions de formation intensives, 100 % à distance, animées en direct par un
-            formateur expert, avec toutes les informations utiles avant votre inscription.
+            Des sessions intensives, 100 % à distance, animées en direct par un formateur expert.
+            Comparez en toute transparence : durée, tarif et programme complet sont affichés
+            avant votre inscription.
           </p>
 
           {/* Accroche manuscrite. La phrase leve l'objection la plus courante

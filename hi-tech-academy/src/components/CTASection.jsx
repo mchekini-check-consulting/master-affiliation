@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Phone } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
+import { rdvProps } from '@/lib/rendezVous';
 import { NAVY, MINT, headingFont, serifFont, bodyFont } from '@/components/design';
 
 // Dernier appel de la page d'accueil : un seul bandeau marine, une promesse,
@@ -21,12 +23,16 @@ export default function CTASection() {
               Votre prochaine compétence commence ici.
             </h2>
             <p className="text-body-base leading-[1.55] mt-3 max-w-measure" style={{ color: '#dbebff', ...bodyFont }}>
-              Choisissez votre formation et recevez programme et devis sous 24 h ouvrées. Sessions dès un participant, sans engagement.
+              Réservez un point stratégique de 30 minutes en visio : votre besoin, votre niveau et votre
+              financement, jusqu'à 100 % pris en charge selon votre situation. Gratuit et sans engagement.
             </p>
           </div>
 
           <div className="flex flex-col items-start lg:items-end gap-3">
-            <PrimaryButton to="/formations" size="lg" inverted>Choisir ma formation</PrimaryButton>
+            <PrimaryButton {...rdvProps()} size="lg" inverted>Réserver mon appel gratuit</PrimaryButton>
+            <Link to="/formations" className="inline-flex items-center min-h-[44px] text-body-sm font-semibold underline underline-offset-4" style={{ color: MINT, ...headingFont }}>
+              Ou choisir d'abord ma formation
+            </Link>
             <a href="tel:+33751474135" className="inline-flex items-center gap-2 text-body-sm font-semibold hover:underline" style={{ color: MINT, ...headingFont }}>
               <Phone className="w-4 h-4" /> Ou appelez-nous : 07 51 47 41 35
             </a>

@@ -6,27 +6,33 @@ import { getFormationById } from '@/data/formations';
 import { getVenteById } from '@/data/ventes';
 import { getFormationPage } from '@/data/formationPage';
 import PageNotFound from '@/lib/PageNotFound';
+import { rdvProps } from '@/lib/rendezVous';
 import HeroVente from '@/components/vente/HeroVente';
 import CarteHero from '@/components/vente/CarteHero';
 import ResultsSection from '@/components/ResultsSection';
-import Arguments from '@/components/vente/Arguments';
 import Objectifs from '@/components/vente/Objectifs';
 import Programme from '@/components/vente/Programme';
+import Bonus from '@/components/vente/Bonus';
 import Formateur from '@/components/vente/Formateur';
 import PourQui from '@/components/vente/PourQui';
-import Parcours from '@/components/vente/Parcours';
+import ParcoursAppel from '@/components/vente/ParcoursAppel';
 import Tarif from '@/components/vente/Tarif';
 import Faq from '@/components/vente/Faq';
+import CtaFinal from '@/components/vente/CtaFinal';
 import BarreCta from '@/components/vente/BarreCta';
 
 // Page formation = tunnel de vente, style éditorial sombre. Elle reçoit du
-// trafic publicitaire : une seule action attendue, la demande d'inscription
-// (/inscription/:id). Le formulaire de devis en pied de page a été retiré.
+// trafic publicitaire : une seule action attendue, la réservation de l'appel
+// découverte (Calendly via rdvProps — 30 min, gratuit). Il lève les deux freins
+// réels (« est-ce pour moi ? », « qui paie ? ») et le dossier de financement se
+// monte ensuite avec nous. La demande d'inscription (/inscription/:id) reste le
+// parcours Qualiopi formel, proposée partout en action secondaire.
 //
 // Rythme : bandes pleine largeur en alternance navy / blanc / pâle, photos
 // bord à bord, une barre CTA fixe dès que le héro est passé. Ordre des
-// sections = ordre de persuasion : objectifs → méthode → programme → pourquoi
-// → formateur → pour qui → parcours → preuve (avis) → prix → objections → formulaire.
+// sections = ordre de persuasion : objectifs → programme → bonus (bande navy)
+// → formateur → pour qui → parcours appel → preuve (avis) → prix/financement
+// → objections → dernier appel.
 //
 // Chaque section est un composant de src/components/vente qui reçoit des props
 // explicites et se masque seul quand sa donnée manque : jamais de preuve
@@ -79,10 +85,13 @@ export default function FormationVente() {
   const effectif = fact('Effectif');
 
   const inscriptionTo = `/inscription/${formation.id}`;
+  // CTA principal du tunnel : l'appel découverte (Calendly, ou formulaire
+  // interne tant que l'URL n'est pas renseignée).
+  const rdvAction = rdvProps(formation.id);
 
-  const heroFacts = ['Organisme certifié Qualiopi', 'Formateur en direct, jamais de vidéo', 'Attestation de fin de formation'];
+  const heroFacts = ['Finançable jusqu\'à 100 % (OPCO, FAF)', 'Organisme certifié Qualiopi', 'Formateur en direct, jamais de vidéo', 'Attestation de fin de formation'];
   // L'attestation figure déjà dans les garanties du héro : pas de doublon ici.
-  const reassurances = ['Réponse sous 24 h ouvrées', 'sans engagement'];
+  const reassurances = ['30 minutes en visio', 'gratuit et sans engagement'];
 
   // Faits clés de la carte du héro : ce qu'il faut savoir avant de s'engager.
   // `detail` n'est affiché qu'à partir de 640 px (voir CarteHero).
@@ -132,12 +141,15 @@ export default function FormationVente() {
           formation={formation}
           titre={vente.titreCourt || formation.title}
           accroche={vente.accroche}
-          sousTitre={preuves.hero.sousTitre || formation.description}
+          // Peu de texte sous l'accroche : une seule ligne, tournée vers le
+          // rendez-vous et le financement. Le détail du programme a sa section.
+          sousTitre={preuves.hero.sousTitre || 'Réservez un appel gratuit de 30 minutes : nous validons ensemble votre projet, votre niveau et votre prise en charge, jusqu\'à 100 %.'}
           image={preuves.hero.image || preuves.ambiance.hero}
           imagePosition={preuves.hero.position}
           alt={preuves.hero.alt}
           facts={heroFacts}
           inscriptionTo={inscriptionTo}
+          rdvAction={rdvAction}
           couleur={vente.couleur}
           carte={
             <CarteHero
@@ -145,6 +157,7 @@ export default function FormationVente() {
               mentionTTC={mentionTTC}
               facts={carteFacts}
               inscriptionTo={inscriptionTo}
+              rdvAction={rdvAction}
               couleur={vente.couleur}
               reassurances={reassurances}
             />
@@ -160,16 +173,12 @@ export default function FormationVente() {
           titre={vente.programmeTitre}
           couleur={vente.couleur}
         />
-        <Arguments
-          arguments={vente.argumentsMarketing}
-          urgence={vente.ctaUrgence}
-          projection={vente.ctaProjection}
-          couleur={vente.couleur}
-          inscriptionTo={inscriptionTo}
-        />
+        {/* Bonus inclus juste après le programme : la valeur s'empile avant
+            l'annonce du prix. C'est la bande marine de la page. */}
+        <Bonus couleur={vente.couleur} rdvAction={rdvAction} inscriptionTo={inscriptionTo} />
         <Formateur formateur={preuves.formateur} />
-        <PourQui pour={pour} pasPour={pasPour} personas={page.personas} prerequis={page.prerequis} couleur={vente.couleur} contactTo={`/contact?mode=rendez-vous&formation=${formation.id}`} inscriptionTo={inscriptionTo} />
-        <Parcours couleur={vente.couleur} inscriptionTo={inscriptionTo} />
+        <PourQui pour={pour} pasPour={pasPour} personas={page.personas} prerequis={page.prerequis} couleur={vente.couleur} rdvAction={rdvAction} />
+        <ParcoursAppel couleur={vente.couleur} rdvAction={rdvAction} />
         {/* Bloc « Nos résultats » de l'accueil, réutilisé tel quel (à la place
             des témoignages) : un seul endroit à mettre à jour pour les chiffres. */}
         <ResultsSection />
@@ -180,11 +189,13 @@ export default function FormationVente() {
           infosPratiques={infosPratiques}
           couleur={vente.couleur}
           inscriptionTo={inscriptionTo}
+          rdvAction={rdvAction}
         />
         <Faq faq={page.faq} />
+        <CtaFinal couleur={vente.couleur} rdvAction={rdvAction} inscriptionTo={inscriptionTo} />
       </main>
 
-      <BarreCta visible={barreVisible} prixHT={prixHT} resume={`${dureeCourte} · ${modaliteCourte}`} inscriptionTo={inscriptionTo} />
+      <BarreCta visible={barreVisible} prixHT={prixHT} resume={`${dureeCourte} · ${modaliteCourte}`} inscriptionTo={inscriptionTo} rdvAction={rdvAction} />
       <Footer />
     </div>
   );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
+import { rdvProps } from '@/lib/rendezVous';
 import Rail from '@/components/ui/rail';
 import { TEAL, MINT, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
@@ -47,6 +48,10 @@ const PERKS = [
     title: 'Un groupe, pas un amphithéâtre',
     description: "Un effectif assez restreint pour que le formateur s'adapte réellement à votre niveau.",
   },
+  {
+    title: 'Le financement, monté avec vous',
+    description: "Prise en charge jusqu'à 100 % par votre OPCO ou votre fonds d'assurance formation : nous préparons devis, programme et convention, et nous restons disponibles jusqu'à l'accord.",
+  },
 ];
 
 export default function WhyUsSection() {
@@ -60,11 +65,11 @@ export default function WhyUsSection() {
               id="whyus-title"
               className="font-serif-display max-w-[18ch]"
               style={{ fontSize: 'clamp(32px, 3.6vw, 48px)', lineHeight: 1.1, letterSpacing: '-0.02em', color: '#243037', ...serifFont }}>
-              Bien plus qu'une formation, un vrai tremplin pour votre avenir
+              Ce que vous ne trouverez pas dans une formation en vidéos
             </h2>
             <p className="text-body-lg leading-[1.6] mt-5 max-w-measure" style={{ color: BODY_MUTED, ...bodyFont }}>
-              Nous vous donnons les compétences, l'accompagnement et le cadre pour atteindre vos objectifs
-              professionnels, à votre rythme.
+              Six choix assumés, vérifiables dans nos programmes et nos conditions, qui changent
+              ce que vous retirez réellement d'une session.
             </p>
 
             {/* Liste de principes, pas de fonctionnalités : un titre bref en DM
@@ -90,7 +95,7 @@ export default function WhyUsSection() {
 
             {/* Sous 1024 px, le bouton est porté par le panneau ci-dessous. */}
             <div className="mt-12 hidden lg:block">
-              <PrimaryButton to="/formations" size="lg">Découvrir nos formations</PrimaryButton>
+              <PrimaryButton {...rdvProps()} size="lg">Réserver mon appel gratuit</PrimaryButton>
             </div>
           </div>
 
@@ -144,8 +149,8 @@ export default function WhyUsSection() {
                   </blockquote>
 
                   {/* `inverted` : le panneau est sur l'aplat #002d74. */}
-                  <PrimaryButton to="/formations" size="lg" inverted block className="lg:hidden max-sm:px-4">
-                    Découvrir nos formations
+                  <PrimaryButton {...rdvProps()} size="lg" inverted block className="lg:hidden max-sm:px-4">
+                    Réserver mon appel gratuit
                   </PrimaryButton>
                 </div>
               </div>

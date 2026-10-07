@@ -36,8 +36,9 @@ for (const largeur of [320, 375, 414]) {
       await preparerContexte(context);
       await ouvrir(page, '/');
       const actions = page.locator('.academy-hero__actions');
-      await expect(actions.getByText('Nos formations', { exact: true })).toBeVisible();
-      await expect(actions.getByText('La méthode', { exact: true })).toBeVisible();
+      await expect(actions.getByText('Appel gratuit', { exact: true })).toBeVisible();
+      await expect(actions.getByText('Formations', { exact: true })).toBeVisible();
+      await expect(actions.getByText('Réserver mon appel gratuit')).toBeHidden();
       await expect(actions.getByText('Découvrir nos formations')).toBeHidden();
     });
   });
@@ -50,7 +51,7 @@ test.describe('actions du héro à 1280 px', () => {
     await preparerContexte(context);
     await ouvrir(page, '/');
     const actions = page.locator('.academy-hero__actions');
+    await expect(actions.getByText('Réserver mon appel gratuit')).toBeVisible();
     await expect(actions.getByText('Découvrir nos formations')).toBeVisible();
-    await expect(actions.getByText('Comment ça marche ?')).toBeVisible();
   });
 });

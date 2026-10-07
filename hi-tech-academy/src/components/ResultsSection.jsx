@@ -3,8 +3,9 @@ import { useInView } from 'framer-motion';
 import { NAVY, MINT, headingFont, serifFont, bodyFont } from '@/components/design';
 
 // Indicateurs de résultats publiés (obligation de transparence Qualiopi).
-// Panneau marine, contenu dans `max-w-site` (pas pleine largeur) : un aplat
-// qui distingue la section sans redevenir la bannière agressive d'origine.
+// Bande marine pleine largeur, le contenu reste dans `max-w-site` : même
+// rythme que les autres bandes sombres du site (héro, bonus des pages de
+// vente).
 const indicators = [
   { value: 95, suffix: '%', label: 'Taux de satisfaction', detail: 'Participants satisfaits ou très satisfaits' },
   { value: 100, suffix: '%', label: 'Taux de recommandation', detail: 'Participants qui recommanderaient la formation' },
@@ -49,12 +50,9 @@ export default function ResultsSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section ref={ref} id="resultats" className="bg-white py-16 sm:py-24">
+    <section ref={ref} id="resultats" className="py-16 sm:py-24" style={{ background: NAVY }}>
       <div className="max-w-site mx-auto px-4 sm:px-6">
-        {/* Panneau marine inscrit dans la grille du site, jamais pleine
-            largeur : c'est ce qui distingue « aplat de marque » d'« encart
-            publicitaire ». */}
-        <div className="px-5 py-8 sm:px-12 sm:py-14" style={{ borderRadius: 8, background: NAVY }}>
+        <div>
           <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 sm:gap-10 lg:gap-20 items-start">
             <div>
               <p className="text-body-sm font-semibold mb-3" style={{ color: MINT, ...headingFont }}>Nos résultats</p>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from '@phosphor-icons/react';
 import PrimaryButton from '@/components/ui/primary-button';
+import { rdvProps } from '@/lib/rendezVous';
 import { NAVY, TEAL, MINT, MINT_LIGHT, LINE, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 
 // Accueil — « Et si votre formation ne vous coûtait rien ? ». Le financement
@@ -16,8 +17,8 @@ const SITUATIONS = [
     label: 'Salarié',
     verdict: "Jusqu'à 100 % pris en charge",
     reste: 'Reste à charge possible : 0 €',
-    texte: "Votre entreprise mobilise son plan de développement des compétences ; selon votre branche, l'OPCO finance tout ou partie de la formation et paie directement l'organisme, sans aucune avance de votre part.",
-    etapes: ['Vous demandez un devis', "Nous fournissons devis, programme et convention à votre employeur", "L'OPCO instruit la prise en charge"],
+    texte: "Votre entreprise mobilise son plan de développement des compétences ; selon votre branche, l'OPCO finance tout ou partie de la formation et paie directement l'organisme, sans aucune avance de votre part. Nous montons le dossier avec vous.",
+    etapes: ['Vous réservez un appel gratuit de 30 minutes', "Nous fournissons devis, programme et convention à votre employeur", "L'OPCO instruit la prise en charge"],
   },
   {
     key: 'dirigeant',
@@ -25,15 +26,15 @@ const SITUATIONS = [
     verdict: 'Formation finançable par votre entreprise',
     reste: 'Reste à charge selon votre enveloppe OPCO',
     texte: "Vous formez vos équipes (ou vous-même en tant que salarié de votre structure) sur le budget formation de l'entreprise, avec l'appui de votre OPCO. Nous montons le dossier avec vous.",
-    etapes: ['Vous demandez un devis', 'Nous préparons le dossier au format de votre OPCO', 'La session est planifiée dès accord'],
+    etapes: ['Vous réservez un appel gratuit de 30 minutes', 'Nous préparons le dossier au format de votre OPCO', 'La session est planifiée dès accord'],
   },
   {
     key: 'independant',
     label: 'Indépendant',
     verdict: 'Prise en charge par votre fonds de formation',
     reste: 'Plafond annuel selon le fonds (AGEFICE, FIF PL, FAFCEA)',
-    texte: "Travailleur non salarié, vous cotisez à un fonds d'assurance formation qui rembourse tout ou partie du coût. Nous vous remettons chaque pièce demandée, à votre nom.",
-    etapes: ['Vous demandez un devis', 'Nous fournissons devis, programme et convention', 'Vous déposez la demande auprès de votre fonds'],
+    texte: "Travailleur non salarié, vous cotisez à un fonds d'assurance formation qui rembourse tout ou partie du coût. Nous identifions votre fonds avec vous et nous vous remettons chaque pièce demandée, à votre nom.",
+    etapes: ['Vous réservez un appel gratuit de 30 minutes', 'Nous fournissons devis, programme et convention', 'Vous déposez la demande auprès de votre fonds'],
   },
   {
     key: 'particulier',
@@ -41,7 +42,7 @@ const SITUATIONS = [
     verdict: 'Tarif TTC, sans frais cachés',
     reste: 'Paiement à la convention, délai de rétractation',
     texte: "Vous vous formez à titre personnel : le prix affiché est le prix final. Un devis et une convention vous sont remis avant tout engagement.",
-    etapes: ['Vous demandez un devis', 'Nous validons ensemble la date et votre niveau', 'Vous signez la convention'],
+    etapes: ['Vous réservez un appel gratuit de 30 minutes', 'Nous validons ensemble la date et votre niveau', 'Vous signez la convention'],
   },
 ];
 
@@ -62,7 +63,7 @@ export default function FinancementSection() {
             </h2>
             <p className="text-body-lg leading-[1.6] mt-6 max-w-[40ch]" style={{ color: BODY_MUTED, ...bodyFont }}>
               La plupart de nos participants ne paient pas leur formation eux-mêmes. Dites-nous qui vous
-              êtes, on vous dit qui paie.
+              êtes, on vous dit qui paie, et on monte le dossier avec vous.
             </p>
 
             <div role="tablist" aria-label="Votre situation" className="grid grid-cols-2 gap-2 mt-8 max-w-[440px]">
@@ -113,7 +114,7 @@ export default function FinancementSection() {
               </ol>
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-8 pt-6" style={{ borderTop: `1px solid ${LINE}` }}>
-                <PrimaryButton to="/formations" block>Choisir ma formation et demander une inscription</PrimaryButton>
+                <PrimaryButton {...rdvProps()} block>Vérifier ma prise en charge en 30 min</PrimaryButton>
                 <Link to="/financements" className="inline-flex items-center gap-2 text-body-sm font-semibold hover:underline" style={{ color: TEAL, ...headingFont }}>
                   Tout comprendre sur le financement <ArrowRight className="w-4 h-4" />
                 </Link>
