@@ -167,7 +167,9 @@ public final class RegistrationDtos {
             int maxScore,
             List<QcmAnswerView> questions) {
 
-        static PositioningTestView from(PositioningTest pt) {
+        // Le catalogue dépend de la formation : sans lui, les réponses d'une
+        // formation IA seraient jointes aux questions Kubernetes par défaut.
+        static PositioningTestView from(PositioningTest pt, String formationId) {
             List<Integer> chosen = new ArrayList<>();
             for (String part : pt.getAnswers().split(",")) {
                 try {
@@ -177,7 +179,7 @@ public final class RegistrationDtos {
                 }
             }
             List<QcmAnswerView> questions = new ArrayList<>();
-            List<PositioningTestCatalog.QcmQuestion> catalog = PositioningTestCatalog.QUESTIONS;
+            List<PositioningTestCatalog.QcmQuestion> catalog = QuizCatalogs.positioningQuestions(formationId);
             for (int i = 0; i < catalog.size(); i++) {
                 PositioningTestCatalog.QcmQuestion q = catalog.get(i);
                 Integer answer = i < chosen.size() ? chosen.get(i) : null;
@@ -216,7 +218,7 @@ public final class RegistrationDtos {
             Integer maxScore,
             List<QcmAnswerView> questions) {
 
-        static FinalEvaluationView from(FinalEvaluation fe) {
+        static FinalEvaluationView from(FinalEvaluation fe, String formationId) {
             List<QcmAnswerView> questions = null;
             if (fe.isSubmitted() && fe.getAnswers() != null) {
                 List<Integer> chosen = new ArrayList<>();
@@ -228,7 +230,7 @@ public final class RegistrationDtos {
                     }
                 }
                 questions = new ArrayList<>();
-                List<FinalEvaluationCatalog.QcmQuestion> catalog = FinalEvaluationCatalog.QUESTIONS;
+                List<FinalEvaluationCatalog.QcmQuestion> catalog = QuizCatalogs.finalQuestions(formationId);
                 for (int i = 0; i < catalog.size(); i++) {
                     FinalEvaluationCatalog.QcmQuestion q = catalog.get(i);
                     Integer answer = i < chosen.size() ? chosen.get(i) : null;
@@ -287,7 +289,7 @@ public final class RegistrationDtos {
             PositioningTestView positioningTest,
             FinalEvaluationView finalEvaluation) {
 
-        static TraineeView from(Trainee t) {
+        static TraineeView from(Trainee t, String formationId) {
             return new TraineeView(
                     t.getId(),
                     t.getSubmittedAt(),
@@ -307,8 +309,8 @@ public final class RegistrationDtos {
                     t.getPlanningConstraints(),
                     t.getScore(),
                     t.getMaxScore(),
-                    t.getPositioningTest() != null ? PositioningTestView.from(t.getPositioningTest()) : null,
-                    t.getFinalEvaluation() != null ? FinalEvaluationView.from(t.getFinalEvaluation()) : null);
+                    t.getPositioningTest() != null ? PositioningTestView.from(t.getPositioningTest(), formationId) : null,
+                    t.getFinalEvaluation() != null ? FinalEvaluationView.from(t.getFinalEvaluation(), formationId) : null);
         }
     }
 
@@ -575,9 +577,9 @@ public final class RegistrationDtos {
                     r.getNeedsAnalysis() != null ? NeedsAnalysisView.from(r.getNeedsAnalysis()) : null,
                     r.getCertificate() != null ? CertificateView.from(r.getCertificate()) : null,
                     r.getSponsorSurvey() != null ? SponsorSurveyView.from(r.getSponsorSurvey()) : null,
-                    r.getTrainees().stream().map(TraineeView::from).toList(),
-                    r.getPositioningTest() != null ? PositioningTestView.from(r.getPositioningTest()) : null,
-                    r.getFinalEvaluation() != null ? FinalEvaluationView.from(r.getFinalEvaluation()) : null);
+                    r.getTrainees().stream().map((t) -> TraineeView.from(t, r.getFormationId())).toList(),
+                    r.getPositioningTest() != null ? PositioningTestView.from(r.getPositioningTest(), r.getFormationId()) : null,
+                    r.getFinalEvaluation() != null ? FinalEvaluationView.from(r.getFinalEvaluation(), r.getFormationId()) : null);
         }
     }
 
