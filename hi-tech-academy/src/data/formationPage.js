@@ -292,7 +292,7 @@ const pages = {
       { icon: Brain, titre: "Comprendre ce que l'IA sait faire", texte: 'Capacités réelles, limites et données sensibles.' },
       { icon: PenLine, titre: 'Maîtriser le prompting', texte: 'Une méthode en 4 étapes, reproductible.' },
       { icon: Timer, titre: 'Gagner des heures chaque semaine', texte: 'E-mails, documents, recherches sourcées.' },
-      { icon: Palette, titre: 'Créer vos contenus professionnels', texte: 'Images, présentations, page web sans code.' },
+      { icon: Palette, titre: 'Créer vos contenus professionnels', texte: 'Images, présentations, sites et applications web sans code.' },
       { icon: Briefcase, titre: "Appliquer l'IA à votre métier", texte: '2 à 3 workflows construits pour votre poste.' },
       { icon: Bot, titre: 'Automatiser en confiance', texte: 'Agents, connecteurs et esprit critique.' },
     ],

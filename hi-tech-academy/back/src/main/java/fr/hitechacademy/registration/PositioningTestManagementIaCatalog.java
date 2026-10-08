@@ -4,11 +4,12 @@ import java.util.List;
 
 /**
  * Contenu du test de positionnement « Gérer et transformer les processus de
- * travail des équipes avec l'IA » (document « Test de positionnement – V1.0 »
- * du 23/09/2026). Les bonnes réponses vivent uniquement ici, côté serveur :
+ * travail des équipes avec l'IA » (document « Test de positionnement – V1.1 »
+ * du 08/10/2026). Les bonnes réponses vivent uniquement ici, côté serveur :
  * l'endpoint public expose les questions sans l'index de la bonne réponse,
- * la correction se fait à la soumission. Le test porte sur les prérequis
- * (pratique managériale, outils numériques), pas sur l'IA elle-même.
+ * la correction se fait à la soumission. Le test vérifie les prérequis
+ * (pratique managériale, outils numériques) puis situe les notions d'IA et
+ * de cadre réglementaire ; il n'est pas éliminatoire.
  */
 public final class PositioningTestManagementIaCatalog {
 
@@ -25,7 +26,8 @@ public final class PositioningTestManagementIaCatalog {
             "Prompt",
             "Hallucination",
             "AI Act",
-            "RAG");
+            "RAG",
+            "Conduite du changement");
 
     public static final List<PositioningTestCatalog.QcmQuestion> QUESTIONS = List.of(
             new PositioningTestCatalog.QcmQuestion(1, "Prérequis — Pratique managériale",
@@ -46,14 +48,22 @@ public final class PositioningTestManagementIaCatalog {
                     "Pour co-éditer un document avec l'équipe, le plus adapté est…",
                     List.of("Un document partagé en ligne (Google Docs, Office 365…)",
                             "Une impression papier", "Un fax", "Un SMS"), 0),
-            new PositioningTestCatalog.QcmQuestion(5, "Prérequis — Outils numériques",
-                    "Dans un tableur, une formule sert à…",
-                    List.of("Imprimer la feuille",
-                            "Calculer automatiquement une valeur à partir d'autres cellules",
-                            "Changer la couleur du texte", "Envoyer un e-mail"), 1),
-            new PositioningTestCatalog.QcmQuestion(6, "Prérequis — Outils numériques",
-                    "Une visioconférence avec partage d'écran nécessite…",
-                    List.of("Une imprimante réseau", "Un serveur local dédié",
-                            "Un navigateur ou une application dédiée et une connexion internet",
-                            "Une carte SIM professionnelle"), 2));
+            new PositioningTestCatalog.QcmQuestion(5, "L'IA : notions",
+                    "Qu'est-ce qu'un LLM (grand modèle de langage) ?",
+                    List.of("Un moteur de recherche qui classe des pages web",
+                            "Un modèle entraîné sur de grands volumes de texte, capable de générer des réponses",
+                            "Une base de données de réponses rédigées à l'avance",
+                            "Un logiciel de visioconférence"), 1),
+            new PositioningTestCatalog.QcmQuestion(6, "L'IA : notions",
+                    "Dans une équipe, le principal risque d'un usage non encadré des IA en ligne est...",
+                    List.of("La hausse du coût des licences",
+                            "L'exposition de données sensibles et la diffusion de contenus non vérifiés",
+                            "La saturation du réseau wifi",
+                            "L'obsolescence des ordinateurs"), 1),
+            new PositioningTestCatalog.QcmQuestion(7, "Cadre réglementaire",
+                    "L'AI Act européen...",
+                    List.of("Interdit l'IA générative en entreprise",
+                            "Classe les systèmes d'IA par niveau de risque et impose des obligations selon ce niveau",
+                            "Ne concerne que les éditeurs américains",
+                            "Remplace le RGPD"), 1));
 }

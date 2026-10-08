@@ -17,7 +17,7 @@ const presentation = {
     icon: Receipt,
   },
   'ia-pour-tous': {
-    pitch: 'ChatGPT, Claude, Gemini : gagnez du temps au quotidien, sans prérequis.',
+    pitch: 'Claude, Gemini, Mistral : gagnez du temps au quotidien, sans prérequis.',
     icon: Cpu,
   },
   'ia-for-business': {

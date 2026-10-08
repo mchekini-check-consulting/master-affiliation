@@ -278,10 +278,10 @@ export const formations = [
     tag: 'Intelligence Artificielle',
     title: 'IA pour tous',
     description:
-      "Utilisez l'IA efficacement au quotidien, même en partant de zéro : comprendre les modèles (ChatGPT, Claude, Gemini…), maîtriser le prompting, gagner du temps sur vos e-mails, documents et recherches, créer images, vidéos, sites et présentations, et automatiser vos tâches avec les agents. 80 heures 100 % pratiques, sans prérequis.",
+      "Utilisez l'IA efficacement au quotidien, même en partant de zéro : acculturation aux IA génératives (Claude, Gemini, Mistral…), prompt engineering et usages GenAI, gain de temps sur vos e-mails, documents et recherches, création d'images, de vidéos, de présentations, de sites web et d'applications web et mobiles sans code, automatisation avec les agents, dans un cadre d'usage responsable (RGPD, AI Act). 80 heures 100 % pratiques, sans prérequis.",
     image: '/images/ia-pour-tous.webp',
-    version: 'Programme V1.0',
-    pdf: '/documents/Programme_IA_Pour_Tous_V1.0.pdf',
+    version: 'Programme V1.1',
+    pdf: '/documents/Programme_IA_Pour_Tous_V1.1.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '80 h, séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
@@ -319,11 +319,12 @@ export const formations = [
           <>
             <p className="mb-2">À l'issue de la formation, le participant sera capable de :</p>
             <ol className="list-decimal pl-5 space-y-1">
-              <li>Expliquer simplement le fonctionnement et les limites des IA génératives (LLM, tokens, contexte, mémoire, hallucinations, vie privée) et choisir l'outil adapté à chaque usage.</li>
-              <li>Rédiger des prompts efficaces et se constituer un environnement personnalisé : méthode en 4 étapes, projets et instructions, bibliothèque de prompts réutilisables.</li>
-              <li>Appliquer l'IA à ses tâches quotidiennes : rédaction, analyse de documents, RAG, Deep Research, apprentissage, organisation, mode vocal.</li>
-              <li>Créer des contenus avec l'IA : images, vidéos, voix et musique, sites web sans code, présentations, écriture créative.</li>
-              <li>Automatiser ses tâches avec agents, connecteurs et MCP, et adopter des usages sûrs et critiques (deepfakes, esprit critique, bonnes habitudes).</li>
+              <li>S'acculturer aux IA génératives : expliquer le fonctionnement et les limites des modèles (LLM, tokens, contexte, mémoire, hallucinations) et choisir l'outil adapté à chaque usage.</li>
+              <li>Pratiquer le prompt engineering et les usages GenAI : méthode structurée, projets et instructions personnalisées, bibliothèque de prompts réutilisables.</li>
+              <li>Identifier les cas d'usage IA de son quotidien et les déployer : rédaction, analyse de documents, RAG, Deep Research, apprentissage, organisation, mode vocal.</li>
+              <li>Créer des contenus avec l'IA : images, vidéos, voix et musique, présentations, sites web et applications web et mobiles sans code.</li>
+              <li>Automatiser ses tâches avec agents, connecteurs et MCP, et accompagner l'adoption de ces usages dans son entourage professionnel.</li>
+              <li>Inscrire ses usages dans le cadre réglementaire : RGPD, AI Act, protection des données sensibles et esprit critique face aux contenus générés.</li>
             </ol>
           </>
         ),
@@ -411,10 +412,10 @@ export const formations = [
     tag: 'Intelligence Artificielle',
     title: "L'essentiel de l'IA : fondamentaux, outils et cas d'usage métiers",
     description:
-      "Les fondamentaux de l'IA en 21 heures : comprendre les modèles (ChatGPT, Claude, Gemini…), maîtriser le prompting, appliquer l'IA à vos e-mails, documents et recherches, créer images, présentations et pages web sans code, découvrir les agents et l'automatisation — avec un module entier consacré aux cas d'usage de votre métier. Format condensé 100 % pratique, accessible sans bagage technique.",
+      "Les fondamentaux de l'IA en 21 heures : acculturation aux IA génératives (Claude, Gemini, Mistral…), prompt engineering et usages GenAI, application à vos e-mails, documents et recherches, création d'images, de présentations, de sites web et d'applications web et mobiles sans code, identification et déploiement de cas d'usage propres à votre métier, agents et automatisation, cadre réglementaire (RGPD, AI Act). Format condensé 100 % pratique, accessible sans bagage technique.",
     image: '/images/essentiel-ia.jpg',
-    version: 'Programme V1.0',
-    pdf: '/documents/Programme_Essentiel_IA_V1.0.pdf',
+    version: 'Programme V1.1',
+    pdf: '/documents/Programme_Essentiel_IA_V1.1.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '21 h, séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
@@ -453,11 +454,12 @@ export const formations = [
           <>
             <p className="mb-2">À l'issue de la formation, le participant sera capable de :</p>
             <ol className="list-decimal pl-5 space-y-1">
-              <li>Expliquer simplement le fonctionnement et les limites des IA génératives (LLM, tokens, contexte, hallucinations, vie privée) et choisir l'outil adapté à chaque usage.</li>
-              <li>Rédiger des prompts efficaces et se constituer un environnement personnalisé : méthode en 4 étapes, projets et instructions, bibliothèque de prompts réutilisables.</li>
+              <li>S'acculturer aux IA génératives : expliquer le fonctionnement et les limites des modèles (LLM, tokens, contexte, hallucinations, vie privée) et choisir l'outil adapté à chaque usage.</li>
+              <li>Pratiquer le prompt engineering et les usages GenAI : méthode structurée, projets et instructions personnalisées, bibliothèque de prompts réutilisables.</li>
               <li>Appliquer l'IA à ses tâches professionnelles quotidiennes : rédaction, analyse de documents, RAG, Deep Research, mode vocal.</li>
-              <li>Créer des contenus professionnels avec l'IA : images, présentations, pages web sans code.</li>
-              <li>Identifier et mettre en œuvre des cas d'usage IA propres à son métier, automatiser ses premières tâches avec agents et connecteurs, et adopter des usages sûrs et critiques.</li>
+              <li>Créer des contenus professionnels avec l'IA : images, présentations, sites web et applications web et mobiles sans code.</li>
+              <li>Identifier et déployer des cas d'usage IA propres à son métier, automatiser ses premières tâches avec agents et connecteurs, et accompagner leur adoption dans son équipe.</li>
+              <li>Inscrire ses usages dans le cadre réglementaire : RGPD, AI Act, protection des données sensibles et vérification des contenus générés.</li>
             </ol>
           </>
         ),
@@ -547,8 +549,8 @@ export const formations = [
     description:
       "Construisez un business opéré par des Agents IA, de l'idée aux premiers clients : trouver et valider une idée, créer marque, site, offre et CRM sans développeur, vendre avec des agents de prospection et de contenu, automatiser support et administratif, piloter le tout dans le respect du RGPD et de l'AI Act. 100 heures avec un projet fil rouge : un micro-business réel lancé pendant la formation.",
     image: '/images/ia-for-business.webp',
-    version: 'Programme V1.0',
-    pdf: '/documents/Programme_IA_For_Business_V1.0.pdf',
+    version: 'Programme V1.1',
+    pdf: '/documents/Programme_IA_For_Business_V1.1.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '100 h, séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
@@ -586,11 +588,12 @@ export const formations = [
           <>
             <p className="mb-2">À l'issue de la formation, le participant sera capable de :</p>
             <ol className="list-decimal pl-5 space-y-1">
-              <li>Maîtriser les fondamentaux IA orientés business : LLM, prompting business, limites, état d'esprit AI-first, boîte à outils (Claude, MCP, n8n) et connecteurs.</li>
-              <li>Trouver et valider une idée de business avec des agents : recherche d'idées, étude de marché express, analyse concurrentielle, ICP et personas, business plan, test de pricing.</li>
-              <li>Construire sa marque, son site, son offre et son CRM avec l'IA, sans développeur.</li>
+              <li>S'acculturer aux fondamentaux IA orientés business : LLM, prompt engineering et usages GenAI, limites, état d'esprit AI-first, boîte à outils (Claude, MCP, n8n) et connecteurs.</li>
+              <li>Identifier et valider les cas d'usage IA à fort potentiel pour son business : recherche d'idées, étude de marché express, analyse concurrentielle, ICP et personas, business plan, test de pricing.</li>
+              <li>Construire sa marque, son site web, ses applications web et mobiles, son offre et son CRM avec l'IA, sans développeur.</li>
               <li>Vendre et acquérir avec des agents : prospection, cold outreach dans le cadre légal, machine à contenu, SEO, publicité, agent commercial 24h/24.</li>
-              <li>Opérer, analyser et piloter son business : support client RAG, administratif automatisé, tableaux de bord, boucles de feedback, orchestration des agents, conformité RGPD / AI Act, arbitrages ROI.</li>
+              <li>Opérer, superviser et piloter son business : support client RAG, administratif automatisé, tableaux de bord, supervision des agents et boucles de feedback, orchestration, arbitrages ROI, conduite du changement dans son organisation.</li>
+              <li>Déployer dans le cadre réglementaire : RGPD, AI Act, protection des données clients et mentions obligatoires.</li>
             </ol>
           </>
         ),
@@ -678,10 +681,10 @@ export const formations = [
     tag: 'Intelligence Artificielle',
     title: 'IA for Tech',
     description:
-      "Concevez, construisez et déployez des applications IA de niveau production : fondamentaux LLM côté ingénierie, intégration d'APIs et SDKs, RAG du premier pipeline au RAG agentique, agents et MCP (consommer et construire), evals, sécurité et observabilité, travail en équipe augmentée (Claude Code, spec-driven development, CI/CD). 100 heures en environnements pré-configurés, avec un projet final déployé et évalué (RAG + MCP + evals).",
+      "Concevez, construisez et déployez des applications IA de niveau production : fondamentaux LLM côté ingénierie, intégration d'APIs et SDKs, RAG du premier pipeline au RAG agentique, agents et MCP (consommer et construire), evals, supervision et monitoring des agents, sécurité et conformité (RGPD, AI Act), travail en équipe augmentée (Claude Code, spec-driven development, CI/CD). 100 heures en environnements pré-configurés, avec un projet final déployé et évalué (RAG + MCP + evals).",
     image: '/images/ia-for-tech.webp',
-    version: 'Programme V1.0',
-    pdf: '/documents/Programme_IA_For_Tech_V1.0.pdf',
+    version: 'Programme V1.1',
+    pdf: '/documents/Programme_IA_For_Tech_V1.1.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '100 h, séances à distance (planning défini à l’inscription)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
@@ -720,7 +723,8 @@ export const formations = [
               <li>Intégrer les LLM proprement en production : APIs (Anthropic, OpenAI, Gemini), gestion d'erreurs, retries, rate limits et coûts, tool use, multimodal, sorties structurées validées.</li>
               <li>Concevoir des pipelines RAG du premier prototype au RAG agentique, et arbitrer RAG vs fine-tuning vs long contexte.</li>
               <li>Construire des agents et systèmes multi-agents de production : LangGraph, Agent SDKs, MCP (consommer et publier un serveur), sandboxing.</li>
-              <li>Livrer des systèmes fiables, sûrs et conformes, et travailler en équipe augmentée : evals, observabilité, sécurité LLM et guardrails, RGPD / AI Act, architecture de production, Claude Code, spec-driven development et CI/CD.</li>
+              <li>Superviser et monitorer les agents IA en production : evals, observabilité (traces, métriques, coûts), sécurité LLM et guardrails, et garantir la conformité réglementaire (RGPD, AI Act) des architectures.</li>
+              <li>Travailler en équipe augmentée et accompagner l'adoption des pratiques IA par les équipes de développement : Claude Code, spec-driven development, CI/CD, revues assistées.</li>
             </ol>
           </>
         ),
@@ -810,8 +814,8 @@ export const formations = [
     description:
       "Intégrez l'IA dans le management quotidien de votre équipe : stratégie d'intégration responsable (AI Act, RGPD), reconfiguration des processus de travail, prompting avancé et assistants, production de contenus professionnels (textes, tableaux de bord, images, vidéos) et amélioration continue. 18 heures 100 % à distance, avec ateliers sur vos propres processus d'équipe.",
     image: '/images/management-processus-ia.jpg',
-    version: 'Programme V1.0',
-    pdf: '/documents/Programme_Management_IA_V1.0.pdf',
+    version: 'Programme V1.1',
+    pdf: '/documents/Programme_Management_IA_V1.1.pdf',
     keyFacts: [
       { icon: Clock, label: 'Durée', value: '18 h, 3 journées de 6 h (9 h–12 h 30 / 13 h 30–16 h)' },
       { icon: Monitor, label: 'Modalité', value: '100 % à distance (classe virtuelle Google Meet)' },
@@ -864,7 +868,7 @@ export const formations = [
           <ul className="list-disc pl-5 space-y-1">
             <li>Alternance d'apports théoriques et d'ateliers pratiques menés sur les processus réels des participants (fil rouge sur les 3 journées).</li>
             <li>Classe virtuelle synchrone Google Meet (caméra, partage d'écran, suivi de connexion).</li>
-            <li>Accès guidé aux outils d'IA générative du marché (ChatGPT, Claude, Gemini) et à des outils de transcription et de création de contenus ; gabarits fournis (charte d'usage IA, matrice de diagnostic des processus, bibliothèque de prompts).</li>
+            <li>Accès guidé aux outils d'IA générative du marché (Claude, Gemini, Mistral…) et à des outils de transcription et de création de contenus ; gabarits fournis (charte d'usage IA, matrice de diagnostic des processus, bibliothèque de prompts).</li>
             <li>Support de cours et modèles téléchargeables sur l'espace de la formation.</li>
           </ul>
         ),
@@ -961,34 +965,38 @@ const pennylaneNeedsLevels = [
   { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Outils numériques de gestion', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
 ];
 
+// Formations IA : les deux premières questions sont volontairement les mêmes
+// partout (aisance sur le web, déjà utilisé une IA ?), la troisième est propre
+// à la formation. L'ordre d'affichage est celui du tableau, le champ de
+// stockage reste la colonne historique indiquée par `field`.
 const iaNeedsLevels = [
-  { key: 'levelLinux', field: 'level_linux', label: 'Outils numériques du quotidien (e-mail, navigateur, bureautique)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', field: 'level_docker', label: 'Usage des IA (ChatGPT, Claude, Gemini…)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Automatisation & outils avancés (agents, connecteurs)', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelLinux', field: 'level_linux', label: 'Êtes-vous à l\'aise sur le web et les outils numériques (navigation, e-mail, bureautique) ?', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Avez-vous déjà utilisé une IA générative (assistant conversationnel, génération d\'images…) ?', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelDocker', field: 'level_docker', label: 'Rédaction de prompts et usages GenAI', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
 ];
 
 const iaBusinessNeedsLevels = [
-  { key: 'levelLinux', field: 'level_linux', label: 'Outils numériques & IA (usage quotidien)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', field: 'level_docker', label: 'Marketing & vente en ligne', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Automatisation & agents (n8n, MCP, connecteurs)', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelLinux', field: 'level_linux', label: 'Êtes-vous à l\'aise sur le web et les outils numériques ?', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Avez-vous déjà utilisé une IA générative pour votre activité ?', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelDocker', field: 'level_docker', label: 'Marketing, vente en ligne et automatisation (agents, n8n)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
 ];
 
 const iaTechNeedsLevels = [
   { key: 'levelLinux', field: 'level_linux', label: 'Développement logiciel (langage, Git, APIs)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', field: 'level_docker', label: 'Intégration de LLM (APIs, RAG)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Agents & MCP', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Avez-vous déjà intégré un LLM dans un projet (API, RAG, agents) ?', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelDocker', field: 'level_docker', label: 'Production IA : evals, supervision et monitoring des agents', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
 ];
 
 const managementIaNeedsLevels = [
   { key: 'levelLinux', field: 'level_linux', label: "Management d'équipe", options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', field: 'level_docker', label: 'Outils numériques du quotidien', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'IA générative', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelDocker', field: 'level_docker', label: 'Êtes-vous à l\'aise sur le web et les outils numériques ?', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Avez-vous déjà utilisé une IA générative avec votre équipe ?', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
 ];
 
 const essentielIaNeedsLevels = [
-  { key: 'levelLinux', field: 'level_linux', label: 'Outils numériques du quotidien (e-mail, navigateur, bureautique)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelDocker', field: 'level_docker', label: 'Usage des IA (ChatGPT, Claude, Gemini…)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
-  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'IA appliquée à votre métier', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelLinux', field: 'level_linux', label: 'Êtes-vous à l\'aise sur le web et les outils numériques (navigation, e-mail, bureautique) ?', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
+  { key: 'levelKubernetes', field: 'level_kubernetes', label: 'Avez-vous déjà utilisé une IA générative dans votre travail ?', options: ['Aucune notion', 'Notions', 'Déjà utilisé'] },
+  { key: 'levelDocker', field: 'level_docker', label: 'Cas d\'usage IA dans votre métier (rédaction, analyse, automatisation)', options: ['Débutant', 'Intermédiaire', 'Confirmé'] },
 ];
 
 const needsLevelsByFormation = {
@@ -1051,7 +1059,7 @@ const iaBusinessQuizTexts = {
 };
 
 const iaTechQuizTexts = {
-  intro: "Ce test vérifie vos prérequis (programmation) et situe vos notions IA, pour adapter l'animation à vos besoins.",
+  intro: "Ce test situe précisément votre niveau d'ingénierie LLM (APIs, RAG, agents, MCP, evals, supervision) pour calibrer la session, et vérifie vos prérequis de programmation. Il n'est pas éliminatoire.",
   selfLevelQuestion: "Où en êtes-vous de l'intégration de LLM dans vos projets ?",
   selfLevelMissing: 'Auto-évaluation intégration LLM',
   selfLevelPdfLabel: 'Niveau déclaré en intégration de LLM',

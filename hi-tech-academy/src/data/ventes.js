@@ -182,12 +182,12 @@ export const ventes = {
   'ia-pour-tous': {
     accroche: "Ils gagnent 5 heures par semaine avec l'IA. Pourquoi pas vous ?",
     promesse:
-      "Aujourd'hui, vous utilisez peut-être ChatGPT « de temps en temps », sans méthode. Après 80 heures 100 % pratiques, l'IA rédigera avec vous, analysera vos documents, créera vos visuels et automatisera vos tâches répétitives. Vous saurez exactement quand lui faire confiance, et quand vous méfier.",
+      "Aujourd'hui, vous utilisez peut-être l'IA « de temps en temps », sans méthode. Après 80 heures 100 % pratiques, l'IA rédigera avec vous, analysera vos documents, créera vos visuels et automatisera vos tâches répétitives. Vous saurez exactement quand lui faire confiance, et quand vous méfier.",
     clusters: [
       {
         titre: "Comprenez enfin ce que l'IA sait (et ne sait pas) faire",
         items: [
-          'ChatGPT, Claude, Gemini, Mistral : lequel est fait pour VOUS ?',
+          'Claude, Gemini, Mistral… : quelle IA est faite pour VOUS ?',
           'Le secret des utilisateurs efficaces : pourquoi ils combinent plusieurs IA',
           "Hallucinations : repérez les erreurs de l'IA avant qu'elles vous coûtent du temps",
           'Vie privée : les données à ne jamais partager avec une IA',
@@ -217,7 +217,7 @@ export const ventes = {
         items: [
           'Images de qualité : les bons outils et les bons prompts',
           'Vidéos sans caméra, voix et musique : ce qui est réellement possible aujourd’hui',
-          'Votre site web sans coder, publié pendant la formation',
+          'Votre site web et vos premières applications web et mobiles, sans code',
           'Présentations professionnelles en quelques minutes',
         ],
       },
@@ -235,7 +235,7 @@ export const ventes = {
     cible: {
       pour: [
         "Vous entendez parler d'IA partout et vous refusez de rester sur le quai.",
-        'Vous utilisez déjà ChatGPT « un peu », sans méthode ni résultats constants.',
+        'Vous utilisez déjà l\'IA « un peu », sans méthode ni résultats constants.',
         'Vous êtes entrepreneur, salarié ou indépendant et vos journées sont trop courtes.',
         "Vous voulez aussi protéger votre famille des arnaques et deepfakes qui explosent.",
       ],
@@ -273,7 +273,7 @@ export const ventes = {
       {
         titre: "Comprenez l'IA en une matinée, sans une ligne de technique",
         items: [
-          'ChatGPT, Claude, Gemini, Mistral : lequel est fait pour VOTRE usage ?',
+          'Claude, Gemini, Mistral… : quelle IA pour VOTRE usage ?',
           "Hallucinations : repérez les réponses inventées avant qu'elles vous coûtent cher",
           "Vie privée : les données à ne JAMAIS confier à une IA",
         ],
@@ -300,7 +300,7 @@ export const ventes = {
         titre: 'Créez comme un pro, sans compétence technique',
         items: [
           'Images et présentations : des visuels professionnels en quelques minutes',
-          'Votre page web publiée pendant la formation, sans coder',
+          'Votre site web ou application, créé sans code et publié pendant la formation',
         ],
       },
       {
@@ -326,7 +326,7 @@ export const ventes = {
     cible: {
       pour: [
         "Vous voulez les bénéfices de l'IA sans pouvoir bloquer 80 heures dans votre agenda.",
-        'Vous utilisez ChatGPT « un peu », sans méthode ni résultats constants.',
+        'Vous utilisez l\'IA « un peu », sans méthode ni résultats constants.',
         "Vous attendez des cas d'usage concrets pour VOTRE métier, pas des démos génériques.",
         'Vous êtes salarié, indépendant ou dirigeant et chaque heure compte.',
       ],

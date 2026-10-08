@@ -46,7 +46,7 @@ public final class FinalEvaluationIaCatalog {
                     List.of("Obtenir un rapport documenté et sourcé en quelques minutes",
                             "Coder un site web", "Retoucher des photos", "Envoyer des e-mails"), 0),
             new FinalEvaluationCatalog.QcmQuestion(7,
-                    "Créer un site web sans coder avec l'IA...",
+                    "Créer un site web ou une application web et mobile sans code avec l'IA...",
                     List.of("Est impossible sans développeur",
                             "Est possible avec les outils de génération dédiés",
                             "N'existe qu'en anglais", "Nécessite d'installer un serveur"), 1),
