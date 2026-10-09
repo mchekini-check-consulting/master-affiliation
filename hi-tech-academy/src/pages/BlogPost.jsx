@@ -106,7 +106,7 @@ export default function BlogPost() {
       <main className="pt-28 pb-20">
         {/* En-tête éditorial sur fond pâle, plus large que le corps */}
         <div className="pt-12 pb-14 mb-10" style={{ background: '#f0f7ff' }}>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <Link
               to="/blog"
               className="inline-flex items-center gap-2 text-sm font-semibold mb-7 transition-all hover:gap-3"
@@ -124,7 +124,7 @@ export default function BlogPost() {
             </div>
 
             <h1
-              className="font-serif-display text-3xl sm:text-4xl lg:text-[2.85rem] font-bold leading-[1.12] mb-6 max-w-3xl"
+              className="font-serif-display text-3xl sm:text-4xl lg:text-[2.85rem] font-bold leading-[1.12] mb-6 max-w-4xl"
               style={{ color: '#243037', ...interFont }}>
               {post.title}
             </h1>
@@ -148,7 +148,7 @@ export default function BlogPost() {
           </div>
         </div>
 
-        <article className="max-w-4xl mx-auto px-4 sm:px-6">
+        <article className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* Image de couverture */}
           <div className="rounded-2xl overflow-hidden mb-12 aspect-[21/9]">
             <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
