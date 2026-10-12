@@ -6,8 +6,10 @@ import Footer from '@/components/Footer';
 import { getFormationById } from '@/data/formations';
 import { createRegistration } from '@/api/backend';
 
-// Options identiques au formulaire d'inscription Qualiobee
+// Options alignées sur le formulaire d'inscription Qualiobee, complétées de
+// la typologie « chef d'entreprise » demandée pour nos dossiers.
 export const CLIENT_TYPOLOGIES = [
+  "Chef d'entreprise souhaitant se former",
   'Entreprise (formant ses salariés)',
   'Pouvoirs publics (formant ses agents)',
   'Gestionnaire de fonds',
@@ -159,8 +161,8 @@ export function Stepper({ current }) {
 }
 
 const APPLICANT_MODES = [
-  { key: 'COMPANY', label: 'Je suis une entreprise', icon: Building2 },
-  { key: 'INDEPENDENT', label: 'Je suis un indépendant', icon: BriefcaseBusiness },
+  { key: 'COMPANY', label: 'Je suis une société avec des salariés', icon: Building2 },
+  { key: 'INDEPENDENT', label: "Je suis Président / Gérant d'une société", icon: BriefcaseBusiness },
   { key: 'INDIVIDUAL', label: 'Je suis un particulier', icon: UserRound },
 ];
 
