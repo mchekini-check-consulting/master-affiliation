@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, DownloadSimple as Download, Minus, Plus } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, Check, Minus, Plus } from '@phosphor-icons/react';
+import PrimaryButton from '@/components/ui/primary-button';
 import { LINE, MINT_LIGHT, BODY, BODY_MUTED, headingFont, serifFont, bodyFont } from '@/components/design';
 import { Bande, SectionTitle, ZonePhoto, RADIUS } from './atomes';
 
@@ -19,23 +20,11 @@ export default function Programme({ modules, captures, pdf, promesseFinale, titr
 
   return (
     <Bande id="programme">
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <SectionTitle
-          kicker="Programme"
-          sub={`${total} étapes progressives, chacune alternant démonstration et travaux pratiques.`}>
-          {titre ?? `${total} étapes, du premier pas à l'autonomie`}
-        </SectionTitle>
-        {pdf && (
-          <a
-            href={pdf}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 h-11 px-5 mb-8 sm:mb-10 rounded-full text-body-sm font-semibold"
-            style={{ color: '#243037', border: `1px solid ${LINE}`, ...headingFont }}>
-            <Download className="w-4 h-4" style={{ color: accent }} /> Programme officiel (PDF)
-          </a>
-        )}
-      </div>
+      <SectionTitle
+        kicker="Programme"
+        sub={`${total} étapes progressives, chacune alternant démonstration et travaux pratiques.`}>
+        {titre ?? `${total} étapes, du premier pas à l'autonomie`}
+      </SectionTitle>
 
       {/* Desktop : progression + panneau */}
       <div className="hidden lg:grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 items-stretch">
@@ -143,6 +132,16 @@ export default function Programme({ modules, captures, pdf, promesseFinale, titr
           );
         })}
       </ol>
+
+      {/* Le programme officiel en bouton plein, centré sous les étapes :
+          même pilule bleue que les autres actions de la page. */}
+      {pdf && (
+        <div className="flex justify-center mt-10 sm:mt-12">
+          <PrimaryButton href={pdf} target="_blank" rel="noopener noreferrer" size="lg" style={{ background: accent }}>
+            Télécharger le programme officiel (PDF)
+          </PrimaryButton>
+        </div>
+      )}
 
       {(promesseFinale || (captures && captures.length > 0)) && (
         <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 mt-12">
