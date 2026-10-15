@@ -4,7 +4,8 @@ import { jsPDF } from 'jspdf';
 // identification complète du vendeur (forme juridique, capital, RCS, SIRET,
 // TVA intracommunautaire, NDA), du client, détail HT / TVA / TTC, conditions
 // de paiement (virement 30 jours, pénalités de retard, indemnité de
-// recouvrement, pas d'escompte) et bloc « Bon pour accord » pour les devis.
+// recouvrement, pas d'escompte) ; les devis s'acceptent par retour signé avec
+// la mention manuscrite « Bon pour accord » (pas de cadre de signature).
 const ORG = {
   name: 'HI-TECH ACADEMY',
   legalLine: 'EURL au capital de 100 € — RCS Paris 922 695 648',
@@ -312,21 +313,6 @@ function buildBillingPdf(d) {
       + `à ${ORG.email}.`,
       { gap: 8 },
     );
-
-    // Bloc signature « Bon pour accord »
-    const boxW = w.contentWidth * 0.48;
-    const boxX = w.pageWidth - MARGIN - boxW;
-    const boxH = 34;
-    w.ensure(boxH);
-    w.doc.setDrawColor(BORDER).setLineWidth(0.3);
-    w.doc.roundedRect(boxX, w.y, boxW, boxH, 1.5, 1.5);
-    w.doc.setFont('helvetica', 'bold').setFontSize(9).setTextColor(NAVY);
-    w.doc.text('Bon pour accord', boxX + 4, w.y + 6);
-    w.doc.setFont('helvetica', 'normal').setFontSize(8.5).setTextColor(GREY);
-    w.doc.text('Date :', boxX + 4, w.y + 13);
-    w.doc.text('Nom et qualité du signataire :', boxX + 4, w.y + 20);
-    w.doc.text('Signature :', boxX + 4, w.y + 27);
-    w.y += boxH + 6;
   }
 
   return w.finish();
