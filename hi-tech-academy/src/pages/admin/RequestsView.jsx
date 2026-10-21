@@ -533,7 +533,8 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
                 Aucun salarié n'a encore rempli son questionnaire — partagez le lien ci-dessus à l'entreprise.
               </p>
             ) : (
-              <table className="w-full text-left">
+              <div className="overflow-x-auto">
+              <table className="w-full text-left" style={{ minWidth: 820 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
                     {['Salarié', 'Poste', 'Analyse du besoin', 'Test de positionnement', 'Évaluation finale', ''].map((h, i) => (
@@ -610,6 +611,7 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </Card>
         )}

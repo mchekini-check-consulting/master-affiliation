@@ -96,19 +96,19 @@ function ContactForm({ form, setForm }) {
   const set = (field) => (value) => setForm((f) => ({ ...f, [field]: value }));
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-3">
         <FieldInput label="Prénom" required value={form.firstName} onChange={set('firstName')} />
         <FieldInput label="Nom" required value={form.lastName} onChange={set('lastName')} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-3">
         <FieldInput label="Email" type="email" value={form.email} onChange={set('email')} />
         <FieldInput label="Téléphone" type="tel" value={form.phone} onChange={set('phone')} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-3">
         <FieldInput label="Entreprise" value={form.company} onChange={set('company')} />
         <FieldInput label="Poste" value={form.jobTitle} onChange={set('jobTitle')} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-3">
         <FieldSelect label="Formation d'intérêt" value={form.formationId} onChange={set('formationId')}>
           <option value="">—</option>
           {formations.map((f) => <option key={f.id} value={f.id}>{f.title}</option>)}
@@ -118,7 +118,7 @@ function ContactForm({ form, setForm }) {
           {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
         </FieldSelect>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-3">
         <FieldSelect label="Colonne" value={form.stage} onChange={set('stage')}>
           {STAGES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
         </FieldSelect>

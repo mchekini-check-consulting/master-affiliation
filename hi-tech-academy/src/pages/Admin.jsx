@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, DatabaseBackup, FolderOpen, GraduationCap, Handshake, Inbox, LogOut, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, TrendingUp, UsersRound, Workflow } from 'lucide-react';
+import { Award, DatabaseBackup, FolderOpen, GraduationCap, Handshake, Inbox, LogOut, Menu, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, TrendingUp, UsersRound, Workflow, X } from 'lucide-react';
 import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
 import { bodyFont, headingFont } from '@/pages/admin/common';
 import RequestsView from '@/pages/admin/RequestsView';
@@ -113,12 +113,101 @@ const NAV_ITEMS = [
   { key: 'backup', label: 'Sauvegardes', icon: DatabaseBackup },
 ];
 
+// --- Logo + intitulé (partagé sidebar / topbar / drawer) --------------
+function Brand() {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm"
+        style={{ background: '#005064', color: 'white', ...headingFont }}>
+        HT
+      </div>
+      <div>
+        <p className="text-sm font-bold leading-tight" style={{ color: 'white', ...headingFont }}>
+          Hi-Tech Academy
+        </p>
+        <p className="text-[11px]" style={{ color: '#8ba0c4', ...bodyFont }}>Administration</p>
+      </div>
+    </div>
+  );
+}
+
+// --- Liste de navigation + pied (partagée sidebar / drawer) -----------
+function NavPanel({ view, onNavigate, email, onLogout }) {
+  return (
+    <>
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+        {NAV_ITEMS.map(({ key, label, icon: Icon }) => {
+          const active = view === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onNavigate(key)}
+              className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition-colors"
+              style={{
+                background: active ? '#005064' : 'transparent',
+                color: active ? 'white' : '#8ba0c4',
+                ...headingFont,
+              }}>
+              <Icon className="w-[18px] h-[18px] shrink-0" />
+              {label}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="px-3 pb-5 pt-3" style={{ borderTop: '1px solid rgba(139,160,196,0.2)' }}>
+        <p className="px-3.5 pb-2 text-[11px] truncate" style={{ color: '#8ba0c4', ...bodyFont }}>
+          {email}
+        </p>
+        <button
+          type="button"
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-left"
+          style={{ color: '#f0a5a5', ...headingFont }}>
+          <LogOut className="w-[18px] h-[18px]" />
+          Se déconnecter
+        </button>
+      </div>
+    </>
+  );
+}
+
+// --- Balises PWA injectées uniquement sur /admin ----------------------
+// Le manifest rend l'admin installable (Android : « Installer l'application »,
+// iOS : Partager → « Sur l'écran d'accueil ») sans toucher au site public.
+// Pas de service worker : l'admin vit sur les données de l'API, un cache
+// offline ne ferait que servir du périmé après chaque déploiement.
+function useAdminPwaTags() {
+  useEffect(() => {
+    const tags = [
+      ['link', { rel: 'manifest', href: '/admin-manifest.webmanifest' }],
+      ['link', { rel: 'apple-touch-icon', href: '/images/admin-icon-180.png' }],
+      ['meta', { name: 'theme-color', content: '#001a4a' }],
+      ['meta', { name: 'mobile-web-app-capable', content: 'yes' }],
+      ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
+      ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }],
+      ['meta', { name: 'apple-mobile-web-app-title', content: 'HTA Admin' }],
+    ].map(([tag, attrs]) => {
+      const el = document.createElement(tag);
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      document.head.appendChild(el);
+      return el;
+    });
+    return () => tags.forEach((el) => el.remove());
+  }, []);
+}
+
 // --- Page /admin ------------------------------------------------------
 export default function Admin() {
   const [auth, setAuth] = useState(getStoredAuth);
   const [view, setView] = useState('requests');
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [requestsFormationFilter, setRequestsFormationFilter] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useAdminPwaTags();
 
   useEffect(() => {
     document.title = 'Administration — Hi-Tech Academy';
@@ -130,6 +219,13 @@ export default function Admin() {
     setAuth(null);
     setView('requests');
     setSelectedRequestId(null);
+    setMenuOpen(false);
+  };
+
+  const navigate = (key) => {
+    setView(key);
+    if (key !== 'requests') setSelectedRequestId(null);
+    setMenuOpen(false);
   };
 
   // Depuis les autres vues : ouvrir une demande précise dans « Demandes à traiter »
@@ -143,67 +239,61 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#f7f9fd' }}>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#f7f9fd' }}>
 
-      {/* Sidebar */}
+      {/* Sidebar — desktop uniquement */}
       <aside
-        className="w-64 shrink-0 flex flex-col sticky top-0 h-screen"
+        className="hidden lg:flex w-64 shrink-0 flex-col sticky top-0 h-screen"
         style={{ background: '#001a4a' }}>
-        <div className="px-5 py-6 flex items-center gap-2.5">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm"
-            style={{ background: '#005064', color: 'white', ...headingFont }}>
-            HT
-          </div>
-          <div>
-            <p className="text-sm font-bold leading-tight" style={{ color: 'white', ...headingFont }}>
-              Hi-Tech Academy
-            </p>
-            <p className="text-[11px]" style={{ color: '#8ba0c4', ...bodyFont }}>Administration</p>
-          </div>
+        <div className="px-5 py-6">
+          <Brand />
         </div>
-
-        <nav className="flex-1 px-3 space-y-1">
-          {NAV_ITEMS.map(({ key, label, icon: Icon }) => {
-            const active = view === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => {
-                  setView(key);
-                  if (key !== 'requests') setSelectedRequestId(null);
-                }}
-                className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-left transition-colors"
-                style={{
-                  background: active ? '#005064' : 'transparent',
-                  color: active ? 'white' : '#8ba0c4',
-                  ...headingFont,
-                }}>
-                <Icon className="w-[18px] h-[18px] shrink-0" />
-                {label}
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="px-3 pb-5 pt-3" style={{ borderTop: '1px solid rgba(139,160,196,0.2)' }}>
-          <p className="px-3.5 pb-2 text-[11px] truncate" style={{ color: '#8ba0c4', ...bodyFont }}>
-            {auth.email}
-          </p>
-          <button
-            type="button"
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-left"
-            style={{ color: '#f0a5a5', ...headingFont }}>
-            <LogOut className="w-[18px] h-[18px]" />
-            Se déconnecter
-          </button>
-        </div>
+        <NavPanel view={view} onNavigate={navigate} email={auth.email} onLogout={logout} />
       </aside>
 
+      {/* Topbar — mobile et tablette */}
+      <header
+        className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3"
+        style={{ background: '#001a4a', paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
+        <Brand />
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Ouvrir le menu"
+          className="w-11 h-11 -mr-1.5 flex items-center justify-center rounded-xl"
+          style={{ color: 'white' }}>
+          <Menu className="w-6 h-6" />
+        </button>
+      </header>
+
+      {/* Drawer de navigation — mobile et tablette */}
+      {menuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0"
+            style={{ background: 'rgba(0,26,74,0.55)' }}
+            onClick={() => setMenuOpen(false)} />
+          <div
+            className="absolute inset-y-0 left-0 w-72 max-w-[85vw] flex flex-col"
+            style={{ background: '#001a4a', paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+            <div className="px-5 py-5 flex items-center justify-between">
+              <Brand />
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Fermer le menu"
+                className="w-11 h-11 -mr-1.5 flex items-center justify-center rounded-xl"
+                style={{ color: '#8ba0c4' }}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <NavPanel view={view} onNavigate={navigate} email={auth.email} onLogout={logout} />
+          </div>
+        </div>
+      )}
+
       {/* Contenu : pleine largeur à côté de la sidebar */}
-      <main className="flex-1 min-w-0 px-5 sm:px-8 py-8 overflow-x-hidden">
+      <main className="flex-1 min-w-0 px-4 sm:px-8 py-5 sm:py-8 overflow-x-hidden">
         <div className="w-full">
           {view === 'formations' && (
             <FormationsView

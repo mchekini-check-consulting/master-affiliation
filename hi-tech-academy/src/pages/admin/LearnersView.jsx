@@ -83,7 +83,8 @@ function LearnerDetail({ learner, onBack, onOpenRequest }) {
       </div>
 
       <Card title="Demandes d'inscription">
-        <table className="w-full text-left">
+        <div className="overflow-x-auto">
+        <table className="w-full text-left" style={{ minWidth: 640 }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #e0e8f4' }}>
               {['Date', 'Formation', 'Questionnaire', 'Statut', ''].map((h, i) => (
@@ -135,6 +136,7 @@ function LearnerDetail({ learner, onBack, onOpenRequest }) {
             ))}
           </tbody>
         </table>
+        </div>
       </Card>
     </div>
   );

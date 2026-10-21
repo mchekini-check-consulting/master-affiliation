@@ -215,7 +215,7 @@ function CreateForm({ auth, type, registrations, onClose, onCreated }) {
             </select>
           </label>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-3">
             <label className="block">
               <span className={labelClass} style={labelStyle}>
                 Client (raison sociale ou nom) <span style={{ color: '#c2410c' }}>*</span>
@@ -238,7 +238,7 @@ function CreateForm({ auth, type, registrations, onClose, onCreated }) {
               className={inputClass} style={inputStyle} />
           </label>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid sm:grid-cols-3 gap-3">
             <label className="block">
               <span className={labelClass} style={labelStyle}>
                 Code postal <span style={{ color: '#c2410c' }}>*</span>
@@ -246,7 +246,7 @@ function CreateForm({ auth, type, registrations, onClose, onCreated }) {
               <input required value={clientPostalCode} onChange={(e) => setClientPostalCode(e.target.value)}
                 className={inputClass} style={inputStyle} />
             </label>
-            <label className="block col-span-2">
+            <label className="block sm:col-span-2">
               <span className={labelClass} style={labelStyle}>
                 Ville <span style={{ color: '#c2410c' }}>*</span>
               </span>
@@ -255,7 +255,7 @@ function CreateForm({ auth, type, registrations, onClose, onCreated }) {
             </label>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid sm:grid-cols-3 gap-3">
             <label className="block">
               <span className={labelClass} style={labelStyle}>SIRET (entreprise)</span>
               <input value={clientSiret} onChange={(e) => setClientSiret(e.target.value)}
@@ -273,7 +273,7 @@ function CreateForm({ auth, type, registrations, onClose, onCreated }) {
             </label>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-3">
             <label className="block">
               <span className={labelClass} style={labelStyle}>Début de la prestation</span>
               <input type="date" value={serviceStartDate} onChange={(e) => setServiceStartDate(e.target.value)}

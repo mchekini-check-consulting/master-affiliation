@@ -80,7 +80,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
         </p>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-3">
             <label className="block">
               <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                 Début de session <span style={{ color: '#c2410c' }}>*</span>
@@ -96,7 +96,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
                 className={inputClass} style={inputStyle} />
             </label>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-3">
             <label className="block">
               <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                 Durée de la formation (h) <span style={{ color: '#c2410c' }}>*</span>
@@ -119,7 +119,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
           </div>
 
           {/* Évaluation des acquis (grille : QCM /10 + mise en pratique /10) */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-3">
             <label className="block">
               <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                 QCM d'évaluation finale / 10 <span style={{ color: '#c2410c' }}>*</span>
