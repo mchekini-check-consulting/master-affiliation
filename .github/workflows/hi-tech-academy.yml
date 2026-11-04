@@ -76,6 +76,17 @@ jobs:
             git remote set-url origin "$REPO_URL"
             git fetch origin main
             git reset --hard origin/main
+            # Synchronise la clé API Yousign (production) depuis le secret
+            # GitHub YOUSIGN_API_KEY vers le .env.secrets de la VM. Secret
+            # absent = on ne touche à rien (l'envoi en signature reste
+            # désactivé avec un message explicite dans l'admin).
+            if [ -n "${{ secrets.YOUSIGN_API_KEY }}" ]; then
+              touch .env.secrets
+              grep -vE '^YOUSIGN_(API_KEY|BASE_URL)=' .env.secrets > .env.secrets.tmp || true
+              echo "YOUSIGN_API_KEY=${{ secrets.YOUSIGN_API_KEY }}" >> .env.secrets.tmp
+              echo "YOUSIGN_BASE_URL=https://api.yousign.app/v3" >> .env.secrets.tmp
+              mv .env.secrets.tmp .env.secrets
+            fi
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             # Retry : les images tout juste poussées peuvent mettre quelques
             # secondes à être disponibles sur GHCR

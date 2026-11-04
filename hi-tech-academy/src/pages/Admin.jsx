@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, DatabaseBackup, FolderOpen, GraduationCap, Handshake, Inbox, LogOut, Menu, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, TrendingUp, UsersRound, Workflow, X } from 'lucide-react';
+import { Award, DatabaseBackup, FileSignature, FolderOpen, GraduationCap, Handshake, Inbox, LogOut, Menu, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, TrendingUp, UsersRound, Workflow, X } from 'lucide-react';
 import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
 import { bodyFont, headingFont } from '@/pages/admin/common';
 import RequestsView from '@/pages/admin/RequestsView';
@@ -15,6 +15,7 @@ import VeilleView from '@/pages/admin/VeilleView';
 import SeoGeoView from '@/pages/admin/SeoGeoView';
 import CrmView from '@/pages/admin/CrmView';
 import BackupView from '@/pages/admin/BackupView';
+import ConventionsView from '@/pages/admin/ConventionsView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
 function LoginScreen({ onLoggedIn }) {
@@ -104,6 +105,7 @@ const NAV_ITEMS = [
   { key: 'learners', label: 'Dossiers apprenants', icon: UsersRound },
   { key: 'certificates', label: 'Certificats de réalisation', icon: Award },
   { key: 'billing', label: 'Devis & Factures', icon: ReceiptText },
+  { key: 'conventions', label: 'Conventions', icon: FileSignature },
   { key: 'complaints', label: 'Réclamations', icon: MessageSquareWarning },
   { key: 'veille', label: 'Veille', icon: Rss },
   { key: 'seo', label: 'SEO / GEO', icon: TrendingUp },
@@ -318,6 +320,9 @@ export default function Admin() {
           )}
           {view === 'billing' && (
             <BillingView auth={auth} />
+          )}
+          {view === 'conventions' && (
+            <ConventionsView auth={auth} />
           )}
           {view === 'complaints' && (
             <ComplaintsView auth={auth} />

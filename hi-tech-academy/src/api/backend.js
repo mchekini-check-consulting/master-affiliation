@@ -147,6 +147,49 @@ export function adminArchiveBillingPdf(auth, id, pdfBase64) {
   });
 }
 
+// --- Conventions de formation (signature Yousign) ----------------------
+export function adminListConventions(auth) {
+  return request('/admin/conventions', { auth });
+}
+
+export function adminCreateConvention(auth, payload) {
+  return request('/admin/conventions', { method: 'POST', body: payload, auth });
+}
+
+// Envoie le PDF généré + les coordonnées des champs de signature : le back
+// crée la demande Yousign et les deux parties reçoivent l'invitation par email
+export function adminSendConventionForSignature(auth, id, pdfBase64, signatureFields) {
+  return request(`/admin/conventions/${id}/sign`, {
+    method: 'POST', auth, body: { pdf_base64: pdfBase64, signature_fields: signatureFields },
+  });
+}
+
+export function adminRefreshConvention(auth, id) {
+  return request(`/admin/conventions/${id}/refresh`, { method: 'POST', auth });
+}
+
+export function adminCancelConvention(auth, id) {
+  return request(`/admin/conventions/${id}/cancel`, { method: 'POST', auth });
+}
+
+// Télécharge le PDF signé (bytes) : fetch direct pour transporter l'auth
+export async function adminDownloadSignedConvention(auth, id) {
+  const response = await fetch(`${API_BASE}/admin/conventions/${id}/signed-pdf`, {
+    headers: { Authorization: `Basic ${btoa(`${auth.email}:${auth.password}`)}` },
+  });
+  if (!response.ok) throw new Error(`Erreur ${response.status}`);
+  return response.blob();
+}
+
+// --- Indicateurs de résultats de l'organisme ----------------------------
+export function adminGetIndicators(auth) {
+  return request('/admin/indicators', { auth });
+}
+
+export function adminUpdateIndicators(auth, payload) {
+  return request('/admin/indicators', { method: 'POST', body: payload, auth });
+}
+
 // --- Kanban de veille -------------------------------------------------
 export function adminListVeille(auth) {
   return request('/admin/veille', { auth });
