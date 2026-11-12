@@ -356,11 +356,14 @@ export default function SessionsView({ auth }) {
                         className="rounded-xl border px-3 py-2 text-xs font-semibold outline-none"
                         style={{ borderColor: '#e0e8f4', color: '#005064', ...headingFont }}>
                         <option value="">+ Rattacher une demande validée…</option>
-                        {attachables(s).map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.company_name || [r.first_name, r.last_name].filter(Boolean).join(' ')}
-                          </option>
-                        ))}
+                        {attachables(s).map((r) => {
+                          const person = [r.first_name, r.last_name].filter(Boolean).join(' ');
+                          return (
+                            <option key={r.id} value={r.id}>
+                              {r.company_name ? `${r.company_name} — ${person}` : person}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
