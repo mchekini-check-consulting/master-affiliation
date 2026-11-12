@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { CalendarDays, Eye, Play, Plus, Send, Trash2, X } from 'lucide-react';
+import { CalendarDays, ChevronDown, Eye, Play, Plus, Send, Trash2, X } from 'lucide-react';
 import {
   adminAttachToSession,
   adminCreateSession,
@@ -496,18 +496,31 @@ export default function SessionsView({ auth }) {
           {sessions.map((s) => {
             const open = expanded === s.id;
             return (
-              <Card key={s.id}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <button type="button" onClick={() => setExpanded(open ? null : s.id)} className="text-left">
-                    <p className="text-sm font-bold flex items-center gap-2" style={{ color: '#001a4a', ...headingFont }}>
+              <Card key={s.id} className={open ? '' : 'transition-colors'}>
+                {/* Toute la ligne d'en-tête déplie la session ; les actions stoppent la propagation. */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setExpanded(open ? null : s.id)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(open ? null : s.id); } }}
+                  className="flex flex-wrap items-center justify-between gap-3 -m-2 p-2 rounded-xl cursor-pointer"
+                  style={{ background: open ? '#f7f9fd' : 'transparent' }}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span
+                      className="w-9 h-9 shrink-0 rounded-xl inline-flex items-center justify-center"
+                      style={{ background: '#f0f3fa' }}>
                       <CalendarDays className="w-4 h-4" style={{ color: '#005064' }} />
-                      {s.formation_title}
-                    </p>
-                    <p className="text-xs mt-1" style={{ color: '#6b7a9b', ...bodyFont }}>
-                      Du {formatDay(s.start_date)} au {formatDay(s.end_date)} · {s.registrations.length} demande(s) · créée le {formatDate(s.created_at)}
-                    </p>
-                  </button>
-                  <div className="flex items-center gap-2">
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold truncate" style={{ color: '#001a4a', ...headingFont }}>
+                        {s.formation_title}
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: '#6b7a9b', ...bodyFont }}>
+                        Du {formatDay(s.start_date)} au {formatDay(s.end_date)} · {s.registrations.length} demande(s) · créée le {formatDate(s.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     {s.status === 'STARTED' ? (
                       <Badge tone="success">Démarrée</Badge>
                     ) : (
@@ -534,12 +547,19 @@ export default function SessionsView({ auth }) {
                       style={{ color: '#a12626' }}>
                       <Trash2 className="w-4 h-4" />
                     </button>
+                    <ChevronDown
+                      className="w-4 h-4 transition-transform"
+                      style={{ color: '#6b7a9b', transform: open ? 'rotate(180deg)' : 'none' }} />
                   </div>
                 </div>
 
                 {open && (
                   <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f0f3fa' }}>
-                    {/* Demandes rattachées */}
+                    {/* Demandes rattachées : même habillage que les blocs satisfaction */}
+                    <div className="rounded-xl p-4" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
+                    <p className="text-xs uppercase tracking-wide font-semibold mb-3" style={{ color: '#6b7a9b', ...headingFont }}>
+                      Demandes rattachées
+                    </p>
                     <div className="flex flex-wrap items-center gap-2">
                       {s.registrations.map((r) => (
                         <span
@@ -572,6 +592,7 @@ export default function SessionsView({ auth }) {
                           );
                         })}
                       </select>
+                    </div>
                     </div>
 
                     <SessionDetailsForm key={s.id} auth={auth} session={s} onSaved={patch} onError={setError} />
