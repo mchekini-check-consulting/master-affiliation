@@ -182,7 +182,14 @@ function CreateForm({ auth, registrations, indicators, onClose, onCreated }) {
       if (r.formation_id && conventionFormations.some((f) => f.id === r.formation_id)) {
         pickFormation(r.formation_id);
       }
-      setParticipantsText((prev) => prev || person);
+      // Article 3 : les participants sont les apprenants qui suivent la
+      // formation. Pour une entreprise, ce sont les salariés déclarés via le
+      // questionnaire (jamais le dirigeant signataire) ; s'ils ne sont pas
+      // encore connus, on laisse vide (« à confirmer » dans le PDF).
+      const trainees = (r.trainees ?? [])
+        .map((t) => [t.first_name, t.last_name].filter(Boolean).join(' '))
+        .filter(Boolean);
+      setParticipantsText(r.applicant_type === 'COMPANY' ? trainees.join('\n') : person);
     } catch (e) {
       setError(e.message);
     }
@@ -359,7 +366,7 @@ function CreateForm({ auth, registrations, indicators, onClose, onCreated }) {
             style={inputStyle} />
         </label>
         <label className="block">
-          <span className={labelClass} style={labelStyle}>Participants (un par ligne)</span>
+          <span className={labelClass} style={labelStyle}>Apprenants (un par ligne — les stagiaires qui suivent la formation, pas le signataire)</span>
           <textarea rows={2} value={participantsText} onChange={(e) => setParticipantsText(e.target.value)} className={inputClass} style={inputStyle} />
         </label>
 
