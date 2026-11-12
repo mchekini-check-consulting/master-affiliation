@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Ban, Download, Eye, Plus, RefreshCw, Send, X } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Ban, Download, Eye, FileUp, Plus, RefreshCw, Send, X } from 'lucide-react';
 import {
   adminCancelConvention,
   adminCreateConvention,
@@ -12,6 +12,7 @@ import {
   adminSendConventionForSignature,
   adminUpdateConventionStatus,
   adminUpdateIndicators,
+  adminUploadSignedConvention,
 } from '@/api/backend';
 import { formations } from '@/data/formations';
 import { getConventionData } from '@/data/conventionData';
@@ -517,6 +518,38 @@ export default function ConventionsView({ auth }) {
     }
   };
 
+  // Dépôt manuel du document signé : input fichier caché, partagé par toutes
+  // les lignes ; la convention ciblée est mémorisée au clic sur le bouton.
+  const fileInputRef = useRef(null);
+  const uploadTargetRef = useRef(null);
+
+  const pickSignedPdf = (c) => {
+    uploadTargetRef.current = c;
+    fileInputRef.current?.click();
+  };
+
+  const uploadSignedPdf = async (file) => {
+    const c = uploadTargetRef.current;
+    if (!c || !file) return;
+    setBusyId(c.id);
+    setError(null);
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let binary = '';
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      patch(await adminUploadSignedConvention(auth, c.id, btoa(binary)));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+      uploadTargetRef.current = null;
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const setStatus = async (c, status) => {
     setBusyId(c.id);
     setError(null);
@@ -687,6 +720,15 @@ export default function ConventionsView({ auth }) {
                             <RefreshCw className="w-4 h-4" />
                           </button>
                         )}
+                        <button
+                          type="button"
+                          title={c.has_signed_pdf ? 'Remplacer le document signé (PDF)' : 'Déposer le document signé (PDF)'}
+                          disabled={busyId === c.id}
+                          onClick={() => pickSignedPdf(c)}
+                          className={iconButton}
+                          style={{ color: '#005064' }}>
+                          <FileUp className="w-4 h-4" />
+                        </button>
                         {(c.status === 'DRAFT' || c.status === 'SENT') && (
                           <button
                             type="button"
@@ -707,6 +749,13 @@ export default function ConventionsView({ auth }) {
           </div>
         </Card>
       )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/pdf"
+        className="hidden"
+        onChange={(e) => uploadSignedPdf(e.target.files?.[0])} />
 
       {creating && (
         <CreateForm

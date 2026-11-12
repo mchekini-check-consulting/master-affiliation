@@ -173,6 +173,13 @@ export function adminUpdateConventionStatus(auth, id, status) {
   return request(`/admin/conventions/${id}/status`, { method: 'POST', body: { status }, auth });
 }
 
+// Dépôt manuel du document signé (scan papier…) : la convention passe Signée
+export function adminUploadSignedConvention(auth, id, pdfBase64) {
+  return request(`/admin/conventions/${id}/signed-pdf`, {
+    method: 'POST', auth, body: { pdf_base64: pdfBase64 },
+  });
+}
+
 export function adminCancelConvention(auth, id) {
   return request(`/admin/conventions/${id}/cancel`, { method: 'POST', auth });
 }

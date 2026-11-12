@@ -52,6 +52,8 @@ public final class ConventionDtos {
 
     public record StatusUpdateRequest(@NotNull ConventionStatus status) {}
 
+    public record UploadSignedPdfRequest(@NotBlank String pdfBase64) {}
+
     public record ConventionView(
             UUID id, String number, ConventionStatus status, LocalDate issueDate,
             String formationId, String formationTitle,

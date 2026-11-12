@@ -68,6 +68,13 @@ public class ConventionAdminController {
         return ConventionView.of(service.cancel(id));
     }
 
+    /** Dépôt manuel du document signé (scan papier ou signature hors Yousign). */
+    @PostMapping("/{id}/signed-pdf")
+    public ConventionView uploadSignedPdf(@PathVariable UUID id,
+            @Valid @RequestBody ConventionDtos.UploadSignedPdfRequest body) {
+        return ConventionView.of(service.attachSignedPdf(id, decodePdf(body.pdfBase64())));
+    }
+
     /** PDF signé (signatures des deux parties et dossier de preuve Yousign). */
     @GetMapping("/{id}/signed-pdf")
     public ResponseEntity<byte[]> signedPdf(@PathVariable UUID id) {

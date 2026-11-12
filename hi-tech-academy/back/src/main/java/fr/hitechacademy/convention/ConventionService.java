@@ -183,6 +183,22 @@ public class ConventionService {
         return c;
     }
 
+    /**
+     * Dépôt manuel du document signé (signature papier ou circuit hors
+     * Yousign) : le PDF remplace l'éventuelle version précédente et la
+     * convention est actée signée.
+     */
+    @Transactional
+    public Convention attachSignedPdf(UUID id, byte[] pdf) {
+        Convention c = get(id);
+        c.setSignedPdf(pdf);
+        c.setStatus(ConventionStatus.SIGNED);
+        if (c.getSignedAt() == null) {
+            c.setSignedAt(Instant.now());
+        }
+        return c;
+    }
+
     @Transactional
     public Convention cancel(UUID id) {
         Convention c = get(id);
