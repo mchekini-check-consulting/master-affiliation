@@ -35,7 +35,9 @@ export function sessionDocumentsFor(formationId) {
       group: 'Accueil',
       docs: [
         { key: 'LIVRET', label: "Livret d'accueil", url: `${Q}/Livret_accueil_V1.0.pdf` },
-        { key: 'CONVOCATION', label: 'Convocation', url: `${Q}/Convocation.pdf` },
+        // Convocation générée par apprenant (nom, dates, horaires, lien Meet) :
+        // plus de PDF statique, le document part en pièce jointe personnalisée.
+        { key: 'CONVOCATION', label: 'Convocation', url: null, generated: true },
       ],
     },
     {

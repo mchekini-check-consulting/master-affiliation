@@ -437,6 +437,27 @@ public class MailService {
                 body.formatted(name, formationTitle, docLabel, baseUrl + docPath));
     }
 
+    /** Envoi d'un document de session en pièce jointe PDF (convocation, règlement…). */
+    @Async
+    public void sendSessionDocumentAttachment(String to, String name, String docLabel,
+            String formationTitle, byte[] pdf, String fileName) {
+        String body = """
+                Bonjour %s,
+
+                Dans le cadre de votre formation « %s », veuillez trouver
+                ci-joint le document suivant : %s
+
+                Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Bien cordialement,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        sendWithAttachment(to,
+                docLabel + " — " + formationTitle,
+                body.formatted(name, formationTitle, docLabel),
+                pdf, fileName);
+    }
+
     private void send(String to, String subject, String body) {
         if (!enabled) {
             log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);

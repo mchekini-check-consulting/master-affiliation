@@ -13,7 +13,9 @@ import {
   adminSessionDocumentDispatches,
   adminSessionRecipients,
   adminStartSession,
+  adminUpdateSessionDetails,
 } from '@/api/backend';
+import { convocationFileName, convocationPdfBase64 } from '@/lib/convocationPdf';
 import { formations } from '@/data/formations';
 import { SATISFACTION_KINDS } from '@/data/satisfactionData';
 import { sessionDocumentsFor } from '@/data/sessionDocuments';
@@ -26,6 +28,73 @@ const labelClass = 'block text-xs font-semibold mb-1.5';
 const labelStyle = { color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 const KINDS = ['HOT_LEARNER', 'CLIENT', 'COLD_LEARNER'];
+
+// ArrayBuffer -> base64 par blocs (même approche que conventionPdf.js)
+function toBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+/** Horaires des séances et lien Google Meet : à renseigner avant d'envoyer la convocation. */
+function SessionDetailsForm({ auth, session, onSaved, onError }) {
+  const [scheduleText, setScheduleText] = useState(session.schedule_text ?? '');
+  const [meetLink, setMeetLink] = useState(session.meet_link ?? '');
+  const [saving, setSaving] = useState(false);
+
+  const save = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      onSaved(await adminUpdateSessionDetails(auth, session.id, { scheduleText, meetLink }));
+    } catch (err) {
+      onError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form onSubmit={save} className="mt-4 rounded-xl p-4" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
+      <p className="text-xs uppercase tracking-wide font-semibold mb-3" style={{ color: '#6b7a9b', ...headingFont }}>
+        Détails de la session (requis pour la convocation)
+      </p>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <label className="block">
+          <span className={labelClass} style={labelStyle}>Horaires des séances (une par ligne)</span>
+          <textarea
+            rows={4}
+            value={scheduleText}
+            onChange={(e) => setScheduleText(e.target.value)}
+            placeholder={'18/07/2026 : 09h00 - 12h30\n18/07/2026 : 13h30 - 17h00'}
+            className={inputClass}
+            style={inputStyle} />
+        </label>
+        <label className="block">
+          <span className={labelClass} style={labelStyle}>Lien Google Meet</span>
+          <input
+            type="url"
+            value={meetLink}
+            onChange={(e) => setMeetLink(e.target.value)}
+            placeholder="https://meet.google.com/…"
+            className={inputClass}
+            style={inputStyle} />
+        </label>
+      </div>
+      <button
+        type="submit"
+        disabled={saving}
+        className="mt-3 px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-50"
+        style={{ background: '#005064', color: 'white', ...headingFont }}>
+        {saving ? 'Enregistrement…' : 'Enregistrer'}
+      </button>
+    </form>
+  );
+}
 
 /** Documents de session : envoi aux apprenants (individuel ou à tous) avec trace. */
 function DocumentsPanel({ auth, session, onError }) {
@@ -52,12 +121,44 @@ function DocumentsPanel({ auth, session, onError }) {
       && (d.trainee_id ?? null) === (l.trainee_id ?? null),
   )?.sent_at;
 
+  // La convocation est générée par apprenant : elle exige les horaires et le lien Meet.
+  const detailsMissing = !session.schedule_text || !session.meet_link;
+  const docDisabled = (doc) => (doc.generated ? detailsMissing : !doc.url);
+  const docTitle = (doc) => {
+    if (doc.generated) return detailsMissing ? 'Renseignez les horaires et le lien Meet de la session' : undefined;
+    return doc.url ? undefined : 'Document absent du projet';
+  };
+
   const send = async (doc, l) => {
     const key = `${doc.key}:${l ? `${l.registration_id}:${l.trainee_id ?? ''}` : 'all'}`;
     if (!l && !window.confirm(`Envoyer « ${doc.label} » par email à ${learners.length} apprenant(s) ?`)) return;
     setBusy(key);
     try {
-      setDispatches(await adminSendSessionDocument(auth, session.id, doc, l?.registration_id, l?.trainee_id));
+      if (doc.generated) {
+        // Un PDF personnalisé par apprenant, donc une requête par apprenant
+        let disp = dispatches;
+        for (const t of l ? [l] : learners) {
+          const pdfBase64 = convocationPdfBase64({
+            learnerName: t.name,
+            formationTitle: session.formation_title,
+            startDate: session.start_date,
+            endDate: session.end_date,
+            scheduleText: session.schedule_text,
+            meetLink: session.meet_link,
+          });
+          disp = await adminSendSessionDocument(
+            auth, session.id, doc, t.registration_id, t.trainee_id, pdfBase64, convocationFileName(t.name));
+        }
+        setDispatches(disp);
+      } else {
+        // Document statique : récupéré une fois, joint tel quel (même base64 pour tous)
+        const response = await fetch(doc.url);
+        if (!response.ok) throw new Error(`Document introuvable : ${doc.url}`);
+        const pdfBase64 = toBase64(await response.arrayBuffer());
+        const fileName = doc.url.split('/').pop();
+        setDispatches(await adminSendSessionDocument(
+          auth, session.id, doc, l?.registration_id, l?.trainee_id, pdfBase64, fileName));
+      }
     } catch (e) {
       onError(e.message);
     } finally {
@@ -86,8 +187,8 @@ function DocumentsPanel({ auth, session, onError }) {
                   </p>
                   <button
                     type="button"
-                    disabled={!doc.url || busy === `${doc.key}:all`}
-                    title={doc.url ? undefined : 'Document absent du projet'}
+                    disabled={docDisabled(doc) || busy === `${doc.key}:all`}
+                    title={docTitle(doc)}
                     onClick={() => send(doc, null)}
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold disabled:opacity-40"
                     style={{ background: '#005064', color: 'white', ...headingFont }}>
@@ -108,7 +209,8 @@ function DocumentsPanel({ auth, session, onError }) {
                           {at ? <Badge tone="success">Envoyé le {formatDay(at)}</Badge> : <Badge>Non envoyé</Badge>}
                           <button
                             type="button"
-                            disabled={!doc.url || busy === key}
+                            disabled={docDisabled(doc) || busy === key}
+                            title={docTitle(doc)}
                             onClick={() => send(doc, l)}
                             className="inline-flex items-center gap-1 text-xs font-semibold disabled:opacity-40"
                             style={{ color: '#005064', ...headingFont }}>
@@ -471,6 +573,8 @@ export default function SessionsView({ auth }) {
                         })}
                       </select>
                     </div>
+
+                    <SessionDetailsForm key={s.id} auth={auth} session={s} onSaved={patch} onError={setError} />
 
                     {s.status === 'STARTED' ? (
                       <>

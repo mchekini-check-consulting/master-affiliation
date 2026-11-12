@@ -231,6 +231,14 @@ export function adminStartSession(auth, id) {
   return request(`/admin/sessions/${id}/start`, { method: 'POST', auth });
 }
 
+// Horaires des séances et lien Google Meet, requis avant la convocation
+export function adminUpdateSessionDetails(auth, id, { scheduleText, meetLink }) {
+  return request(`/admin/sessions/${id}/details`, {
+    method: 'POST', auth,
+    body: { schedule_text: scheduleText || null, meet_link: meetLink || null },
+  });
+}
+
 export function adminSessionRecipients(auth, id) {
   return request(`/admin/sessions/${id}/recipients`, { auth });
 }
@@ -251,13 +259,15 @@ export function adminSessionDocumentDispatches(auth, sessionId) {
   return request(`/admin/sessions/${sessionId}/document-dispatches`, { auth });
 }
 
-// registrationId null = envoi à tous les apprenants de la session
-export function adminSendSessionDocument(auth, sessionId, doc, registrationId, traineeId) {
+// registrationId null = envoi à tous les apprenants de la session ;
+// pdfBase64 présent = le document part en pièce jointe (file_name en nom de fichier)
+export function adminSendSessionDocument(auth, sessionId, doc, registrationId, traineeId, pdfBase64, fileName) {
   return request(`/admin/sessions/${sessionId}/send-document`, {
     method: 'POST', auth,
     body: {
-      doc_key: doc.key, doc_label: doc.label, doc_url: doc.url,
+      doc_key: doc.key, doc_label: doc.label, doc_url: doc.url || null,
       registration_id: registrationId || null, trainee_id: traineeId || null,
+      pdf_base64: pdfBase64 || null, file_name: fileName || null,
     },
   });
 }

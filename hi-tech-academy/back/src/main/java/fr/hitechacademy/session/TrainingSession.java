@@ -37,6 +37,13 @@ public class TrainingSession {
     @Column(nullable = false)
     private String status = "PLANNED";
 
+    /** Horaires des séances (une séance par ligne), requis pour la convocation. */
+    @Column(length = 4000)
+    private String scheduleText;
+
+    /** Lien Google Meet de la classe virtuelle, requis pour la convocation. */
+    private String meetLink;
+
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
@@ -51,5 +58,9 @@ public class TrainingSession {
     public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getScheduleText() { return scheduleText; }
+    public void setScheduleText(String scheduleText) { this.scheduleText = scheduleText; }
+    public String getMeetLink() { return meetLink; }
+    public void setMeetLink(String meetLink) { this.meetLink = meetLink; }
     public Instant getCreatedAt() { return createdAt; }
 }

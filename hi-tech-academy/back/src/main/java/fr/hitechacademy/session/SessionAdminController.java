@@ -77,8 +77,11 @@ public class SessionAdminController {
 
     public record RegistrationSummary(UUID id, String label, String applicantType) {}
 
+    public record SessionDetailsRequest(String scheduleText, String meetLink) {}
+
     public record SessionView(UUID id, String formationId, String formationTitle,
             LocalDate startDate, LocalDate endDate, String status,
+            String scheduleText, String meetLink,
             List<RegistrationSummary> registrations, Instant createdAt) {}
 
     /** Un destinataire d'un questionnaire donné, avec l'état de son invitation. */
@@ -152,6 +155,16 @@ public class SessionAdminController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Aucune demande rattachée : rien à démarrer");
         }
         s.setStatus("STARTED");
+        return view(s);
+    }
+
+    /** Horaires des séances et lien Google Meet : requis avant la convocation. */
+    @PostMapping("/sessions/{id}/details")
+    @Transactional
+    public SessionView updateDetails(@PathVariable UUID id, @RequestBody SessionDetailsRequest body) {
+        TrainingSession s = find(id);
+        s.setScheduleText(blankToNull(body.scheduleText()));
+        s.setMeetLink(blankToNull(body.meetLink()));
         return view(s);
     }
 
@@ -237,7 +250,8 @@ public class SessionAdminController {
     // --- Documents de session --------------------------------------------
 
     public record SendDocumentRequest(@NotBlank String docKey, @NotBlank String docLabel,
-            @NotBlank String docUrl, UUID registrationId, UUID traineeId) {}
+            String docUrl, UUID registrationId, UUID traineeId,
+            String pdfBase64, String fileName) {}
 
     public record DocumentDispatchView(String docKey, UUID registrationId, UUID traineeId, Instant sentAt) {}
 
@@ -256,26 +270,35 @@ public class SessionAdminController {
         return out;
     }
 
-    /** Envoi d'un document à un apprenant, ou à tous ceux de la session si registrationId est nul. */
+    /**
+     * Envoi d'un document à un apprenant, ou à tous ceux de la session si
+     * registrationId est nul. Si le PDF est fourni (base64), il part en pièce
+     * jointe ; sinon l'email contient le lien vers le document publié.
+     */
     @PostMapping("/sessions/{id}/send-document")
     @Transactional
     public List<DocumentDispatchView> sendDocument(@PathVariable UUID id, @Valid @RequestBody SendDocumentRequest body) {
         TrainingSession s = find(id);
         requireStarted(s);
+        boolean attached = body.pdfBase64() != null && !body.pdfBase64().isBlank();
+        if (!attached && (body.docUrl() == null || body.docUrl().isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fournissez l'URL du document ou son PDF");
+        }
+        byte[] pdf = attached ? decodePdf(body.pdfBase64()) : null;
         if (body.registrationId() != null) {
             RegistrationRequest r = registrations.findById(body.registrationId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Demande introuvable"));
             Recipient p = resolveRecipient(r, "HOT_LEARNER", body.traineeId());
-            dispatchDocument(s, r, p, body);
+            dispatchDocument(s, r, p, body, pdf);
         } else {
             for (RegistrationRequest r : attachedTo(s)) {
-                for (Recipient p : learnersOf(r)) dispatchDocument(s, r, p, body);
+                for (Recipient p : learnersOf(r)) dispatchDocument(s, r, p, body, pdf);
             }
         }
         return documentDispatches(id);
     }
 
-    private void dispatchDocument(TrainingSession s, RegistrationRequest r, Recipient p, SendDocumentRequest body) {
+    private void dispatchDocument(TrainingSession s, RegistrationRequest r, Recipient p, SendDocumentRequest body, byte[] pdf) {
         DocumentDispatch d = documents.findByRegistrationId(r.getId()).stream()
                 .filter(x -> x.getDocKey().equals(body.docKey())
                         && Objects.equals(x.getTrainee() == null ? null : x.getTrainee().getId(), p.traineeId()))
@@ -294,12 +317,40 @@ public class SessionAdminController {
         d.setRecipientName(p.name());
         d.setSentAt(Instant.now());
         documents.save(d);
-        mailService.sendSessionDocument(p.email(), p.name(), body.docLabel(), r.getFormationTitle(), body.docUrl());
+        if (pdf != null) {
+            String fileName = body.fileName() != null && !body.fileName().isBlank()
+                    ? body.fileName() : body.docLabel() + ".pdf";
+            mailService.sendSessionDocumentAttachment(p.email(), p.name(), body.docLabel(),
+                    r.getFormationTitle(), pdf, fileName);
+        } else {
+            mailService.sendSessionDocument(p.email(), p.name(), body.docLabel(), r.getFormationTitle(), body.docUrl());
+        }
     }
 
     // --- Plomberie -------------------------------------------------------
 
     private record Recipient(UUID traineeId, String name, String email) {}
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    /** Décode et valide un PDF base64 (même garde-fous que les conventions). */
+    private static byte[] decodePdf(String base64) {
+        final byte[] pdf;
+        try {
+            pdf = java.util.Base64.getDecoder().decode(base64);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PDF invalide (base64)");
+        }
+        if (pdf.length < 5 || pdf[0] != '%' || pdf[1] != 'P' || pdf[2] != 'D' || pdf[3] != 'F') {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le fichier joint n'est pas un PDF");
+        }
+        if (pdf.length > 10 * 1024 * 1024) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PDF trop volumineux (max 10 Mo)");
+        }
+        return pdf;
+    }
 
     private TrainingSession find(UUID id) {
         return sessions.findById(id)
@@ -404,6 +455,7 @@ public class SessionAdminController {
                 .map(r -> new RegistrationSummary(r.getId(), label(r), r.getApplicantType().name()))
                 .toList();
         return new SessionView(s.getId(), s.getFormationId(), s.getFormationTitle(),
-                s.getStartDate(), s.getEndDate(), s.getStatus(), regs, s.getCreatedAt());
+                s.getStartDate(), s.getEndDate(), s.getStatus(),
+                s.getScheduleText(), s.getMeetLink(), regs, s.getCreatedAt());
     }
 }
