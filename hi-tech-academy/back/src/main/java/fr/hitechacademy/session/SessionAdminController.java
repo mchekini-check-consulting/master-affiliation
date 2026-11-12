@@ -47,14 +47,17 @@ public class SessionAdminController {
 
     private final TrainingSessionRepository sessions;
     private final SatisfactionResponseRepository responses;
+    private final DocumentDispatchRepository documents;
     private final RegistrationRepository registrations;
     private final MailService mailService;
     private final ObjectMapper mapper;
 
     public SessionAdminController(TrainingSessionRepository sessions, SatisfactionResponseRepository responses,
-            RegistrationRepository registrations, MailService mailService, ObjectMapper mapper) {
+            DocumentDispatchRepository documents, RegistrationRepository registrations,
+            MailService mailService, ObjectMapper mapper) {
         this.sessions = sessions;
         this.responses = responses;
+        this.documents = documents;
         this.registrations = registrations;
         this.mailService = mailService;
         this.mapper = mapper;
@@ -229,6 +232,69 @@ public class SessionAdminController {
         out.put("session", s == null ? null : view(s));
         out.put("recipients", recips);
         return out;
+    }
+
+    // --- Documents de session --------------------------------------------
+
+    public record SendDocumentRequest(@NotBlank String docKey, @NotBlank String docLabel,
+            @NotBlank String docUrl, UUID registrationId, UUID traineeId) {}
+
+    public record DocumentDispatchView(String docKey, UUID registrationId, UUID traineeId, Instant sentAt) {}
+
+    /** Traces d'envoi des documents pour les demandes de la session. */
+    @GetMapping("/sessions/{id}/document-dispatches")
+    @Transactional(readOnly = true)
+    public List<DocumentDispatchView> documentDispatches(@PathVariable UUID id) {
+        TrainingSession s = find(id);
+        List<DocumentDispatchView> out = new ArrayList<>();
+        for (RegistrationRequest r : attachedTo(s)) {
+            for (DocumentDispatch d : documents.findByRegistrationId(r.getId())) {
+                out.add(new DocumentDispatchView(d.getDocKey(), r.getId(),
+                        d.getTrainee() == null ? null : d.getTrainee().getId(), d.getSentAt()));
+            }
+        }
+        return out;
+    }
+
+    /** Envoi d'un document à un apprenant, ou à tous ceux de la session si registrationId est nul. */
+    @PostMapping("/sessions/{id}/send-document")
+    @Transactional
+    public List<DocumentDispatchView> sendDocument(@PathVariable UUID id, @Valid @RequestBody SendDocumentRequest body) {
+        TrainingSession s = find(id);
+        requireStarted(s);
+        if (body.registrationId() != null) {
+            RegistrationRequest r = registrations.findById(body.registrationId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Demande introuvable"));
+            Recipient p = resolveRecipient(r, "HOT_LEARNER", body.traineeId());
+            dispatchDocument(s, r, p, body);
+        } else {
+            for (RegistrationRequest r : attachedTo(s)) {
+                for (Recipient p : learnersOf(r)) dispatchDocument(s, r, p, body);
+            }
+        }
+        return documentDispatches(id);
+    }
+
+    private void dispatchDocument(TrainingSession s, RegistrationRequest r, Recipient p, SendDocumentRequest body) {
+        DocumentDispatch d = documents.findByRegistrationId(r.getId()).stream()
+                .filter(x -> x.getDocKey().equals(body.docKey())
+                        && Objects.equals(x.getTrainee() == null ? null : x.getTrainee().getId(), p.traineeId()))
+                .findFirst()
+                .orElseGet(() -> {
+                    DocumentDispatch x = new DocumentDispatch();
+                    x.setDocKey(body.docKey());
+                    x.setRegistration(r);
+                    if (p.traineeId() != null) {
+                        x.setTrainee(r.getTrainees().stream().filter(t -> t.getId().equals(p.traineeId())).findFirst().orElse(null));
+                    }
+                    return x;
+                });
+        d.setSession(s);
+        d.setRecipientEmail(p.email());
+        d.setRecipientName(p.name());
+        d.setSentAt(Instant.now());
+        documents.save(d);
+        mailService.sendSessionDocument(p.email(), p.name(), body.docLabel(), r.getFormationTitle(), body.docUrl());
     }
 
     // --- Plomberie -------------------------------------------------------

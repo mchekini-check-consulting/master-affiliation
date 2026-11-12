@@ -415,6 +415,28 @@ public class MailService {
                 body.formatted(name, formationTitle, kindLabel, baseUrl + path));
     }
 
+    /** Envoi d'un document de session (lien vers le PDF publié sur le site). */
+    @org.springframework.scheduling.annotation.Async
+    public void sendSessionDocument(String to, String name, String docLabel,
+            String formationTitle, String docPath) {
+        String body = """
+                Bonjour %s,
+
+                Dans le cadre de votre formation « %s », veuillez trouver
+                le document suivant : %s
+
+                %s
+
+                Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Bien cordialement,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        send(to,
+                docLabel + " — " + formationTitle,
+                body.formatted(name, formationTitle, docLabel, baseUrl + docPath));
+    }
+
     private void send(String to, String subject, String body) {
         if (!enabled) {
             log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);

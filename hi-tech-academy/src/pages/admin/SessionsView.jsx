@@ -9,11 +9,14 @@ import {
   adminListSessions,
   adminSendSatisfaction,
   adminSendSatisfactionAll,
+  adminSendSessionDocument,
+  adminSessionDocumentDispatches,
   adminSessionRecipients,
   adminStartSession,
 } from '@/api/backend';
 import { formations } from '@/data/formations';
 import { SATISFACTION_KINDS } from '@/data/satisfactionData';
+import { sessionDocumentsFor } from '@/data/sessionDocuments';
 import SatisfactionResponseModal from '@/pages/admin/SatisfactionResponseModal';
 import { Badge, Card, EmptyState, ViewHeader, bodyFont, formatDate, formatDay, headingFont } from '@/pages/admin/common';
 
@@ -23,6 +26,108 @@ const labelClass = 'block text-xs font-semibold mb-1.5';
 const labelStyle = { color: '#002d74', fontFamily: "'Plus Jakarta Sans', sans-serif" };
 
 const KINDS = ['HOT_LEARNER', 'CLIENT', 'COLD_LEARNER'];
+
+/** Documents de session : envoi aux apprenants (individuel ou à tous) avec trace. */
+function DocumentsPanel({ auth, session, onError }) {
+  const [learners, setLearners] = useState(null);
+  const [dispatches, setDispatches] = useState(null);
+  const [busy, setBusy] = useState(null);
+
+  const load = useCallback(() => {
+    Promise.all([adminSessionRecipients(auth, session.id), adminSessionDocumentDispatches(auth, session.id)])
+      .then(([recips, disp]) => {
+        setLearners(recips.filter((r) => r.kind === 'HOT_LEARNER')
+          .map(({ registration_id, trainee_id, name, email, registration_label }) => ({ registration_id, trainee_id, name, email, registration_label })));
+        setDispatches(disp);
+      })
+      .catch((e) => onError(e.message));
+  }, [auth, session.id, onError]);
+
+  useEffect(load, [load]);
+
+  if (!learners || !dispatches) return null;
+
+  const sentAt = (doc, l) => dispatches.find(
+    (d) => d.doc_key === doc.key && d.registration_id === l.registration_id
+      && (d.trainee_id ?? null) === (l.trainee_id ?? null),
+  )?.sent_at;
+
+  const send = async (doc, l) => {
+    const key = `${doc.key}:${l ? `${l.registration_id}:${l.trainee_id ?? ''}` : 'all'}`;
+    if (!l && !window.confirm(`Envoyer « ${doc.label} » par email à ${learners.length} apprenant(s) ?`)) return;
+    setBusy(key);
+    try {
+      setDispatches(await adminSendSessionDocument(auth, session.id, doc, l?.registration_id, l?.trainee_id));
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div className="mt-5 space-y-5">
+      {sessionDocumentsFor(session.formation_id).map(({ group, docs }) => (
+        <div key={group} className="rounded-xl p-4" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
+          <p className="text-xs uppercase tracking-wide font-semibold mb-3" style={{ color: '#6b7a9b', ...headingFont }}>
+            Documents — {group}
+          </p>
+          <div className="space-y-4">
+            {docs.map((doc) => (
+              <div key={doc.key}>
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                  <p className="text-sm font-bold" style={{ color: '#001a4a', ...headingFont }}>
+                    {doc.url ? (
+                      <a href={doc.url} target="_blank" rel="noopener noreferrer" className="underline">{doc.label}</a>
+                    ) : doc.label}
+                    <span className="font-normal text-xs ml-2" style={{ color: '#6b7a9b', ...bodyFont }}>
+                      {learners.filter((l) => sentAt(doc, l)).length}/{learners.length} envoyé(s)
+                    </span>
+                  </p>
+                  <button
+                    type="button"
+                    disabled={!doc.url || busy === `${doc.key}:all`}
+                    title={doc.url ? undefined : 'Document absent du projet'}
+                    onClick={() => send(doc, null)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold disabled:opacity-40"
+                    style={{ background: '#005064', color: 'white', ...headingFont }}>
+                    <Send className="w-3.5 h-3.5" />
+                    {busy === `${doc.key}:all` ? 'Envoi…' : 'Envoyer à tous'}
+                  </button>
+                </div>
+                <div className="space-y-1.5">
+                  {learners.map((l) => {
+                    const key = `${doc.key}:${l.registration_id}:${l.trainee_id ?? ''}`;
+                    const at = sentAt(doc, l);
+                    return (
+                      <div key={key} className="flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
+                        <p className="text-xs" style={{ color: '#001a4a', ...bodyFont }}>
+                          <span className="font-semibold" style={headingFont}>{l.name}</span> · {l.email} · {l.registration_label}
+                        </p>
+                        <span className="inline-flex items-center gap-3">
+                          {at ? <Badge tone="success">Envoyé le {formatDay(at)}</Badge> : <Badge>Non envoyé</Badge>}
+                          <button
+                            type="button"
+                            disabled={!doc.url || busy === key}
+                            onClick={() => send(doc, l)}
+                            className="inline-flex items-center gap-1 text-xs font-semibold disabled:opacity-40"
+                            style={{ color: '#005064', ...headingFont }}>
+                            <Send className="w-3.5 h-3.5" />
+                            {busy === key ? 'Envoi…' : at ? 'Renvoyer' : 'Envoyer'}
+                          </button>
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /** Bloc des trois questionnaires d'une session démarrée : envois et suivi. */
 function RecipientsPanel({ auth, session, onError }) {
@@ -368,7 +473,10 @@ export default function SessionsView({ auth }) {
                     </div>
 
                     {s.status === 'STARTED' ? (
-                      <RecipientsPanel auth={auth} session={s} onError={setError} />
+                      <>
+                        <DocumentsPanel auth={auth} session={s} onError={setError} />
+                        <RecipientsPanel auth={auth} session={s} onError={setError} />
+                      </>
                     ) : (
                       <p className="text-xs mt-4" style={{ color: '#6b7a9b', ...bodyFont }}>
                         Démarrez la session pour envoyer les questionnaires de satisfaction aux participants.

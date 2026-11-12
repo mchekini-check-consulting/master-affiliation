@@ -247,6 +247,21 @@ export function adminSendSatisfactionAll(auth, sessionId, kind) {
   return request(`/admin/sessions/${sessionId}/send-all`, { method: 'POST', body: { kind }, auth });
 }
 
+export function adminSessionDocumentDispatches(auth, sessionId) {
+  return request(`/admin/sessions/${sessionId}/document-dispatches`, { auth });
+}
+
+// registrationId null = envoi à tous les apprenants de la session
+export function adminSendSessionDocument(auth, sessionId, doc, registrationId, traineeId) {
+  return request(`/admin/sessions/${sessionId}/send-document`, {
+    method: 'POST', auth,
+    body: {
+      doc_key: doc.key, doc_label: doc.label, doc_url: doc.url,
+      registration_id: registrationId || null, trainee_id: traineeId || null,
+    },
+  });
+}
+
 export function adminGetSatisfactionResponse(auth, responseId) {
   return request(`/admin/satisfaction/${responseId}`, { auth });
 }
