@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Award, DatabaseBackup, FileSignature, FolderOpen, GraduationCap, Handshake, Inbox, LogOut, Menu, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, TrendingUp, UsersRound, Workflow, X } from 'lucide-react';
+import { Award, CalendarDays, DatabaseBackup, FileSignature, FolderOpen, GraduationCap, Handshake, Inbox, LogOut, Menu, MessageSquareWarning, ReceiptText, Rss, ShieldCheck, TrendingUp, UsersRound, Workflow, X } from 'lucide-react';
 import { adminCheckCredentials, clearAuth, getStoredAuth, storeAuth } from '@/api/backend';
 import { bodyFont, headingFont } from '@/pages/admin/common';
 import RequestsView from '@/pages/admin/RequestsView';
@@ -16,6 +16,7 @@ import SeoGeoView from '@/pages/admin/SeoGeoView';
 import CrmView from '@/pages/admin/CrmView';
 import BackupView from '@/pages/admin/BackupView';
 import ConventionsView from '@/pages/admin/ConventionsView';
+import SessionsView from '@/pages/admin/SessionsView';
 
 // --- Écran de connexion (basic auth) ---------------------------------
 function LoginScreen({ onLoggedIn }) {
@@ -101,6 +102,7 @@ function LoginScreen({ onLoggedIn }) {
 const NAV_ITEMS = [
   { key: 'formations', label: 'Formations', icon: GraduationCap },
   { key: 'requests', label: 'Demandes à traiter', icon: Inbox },
+  { key: 'sessions', label: 'Sessions', icon: CalendarDays },
   { key: 'crm', label: 'CRM', icon: Handshake },
   { key: 'learners', label: 'Dossiers apprenants', icon: UsersRound },
   { key: 'certificates', label: 'Certificats de réalisation', icon: Award },
@@ -323,6 +325,9 @@ export default function Admin() {
           )}
           {view === 'conventions' && (
             <ConventionsView auth={auth} />
+          )}
+          {view === 'sessions' && (
+            <SessionsView auth={auth} />
           )}
           {view === 'complaints' && (
             <ComplaintsView auth={auth} />

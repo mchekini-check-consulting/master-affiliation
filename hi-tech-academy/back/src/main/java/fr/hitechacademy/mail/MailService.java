@@ -391,6 +391,30 @@ public class MailService {
                 body.formatted(firstName, corps));
     }
 
+    /** Invitation à un questionnaire de satisfaction (lien public à jeton). */
+    @org.springframework.scheduling.annotation.Async
+    public void sendSatisfactionInvitation(String to, String name, String kindLabel,
+            String formationTitle, String path) {
+        String body = """
+                Bonjour %s,
+
+                Dans le cadre du suivi qualité de la formation « %s »,
+                merci de renseigner le questionnaire « %s » (environ 5 minutes) :
+
+                %s
+
+                Vos réponses nous aident à améliorer nos prestations.
+
+                Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Merci beaucoup,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        send(to,
+                kindLabel + " — " + formationTitle,
+                body.formatted(name, formationTitle, kindLabel, baseUrl + path));
+    }
+
     private void send(String to, String subject, String body) {
         if (!enabled) {
             log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);

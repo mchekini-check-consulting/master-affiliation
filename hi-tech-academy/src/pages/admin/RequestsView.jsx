@@ -12,6 +12,7 @@ import {
   exportPositioningTestPdf, exportSponsorSurveyPdf,
 } from '@/lib/surveyPdf';
 import PdfViewer from './PdfViewer';
+import RegistrationSessionPanel from './RegistrationSessionPanel';
 import SurveyModal, { Answer, LevelAnswer, QcmAnswer, SurveySection } from './SurveyModal';
 import { getNeedsLevels, getQuizTexts } from '@/data/formations';
 import {
@@ -615,6 +616,8 @@ export function RegistrationDetail({ auth, id, onBack, onStatusChanged }) {
             )}
           </Card>
         )}
+
+        <RegistrationSessionPanel auth={auth} registrationId={detail.id} />
 
         <Card title="Certificat de réalisation">
           {certificate ? (

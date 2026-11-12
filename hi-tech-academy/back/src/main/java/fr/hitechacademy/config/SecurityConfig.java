@@ -49,6 +49,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Réclamation publique
                         .requestMatchers(HttpMethod.POST, "/complaints").permitAll()
+                        // Questionnaires de satisfaction (lien emailé, jeton = UUID d'invitation)
+                        .requestMatchers(HttpMethod.GET, "/satisfaction/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/satisfaction/*").permitAll()
                         // Lead « livre IA offert » (fin des articles de blog)
                         .requestMatchers(HttpMethod.POST, "/leads/book").permitAll()
                         // Page Contact : message ou demande de rendez-vous

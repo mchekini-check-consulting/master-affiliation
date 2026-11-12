@@ -133,6 +133,14 @@ public class RegistrationRequest {
     @OneToOne(mappedBy = "registration", cascade = CascadeType.ALL, orphanRemoval = true)
     private FinalEvaluation finalEvaluation;
 
+    // --- Session de formation à laquelle la demande est rattachée --------
+    @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+    @jakarta.persistence.JoinColumn(name = "session_id")
+    private fr.hitechacademy.session.TrainingSession session;
+
+    public fr.hitechacademy.session.TrainingSession getSession() { return session; }
+    public void setSession(fr.hitechacademy.session.TrainingSession session) { this.session = session; }
+
     public UUID getId() { return id; }
 
     public Instant getCreatedAt() { return createdAt; }

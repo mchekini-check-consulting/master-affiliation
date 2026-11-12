@@ -198,6 +198,63 @@ export async function adminDownloadSignedConvention(auth, id) {
   return response.blob();
 }
 
+// --- Sessions de formation et satisfaction ------------------------------
+export function getSatisfactionContext(responseId) {
+  return request(`/satisfaction/${responseId}`);
+}
+
+export function submitSatisfaction(responseId, answers) {
+  return request(`/satisfaction/${responseId}`, { method: 'POST', body: { answers } });
+}
+
+export function adminListSessions(auth) {
+  return request('/admin/sessions', { auth });
+}
+
+export function adminCreateSession(auth, payload) {
+  return request('/admin/sessions', { method: 'POST', body: payload, auth });
+}
+
+export function adminDeleteSession(auth, id) {
+  return request(`/admin/sessions/${id}`, { method: 'DELETE', auth });
+}
+
+export function adminAttachToSession(auth, id, registrationId) {
+  return request(`/admin/sessions/${id}/attach`, { method: 'POST', body: { registration_id: registrationId }, auth });
+}
+
+export function adminDetachFromSession(auth, id, registrationId) {
+  return request(`/admin/sessions/${id}/detach`, { method: 'POST', body: { registration_id: registrationId }, auth });
+}
+
+export function adminStartSession(auth, id) {
+  return request(`/admin/sessions/${id}/start`, { method: 'POST', auth });
+}
+
+export function adminSessionRecipients(auth, id) {
+  return request(`/admin/sessions/${id}/recipients`, { auth });
+}
+
+// kind : HOT_LEARNER | CLIENT | COLD_LEARNER
+export function adminSendSatisfaction(auth, sessionId, kind, registrationId, traineeId) {
+  return request(`/admin/sessions/${sessionId}/send`, {
+    method: 'POST', auth,
+    body: { kind, registration_id: registrationId, trainee_id: traineeId || null },
+  });
+}
+
+export function adminSendSatisfactionAll(auth, sessionId, kind) {
+  return request(`/admin/sessions/${sessionId}/send-all`, { method: 'POST', body: { kind }, auth });
+}
+
+export function adminGetSatisfactionResponse(auth, responseId) {
+  return request(`/admin/satisfaction/${responseId}`, { auth });
+}
+
+export function adminRegistrationSessionInfo(auth, registrationId) {
+  return request(`/admin/registrations/${registrationId}/session-info`, { auth });
+}
+
 // --- Indicateurs de résultats de l'organisme ----------------------------
 export function adminGetIndicators(auth) {
   return request('/admin/indicators', { auth });
