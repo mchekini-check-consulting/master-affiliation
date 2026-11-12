@@ -50,6 +50,8 @@ public final class ConventionDtos {
             @NotBlank String pdfBase64,
             @NotEmpty List<@Valid SignatureFieldPayload> signatureFields) {}
 
+    public record StatusUpdateRequest(@NotNull ConventionStatus status) {}
+
     public record ConventionView(
             UUID id, String number, ConventionStatus status, LocalDate issueDate,
             String formationId, String formationTitle,

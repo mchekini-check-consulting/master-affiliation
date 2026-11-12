@@ -168,6 +168,11 @@ export function adminRefreshConvention(auth, id) {
   return request(`/admin/conventions/${id}/refresh`, { method: 'POST', auth });
 }
 
+// Statut libre (conventions signées sur papier ou hors circuit Yousign)
+export function adminUpdateConventionStatus(auth, id, status) {
+  return request(`/admin/conventions/${id}/status`, { method: 'POST', body: { status }, auth });
+}
+
 export function adminCancelConvention(auth, id) {
   return request(`/admin/conventions/${id}/cancel`, { method: 'POST', auth });
 }

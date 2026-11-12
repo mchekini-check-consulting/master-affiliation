@@ -50,6 +50,13 @@ public class ConventionAdminController {
         return ConventionView.of(service.sendForSignature(id, decodePdf(body.pdfBase64()), body.signatureFields()));
     }
 
+    /** Changement de statut manuel (conventions signées hors circuit Yousign). */
+    @PostMapping("/{id}/status")
+    public ConventionView updateStatus(@PathVariable UUID id,
+            @Valid @RequestBody ConventionDtos.StatusUpdateRequest body) {
+        return ConventionView.of(service.updateStatus(id, body.status()));
+    }
+
     /** Resynchronise le statut de signature depuis Yousign (bouton « Actualiser »). */
     @PostMapping("/{id}/refresh")
     public ConventionView refresh(@PathVariable UUID id) {

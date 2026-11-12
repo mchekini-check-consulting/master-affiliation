@@ -10,6 +10,7 @@ import {
   adminListRegistrations,
   adminRefreshConvention,
   adminSendConventionForSignature,
+  adminUpdateConventionStatus,
   adminUpdateIndicators,
 } from '@/api/backend';
 import { formations } from '@/data/formations';
@@ -38,14 +39,25 @@ const STATUS_META = {
   CANCELED: { label: 'Annulée', background: '#f0f0f0', color: '#8c8c8c' },
 };
 
-function ConventionStatusBadge({ status }) {
+/**
+ * Statut éditable à la main : tant que la signature électronique n'est pas
+ * systématique, l'admin peut acter lui-même « Envoyée », « Signée »… pour les
+ * conventions traitées hors Yousign.
+ */
+function ConventionStatusSelect({ status, disabled, onChange }) {
   const meta = STATUS_META[status] ?? STATUS_META.DRAFT;
   return (
-    <span
-      className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
-      style={{ background: meta.background, color: meta.color, ...headingFont }}>
-      {meta.label}
-    </span>
+    <select
+      value={status}
+      disabled={disabled}
+      onChange={(e) => onChange(e.target.value)}
+      title="Changer le statut"
+      className="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap cursor-pointer disabled:opacity-50"
+      style={{ background: meta.background, color: meta.color, border: 'none', appearance: 'auto', ...headingFont }}>
+      {Object.entries(STATUS_META).map(([value, m]) => (
+        <option key={value} value={value}>{m.label}</option>
+      ))}
+    </select>
   );
 }
 
@@ -505,6 +517,18 @@ export default function ConventionsView({ auth }) {
     }
   };
 
+  const setStatus = async (c, status) => {
+    setBusyId(c.id);
+    setError(null);
+    try {
+      patch(await adminUpdateConventionStatus(auth, c.id, status));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const refresh = async (c) => {
     setBusyId(c.id);
     setError(null);
@@ -617,7 +641,10 @@ export default function ConventionsView({ auth }) {
                       {c.opco_funded ? `${c.opco_name} (butoir ${formatDay(c.opco_deadline)})` : '—'}
                     </td>
                     <td className="px-3 py-3">
-                      <ConventionStatusBadge status={c.status} />
+                      <ConventionStatusSelect
+                        status={c.status}
+                        disabled={busyId === c.id}
+                        onChange={(status) => setStatus(c, status)} />
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex items-center justify-end gap-1">

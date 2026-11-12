@@ -163,6 +163,26 @@ public class ConventionService {
         return c;
     }
 
+    /**
+     * Changement de statut manuel depuis l'admin : tant que le circuit de
+     * signature électronique n'est pas systématique (conventions signées sur
+     * papier ou hors Yousign), l'admin reste maître du statut. Aucun appel
+     * Yousign ici ; « Actualiser » reste la voie de synchronisation pour les
+     * conventions réellement parties chez Yousign.
+     */
+    @Transactional
+    public Convention updateStatus(UUID id, ConventionStatus status) {
+        Convention c = get(id);
+        c.setStatus(status);
+        if (status == ConventionStatus.SENT && c.getSentAt() == null) {
+            c.setSentAt(Instant.now());
+        }
+        if (status == ConventionStatus.SIGNED && c.getSignedAt() == null) {
+            c.setSignedAt(Instant.now());
+        }
+        return c;
+    }
+
     @Transactional
     public Convention cancel(UUID id) {
         Convention c = get(id);
