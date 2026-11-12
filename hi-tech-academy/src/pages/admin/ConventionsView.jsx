@@ -494,6 +494,25 @@ export default function ConventionsView({ auth }) {
     setConventions((prev) => (prev ?? []).map((c) => (c.id === updated.id ? updated : c)));
   };
 
+  // Visualisation : le document signé archivé s'il existe (déposé à la main
+  // ou récupéré de Yousign), sinon le PDF regénéré depuis les données.
+  const openViewer = async (c) => {
+    if (c.has_signed_pdf) {
+      setBusyId(c.id);
+      setError(null);
+      try {
+        const blob = await adminDownloadSignedConvention(auth, c.id);
+        setViewer({ title: `Convention ${c.number} (signée)`, url: URL.createObjectURL(blob), convention: c, signed: true });
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setBusyId(null);
+      }
+    } else {
+      setViewer({ title: `Convention ${c.number}`, url: conventionPdfBlobUrl(c), convention: c });
+    }
+  };
+
   // Envoi en signature : vérification visuelle du PDF, puis confirmation.
   const openSendConfirmation = (c) => {
     setViewer({
@@ -683,8 +702,9 @@ export default function ConventionsView({ auth }) {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           type="button"
-                          title="Visualiser"
-                          onClick={() => setViewer({ title: `Convention ${c.number}`, url: conventionPdfBlobUrl(c), convention: c })}
+                          title={c.has_signed_pdf ? 'Visualiser le document signé' : 'Visualiser'}
+                          disabled={busyId === c.id}
+                          onClick={() => openViewer(c)}
                           className={iconButton}
                           style={{ color: '#005064' }}>
                           <Eye className="w-4 h-4" />
@@ -773,8 +793,11 @@ export default function ConventionsView({ auth }) {
         <PdfViewer
           title={viewer.title}
           url={viewer.url}
-          onDownload={() => downloadConventionPdf(viewer.convention)}
-          onClose={() => setViewer(null)}
+          onDownload={() => (viewer.signed ? downloadSigned(viewer.convention) : downloadConventionPdf(viewer.convention))}
+          onClose={() => {
+            if (viewer.signed) URL.revokeObjectURL(viewer.url);
+            setViewer(null);
+          }}
           actions={viewer.confirmSend ? (
             <button
               type="button"
