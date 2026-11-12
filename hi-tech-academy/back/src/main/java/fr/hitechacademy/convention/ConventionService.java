@@ -212,6 +212,25 @@ public class ConventionService {
         return c;
     }
 
+    /**
+     * Suppression définitive (document signé archivé compris). Si un circuit
+     * Yousign est encore actif, on tente de l'annuler au passage pour ne pas
+     * laisser d'invitations de signature orphelines ; son échec ne bloque pas
+     * la suppression.
+     */
+    @Transactional
+    public void delete(UUID id) {
+        Convention c = get(id);
+        if (c.getStatus() == ConventionStatus.SENT && c.getYousignRequestId() != null) {
+            try {
+                yousign.cancel(c.getYousignRequestId());
+            } catch (RuntimeException e) {
+                // Demande déjà terminée ou Yousign indisponible : suppression quand même.
+            }
+        }
+        repository.delete(c);
+    }
+
     private List<YousignClient.SignerField> fieldsOf(List<SignatureFieldPayload> fields, String signer) {
         return fields.stream()
                 .filter(f -> signer.equalsIgnoreCase(f.signer()))

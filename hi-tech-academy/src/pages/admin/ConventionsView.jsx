@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Ban, Download, Eye, FileUp, Plus, RefreshCw, Send, X } from 'lucide-react';
+import { Ban, Download, Eye, FileUp, Plus, RefreshCw, Send, Trash2, X } from 'lucide-react';
 import {
   adminCancelConvention,
   adminCreateConvention,
+  adminDeleteConvention,
   adminDownloadSignedConvention,
   adminGetIndicators,
   adminGetRegistration,
@@ -606,6 +607,23 @@ export default function ConventionsView({ auth }) {
     }
   };
 
+  const remove = async (c) => {
+    const warning = c.has_signed_pdf
+      ? `Supprimer définitivement la convention ${c.number} ?\n\nLe document signé archivé sera détruit lui aussi. Cette action est irréversible.`
+      : `Supprimer définitivement la convention ${c.number} ?\n\nCette action est irréversible.`;
+    if (!window.confirm(warning)) return;
+    setBusyId(c.id);
+    setError(null);
+    try {
+      await adminDeleteConvention(auth, c.id);
+      setConventions((prev) => (prev ?? []).filter((x) => x.id !== c.id));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const downloadSigned = async (c) => {
     setBusyId(c.id);
     setError(null);
@@ -760,6 +778,15 @@ export default function ConventionsView({ auth }) {
                             <Ban className="w-4 h-4" />
                           </button>
                         )}
+                        <button
+                          type="button"
+                          title="Supprimer définitivement"
+                          disabled={busyId === c.id}
+                          onClick={() => remove(c)}
+                          className={iconButton}
+                          style={{ color: '#a12626' }}>
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>

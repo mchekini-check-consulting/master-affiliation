@@ -173,6 +173,11 @@ export function adminUpdateConventionStatus(auth, id, status) {
   return request(`/admin/conventions/${id}/status`, { method: 'POST', body: { status }, auth });
 }
 
+// Suppression définitive (document signé archivé compris)
+export function adminDeleteConvention(auth, id) {
+  return request(`/admin/conventions/${id}`, { method: 'DELETE', auth });
+}
+
 // Dépôt manuel du document signé (scan papier…) : la convention passe Signée
 export function adminUploadSignedConvention(auth, id, pdfBase64) {
   return request(`/admin/conventions/${id}/signed-pdf`, {
