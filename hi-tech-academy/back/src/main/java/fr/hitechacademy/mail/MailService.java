@@ -477,6 +477,46 @@ public class MailService {
         }
     }
 
+    /** Envoi groupé des documents d'accueil d'une session (plusieurs PDF dans un seul email). */
+    @org.springframework.scheduling.annotation.Async
+    public void sendSessionDocumentsBundle(String to, String name, String formationTitle,
+            java.util.List<String> docLabels, java.util.List<String> fileNames, java.util.List<byte[]> pdfs) {
+        StringBuilder liste = new StringBuilder();
+        for (String label : docLabels) liste.append("- ").append(label).append('\n');
+        String body = """
+                Bonjour %s,
+
+                Dans le cadre de votre formation « %s », veuillez trouver
+                ci-joint les documents suivants :
+
+                %s
+                Pour toute question : contact@hi-techacademy.fr — 07 51 47 41 35.
+
+                Bien cordialement,
+                Mahdi CHEKINI
+                HI-TECH ACADEMY — 73 rue de Reuilly, 75012 Paris""";
+        String subject = "Documents de votre formation — " + formationTitle;
+        if (!enabled) {
+            log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);
+            return;
+        }
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body.formatted(name, formationTitle, liste));
+            for (int i = 0; i < pdfs.size(); i++) {
+                helper.addAttachment(fileNames.get(i), new ByteArrayResource(pdfs.get(i)), "application/pdf");
+            }
+            mailSender.send(message);
+            log.info("Email (PJ multiples) envoyé — à: {}, sujet: {}", to, subject);
+        } catch (Exception e) {
+            log.error("Échec d'envoi d'email (PJ multiples) — à: {}, sujet: {}", to, subject, e);
+        }
+    }
+
     private void sendWithAttachment(String to, String subject, String body, byte[] attachment, String filename) {
         if (!enabled) {
             log.info("Email non envoyé (désactivé) — à: {}, sujet: {}", to, subject);

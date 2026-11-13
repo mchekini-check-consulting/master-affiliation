@@ -26,15 +26,22 @@ export function sessionDocumentsFor(formationId) {
     {
       group: 'Avant la formation',
       docs: [
-        { key: 'REGLEMENT', label: 'Règlement intérieur', url: `${Q}/Reglement_interieur_V1.0.pdf` },
-        { key: 'CGV', label: 'Conditions générales de vente', url: `${Q}/CGV_V1.0.pdf` },
-        { key: 'PROGRAMME', label: 'Programme de la formation', url: programme },
+        // Un seul email avec les quatre PDF en pièces jointes
+        {
+          key: 'PACK_DOCUMENTS',
+          label: 'Documents de la formation',
+          bundle: [
+            { label: 'Règlement intérieur', url: `${Q}/Reglement_interieur_V1.0.pdf` },
+            { label: 'Conditions générales de vente', url: `${Q}/CGV_V1.0.pdf` },
+            { label: 'Programme de la formation', url: programme },
+            { label: "Livret d'accueil", url: `${Q}/Livret_accueil_V1.0.pdf` },
+          ],
+        },
       ],
     },
     {
       group: 'Accueil',
       docs: [
-        { key: 'LIVRET', label: "Livret d'accueil", url: `${Q}/Livret_accueil_V1.0.pdf` },
         // Convocation générée par apprenant (nom, dates, horaires, lien Meet) :
         // plus de PDF statique, le document part en pièce jointe personnalisée.
         { key: 'CONVOCATION', label: 'Convocation', url: null, generated: true },

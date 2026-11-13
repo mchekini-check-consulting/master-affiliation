@@ -249,9 +249,14 @@ public class SessionAdminController {
 
     // --- Documents de session --------------------------------------------
 
+    public record AttachmentPayload(@NotBlank String fileName, @NotBlank String pdfBase64) {}
+
     public record SendDocumentRequest(@NotBlank String docKey, @NotBlank String docLabel,
             String docUrl, UUID registrationId, UUID traineeId,
-            String pdfBase64, String fileName) {}
+            String pdfBase64, String fileName,
+            // Envoi groupé : plusieurs PDF dans un seul email, avec la liste
+            // des intitulés pour le corps du message
+            List<AttachmentPayload> attachments, List<String> docLabels) {}
 
     public record DocumentDispatchView(String docKey, UUID registrationId, UUID traineeId, Instant sentAt) {}
 
@@ -280,25 +285,29 @@ public class SessionAdminController {
     public List<DocumentDispatchView> sendDocument(@PathVariable UUID id, @Valid @RequestBody SendDocumentRequest body) {
         TrainingSession s = find(id);
         requireStarted(s);
+        boolean bundled = body.attachments() != null && !body.attachments().isEmpty();
         boolean attached = body.pdfBase64() != null && !body.pdfBase64().isBlank();
-        if (!attached && (body.docUrl() == null || body.docUrl().isBlank())) {
+        if (!bundled && !attached && (body.docUrl() == null || body.docUrl().isBlank())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fournissez l'URL du document ou son PDF");
         }
         byte[] pdf = attached ? decodePdf(body.pdfBase64()) : null;
+        List<byte[]> bundle = bundled
+                ? body.attachments().stream().map(a -> decodePdf(a.pdfBase64())).toList() : null;
         if (body.registrationId() != null) {
             RegistrationRequest r = registrations.findById(body.registrationId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Demande introuvable"));
             Recipient p = resolveRecipient(r, "HOT_LEARNER", body.traineeId());
-            dispatchDocument(s, r, p, body, pdf);
+            dispatchDocument(s, r, p, body, pdf, bundle);
         } else {
             for (RegistrationRequest r : attachedTo(s)) {
-                for (Recipient p : learnersOf(r)) dispatchDocument(s, r, p, body, pdf);
+                for (Recipient p : learnersOf(r)) dispatchDocument(s, r, p, body, pdf, bundle);
             }
         }
         return documentDispatches(id);
     }
 
-    private void dispatchDocument(TrainingSession s, RegistrationRequest r, Recipient p, SendDocumentRequest body, byte[] pdf) {
+    private void dispatchDocument(TrainingSession s, RegistrationRequest r, Recipient p, SendDocumentRequest body,
+            byte[] pdf, List<byte[]> bundle) {
         DocumentDispatch d = documents.findByRegistrationId(r.getId()).stream()
                 .filter(x -> x.getDocKey().equals(body.docKey())
                         && Objects.equals(x.getTrainee() == null ? null : x.getTrainee().getId(), p.traineeId()))
@@ -317,7 +326,13 @@ public class SessionAdminController {
         d.setRecipientName(p.name());
         d.setSentAt(Instant.now());
         documents.save(d);
-        if (pdf != null) {
+        if (bundle != null) {
+            List<String> labels = body.docLabels() != null && !body.docLabels().isEmpty()
+                    ? body.docLabels()
+                    : body.attachments().stream().map(AttachmentPayload::fileName).toList();
+            mailService.sendSessionDocumentsBundle(p.email(), p.name(), r.getFormationTitle(),
+                    labels, body.attachments().stream().map(AttachmentPayload::fileName).toList(), bundle);
+        } else if (pdf != null) {
             String fileName = body.fileName() != null && !body.fileName().isBlank()
                     ? body.fileName() : body.docLabel() + ".pdf";
             mailService.sendSessionDocumentAttachment(p.email(), p.name(), body.docLabel(),

@@ -123,9 +123,14 @@ function DocumentsPanel({ auth, session, onError }) {
 
   // La convocation est générée par apprenant : elle exige les horaires et le lien Meet.
   const detailsMissing = !session.schedule_text || !session.meet_link;
-  const docDisabled = (doc) => (doc.generated ? detailsMissing : !doc.url);
+  const docDisabled = (doc) => {
+    if (doc.generated) return detailsMissing;
+    if (doc.bundle) return doc.bundle.some((b) => !b.url);
+    return !doc.url;
+  };
   const docTitle = (doc) => {
     if (doc.generated) return detailsMissing ? 'Renseignez les horaires et le lien Meet de la session' : undefined;
+    if (doc.bundle) return doc.bundle.some((b) => !b.url) ? 'Un document du lot est absent du projet' : undefined;
     return doc.url ? undefined : 'Document absent du projet';
   };
 
@@ -150,6 +155,17 @@ function DocumentsPanel({ auth, session, onError }) {
             auth, session.id, doc, t.registration_id, t.trainee_id, pdfBase64, convocationFileName(t.name));
         }
         setDispatches(disp);
+      } else if (doc.bundle) {
+        // Lot : tous les PDF récupérés une fois, joints au même email pour tous
+        const attachments = [];
+        for (const b of doc.bundle) {
+          const response = await fetch(b.url);
+          if (!response.ok) throw new Error(`Document introuvable : ${b.url}`);
+          attachments.push({ file_name: b.url.split('/').pop(), pdf_base64: toBase64(await response.arrayBuffer()) });
+        }
+        setDispatches(await adminSendSessionDocument(
+          auth, session.id, doc, l?.registration_id, l?.trainee_id, null, null,
+          attachments, doc.bundle.map((b) => b.label)));
       } else {
         // Document statique : récupéré une fois, joint tel quel (même base64 pour tous)
         const response = await fetch(doc.url);
@@ -181,6 +197,16 @@ function DocumentsPanel({ auth, session, onError }) {
                     {doc.url ? (
                       <a href={doc.url} target="_blank" rel="noopener noreferrer" className="underline">{doc.label}</a>
                     ) : doc.label}
+                    {doc.bundle && (
+                      <span className="block font-normal text-xs mt-0.5" style={{ color: '#6b7a9b', ...bodyFont }}>
+                        Un seul email avec : {doc.bundle.map((b, i) => (
+                          <React.Fragment key={b.label}>
+                            {i > 0 && ' · '}
+                            {b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer" className="underline">{b.label}</a> : b.label}
+                          </React.Fragment>
+                        ))}
+                      </span>
+                    )}
                     <span className="font-normal text-xs ml-2" style={{ color: '#6b7a9b', ...bodyFont }}>
                       {learners.filter((l) => sentAt(doc, l)).length}/{learners.length} envoyé(s)
                     </span>

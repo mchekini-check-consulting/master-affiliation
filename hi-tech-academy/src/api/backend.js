@@ -261,13 +261,16 @@ export function adminSessionDocumentDispatches(auth, sessionId) {
 
 // registrationId null = envoi à tous les apprenants de la session ;
 // pdfBase64 présent = le document part en pièce jointe (file_name en nom de fichier)
-export function adminSendSessionDocument(auth, sessionId, doc, registrationId, traineeId, pdfBase64, fileName) {
+// attachments : [{ file_name, pdf_base64 }] + docLabels pour un envoi groupé
+// (plusieurs PDF dans un seul email) ; sinon pdfBase64/fileName pour un seul PDF
+export function adminSendSessionDocument(auth, sessionId, doc, registrationId, traineeId, pdfBase64, fileName, attachments, docLabels) {
   return request(`/admin/sessions/${sessionId}/send-document`, {
     method: 'POST', auth,
     body: {
       doc_key: doc.key, doc_label: doc.label, doc_url: doc.url || null,
       registration_id: registrationId || null, trainee_id: traineeId || null,
       pdf_base64: pdfBase64 || null, file_name: fileName || null,
+      attachments: attachments || null, doc_labels: docLabels || null,
     },
   });
 }
