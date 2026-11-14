@@ -16,6 +16,7 @@ import {
   adminUpdateSessionDetails,
 } from '@/api/backend';
 import { convocationFileName, convocationPdfBase64 } from '@/lib/convocationPdf';
+import { emargementFileName, emargementPdfBase64 } from '@/lib/emargementPdf';
 import { formations } from '@/data/formations';
 import { SATISFACTION_KINDS } from '@/data/satisfactionData';
 import { sessionDocumentsFor } from '@/data/sessionDocuments';
@@ -253,6 +254,133 @@ function DocumentsPanel({ auth, session, onError }) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Émargement : une feuille par apprenant et par journée (cases matin et
+ * après-midi), générée à l'identité de l'organisme et envoyée en pièce
+ * jointe. Les journées viennent des dates présentes dans les horaires des
+ * séances (détails de la session). Trace par jour via document_dispatches
+ * (clé EMARGEMENT_JJ-MM-AAAA).
+ */
+function EmargementPanel({ auth, session, onError }) {
+  const [learners, setLearners] = useState(null);
+  const [dispatches, setDispatches] = useState(null);
+  const [busy, setBusy] = useState(null);
+
+  const load = useCallback(() => {
+    Promise.all([adminSessionRecipients(auth, session.id), adminSessionDocumentDispatches(auth, session.id)])
+      .then(([recips, disp]) => {
+        setLearners(recips.filter((r) => r.kind === 'HOT_LEARNER')
+          .map(({ registration_id, trainee_id, name, email, registration_label }) => ({ registration_id, trainee_id, name, email, registration_label })));
+        setDispatches(disp);
+      })
+      .catch((e) => onError(e.message));
+  }, [auth, session.id, onError]);
+
+  useEffect(load, [load]);
+
+  if (!learners || !dispatches) return null;
+
+  // Journées de formation : dates uniques trouvées dans les horaires des séances
+  const days = [...new Set((session.schedule_text ?? '').match(/\b\d{2}\/\d{2}\/\d{4}\b/g) ?? [])];
+  const docOf = (day) => ({ key: `EMARGEMENT_${day.replace(/\//g, '-')}`, label: `Feuille d'émargement du ${day}` });
+
+  const sentAt = (doc, l) => dispatches.find(
+    (d) => d.doc_key === doc.key && d.registration_id === l.registration_id
+      && (d.trainee_id ?? null) === (l.trainee_id ?? null),
+  )?.sent_at;
+
+  const send = async (day, l) => {
+    const doc = docOf(day);
+    const key = `${doc.key}:${l ? `${l.registration_id}:${l.trainee_id ?? ''}` : 'all'}`;
+    if (!l && !window.confirm(`Envoyer la feuille d'émargement du ${day} à ${learners.length} apprenant(s) ?`)) return;
+    setBusy(key);
+    try {
+      let disp = dispatches;
+      for (const t of l ? [l] : learners) {
+        const pdfBase64 = emargementPdfBase64({
+          learnerName: t.name,
+          formationTitle: session.formation_title,
+          dayLabel: day,
+        });
+        disp = await adminSendSessionDocument(
+          auth, session.id, doc, t.registration_id, t.trainee_id, pdfBase64, emargementFileName(t.name, day));
+      }
+      setDispatches(disp);
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div className="mt-5 rounded-xl p-4" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
+      <p className="text-xs uppercase tracking-wide font-semibold mb-3" style={{ color: '#6b7a9b', ...headingFont }}>
+        Émargement
+      </p>
+      {days.length === 0 ? (
+        <p className="text-xs" style={{ color: '#6b7a9b', ...bodyFont }}>
+          Renseignez les horaires des séances (avec les dates au format JJ/MM/AAAA) dans les détails de la
+          session : une feuille d'émargement par journée sera proposée ici.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {days.map((day) => {
+            const doc = docOf(day);
+            const answered = learners.filter((l) => sentAt(doc, l)).length;
+            return (
+              <div key={day}>
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                  <p className="text-sm font-bold" style={{ color: '#001a4a', ...headingFont }}>
+                    Journée du {day}
+                    <span className="font-normal text-xs ml-2" style={{ color: '#6b7a9b', ...bodyFont }}>
+                      {answered}/{learners.length} envoyé(s) · cases matin et après-midi
+                    </span>
+                  </p>
+                  <button
+                    type="button"
+                    disabled={busy === `${doc.key}:all`}
+                    onClick={() => send(day, null)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold disabled:opacity-40"
+                    style={{ background: '#005064', color: 'white', ...headingFont }}>
+                    <Send className="w-3.5 h-3.5" />
+                    {busy === `${doc.key}:all` ? 'Envoi…' : 'Envoyer à tous'}
+                  </button>
+                </div>
+                <div className="space-y-1.5">
+                  {learners.map((l) => {
+                    const key = `${doc.key}:${l.registration_id}:${l.trainee_id ?? ''}`;
+                    const at = sentAt(doc, l);
+                    return (
+                      <div key={key} className="flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2" style={{ background: 'white', border: '1px solid #e0e8f4' }}>
+                        <p className="text-xs" style={{ color: '#001a4a', ...bodyFont }}>
+                          <span className="font-semibold" style={headingFont}>{l.name}</span> · {l.email} · {l.registration_label}
+                        </p>
+                        <span className="inline-flex items-center gap-3">
+                          {at ? <Badge tone="success">Envoyé le {formatDay(at)}</Badge> : <Badge>Non envoyé</Badge>}
+                          <button
+                            type="button"
+                            disabled={busy === key}
+                            onClick={() => send(day, l)}
+                            className="inline-flex items-center gap-1 text-xs font-semibold disabled:opacity-40"
+                            style={{ color: '#005064', ...headingFont }}>
+                            <Send className="w-3.5 h-3.5" />
+                            {busy === key ? 'Envoi…' : at ? 'Renvoyer' : 'Envoyer'}
+                          </button>
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -626,6 +754,7 @@ export default function SessionsView({ auth }) {
                     {s.status === 'STARTED' ? (
                       <>
                         <DocumentsPanel auth={auth} session={s} onError={setError} />
+                        <EmargementPanel auth={auth} session={s} onError={setError} />
                         <RecipientsPanel auth={auth} session={s} onError={setError} />
                       </>
                     ) : (
