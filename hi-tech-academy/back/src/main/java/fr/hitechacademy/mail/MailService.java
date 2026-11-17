@@ -140,7 +140,7 @@ public class MailService {
                 Bonjour %s %s,
 
                 Dans le cadre de votre formation « %s », merci de compléter
-                le QCM d'évaluation finale des acquis (10 questions, environ 10 minutes,
+                le QCM d'évaluation finale des acquis (environ 15 minutes,
                 une seule tentative) :
 
                 %s

@@ -27,7 +27,11 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
   // Note QCM : récupérée automatiquement de l'évaluation finale si passée,
   // saisie manuelle sinon ; mise en pratique toujours saisie (partie B)
   const qcmAuto = registration.final_evaluation_score !== null && registration.final_evaluation_score !== undefined;
-  const [qcmScore, setQcmScore] = useState(qcmAuto ? String(registration.final_evaluation_score) : '');
+  // Affichage ramené sur 10 quel que soit le nombre de questions du QCM
+  // (le back applique la même normalisation à l'émission)
+  const [qcmScore, setQcmScore] = useState(qcmAuto
+    ? String(Math.round((registration.final_evaluation_score * 10) / Math.max(1, registration.final_evaluation_max_score ?? 10)))
+    : '');
   const [practicalScore, setPracticalScore] = useState('');
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);

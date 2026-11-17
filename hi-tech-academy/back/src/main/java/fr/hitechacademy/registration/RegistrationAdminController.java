@@ -244,7 +244,11 @@ public class RegistrationAdminController {
         // Résultats de l'évaluation des acquis (grille : QCM /10 + mise en
         // pratique /10, objectifs atteints à partir de 60 % du total)
         FinalEvaluation fe = r.getFinalEvaluation();
-        Integer qcmScore = fe != null && fe.isSubmitted() ? fe.getScore() : body.qcmScore();
+        // Note QCM ramenée sur 10 quel que soit le nombre de questions du
+        // catalogue (ex. 20 questions pour L'essentiel de l'IA)
+        Integer qcmScore = fe != null && fe.isSubmitted()
+                ? (int) Math.round(fe.getScore() * 10.0 / Math.max(1, fe.getMaxScore()))
+                : body.qcmScore();
         if (qcmScore == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Le QCM d'évaluation finale n'a pas été passé : renseignez la note QCM manuellement");
