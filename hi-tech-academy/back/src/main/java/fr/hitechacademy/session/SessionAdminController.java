@@ -290,9 +290,9 @@ public class SessionAdminController {
         if (!bundled && !attached && (body.docUrl() == null || body.docUrl().isBlank())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fournissez l'URL du document ou son PDF");
         }
-        byte[] pdf = attached ? decodePdf(body.pdfBase64()) : null;
+        byte[] pdf = attached ? decodeAttachment(body.pdfBase64(), body.fileName()) : null;
         List<byte[]> bundle = bundled
-                ? body.attachments().stream().map(a -> decodePdf(a.pdfBase64())).toList() : null;
+                ? body.attachments().stream().map(a -> decodeAttachment(a.pdfBase64(), a.fileName())).toList() : null;
         if (body.registrationId() != null) {
             RegistrationRequest r = registrations.findById(body.registrationId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Demande introuvable"));
@@ -350,21 +350,28 @@ public class SessionAdminController {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
-    /** Décode et valide un PDF base64 (même garde-fous que les conventions). */
-    private static byte[] decodePdf(String base64) {
-        final byte[] pdf;
+    /**
+     * Décode et valide une pièce jointe base64 : un PDF (en-tête %PDF), ou un
+     * PPTX (archive ZIP, en-tête PK) lorsque le nom de fichier finit par .pptx.
+     */
+    private static byte[] decodeAttachment(String base64, String fileName) {
+        final byte[] bytes;
         try {
-            pdf = java.util.Base64.getDecoder().decode(base64);
+            bytes = java.util.Base64.getDecoder().decode(base64);
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PDF invalide (base64)");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pièce jointe invalide (base64)");
         }
-        if (pdf.length < 5 || pdf[0] != '%' || pdf[1] != 'P' || pdf[2] != 'D' || pdf[3] != 'F') {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le fichier joint n'est pas un PDF");
+        boolean pptx = fileName != null && fileName.toLowerCase().endsWith(".pptx");
+        boolean isPdf = bytes.length >= 5 && bytes[0] == '%' && bytes[1] == 'P' && bytes[2] == 'D' && bytes[3] == 'F';
+        boolean isZip = bytes.length >= 4 && bytes[0] == 'P' && bytes[1] == 'K' && bytes[2] == 3 && bytes[3] == 4;
+        if (!isPdf && !(pptx && isZip)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    pptx ? "Le fichier joint n'est pas un PPTX valide" : "Le fichier joint n'est pas un PDF");
         }
-        if (pdf.length > 10 * 1024 * 1024) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PDF trop volumineux (max 10 Mo)");
+        if (bytes.length > 10 * 1024 * 1024) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pièce jointe trop volumineuse (max 10 Mo)");
         }
-        return pdf;
+        return bytes;
     }
 
     private TrainingSession find(UUID id) {

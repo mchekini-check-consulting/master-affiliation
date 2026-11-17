@@ -508,7 +508,7 @@ public class MailService {
             helper.setSubject(subject);
             helper.setText(body.formatted(name, formationTitle, liste));
             for (int i = 0; i < pdfs.size(); i++) {
-                helper.addAttachment(fileNames.get(i), new ByteArrayResource(pdfs.get(i)), "application/pdf");
+                helper.addAttachment(fileNames.get(i), new ByteArrayResource(pdfs.get(i)), contentTypeFor(fileNames.get(i)));
             }
             mailSender.send(message);
             log.info("Email (PJ multiples) envoyé — à: {}, sujet: {}", to, subject);
@@ -529,12 +529,19 @@ public class MailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(body);
-            helper.addAttachment(filename, new ByteArrayResource(attachment), "application/pdf");
+            helper.addAttachment(filename, new ByteArrayResource(attachment), contentTypeFor(filename));
             mailSender.send(message);
             log.info("Email (avec PJ) envoyé — à: {}, sujet: {}", to, subject);
         } catch (Exception e) {
             log.error("Échec d'envoi d'email (avec PJ) — à: {}, sujet: {}", to, subject, e);
         }
+    }
+
+    /** Type MIME d'une pièce jointe d'après son nom de fichier (PPTX, sinon PDF). */
+    private static String contentTypeFor(String fileName) {
+        return fileName != null && fileName.toLowerCase().endsWith(".pptx")
+                ? "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                : "application/pdf";
     }
 
     private static String applicantLabel(ApplicantType type) {

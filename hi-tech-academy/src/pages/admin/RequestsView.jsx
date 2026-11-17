@@ -780,7 +780,8 @@ function PositioningTestModal({ test, subjectName, formationTitle, formationId, 
 }
 
 // --- Résultats de l'évaluation finale, grand format --------------------
-function FinalEvaluationModal({ evaluation, subjectName, formationTitle, formationId, onClose }) {
+// Exportée : réutilisée par SessionsView (panneau « Quiz d'évaluation »)
+export function FinalEvaluationModal({ evaluation, subjectName, formationTitle, formationId, onClose }) {
   return (
     <SurveyModal
       title={`Évaluation finale — ${subjectName}`}

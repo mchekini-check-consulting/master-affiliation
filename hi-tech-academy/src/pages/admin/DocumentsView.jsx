@@ -65,7 +65,7 @@ const SECTIONS = [
     documents: [
       { title: 'Programme de formation', file: `${BASE}/Programme_Essentiel_IA_V1.1.pdf`, icon: GraduationCap },
       { title: 'Déroulé pédagogique', file: `${BASE}/Deroule_pedagogique_Essentiel_IA_V1.1.pdf`, icon: LayoutList },
-      { title: 'Support de cours', file: `${BASE}/Support_de_cours_Essentiel_IA_V1.1.pdf`, icon: FileText },
+      { title: 'Support de cours', file: `${BASE}/Support_de_cours_Essentiel_IA_V2.0.pptx`, icon: FileText },
       { title: 'Test de positionnement', file: `${BASE}/Test_positionnement_Essentiel_IA.pdf`, icon: SearchCheck },
       { title: 'Évaluation finale (QCM)', file: `${BASE}/Evaluation_finale_QCM_Essentiel_IA.pdf`, icon: ClipboardCheck },
       { title: 'Tableau croisé objectifs / contenus / évaluations', file: `${BASE}/Tableau_croise_Essentiel_IA_V1.1.pdf`, icon: ClipboardList },
@@ -181,14 +181,17 @@ export default function DocumentsView() {
                         {title}
                       </h4>
                       <div className="flex items-center gap-4 mt-2.5">
-                        <button
-                          type="button"
-                          onClick={() => setViewer({ title, file })}
-                          className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                          style={{ color: '#005064', ...headingFont }}>
-                          <Eye className="w-4 h-4" />
-                          Visualiser
-                        </button>
+                        {/* La visionneuse ne sait afficher que des PDF (le support PPTX se télécharge) */}
+                        {file.endsWith('.pdf') && (
+                          <button
+                            type="button"
+                            onClick={() => setViewer({ title, file })}
+                            className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                            style={{ color: '#005064', ...headingFont }}>
+                            <Eye className="w-4 h-4" />
+                            Visualiser
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => downloadFile(file)}

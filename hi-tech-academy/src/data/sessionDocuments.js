@@ -13,7 +13,7 @@ const SUPPORTS = {
   'kubernetes-fondamentaux': `${Q}/Support_de_cours_Kubernetes_V1.0.pdf`,
   'facturation-electronique-pennylane': `${Q}/Support_de_cours_Facturation_Pennylane_V1.0.pdf`,
   'ia-pour-tous': `${Q}/Support_de_cours_IA_Pour_Tous_V1.1.pdf`,
-  'essentiel-ia': `${Q}/Support_de_cours_Essentiel_IA_V1.1.pdf`,
+  'essentiel-ia': `${Q}/Support_de_cours_Essentiel_IA_V2.0.pptx`,
   'ia-for-business': `${Q}/Support_de_cours_IA_For_Business_V1.1.pdf`,
   'ia-for-tech': `${Q}/Support_de_cours_IA_For_Tech_V1.1.pdf`,
   'management-processus-ia': `${Q}/Support_de_cours_Management_IA_V1.1.pdf`,
