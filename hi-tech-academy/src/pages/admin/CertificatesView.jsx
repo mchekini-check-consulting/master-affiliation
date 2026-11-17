@@ -27,10 +27,10 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
   // Note QCM : récupérée automatiquement de l'évaluation finale si passée,
   // saisie manuelle sinon ; mise en pratique toujours saisie (partie B)
   const qcmAuto = registration.final_evaluation_score !== null && registration.final_evaluation_score !== undefined;
-  // Affichage ramené sur 10 quel que soit le nombre de questions du QCM
+  // Affichage ramené sur 20 quel que soit le nombre de questions du QCM
   // (le back applique la même normalisation à l'émission)
   const [qcmScore, setQcmScore] = useState(qcmAuto
-    ? String(Math.round((registration.final_evaluation_score * 10) / Math.max(1, registration.final_evaluation_max_score ?? 10)))
+    ? String(Math.round((registration.final_evaluation_score * 20) / Math.max(1, registration.final_evaluation_max_score ?? 10)))
     : '');
   const [practicalScore, setPracticalScore] = useState('');
   const [error, setError] = useState(null);
@@ -126,10 +126,10 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="block">
               <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
-                QCM d'évaluation finale / 10 <span style={{ color: '#c2410c' }}>*</span>
+                QCM d'évaluation finale / 20 <span style={{ color: '#c2410c' }}>*</span>
               </span>
               <input
-                type="number" min="0" max="10" required value={qcmScore}
+                type="number" min="0" max="20" required value={qcmScore}
                 onChange={(e) => setQcmScore(e.target.value)}
                 disabled={qcmAuto}
                 className={`${inputClass} disabled:opacity-70`} style={inputStyle} />
@@ -155,11 +155,11 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
             <p
               className="text-sm rounded-xl px-4 py-3 font-semibold"
               style={{
-                background: total >= 12 ? '#e5f6ec' : '#fdecec',
-                color: total >= 12 ? '#116632' : '#a12626',
+                background: total >= 18 ? '#e5f6ec' : '#fdecec',
+                color: total >= 18 ? '#116632' : '#a12626',
                 ...headingFont,
               }}>
-              Total : {total} / 20 — objectifs {total >= 12 ? 'ATTEINTS' : 'NON ATTEINTS'} (seuil 60 %)
+              Total : {total} / 30 — objectifs {total >= 18 ? 'ATTEINTS' : 'NON ATTEINTS'} (seuil 60 %)
             </p>
           )}
         </div>
