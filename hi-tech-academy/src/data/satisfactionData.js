@@ -56,7 +56,7 @@ export const SATISFACTION_KINDS = {
       { key: 'citation', type: 'radio', label: 'Nous autorisez-vous à citer vos commentaires sur notre site web pour promouvoir nos formations ?', options: [
         'Oui et vous pouvez indiquer mon nom et celui de mon entreprise',
         'Oui mais sans indiquer mon nom (vous pouvez indiquer celui de mon entreprise)',
-        'Oui mais sans indiquer ni mon nom ni celui de mon entreprise',
+        'Oui mais en anonyme (ni mon nom ni celui de mon entreprise)',
         "Non, je préfère qu'ils restent entre nous",
       ] },
       { key: 'infos_formations', type: 'radio', label: 'Souhaitez-vous obtenir des informations sur les formations que nous proposons ?', options: OUI_NON },
