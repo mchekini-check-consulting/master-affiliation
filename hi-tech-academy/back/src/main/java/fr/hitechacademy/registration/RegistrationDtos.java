@@ -433,7 +433,9 @@ public final class RegistrationDtos {
             // Note QCM : reprise automatiquement de l'évaluation finale si
             // elle a été passée ; sinon cette valeur saisie est requise
             Integer qcmScore,
-            @NotNull Integer practicalScore) {
+            // Absente pour les formations évaluées uniquement par QCM
+            // (ex. L'essentiel de l'IA) : certificat noté sur 20
+            Integer practicalScore) {
     }
 
     public record CertificateView(

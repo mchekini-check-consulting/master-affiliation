@@ -18,8 +18,14 @@ function archiveCertificatePdf(auth, certificate) {
   adminArchiveCertificatePdf(auth, certificate.id, certificatePdfBase64(certificate)).catch(() => {});
 }
 
+// Formations évaluées uniquement par QCM : pas de partie « mise en pratique »
+// sur le certificat (noté sur 20, seuil 60 % = 12).
+const QCM_ONLY_FORMATIONS = ['essentiel-ia'];
+
 // Formulaire d'émission (dates de session + durée) pour une demande validée.
 function IssueForm({ auth, registration, onClose, onIssued }) {
+  const hasPractical = !QCM_ONLY_FORMATIONS.includes(registration.formation_id);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [hours, setHours] = useState('7');
@@ -36,9 +42,30 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const total = qcmScore !== '' && practicalScore !== ''
-    ? Number(qcmScore) + Number(practicalScore)
+  const total = qcmScore !== '' && (!hasPractical || practicalScore !== '')
+    ? Number(qcmScore) + (hasPractical ? Number(practicalScore) : 0)
     : null;
+  const totalMax = hasPractical ? 30 : 20;
+  const threshold = hasPractical ? 18 : 12;
+
+  // Aperçu du certificat tel qu'il sera émis (date d'émission simulée)
+  const openPreview = () => {
+    setPreviewUrl(certificatePdfBlobUrl({
+      first_name: registration.first_name,
+      last_name: registration.last_name,
+      formation_title: registration.formation_title,
+      formation_id: registration.formation_id,
+      session_start_date: startDate || new Date().toISOString().slice(0, 10),
+      session_end_date: endDate || startDate || new Date().toISOString().slice(0, 10),
+      duration_hours: Number(hours) || 0,
+      attended_hours: Number(attendedHours) || 0,
+      qcm_score: qcmScore === '' ? 0 : Number(qcmScore),
+      practical_score: hasPractical ? (practicalScore === '' ? 0 : Number(practicalScore)) : null,
+      total_score: total ?? (qcmScore === '' ? 0 : Number(qcmScore)),
+      objectives_achieved: (total ?? 0) >= threshold,
+      issued_at: new Date().toISOString(),
+    }));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -51,7 +78,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
         duration_hours: Number(hours),
         attended_hours: Number(attendedHours),
         qcm_score: qcmAuto ? null : Number(qcmScore),
-        practical_score: Number(practicalScore),
+        practical_score: hasPractical ? Number(practicalScore) : null,
       });
       downloadCertificatePdf(certificate);
       archiveCertificatePdf(auth, certificate);
@@ -137,6 +164,7 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
                 {qcmAuto ? '✓ Récupérée automatiquement du QCM passé en ligne' : 'QCM non passé en ligne : saisir la note'}
               </span>
             </label>
+            {hasPractical && (
             <label className="block">
               <span className="block text-xs font-semibold mb-1.5" style={{ color: '#002d74', ...headingFont }}>
                 Mise en pratique / 10 <span style={{ color: '#c2410c' }}>*</span>
@@ -149,17 +177,18 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
                 Partie B évaluée par le formateur (5+3+2 points)
               </span>
             </label>
+            )}
           </div>
 
           {total !== null && (
             <p
               className="text-sm rounded-xl px-4 py-3 font-semibold"
               style={{
-                background: total >= 18 ? '#e5f6ec' : '#fdecec',
-                color: total >= 18 ? '#116632' : '#a12626',
+                background: total >= threshold ? '#e5f6ec' : '#fdecec',
+                color: total >= threshold ? '#116632' : '#a12626',
                 ...headingFont,
               }}>
-              Total : {total} / 30 — objectifs {total >= 18 ? 'ATTEINTS' : 'NON ATTEINTS'} (seuil 60 %)
+              Total : {total} / {totalMax} — objectifs {total >= threshold ? 'ATTEINTS' : 'NON ATTEINTS'} (seuil 60 %)
             </p>
           )}
         </div>
@@ -170,13 +199,30 @@ function IssueForm({ auth, registration, onClose, onIssued }) {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full mt-5 py-3 rounded-xl font-bold text-sm disabled:opacity-50"
-          style={{ background: '#005064', color: 'white', ...headingFont }}>
-          {submitting ? 'Émission…' : 'Émettre et télécharger le PDF'}
-        </button>
+        <div className="flex gap-3 mt-5">
+          <button
+            type="button"
+            onClick={openPreview}
+            className="flex-1 py-3 rounded-xl font-bold text-sm inline-flex items-center justify-center gap-1.5"
+            style={{ color: '#005064', border: '1px solid #e0e8f4', background: 'white', ...headingFont }}>
+            <Eye className="w-4 h-4" />
+            Visualiser
+          </button>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="flex-1 py-3 rounded-xl font-bold text-sm disabled:opacity-50"
+            style={{ background: '#005064', color: 'white', ...headingFont }}>
+            {submitting ? 'Émission…' : 'Émettre et télécharger le PDF'}
+          </button>
+        </div>
+
+        {previewUrl && (
+          <PdfViewer
+            title={`Aperçu — certificat de ${registration.first_name} ${registration.last_name}`}
+            url={previewUrl}
+            onClose={() => setPreviewUrl(null)} />
+        )}
       </form>
     </div>
   );

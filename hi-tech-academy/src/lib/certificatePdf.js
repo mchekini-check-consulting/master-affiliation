@@ -302,8 +302,10 @@ function buildCertificatePdf(certificate) {
   if (certificate.total_score !== null && certificate.total_score !== undefined) {
     w.sectionHeading("Résultat de l'évaluation des acquis");
     w.paragraph(
-      `QCM d'évaluation finale : ${certificate.qcm_score} / 20 — Mise en pratique : `
-      + `${certificate.practical_score} / 10 — Total : ${certificate.total_score} / 30.`,
+      certificate.practical_score !== null && certificate.practical_score !== undefined
+        ? `QCM d'évaluation finale : ${certificate.qcm_score} / 20 — Mise en pratique : `
+          + `${certificate.practical_score} / 10 — Total : ${certificate.total_score} / 30.`
+        : `QCM d'évaluation finale : ${certificate.qcm_score} / 20 — Total : ${certificate.total_score} / 20.`,
       { gap: 3 },
     );
     w.paragraph(

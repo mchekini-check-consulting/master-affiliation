@@ -253,7 +253,8 @@ public class RegistrationAdminController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Le QCM d'évaluation finale n'a pas été passé : renseignez la note QCM manuellement");
         }
-        if (qcmScore < 0 || qcmScore > 20 || body.practicalScore() < 0 || body.practicalScore() > 10) {
+        Integer practical = body.practicalScore();
+        if (qcmScore < 0 || qcmScore > 20 || (practical != null && (practical < 0 || practical > 10))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notes attendues : QCM entre 0 et 20, mise en pratique entre 0 et 10");
         }
 
@@ -264,9 +265,10 @@ public class RegistrationAdminController {
         c.setDurationHours(body.durationHours());
         c.setAttendedHours(body.attendedHours());
         c.setQcmScore(qcmScore);
-        c.setPracticalScore(body.practicalScore());
-        c.setTotalScore(qcmScore + body.practicalScore());
-        c.setObjectivesAchieved(c.getTotalScore() >= 18); // seuil Qualiopi indicatif : 60 % de 30 (QCM /20 + pratique /10)
+        c.setPracticalScore(practical);
+        c.setTotalScore(qcmScore + (practical == null ? 0 : practical));
+        // Seuil Qualiopi indicatif : 60 % du total (30 avec mise en pratique, 20 sans)
+        c.setObjectivesAchieved(c.getTotalScore() >= (practical == null ? 12 : 18));
         r.setCertificate(c);
         repository.save(r);
         return CertificateView.from(r.getCertificate());
