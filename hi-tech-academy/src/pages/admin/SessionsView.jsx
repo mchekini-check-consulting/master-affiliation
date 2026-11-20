@@ -456,6 +456,7 @@ function RecipientsPanel({ auth, session, onError }) {
   const [recipients, setRecipients] = useState(null);
   const [busy, setBusy] = useState(null); // clé d'action en cours
   const [viewing, setViewing] = useState(null); // responseId
+  const [previewKind, setPreviewKind] = useState(null); // questionnaire prévisualisé avant envoi
 
   const load = useCallback(() => {
     adminSessionRecipients(auth, session.id).then(setRecipients).catch((e) => onError(e.message));
@@ -509,15 +510,25 @@ function RecipientsPanel({ auth, session, onError }) {
                   {answered}/{rows.length} réponse(s)
                 </span>
               </p>
-              <button
-                type="button"
-                disabled={busy === kind || rows.every((r) => r.submitted_at)}
-                onClick={() => sendAllOf(kind)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold disabled:opacity-40"
-                style={{ background: '#005064', color: 'white', ...headingFont }}>
-                <Send className="w-3.5 h-3.5" />
-                {busy === kind ? 'Envoi…' : 'Envoyer à tous'}
-              </button>
+              <span className="inline-flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPreviewKind(kind)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold"
+                  style={{ color: '#005064', border: '1px solid #e0e8f4', background: 'white', ...headingFont }}>
+                  <Eye className="w-3.5 h-3.5" />
+                  Prévisualiser
+                </button>
+                <button
+                  type="button"
+                  disabled={busy === kind || rows.every((r) => r.submitted_at)}
+                  onClick={() => sendAllOf(kind)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold disabled:opacity-40"
+                  style={{ background: '#005064', color: 'white', ...headingFont }}>
+                  <Send className="w-3.5 h-3.5" />
+                  {busy === kind ? 'Envoi…' : 'Envoyer à tous'}
+                </button>
+              </span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left" style={{ minWidth: 640 }}>
@@ -573,6 +584,38 @@ function RecipientsPanel({ auth, session, onError }) {
 
       {viewing && (
         <SatisfactionResponseModal auth={auth} responseId={viewing} onClose={() => setViewing(null)} />
+      )}
+
+      {/* Prévisualisation du questionnaire tel que le destinataire le verra */}
+      {previewKind && (
+        <SurveyModal
+          title={`Prévisualisation — ${SATISFACTION_KINDS[previewKind].label}`}
+          subtitle="Questions telles qu'elles seront présentées au destinataire"
+          onClose={() => setPreviewKind(null)}>
+          <SurveySection title="Introduction du questionnaire">
+            <p className="text-sm whitespace-pre-line rounded-2xl px-5 py-4" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4', color: '#001a4a', ...bodyFont }}>
+              {SATISFACTION_KINDS[previewKind].intro}
+            </p>
+          </SurveySection>
+          <SurveySection title={`${SATISFACTION_KINDS[previewKind].questions.length} questions`}>
+            {SATISFACTION_KINDS[previewKind].questions.map((q, i) => (
+              <div key={q.key} className="rounded-2xl px-5 py-4" style={{ background: '#f7f9fd', border: '1px solid #e0e8f4' }}>
+                <p className="text-sm font-semibold" style={{ color: '#001a4a', ...headingFont }}>
+                  {i + 1}. {q.label}
+                  {q.optional ? <span className="font-normal" style={{ color: '#6b7a9b' }}> (facultatif)</span> : null}
+                </p>
+                {q.hint && <p className="text-xs mt-1" style={{ color: '#6b7a9b', ...bodyFont }}>{q.hint}</p>}
+                <p className="text-sm mt-2" style={{ color: '#6b7a9b', ...bodyFont }}>
+                  {q.type === 'scale' && 'Note de 1 à 10'}
+                  {q.type === 'text' && 'Réponse libre'}
+                  {(q.type === 'radio' || q.type === 'checkboxes') && (
+                    `${q.type === 'checkboxes' ? 'Choix multiples' : 'Un seul choix'} : ${q.options.join(' · ')}`
+                  )}
+                </p>
+              </div>
+            ))}
+          </SurveySection>
+        </SurveyModal>
       )}
     </div>
   );
