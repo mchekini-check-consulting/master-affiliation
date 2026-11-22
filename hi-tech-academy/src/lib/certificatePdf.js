@@ -1,5 +1,4 @@
 import { jsPDF } from 'jspdf';
-import { SIGNATURE_PNG, SIGNATURE_RATIO } from './signatureImage.js';
 
 // Certificat de réalisation au format du modèle officiel de l'organisme
 // (documents_finaux/Certificat_de_réalisation.pdf) : attestation d'assiduité
@@ -223,6 +222,19 @@ class CertWriter {
  * Construit le PDF d'un certificat de réalisation à partir des données
  * renvoyées par l'API admin (téléchargement ou visualisation navigateur).
  */
+
+// « du 14 au 17 novembre 2026 » (mois et année factorisés quand ils coïncident)
+function formatSessionRangeFr(startIso, endIso) {
+  const long = (d) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  if (startIso === endIso) return `le ${long(startIso)}`;
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `du ${start.getDate()} au ${long(endIso)}`;
+  }
+  return `du ${long(startIso)} au ${long(endIso)}`;
+}
+
 function buildCertificatePdf(certificate) {
   const w = new CertWriter();
   const learner = `${certificate.first_name} ${certificate.last_name}`;
@@ -242,16 +254,11 @@ function buildCertificatePdf(certificate) {
     { gap: 7 },
   );
 
-  const address = [
-    [certificate.address_line, certificate.address_complement].filter(Boolean).join(', '),
-    [certificate.postal_code, certificate.city].filter(Boolean).join(' '),
-  ].filter(Boolean).join(', ');
   const rows = [["Nom et prénom de l'apprenant", learner]];
   if (certificate.company_name) rows.push(["Nom de l'entreprise", certificate.company_name]);
-  rows.push(['Adresse postale', address ? `${address}, France` : '—']);
   w.infoTable(rows);
 
-  w.paragraph('A participé à la totalité de la formation suivante, intitulé :', { gap: 2 });
+  w.paragraph('A suivi la formation suivante, intitulée :', { gap: 2 });
   w.paragraph(certificate.formation_title, { bold: true, size: 11.5, gap: 7 });
 
   w.richParagraph([
@@ -260,13 +267,7 @@ function buildCertificatePdf(certificate) {
     { text: 'Action de formation.', bold: true },
   ], { gap: 6 });
 
-  const sameDay = certificate.session_start_date === certificate.session_end_date;
-  w.paragraph(
-    sameDay
-      ? `Dates de la formation : le ${formatDateFr(certificate.session_start_date)}`
-      : `Dates de la formation : du ${formatDateFr(certificate.session_start_date)} au ${formatDateFr(certificate.session_end_date)}`,
-    { gap: 6 },
-  );
+  w.paragraph(`Dates de la formation : ${formatSessionRangeFr(certificate.session_start_date, certificate.session_end_date)}`, { gap: 6 });
 
   w.paragraph(
     'Modalités utilisées (Article L.6313-2 du Code du travail) et durée de formation par modalités :',
@@ -288,16 +289,6 @@ function buildCertificatePdf(certificate) {
     ['Durée totale', hourLabel(duration)],
   ]);
 
-  // Assiduité réelle (au-delà du modèle : heures réellement suivies)
-  const attendanceRate = Math.round((attended / duration) * 100);
-  w.sectionHeading('Assiduité');
-  w.paragraph(
-    `Durée effectivement réalisée par le stagiaire : ${hourLabel(attended)} sur ${duration} `
-    + `(assiduité de ${attendanceRate} %), justifiée par les feuilles d'émargement par demi-journée `
-    + 'et les rapports de connexion à la classe virtuelle.',
-    { gap: 7 },
-  );
-
   // Résultat de l'évaluation des acquis (grille « Évaluation finale – V1.0 »)
   if (certificate.total_score !== null && certificate.total_score !== undefined) {
     w.sectionHeading("Résultat de l'évaluation des acquis");
@@ -316,31 +307,8 @@ function buildCertificatePdf(certificate) {
     );
   }
 
-  w.sectionHeading(
-    "Documents disponibles (sur demande) ayant servi à l'établissement de la présente attestation :",
-  );
-  w.bullet("Les feuilles d'émargement (états de présence émargés)");
-  w.bullet('Les comptes rendus de positionnement et les évaluations qui jalonnent ou terminent la formation');
-  w.bullet("Toute autre donnée justifiant la participation effective à l'action de formation");
-  w.y += 4;
-
-  w.richParagraph([
-    { text: `L'organisme ${ORG.name} s'engage à :`, bold: true },
-  ], { gap: 2 });
-  w.bullet(
-    "Fournir l'ensemble des pièces justificatives permettant de démontrer la réalité de la réalisation. "
-    + 'Ces pièces pourront être demandées notamment par le financeur dans le cadre d\'un contrôle.',
-  );
-  w.bullet(
-    "Conserver et fournir ces pièces pendant une durée d'au moins 3 ans à compter de la date de début "
-    + `de l'action de formation, soit à compter du ${formatDateFr(certificate.session_start_date)}.`,
-  );
-
-  // ----- Page 3 : signature de l'organisme uniquement --------------------
-  w.newPage();
-  w.y += 6;
-  w.paragraph(`Document réalisé et signé le ${formatDateFr(certificate.issued_at)} :`, { gap: 14 });
-
+  // ----- Signature de l'organisme (sans date ni cachet) ------------------
+  w.y += 10;
   const boxW = 80;
   const boxX = w.pageWidth - MARGIN - boxW;
   w.doc.setFont('helvetica', 'bold').setFontSize(11).setTextColor(NAVY);
@@ -351,11 +319,6 @@ function buildCertificatePdf(certificate) {
   w.y += 4.5;
   w.doc.setFontSize(9).setTextColor(GREY);
   w.doc.text(ORG.representativeRole, boxX + boxW / 2, w.y, { align: 'center' });
-  w.y += 6;
-  // Signature / tampon de l'organisme
-  const sigW = 62;
-  const sigH = sigW * SIGNATURE_RATIO;
-  w.doc.addImage(SIGNATURE_PNG, 'PNG', boxX + (boxW - sigW) / 2, w.y, sigW, sigH);
 
   return w.finish();
 }
