@@ -267,7 +267,11 @@ function buildCertificatePdf(certificate) {
     { text: 'Action de formation.', bold: true },
   ], { gap: 6 });
 
-  w.paragraph(`Dates de la formation : ${formatSessionRangeFr(certificate.session_start_date, certificate.session_end_date)}`, { gap: 6 });
+  w.paragraph(`Dates de la formation : ${formatSessionRangeFr(certificate.session_start_date, certificate.session_end_date)}`, { gap: 3 });
+  w.paragraph(
+    `Durée totale de la formation : ${certificate.duration_hours} heure${certificate.duration_hours > 1 ? 's' : ''}.`,
+    { gap: 6 },
+  );
 
   w.paragraph(
     'Modalités utilisées (Article L.6313-2 du Code du travail) et durée de formation par modalités :',
@@ -278,14 +282,12 @@ function buildCertificatePdf(certificate) {
   w.newPage();
   const duration = certificate.duration_hours;
   const attended = certificate.attended_hours ?? duration;
-  const absences = Math.max(0, duration - attended);
   const hourLabel = (n) => `${n} heure${n > 1 ? 's' : ''}`;
   w.modalitiesTable([
     ['Présentiel', hourLabel(0)],
     ['Distanciel (classe virtuelle)', hourLabel(attended)],
     ['E-learning', hourLabel(0)],
     ['AFEST', hourLabel(0)],
-    ['Absences', hourLabel(absences)],
     ['Durée totale', hourLabel(duration)],
   ]);
 
