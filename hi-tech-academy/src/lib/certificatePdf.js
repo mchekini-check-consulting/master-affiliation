@@ -147,7 +147,7 @@ class CertWriter {
     this.doc.rect(MARGIN, this.y, this.contentWidth, rowH, 'F');
     this.doc.setFont('helvetica', 'bold').setFontSize(10).setTextColor('#ffffff');
     this.doc.text('Modalité', MARGIN + 3.5, this.y + 6);
-    this.doc.text('Heures', col2X + 3.5, this.y + 6);
+    this.doc.text('Heures suivies', col2X + 3.5, this.y + 6);
     this.y += rowH;
     // Lignes
     rows.forEach(([label, hours], i) => {
@@ -274,7 +274,7 @@ function buildCertificatePdf(certificate) {
   );
 
   w.paragraph(
-    'Modalités utilisées (Article L.6313-2 du Code du travail) et durée de formation par modalités :',
+    "Modalités utilisées (Article L.6313-2 du Code du travail) et nombre d'heures suivies par l'apprenant selon chaque modalité :",
     { gap: 4 },
   );
 
@@ -288,7 +288,6 @@ function buildCertificatePdf(certificate) {
     ['Distanciel (classe virtuelle)', hourLabel(attended)],
     ['E-learning', hourLabel(0)],
     ['AFEST', hourLabel(0)],
-    ['Durée totale', hourLabel(duration)],
   ]);
 
   // Résultat de l'évaluation des acquis (grille « Évaluation finale – V1.0 »)
